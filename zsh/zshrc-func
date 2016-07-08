@@ -1,0 +1,300 @@
+#!/bin/zsh -f
+# Description: Functions for ZSH
+
+#typeset -A lsfjobs
+
+
+#zshaddhistory(){
+#  [[ $1 != (?:??) ]]
+#}
+
+
+#===================================================================================================
+# Easy extract
+function extract () {
+  if [ -f $1 ] ; then
+    case $1 in
+      *.tar.bz2)   tar xvjf $1    ;;
+      *.tar.gz)    tar xvzf $1    ;;
+      *.bz2)       bunzip2 $1     ;;
+      *.rar)       rar x $1       ;;
+      *.gz)        gunzip $1      ;;
+      *.tar)       tar xvf $1     ;;
+      *.tbz2)      tar xvjf $1    ;;
+      *.tgz)       tar xvzf $1    ;;
+      *.zip)       unzip $1       ;;
+      *.Z)         uncompress $1  ;;
+      *.7z)        7z x $1        ;;
+      *)           echo "don't know how to extract '$1'..." ;;
+    esac
+  else
+    echo "'$1' is not a valid file!"
+  fi
+}
+
+
+function pushd() {
+    # pushd +/-n lifts the selected element to the top of the stack instead of cycling the stack.
+
+  emulate -R zsh
+  setopt localoptions
+
+  if [[ ARGC -eq 1 && "$1" == [+-]<-> ]] then
+      setopt pushdignoredups
+      builtin pushd ~$1 > /dev/null
+  else
+      builtin pushd "$@" > /dev/null
+  fi
+}
+
+
+#function tr2pun() {
+#    # Function to convert tr0 to pun
+#    for i in $*; do
+#        echo
+#        echo "Converting $i..."
+#        echo
+#        ~a0393831/bin/converter -t punch -i `basename $i 0` -o `basename $i .tr0`
+#    done
+#    return
+#}
+
+
+function tex2pdf() {
+    # Function to convert latex file to pdf
+    for i in $*; do
+        file=`basename $i .tex`
+        file=`basename $file .latex`
+
+        latex $i
+        dvipdf $file.dvi
+        \rm -rf $file.dvi $file.aux $file.log
+    done
+    return
+}
+
+
+#function colm() {
+#    # Function to print column no. n (input)
+#    print ${argv[1]}
+#}
+
+
+#function lsftr2pun() {
+#    # Function to submit tr0 to pun conversion to short queue in lsf
+#    for i in $*; do
+#        /usr/local/lsf/bin/bsub -P P0:IO_10015123 -q short -o /dev/null -R ws40 -J tr2pun converter -t punch -i `basename $i 0` -o `basename $i .tr0`
+#    done
+#    return
+#}
+
+
+function mcd() {
+    # Function to create new dir(s) and enter it (last directory if multiple arguments are given)
+  for i in $*; do
+    mkdir -p $i
+  done
+
+  cd ${argv[-1]}
+
+  return
+}
+
+
+function vsim() {
+    # Function to compile and simulate verilog using Icarus Verilog
+  out=`basename $*[1] .v`.out
+    iverilog -o $out $*
+    vvp $out
+
+  return
+}
+
+
+function vrun() {
+    vsim $1 ../../HDL/run_s/${1//_tb/}
+  return
+}
+
+
+function gpp() {
+  # Function to compile C/C++ source files and generate output files of the same name
+
+  out=`basename $i   .c`
+  out=`basename $out .cc`
+  out=`basename $out .cpp`
+  g++ $1 -o $out.out
+
+  if [[ $? -eq 0 ]]; then
+    ./$out.out
+  fi
+  return
+}
+
+
+#function bkillall() {
+#    # Function to kill all jobs that match a pattern
+#    for i in `bjg $1 | cut -d" " -f1`; do
+#        bkill $i
+#    done
+#
+#    return
+#}
+
+
+function mvall(){
+  # Function to move multiple files to directory which is specified as the last argument
+  if [[ -d $*[$#] ]]; then
+    integer last
+    (( last = $# - 1 ))
+    print "Moving all to $*[$#]"
+    for i in {1..$last}; do
+        mv $*[$i] $*[$#]
+    done
+  else
+    print "ERROR: Incorrect syntax. Last argument must be a directory"
+  fi
+}
+
+
+function fin(){
+  find . -name $1
+}
+
+
+function findtags() {
+    # Function to find and print all Sub-spice tags in the deck
+  for i in $*; do
+    print "$i : "
+    perl -lne 'print "  $&" if/<\w+>/' $i | sort -u
+  done
+
+  return
+}
+
+
+function mt2prt() {
+    # Function to convert HSPICE mt* files to TISPICE prt format
+  for i in $*; do
+    print "Converting $i..."
+      perl -lne 'if(/^ \w+/){@a=(@a,split(/\s+/))};if(/^\s+-?\d/){@v=(@v,split(/\s+/))};END{for(0..$#a){!($a[$_])||print "$a[$_]=$v[$_]"}}' $i > $i.prt
+    done
+
+  return
+}
+
+
+#function cjobs() {
+#    # Function to summarise the number of jobs running in LSF queue
+# /usr/local/lsf/bin/bjobs >| /tmp/$$
+# lsfjobs[running]=`grep -c RUN /tmp/$$`
+# lsfjobs[pending]=`grep -c PEND /tmp/$$`
+# lsfjobs[total]=`grep -vc JOBID /tmp/$$`
+#
+# return
+#}
+
+
+function xtm(){bsub -q gui -J xterm_$1 -P P0:IO_10015123 -sp 100 -I -R 'select[ws40&&mem>4000]' xterm -bg black -fg gray -cr white -ms white -sl 5000 -rightbar -T $1 &;return}
+function xt(){bsub -q gui -J xterm_$1 -P P0:IO_10015123 -sp 100 -I -R ws40 xterm -bg black -fg gray -cr white -ms white -sl 5000 -rightbar -T $1 &;return}
+
+
+function send(){
+  for i in $*; do
+        cp $i ~/tmp/`basename $i`
+  done
+  return
+}
+
+
+function bak(){
+  for i in $*; do
+    \mv -vi $i{,.bak}
+  done
+  return
+}
+function bakc(){
+for i in $*; do
+  \cp -vi $i{,.bak}
+done
+return
+}
+function unbak(){
+  for i in $*; do
+    \mv -vi $i `basename $i .bak`
+  done
+  return
+}
+
+
+function hspx(){
+  for i in $*; do
+    cell=`basename $i .hsp`
+    #sed -i -e "/^\.TEMP/,/^$/d" -e "/Cell name: $cell$/ N; /View name: schematic$/ r $cell.pin" -e "$ a .ends $cell" $i
+    sed -i -e "/^\.TEMP/,/^$/d" $i
+  done
+  return
+}
+
+
+function targz(){
+  # function to untar, and unzip an archive
+  gunzip -c $1 | tar xvf -
+}
+
+
+# for csh compatibility
+function setenv (){
+  var=$1
+  shift
+  eval $var="'$@'"
+  echo "$var='$@'"
+  unset var
+}
+
+
+lc(){
+  echo $* |/usr/bin/tr "[A-Z]" "[a-z]"
+}
+uc(){
+  echo $* |/usr/bin/tr "[a-z]" "[A-Z]"
+}
+
+
+# Print the header (the first line of input) and then run the specified command on the body
+# Use it in a pipeline, e.g. ps | body grep somepattern
+body() {
+  IFS= read -r header
+  printf '%s\n' "$header"
+  "$@"
+}
+
+
+# Human readable du sorted by size
+dur() {
+  command du -k --max-depth=1 "$@" | sort -n | while read size fname; do
+    for unit in "K" "M" "G" "T" "P" "E" "Z" "Y"; do
+      if [[ $size -lt 1024 ]]; then
+        echo -e "${size}${unit}\t${fname}"
+        break
+      fi
+      size=$((size/1024))
+    done
+  done
+}
+
+
+# tmux - Creating/attaching sessions with autocomplete support {{{1
+# Creating/attaching named sessions
+function tm() {
+  [[ -z "$1" ]] && { echo "usage: tm <session>" >&2; return 1; }
+  tmux has -t $1 && tmux attach -t $1 || tmux new -s $1
+}
+# Completion function for tm
+function __tmux-sessions() {
+    local expl
+    local -a sessions
+    sessions=( ${${(f)"$(command tmux list-sessions)"}/:[ $'\t']##/:} )
+    _describe -t sessions 'sessions' sessions "$@"
+}
+#compdef __tmux-sessions tm

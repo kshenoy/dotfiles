@@ -1,0 +1,182 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# Kartik Shenoy (kartik.shenoy@amd.com)
+
+
+#=======================================================================================================================
+# SHELL CONFIGURATION
+#======================
+umask 002
+
+if [[ $- == *i* ]]; then
+  # Shell is interactive
+  # Turn off TTY "start" and "stop" commands in all interactive shells.
+  # They default to C-q and C-s, Bash uses C-s to do a forward history search.
+  stty start ''
+  stty stop  ''
+  stty -ixon # disable XON/XOFF flow control
+  stty ixoff # enable sending (to app) of start/stop characters
+  stty ixany # let any character restart output, not only start character
+fi
+
+shopt -s cdspell
+shopt -s cdable_vars
+shopt -s checkhash
+# Check the window size after each command and, if necessary, update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+shopt -s mailwarn
+shopt -s sourcepath
+# Force commands entered on multiple lines to be shown on a single line in history file
+shopt -s cmdhist
+# Append to the history file, don't overwrite it
+shopt -s histappend histreedit histverify
+
+set -o noclobber
+#set -o vi
+set bell-style none
+# Otherwise some completions will fail
+set +o nounset
+
+
+#=======================================================================================================================
+# COMPLETION
+#=============
+complete -A hostname   rsh rcp telnet rlogin r ftp ping disk
+complete -A export     printenv
+complete -A variable   export local readonly unset
+complete -A enabled    builtin
+complete -A alias      alias unalias
+complete -A function   function
+complete -A user       su mail finger
+
+complete -A helptopic  help     # currently same as builtins
+complete -A shopt      shopt
+complete -A stopped -P '%' bg
+complete -A job -P '%' fg jobs disown
+
+complete -A directory  mkdir rmdir
+complete -A directory  -o default cd
+
+# Compression
+complete -f -o default -X '*.+(zip|ZIP)'  zip
+complete -f -o default -X '!*.+(zip|ZIP)' unzip
+complete -f -o default -X '*.+(z|Z)'      compress
+complete -f -o default -X '!*.+(z|Z)'     uncompress
+complete -f -o default -X '*.+(gz|GZ)'    gzip
+complete -f -o default -X '!*.+(gz|GZ)'   gunzip
+complete -f -o default -X '*.+(bz2|BZ2)'  bzip2
+complete -f -o default -X '!*.+(bz2|BZ2)' bunzip2
+
+# Misc filetypes
+complete -f -o default -X '!*.ps'  gs ghostview ps2pdf ps2ascii
+complete -f -o default -X '!*.dvi' dvips dvipdf xdvi dviselect dvitype
+complete -f -o default -X '!*.pdf' acroread pdf2ps
+complete -f -o default -X '!*.+(pdf|ps)' gv
+complete -f -o default -X '!*.texi*' makeinfo texi2dvi texi2html texi2pdf
+complete -f -o default -X '!*.tex' tex latex slitex
+complete -f -o default -X '!*.lyx' lyx
+complete -f -o default -X '!*.+(htm*|HTM*)' lynx html2ps
+complete -f -o default -X '!*.pl'  perl perl5
+complete -f -o default -X '!*.gv'   dot
+complete -f -o default -X '!*.gif'  kview
+
+# Multimedia
+#complete -f -o default -X '!*.+(jp*g|gif|xpm|png|bmp)' xv gimp
+#complete -f -o default -X '!*.+(mp3|MP3)' mpg123 mpg321
+#complete -f -o default -X '!*.+(ogg|OGG)' ogg123
+
+# Default LS_COLORS (Disabled as I use dir_colors)
+#export CLICOLOR=1
+
+[ -f ~/.dotfiles/tmux/tmux_completion_bash ] && . ~/.dotfiles/tmux/tmux_completion_bash
+
+
+#=======================================================================================================================
+# ENVIRONMENT VARIABLES
+#========================
+# History
+HISTSIZE=65535
+HISTFILESIZE=65535
+# Show timestamps in history
+HISTTIMEFORMAT="%F %T  "
+# Ignore duplicates and trivial one- and two-char commands
+HISTCONTROL=ignoreboth #same as export HISTCONTROL=ignoredups:ignorespace
+HISTIGNORE='?:??:history*:sra:src:srf:srp'
+HOSTNAME="$(hostname)"
+# Keeps history forever. Requires PROMPT_COMMAND='history -a; history -r'
+HISTFILE="${HOME}/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
+mkdir -p $(dirname ${HISTFILE})
+
+## TERMINAL
+# Set terminal to mimic titeInhibit = true
+PATH=~/bin:$PATH
+MANPAGER=less
+PAGER=less
+# vim needs to be explicitly told that it should open from stdin using the '-' option.
+# Because of this, we can't arbitrarily set the PAGER variable and replace less in both `less <filename>` and
+# `cat <filename> | less`
+# PAGER='svim -R -c "syntax on"'
+EDITOR=vim
+VISUAL=gvim
+
+#LESS="-icuf -P?f%f:stdin. [%T] (?pB%pB\%:byte %bB.)"
+
+#GREP_OPTIONS="--color=auto"
+GREP_COLOR=32
+
+# Ruby gem path
+if which ruby >/dev/null && which gem >/dev/null; then
+  PATH="$(ruby -rubygems -e 'puts Gem.user_dir')/bin":$PATH
+fi
+
+LANG=en_US.UTF-8
+
+# Ack
+#ACK_OPTIONS='--color-filename=COLOR --color-match=COLOR --color-lineno=COLOR --type-add verilog:ext:.sv,.svh,.v'
+#ACK_OPTIONS='--type-set verilog=.sv,.svh,.v'
+
+
+#=======================================================================================================================
+# MISC SETTINGS
+#================
+
+# Make less more friendly for non-text input files, see lesspipe(1)
+[[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [[ -z "$debian_chroot" ]] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+
+#=======================================================================================================================
+# EXTERNAL CUSTOMISATIONS
+#==========================
+
+# If not running interactively, don't do anything
+[[ -z "$PS1" ]] && return
+
+if [[ -x /usr/bin/dircolors ]]; then
+  test -r ~/.dircolors && eval "$(dircolors -b ${HOME}/.dircolors)" || eval "$(dircolors -b)"
+fi
+
+if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
+  . /etc/bash_completion
+fi
+
+for i in \
+  ~/.dotfiles/bash/bashrc-func    \
+  ~/.dotfiles/bash/bashrc-prompt  \
+  ~/.bashrc_local              \
+  ~/.dotfiles/aliases             \
+  ~/.fzf.bash                  \
+  ; do
+  if [[ -f ${i} ]]; then
+  # echo "  Sourcing ${i} ..."
+  . ${i}
+  # echo "  ... done"
+  fi
+done
+
+# Automatically add completion for all aliases to commands having completion functions. Should be called at the end
+alias_completion

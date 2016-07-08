@@ -1,0 +1,285 @@
+# vim:ft=snippets:
+#===========================================================================
+# Headers
+#
+snippet #! "#!" b
+#!`which perl`
+endsnippet
+
+snippet pragma
+use strict;
+use warnings;
+use diagnostics;
+endsnippet
+
+snippet sub "sub"
+sub ${1:function_name}{
+  ${2:#body ...}
+}
+endsnippet
+
+
+
+#===========================================================================
+# Conditionals
+#
+snippet if "if ..."
+if ( ${1:/* condition */} ){
+  ${0:/* code */}
+}
+endsnippet
+
+snippet xif "Inline if"
+${1:expression} if ${2:condition};
+endsnippet
+
+snippet ife "if ... else"
+if ( ${1:/* condition */} ){
+  ${0:/* code */}
+}else{
+}
+endsnippet
+
+snippet ifee "if ... elsif ... else"
+if ( ${1:/* condition */} ) {
+  ${0:# body...}
+} elsif () {
+} else {
+}
+endsnippet
+
+snippet eli "elsif ..." w
+elsif ( ${1:/* condition */} ){
+  ${0:/* code */}
+}
+endsnippet
+
+snippet el "else ..." w
+else{
+  ${0:/* code */}
+}
+endsnippet
+
+snippet ter "Ternary ?: operator"
+${1:/* condition */} ? ${2:a} : ${3:b}
+endsnippet
+snippet ?: "Ternary ?: operator"
+${1:/* condition */} ? ${2:a} : ${3:b}
+endsnippet
+
+snippet unless "unless"
+unless ( ${1:/* condition */} ){
+  ${2:# body...}
+}
+endsnippet
+snippet un "unless"
+unless ( ${1:/* condition */} ){
+  ${2:# body...}
+}
+endsnippet
+
+snippet xun "Inline unless"
+${1:expression} unless ${2:condition};
+endsnippet
+snippet xunless "Inline unless"
+${1:expression} unless ${2:condition};
+endsnippet
+
+snippet eval "eval"
+eval{
+  ${1:# do something risky...}
+};
+if ( $@ ){
+  ${2:# handle failure...}
+}
+endsnippet
+
+
+
+#===========================================================================
+# Loops
+#
+#snippet fore "foreach loop"
+#foreach ${1:my $${2:i}} ( @${3:array} ){
+#  ${4:# body...}
+#}
+#endsnippet
+snippet foreach "foreach loop"
+foreach ${1:my $${2:i}} ( @${3:array} ){
+  ${0:# body...}
+}
+endsnippet
+
+snippet xfore "Inline foreach loop"
+${1:expression} foreach @${2:array};
+endsnippet
+snippet xforeach "Inline foreach loop"
+${1:expression} foreach @${2:array};
+endsnippet
+
+snippet for "for loop"
+for ( my $${1:i} = ${2:0}; $$1 < $${3:n}; $$1${4:++} ){
+  ${0:# body...}
+}
+endsnippet
+
+snippet xfor "Inline for loop"
+${1:expression} for @${2:array};
+endsnippet
+
+snippet while "while loop"
+while ( ${1:/* condition */} ){
+  ${2:# body...}
+}
+endsnippet
+snippet wh "while loop"
+while ( ${1:/* condition */} ){
+  ${2:# body...}
+}
+endsnippet
+
+snippet xwhile "Inline while loop"
+${1:expression} while ${2:condition};
+endsnippet
+snippet xwh "Inline while loop"
+${1:expression} while ${2:condition};
+endsnippet
+
+
+#===========================================================================
+# Misc
+#
+snippet 'cl(ass)?' "class" r
+package ${1:ClassName};
+
+${2:use base qw(${3:ParentClass});}${2/.+/\n\n/}sub new {
+  my $class = shift;
+  $class = ref $class if ref $class;
+  my $self = bless {}, $class;
+  $self;
+}
+
+1;
+
+endsnippet
+
+snippet slurp "slurp"
+my $${1:var};
+{ local $/ = undef; local *FILE; open FILE, "<${2:file}"; $$1 = <FILE>; close FILE }
+
+endsnippet
+
+snippet hash "hash"
+%${1:hash_name} = (
+  ${2:key} => ${3:'value'},
+);
+endsnippet
+
+snippet perl "perl"
+#!`which perl`
+
+#=======================================================================================================================
+# Documentation                                                                                                     {{{1
+#
+=head1 NAME
+
+ ${1:`!p snip.rv = snip.basename`}
+
+=head1 AUTHOR
+
+ Kartik Shenoy
+
+=head1 SYNOPSIS
+
+ $1 [OPTIONS]
+
+=head1 DESCRIPTION
+
+ <Description>
+
+=head1 OPTIONS
+
+  -t, --test          Test run
+  -v, --verbose       Verbose mode. Print values of all arguments
+
+=cut
+# }}}1
+
+
+## Modules
+use Getopt::Long;
+use Pod::Usage;
+#use carp;
+
+Getopt::Long::Configure("bundling");
+#Getopt::Long::Configure("pass_through");
+
+
+## Pragmas
+use strict;
+use warnings;
+use diagnostics;
+
+#local $SIG{__DIE__}  = \&croak;
+#local $SIG{__WARN__} = \&carp;
+
+
+#=======================================================================================================================
+# Command-line parameter handling                                                                                   {{{1
+#
+my %opts = (
+  'test'    => 0,
+  'verbose' => 0,
+  'ifile'   => '',
+  'ofile'   => '',
+);
+
+GetOptions(
+  'help|h|?'      => sub { pod2usage( -verbose => 1, -exitval => 0 ); },
+#  'ifile|i=s' => \my $ifile,
+#  'ofile|o=s' => \my $ofile,
+  'test|t',
+  'verbose|v!',
+) or pod2usage( -verbose => 1 ) && exit;
+
+#$opts{ifile}||=$ARGV[0] unless defined $opts{ifile};
+#$opts{ofile}||=$ARGV[1] unless defined $opts{ofile};
+
+# Dump the input arguments
+if ( $opts{'verbose'} ){
+#  print "ifile      : $opts{'ifile'}\n";
+#  print "ofile      : $opts{'ofile'}\n";
+  print "test       : $opts{'test'}\n";
+  print "\n";
+}
+
+
+#=======================================================================================================================
+# File Handling                                                                                                     {{{1
+#
+#defined( $ifile ) or die("ERROR: Input file not specified\n");
+#die( "ERROR : $opts{ifile} not found\n" ) unless( -e $opts{ifile} );
+#open( my $fin, "<", $opts{ifile} ) or die( "ERROR: Unable to open $opts{ifile} for reading\n" );
+
+#defined( $opts{ofile} ) or warn( "WARN: Output file not specified\n" );
+#open( my $fout, ">", $opts{ofile} ) or die( "ERROR: Unable to open $opts{ofile} for writing\n" );
+
+#while( <$fin> ){
+#    chomp;
+#}
+
+
+#=======================================================================================================================
+# Main Code                                                                                                         {{{1
+#
+$0
+
+
+#=======================================================================================================================
+# Clean-up
+#
+#close $fin;
+#close $fout;
+
+exit 0;
+endsnippet

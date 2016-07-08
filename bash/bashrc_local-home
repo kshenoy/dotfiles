@@ -1,0 +1,14 @@
+# bashrc file for home
+
+has() {
+  command -v "$1" > /dev/null 2>&1
+}
+
+# thefuck : https://github.com/nvbn/thefuck
+has thefuck && eval "$(thefuck --alias pls)"
+
+
+##
+# Aliases
+alias amd_vpn='sudo openconnect -u kshenoy --no-cert-check --token-mode=rsa mkm-vpn.amd.com'
+

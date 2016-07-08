@@ -1,0 +1,292 @@
+#!/bin/bash -f
+# Description: Functions for BASH
+
+#typeset -A lsfjobs
+
+
+# TMUX                                                                                                              {{{1
+[[ -f ~/.linux/tmux/tmux_scripts ]] && . ~/.linux/tmux/tmux_scripts
+
+
+# "alert" for long running commands                                                                                 {{{1
+# Use like so:  sleep 10; alert
+unset -f alert
+alert() {
+  local _icon=$( (($? == 0)) && echo terminal || echo error)
+  local _msg=$(fc -nl -1 | sed -e 's/^\s*[0-9]\+\s*//' -e 's/[;&|]\s*alert$//')
+  _msg="$([[ -n "$TMUX" ]] && tmux display-message -p "[tmux #S:#I.#P] ")$_msg"
+  notify-send --urgency=low -i ${_icon} ${_msg}
+}
+
+
+# Human-readable du sorted by size                                                                                  {{{1
+unset -f duh
+duh() {
+  depth="0"
+  dir="."
+  if (( $# > 0 )); then
+    depth=$1
+    shift
+  fi
+  if (( $# > 0 )); then
+    dir=$1
+    shift
+  fi
+
+  # Check to see if sort supports -h or not
+  echo "A" | sort -h &> /dev/null
+  if [[ $? ]]; then
+    # sort -h is not supported
+    command du -k --max-depth=$depth $dir | sort -n | while read size fname; do for unit in K M G T P E Z Y; do if [ $size -lt 1024 ]; then printf " %4d%sB\t  %s\n" ${size} ${unit} ${fname}; break; fi; size=$((size/1024)); done; done
+  else
+    # sort -h is supported
+    echo "du -kh --max-depth=$depth $dir 2> /dev/null | sort -h"
+    du -kh --max-depth=$depth $dir 2> /dev/null | sort -h
+  fi
+}
+
+
+# Misc utils                                                                                                        {{{1
+[[ -f ~/.linux/bash/utils/jumper       ]] && . ~/.linux/bash/utils/jumper
+[[ -f ~/.linux/bash/utils/query        ]] && . ~/.linux/bash/utils/query
+[[ -f ~/.linux/bash/utils/colm         ]] && . ~/.linux/bash/utils/colm
+[[ -f ~/.linux/bash/utils/base16_color ]] && . ~/.linux/bash/utils/base16_color
+
+
+# Silent push and popd. Use dirs -v for vertical dirstack                                                           {{{1
+pushd() { command pushd $@ > /dev/null ; }
+popd()  { command popd  $@ > /dev/null ; }
+
+# DirStack - Emulate Zsh's behavior of pushd lifting the directory to tos instead of cycling the stack              {{{1
+# 'cd ='      Lists the contents of the stack.
+# 'cd +n'     Exchanges the current directory with the directory stored in 'n'. 'cd +0' is a NOP.
+# 'cd -'      Is the same as 'cd +1'
+# 'cd +'      Pops the current directory off the stack and cd's to the next directory on the stack (equivalent to popd).
+# 'cd'        Goes to $REPO_PATH if it's set else goes to $HOME
+# 'cd ,targ'  Jump to a directory in the path that starts with targ. Case-insensitive and also supports fuzzy matching
+super_cd() {
+  local _dir
+  if (( $#==0 )); then
+    _dir=${REPO_PATH-${HOME/%\//}}
+  else
+    _dir=${1/%\//}
+  fi
+
+  local _dirstack=($(command dirs))
+  case ${_dir} in
+    +[0-9]*)
+      #echo "Jumping to a dir on the stack"
+      # $[#_dirstack[@]] gives the number of elements in _dirstack
+      #if ((${_dir}<$[#_dirstack[@]])); then
+      command popd $1 > /dev/null
+      command pushd ${_dirstack[$1]/#~/$HOME} > /dev/null
+      ;;
+
+    -)
+      #echo "Jumping to the prev dir"
+      command popd +1 > /dev/null
+      command pushd ${_dirstack[1]/#~/$HOME} > /dev/null
+      ;;
+
+    +)
+      #echo "Popping current dir from the stack"
+      command popd > /dev/null
+      ;;
+
+    =)
+      command dirs -v
+      ;;
+
+    ,*)
+      #echo "Jumping to a parent dir in the path"
+      local _targ=${_dir/#,}
+      _dir=$(jumper ${_targ/#,})
+      #echo $_dir
+      ;&
+
+    *)
+      #echo "Pushing $_dir onto the stack"
+      command pushd ${_dir} > /dev/null
+      # Remove any duplicate entries
+      # $[#_dirstack[@]] gives the number of elements in _dirstack
+      local _i=0
+      while (( $_i < ${#_dirstack[@]} )); do
+        #echo $_i / ${#_dirstack[@]} : ${_dir/#~/$HOME} ${_dirstack[$_i]/#~/$HOME}
+        if [ "$PWD" == "${_dirstack[$_i]/#~/$HOME}" ]; then
+          command popd +$((($_i+1))) > /dev/null
+          break
+        fi
+        let _i=$_i+1
+      done
+      ;;
+  esac
+}
+alias cd=super_cd
+
+
+# Intelligent ..                                                                                                    {{{1
+..() {
+  local _levels=${1:-1};
+  if (( $_levels <= 0 )); then
+    _levels=1;
+  fi;
+
+  cd $(printf '../%.0s' $(seq 1 ${_levels}))
+}
+
+
+# Function to create new dir(s) and enter it (last directory if multiple arguments are given)                       {{{1
+mcd() { mkdir -p $1 && cd $1; }
+
+
+# Function to summarise the number of jobs running in LSF queue                                                     {{{1
+#function cjobs(){
+#  /usr/local/lsf/bin/bjobs >| /tmp/$$
+#  lsfjobs[running]=`grep -c RUN /tmp/$$`
+#  lsfjobs[pending]=`grep -c PEND /tmp/$$`
+#  lsfjobs[total]=`grep -vc JOBID /tmp/$$`
+#
+#  return
+#}
+
+
+lc() { echo $@ | /usr/bin/tr "[A-Z]" "[a-z]"; }
+uc() { echo $@ | /usr/bin/tr "[a-z]" "[A-Z]"; }
+
+
+# Simple calc                                                                                                       {{{1
+unset -f =
+=() {
+  echo "$@" | irb | sed -e '1d' -e '/^\s*$/d'
+}
+unset -f =d
+=d() {
+  = "($@).to_s(10)" | command sed -e '$ s/"//g'
+}
+unset -f =h
+=h() {
+  # Call the main IRB function. Remove quotes etc. and add 0x at the beginning of the last line only
+  = "($@).to_s(16).upcase()" | command sed -e '$ s/"//g' -e '$ s/^/0x/'
+}
+
+
+# Coloured man pages with less                                                                                      {{{1
+man() {
+  env \
+    LESS_TERMCAP_mb=$(printf "\e[1;31m") \
+    LESS_TERMCAP_md=$(printf "\e[1;31m") \
+    LESS_TERMCAP_me=$(printf "\e[0m") \
+    LESS_TERMCAP_se=$(printf "\e[0m") \
+    LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
+    LESS_TERMCAP_ue=$(printf "\e[0m") \
+    LESS_TERMCAP_us=$(printf "\e[1;32m") \
+    man "$@"
+}
+
+
+# Delete in background                                                                                              {{{1
+unset -f rm_rf
+rm_rf_silent() {
+
+  # FIXME: Doesn't work if there are spaces in the filename
+  for i in "$@"; do
+    # Remove trailing slash and move to hidden
+    ni=${i/%\//}
+    bi=$(basename $ni)
+    ni=${ni/%${bi}/.${bi}}
+
+    #echo ${ni}.$$
+    command mv $i ${ni}.$$
+    command rm -rf ${ni}.$$ &
+  done
+}
+alias rdj='rm_rf_silent'
+
+# Delete all but...
+unset -f rm_but
+rm_but() {
+  # Delete all files except the specified ones.
+  # All arguments are considered relative to the PWD even if any argument has an absolute path
+  # This is because, for this function to work, two pieces of information are needed -
+  #   1. a base workarea from which
+  #   2. a list of files or folders will not be deleted
+  # The arguments provide us with 2. However, this still leaves the issue of specifying the base workarea.
+  #
+  # Also, currently, only files and folders located in the PWD can be specified.
+  # Those located in subfolders are not supported
+
+  local _names=""
+  for i in "$@"; do
+    _names="$_names -name "'"'"$i"'" -o'
+  done
+  _names=${_names%" -o"}
+  #echo $_names
+
+  echo "find . -mindepth 1 -maxdepth 1 $_names -prune -o -print"
+  find . -mindepth 1 -maxdepth 1 $_names -prune -o -print
+}
+alias rmb='rm_but'
+
+# dos2unix                                                                                                          {{{1
+unset -f dos2unix
+dos2unix() {
+  command sed -i -e 's/\r*$//' "$@"
+}
+unset -f unix2dos
+unix2dos() {
+  command sed -i -e 's/\r*$/\r/' "$@"
+}
+
+
+# Automatically add completion for all aliases to commands having completion functions                              {{{1
+# Call this at the end
+alias_completion() {
+  local namespace="alias_completion"
+
+  # parse function based completion definitions, where capture group 2 => function and 3 => trigger
+  local compl_regex='complete( +[^ ]+)* -F ([^ ]+) ("[^"]+"|[^ ]+)'
+  # parse alias definitions, where capture group 1 => trigger, 2 => command, 3 => command arguments
+  local alias_regex="alias ([^=]+)='(\"[^\"]+\"|[^ ]+)(( +[^ ]+)*)'"
+
+  # create array of function completion triggers, keeping multi-word triggers together
+  eval "local completions=($(complete -p | sed -ne "/$compl_regex/s//'\3'/p"))"
+  (( ${#completions[@]} == 0 )) && return 0
+
+  # create temporary file for wrapper functions and completions
+  rm -f "/tmp/${namespace}-*.tmp" # preliminary cleanup
+  local tmp_file="$(mktemp "/tmp/${namespace}-${RANDOM}.tmp")" || return 1
+
+  # read in "<alias> '<aliased command>' '<command args>'" lines from defined aliases
+  local line; while read line; do
+    eval "local alias_tokens=($line)" 2>/dev/null || continue # some alias arg patterns cause an eval parse error
+    local alias_name="${alias_tokens[0]}" alias_cmd="${alias_tokens[1]}" alias_args="${alias_tokens[2]# }"
+
+    # skip aliases to pipes, boolan control structures and other command lists
+    # (leveraging that eval errs out if $alias_args contains unquoted shell metacharacters)
+    eval "local alias_arg_words=($alias_args)" 2>/dev/null || continue
+
+    # skip alias if there is no completion function triggered by the aliased command
+    [[ " ${completions[*]} " =~ " $alias_cmd " ]] || continue
+    local new_completion="$(complete -p "$alias_cmd")"
+
+    # create a wrapper inserting the alias arguments if any
+    if [[ -n $alias_args ]]; then
+        local compl_func="${new_completion/#* -F /}"; compl_func="${compl_func%% *}"
+        # avoid recursive call loops by ignoring our own functions
+        if [[ "${compl_func#_$namespace::}" == $compl_func ]]; then
+            local compl_wrapper="_${namespace}::${alias_name}"
+                echo "function $compl_wrapper {
+                    (( COMP_CWORD += ${#alias_arg_words[@]} ))
+                    COMP_WORDS=($alias_cmd $alias_args \${COMP_WORDS[@]:1})
+                    $compl_func
+                }" >> "$tmp_file"
+                new_completion="${new_completion/ -F $compl_func / -F $compl_wrapper }"
+        fi
+    fi
+
+    # replace completion trigger by alias
+    new_completion="${new_completion% *} $alias_name"
+    echo "$new_completion" >> "$tmp_file"
+  done < <(alias -p | sed -ne "s/$alias_regex/\1 '\2' '\3'/p")
+  source "$tmp_file" && rm -f "$tmp_file"
+};

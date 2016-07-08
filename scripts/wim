@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+
+#=======================================================================================================================
+# POD                                                                                                               {{{1
+#=======================================================================================================================
+=head1 NAME
+
+ WIM - Wrapper around vIM
+
+=head1 AUTHOR
+
+ Kartik Shenoy
+
+=head1 SYNOPSIS
+
+ A simple wrapper around vim which adds some more options
+
+ usage: vim [OPTIONS]
+
+=head1 OPTIONS
+
+      --config <folder>  Use the specified folder instead of ~/.vim.
+                         If set to NONE then ignores the user config (~/.vimrc and ~/.vim/*)
+  -h, --help             Print this followed by vim's help
+
+
+=cut
+# }}}1
+
+use strict;
+use diagnostics;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper;
+
+
+Getopt::Long::Configure("bundling");
+Getopt::Long::Configure("pass_through");
+
+
+my %opts = (
+  'config' => ""
+);
+
+GetOptions(
+  \%opts,
+  # This option is actually mandatory however using a '=' doesn't work with 'pass_through' enabled because by specifying
+  # an '=' we tell GetOpt that an argument is mandatory but if one is not specified then it just fails to recognize it
+  # due to the pass_through and passes it along in @ARGV.
+  # Thus, we need to use a ':' so that GetOpt picks up that '--config' was specified and then explicitly check the rest
+  'config:s'  => sub { if ($_[1] eq "") {
+                         print "The --config option requires a string argument\n", 'More info with: "vim -h"', "\n";
+                         exit 1;
+                       }
+                       $opts{'config'} = $_[1];
+                     },
+  'help|h|?'  => sub { pod2usage(-verbose => 1, -exitval => "NOEXIT");
+                       print "\nThe default vim help is as follows\n\n\n";
+                       exec 'vim -h';
+                     }
+) or pod2usage(-verbose => 1);
+
+my @args = qw(vim);
+
+if ($opts{'config'} eq "NONE") {
+  push @args, qw(-u NORC -N --cmd), 'set rtp=$VIM,$VIMRUNTIME,$VIM/after'
+} elsif ($opts{'config'} ne "") {
+  push @args, qw(-N --cmd), sprintf("set rtp=%s,\$VIM,\$VIMRUNTIME,\$VIM/after,%s/after", $opts{'config'}, $opts{'config'});
+
+  # Check to see if the user has specified -u and/or -U. If not, add them if it's present in $opts{'config'}
+  my $u_set = 0;
+  my $U_set = 0;
+  foreach (@ARGV) {
+    if (/^-u$/) {
+      $u_set = 1;
+    }
+    if (/^-U$/) {
+      $U_set = 1;
+    }
+  }
+
+  push @args, '-u', "$opts{'config'}/vimrc"  if (!$u_set && (-f "$opts{'config'}/vimrc"));
+  push @args, '-U', "$opts{'config'}/gvimrc" if (!$U_set && (-f "$opts{'config'}/gvimrc"));
+}
+
+# Push the remaining arguments to be passed to vim
+push @args, @ARGV;
+
+print Dumper \@args;
+exec(@args);

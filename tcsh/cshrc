@@ -1,0 +1,141 @@
+# First source system default cshrc if it exists
+# ******************** PLEASE DO NOT REMOVE THIS LINE ********************
+if (-e /usr/local/setup/sys.cshrc) source /usr/local/setup/sys.cshrc
+
+# Source k8.cshrc if you are on the K8 project (change if needed)
+if (-e /usr/local/setup/k8.cshrc) source /usr/local/setup/k8.cshrc
+
+# set path:
+set path= \
+   ( \
+   $HOME/bin \
+   /tool/pandora/bin \
+   /usr/local/bin \
+   /bin \
+   /usr/bin \
+   /usr/bin/X11 \
+   /etc \
+   /usr/ucb \
+   . \
+   )
+
+# Search path for man pages
+setenv MANPATH .:/usr/local/man:/usr/man
+
+# reset LM_LICENSE_FILE
+unsetenv LM_LICENSE_FILE
+
+set host = `uname -n`
+unset autologout
+
+if (-x /usr/local/bin/get_arch) then
+   set archtype = `/usr/local/bin/get_arch`
+else
+   set archtype = "unknown"
+endif
+
+switch ($archtype)
+   case 'sparc':
+   case 'solsparc':
+      # Append SUN specific stuff to path
+      set path=( /usr/openwin/bin $path )
+
+      # set OPENWINHOME
+      setenv OPENWINHOME /usr/openwin
+
+      # Search path for man pages
+      setenv MANPATH ${MANPATH}:/usr/openwin/man
+
+      # Limit coredumpsize
+      limit coredumpsize 0
+
+      breaksw
+
+   case 'hp':
+   case 'hp10':
+   case 'linux-x86':
+   default:
+      breaksw
+endsw
+
+# --------------------------------------------------------------------
+
+#* Use the canned K8 setup by default
+#* If you want to customize the tools that are loaded, comment the
+#* following line and uncomment the module load line below.
+#* WARNING ... if you customize the setup using the module load line
+#* below, we recommended that you do not use the k8_bundle file.
+if (-e /usr/local/setup/BUNDLES/k8_bundle) \
+    source /usr/local/setup/BUNDLES/k8_bundle
+
+#* Sample line for tool setup
+#* module load <vendorname>/[version]
+#* See http://cmdwww/sysadmin/modules for more information
+#*
+#* WARNING ... if you customize the setup using the module load line
+#* below, we recommended that you do not use the k8_bundle file.
+# module load lsf k8 frame
+
+
+
+###########################################################
+# Exit if this is not an interactive shell
+if ($?prompt == 0) exit
+###########################################################
+
+set notify              # notify me of completed jobs immediately
+set noclobber           # don't allow > to overwrite
+set filec               # enable file completion
+set history=20          # save last 20 commands
+set savehist=20         # Keeps history over sessions
+
+set autolist
+set autologout=0
+set history  = 500
+set savehist = 500
+set complete=enhance
+set correct=cmd
+
+set prompt="`hostname`[\!]% "
+#set prompt = "[\!] %c/$ "
+#set prompt = '%{\e[1;30m%}(%{\e[0;33m%}\\!\!%{\e[1;30m%})-(%{\e[1;32m%}%c%{\e[1;30m%})\n$%{\e[0m%} '
+set prompt = '\n%{\e[1;30m%}(%{\e[0;33m%}\\!\!%{\e[1;30m%})-(%{\e[1;32m%}%/%{\e[1;30m%})\n%{\e[0m%}$ '
+#PS1 = "\[\e[1;30m\](\[\e[0;33m\]!\!\[\e[1;30m\])-(\`if [ \$? = 0 ]; then echo '\[\e[1;32m\]\w\[\e[1;30m\])\n\[\e[1;32m\]^_^'; else echo '\[\e[1;31m\]\w\[\e[1;30m\])\n\[\e[1;31m\]@_@'; fi\` \[\e[1;30m\]$ \[\e[0m\]"
+
+
+#==========
+# Aliases
+#
+source ~/Dropbox/Softwares/Linux/tcsh/tcsh_aliases
+
+
+# Ctrl-R functionality of bash
+# Remember if this is interactive before prompt is set
+#if ($?prompt) set interactive
+# Set key bindings if shell is interactive
+#if ($?interactive) then
+#  bindkey "^R" i-search-back
+#endif
+
+
+#====================
+# Terminal Settings
+#
+
+# Command Line Editing - emacs mode
+bindkey -e
+
+# Command Line Editing - vi mode
+#bindkey -v
+
+if ($term == "xterm" || $term == "vt100" || $term == "vt102" || $term !~ "con*") then
+# bind keypad keys for console, vt100, vt102, xterm
+  bindkey "\e[1~" beginning-of-line  # Home
+  bindkey "\e[7~" beginning-of-line  # Home rxvt
+  bindkey "\e[2~" overwrite-mode     # Ins
+  bindkey "\e[3~" delete-char        # Delete
+  bindkey "\e[4~" end-of-line        # End
+  bindkey "\e[8~" end-of-line        # End rxvt
+endif
+
+setenv LANG en_US.UTF-8

@@ -1,0 +1,158 @@
+# Configuration file for the color ls utility
+# This file goes in the /etc directory, and must be world readable.
+# You can copy this file to .dir_colors in your $HOME directory to override
+# the system defaults.
+
+# COLOR needs one of these arguments: 'tty' colorizes output to ttys, but not
+# pipes. 'all' adds color characters to all output. 'none' shuts colorization
+# off.
+COLOR tty
+
+# Extra command line options for ls go here.
+# Basically these ones are:
+#  -F = show '/' for dirs, '*' for executables, etc.
+#  -T 0 = don't trust tab spacing when formatting ls output.
+OPTIONS -F -T 0
+
+# Below, there should be one TERM entry for each termtype that is colorizable
+TERM linux
+TERM linux-c
+TERM mach-color
+TERM console
+TERM con132x25
+TERM con132x30
+TERM con132x43
+TERM con132x60
+TERM con80x25
+TERM con80x28
+TERM con80x30
+TERM con80x43
+TERM con80x50
+TERM con80x60
+TERM dtterm
+TERM color_xterm
+TERM ansi
+TERM screen
+TERM screen.linux
+TERM kon
+TERM kterm
+TERM gnome
+TERM konsole
+TERM xterm
+TERM xterm-256color
+TERM xterm-debian
+TERM rxvt
+TERM screen
+TERM screen-w
+TERM vt100
+TERM Eterm
+TERM uxterm
+
+# Below are the color init strings for the basic file types. A color init
+# string consists of one or more of the following numeric codes:
+#
+# Attribute codes:
+#   00=none
+#   01=bold
+#   04=underscore
+#   05=blink
+#   07=reverse
+#   08=concealed
+#
+#  | Color   | Foreground | Background |
+#  |-----------------------------------|
+#  | black   |     30     |     40     |
+#  | red     |     31     |     41     |
+#  | green   |     32     |     42     |
+#  | yellow  |     33     |     43     |
+#  | blue    |     34     |     44     |
+#  | magenta |     35     |     45     |
+#  | cyan    |     36     |     46     |
+#  | white   |     37     |     47     |
+#
+NORMAL  00          # global default, although everything should be something.
+FILE    00          # normal file
+DIR     01;34       # directory
+EXEC    00;32       # files with execute permissions
+LINK    00;36       # symbolic link
+FIFO    40;33       # pipe
+SOCK    01;35       # socket
+BLK     40;33;01    # block device driver
+CHR     40;33;01    # character device driver
+ORPHAN  01;37;41    # orphaned syminks
+MISSING 01;37;41    # ... and the files they point to
+
+# List any file extensions like '.gz' or '.tar' that you would like ls
+# to colorize below. Put the extension, a space, and the color init string.
+# (and any comments you want to add after a '#')
+
+# Executables
+.cmd 00;32
+.exe 00;32
+.com 00;32
+.btm 00;32
+.bat 00;32
+.sh  00;32
+.csh 00;32
+
+# Archives or compressed files
+.tar  00;31
+.tgz  00;31
+.arj  00;31
+.taz  00;31
+.lzh  00;31
+.zip  00;31
+.z    00;31
+.Z    00;31
+.gz   00;31
+.bz2  00;31
+.deb  00;31
+.rpm  00;31
+.jar  00;31
+.bz   00;31
+.tz   00;31
+.cpio 00;31
+
+# Image formats
+.jpg  00;35
+.jpeg 00;35
+.gif  00;35
+.bmp  00;35
+.pbm  00;35
+.pgm  00;35
+.ppm  00;35
+.tga  00;35
+.xbm  00;35
+.xpm  00;35
+.tif  00;35
+.tiff 00;35
+.png  00;35
+.mpg  00;35
+.mpeg 00;35
+.avi  00;35
+.fli  00;35
+.gl   00;35
+.dl   00;35
+.xcf  00;35
+.xwd  00;35
+
+# Audio formats
+.ogg 00;35
+.mp3 00;35
+.wav 00;35
+
+# Simulation setups
+#.deck    01;37
+#.spi     01;37
+#.hsp     01;37
+#.tispice 01;37
+# *command  01;37
+
+# Documents
+.csv 00;33
+.xls 00;33
+.pdf 00;33
+.doc 00;33
+.txt 00;33
+.md  00;33
+.ppt 00;33

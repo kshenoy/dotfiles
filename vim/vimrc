@@ -1,0 +1,430 @@
+" Organized as per sections in ":options"
+let DISABLE_FROM = 0
+
+" When vim is started with -u option, the $MYVIMRC variable does not get set. In that case, we manually construct the
+" entire runtimepath by adding the system vimfiles and my vimfiles directory to the runtimepath. This allows me to
+" start vim on somebody else's comp using 'vim -u <path/to/my/vimrc> -U <path/to/my/gvimrc>', ignore their local
+" vimfiles and have all of my plugins available as well!
+let g:dotvim = expand('<sfile>:p:h')
+if (strlen($MYVIMRC) == 0)
+  let &rtp=expand($VIMRUNTIME)
+  let s:vimfiles=substitute($VIMRUNTIME, "/[^/]*$", "/vimfiles", "")
+  for i in [s:vimfiles, g:dotvim]
+    execute 'let &rtp="' . i . ',' . &rtp . ',' . i . '/after"'
+  endfor
+endif
+
+
+" Placing at top so all files can use it no matter in which order they get sourced
+let mapleader = "\<Space>"
+let maplocalleader = "\\"
+
+
+"
+" 1.  IMPORTANT                                                                                                     {{{1
+"
+if DISABLE_FROM == 1 | finish | endif
+
+set nocompatible                                                       " Doesn't constrain VIM to be fully VI compatible
+if has('autocmd')
+  " Clear ALL autocommands during init
+  autocmd!
+endif
+
+if filereadable(expand(g:dotvim . '/bundle.vim'))
+  execute 'source ' . g:dotvim . '/bundle.vim'
+endif
+filetype plugin indent on
+
+"
+" 2.  MOVING AROUND, SEARCHING AND PATTERNS                                                                         {{{1
+"
+if DISABLE_FROM == 2 | finish | endif
+
+set whichwrap=b,s,<,>,h,l,[,]                     " Allows backspace, space, left, right arrow keys, as well as h and l,
+                                                                        " to wrap when used at beginning or end of lines
+set nostartofline                             " Prevent cursor from jumping to start of line in case of certain commands
+set autochdir                                                                       " Change directory to file in buffer
+set incsearch                                                                          " Incremental search highlighting
+set magic                                                  " Enable non-alphanumeric characters to have special meanings
+set ignorecase                                                                              " Ignore Case when searching
+set smartcase                                               " Override ignorecase when pattern has upper case characters
+
+
+"
+" 3.  TAGS                                                                                                          {{{1
+"
+if DISABLE_FROM == 3 | finish | endif
+
+"set taglength=4                                                           " No. of significant characters in a tag name
+set notagrelative                           " Filenames in tag files are relative to the directory where the tag file is
+set tags=.tags; tags+=tags;
+execute 'set tags+=' . g:dotvim . '/tags/cpp_stl.tags'
+set cscopetag                                                       " Use cscope as well as tags when searching for tags
+set cscopetagorder=0                                                                     " Search cscope.out before tags
+"set cscopequickfix=s-,g-,c-,d-,i-,t-,e-            " Show symbols, calls, called, includes, tags and egreps in quickfix
+set nocscoperelative
+
+" Add any cscope database in current directory
+call my#LoadCscopeDB()
+
+
+"
+" 4.  DISPLAYING TEXT                                                                                               {{{1
+"
+if DISABLE_FROM == 4 | finish | endif
+
+set scrolloff=3                                                       " Number of screen lines to show around the cursor
+set sidescroll=3
+set wrap                                                                                              " Enable word wrap
+set sidescrolloff=10
+set cmdheight=2                                                                                    " Command area height
+"set columns=120                                                                                Set width of the display
+set encoding=utf-8                                                                                  " Character encoding
+
+set list                                                                              " Display non-printable characters
+set listchars=tab:➤\ ,extends:»,precedes:«,nbsp:˽,trail:…
+augroup set_list
+  au!
+  autocmd BufEnter    * if (&ft == 'help' || &bt == 'nofile') | setlocal nolist | endif
+  autocmd InsertEnter * set listchars-=trail:…
+  autocmd InsertLeave * set listchars+=trail:…
+augroup END
+"set listchars=eol:$,trail:-,tab:>-,extends:>,precedes:<,conceal:+
+"set fillchars=stl:^,stlnc:-,vert:\│,fold:-,diff:-
+"set fillchars=stl:\ ,stlnc:\ ,vert:\│,fold:-,diff:-
+"·⌴…˽│➤►×ˑ▕—▸¬•⣿\║│
+
+set fillchars=diff:\ ,stl:\ ,stlnc:\ ,vert:│             " Characters to use for the status line, folds and filler lines
+set showbreak=↪
+
+set number                                                                                     " Absolute line numbering
+if exists('&relativenumber')
+  "set nonumber                                                                        " Disable absolute line numbering
+  set relativenumber                                                                 " Line numbering relative to cursor
+endif
+
+if has('conceal')
+  set conceallevel=2
+  set concealcursor=nc
+endif
+
+
+"
+" 5.  SYNTAX, HIGHLIGHTING AND SPELLING                                                                             {{{1
+"
+if DISABLE_FROM == 5 | finish | endif
+
+syntax on                                                                                   " Enable syntax highlighting
+set synmaxcol=1000                                                       " Don't syntax highlight lines longer than this
+set hlsearch                                                                 " Search highlighting : Enabled by default.
+"set cursorcolumn                                                                     " Highlight the line of the cursor
+"set cursorline                                                                     " Highlight the column of the cursor
+if exists('+colorcolumn')
+  set colorcolumn=121
+endif
+"set spell
+set spelllang=en_us
+
+
+"
+" 6.  MULTIPLE WINDOWS                                                                                              {{{1
+"
+if DISABLE_FROM == 6 | finish | endif
+
+set laststatus=2                                                                                 " Status line always-on
+set statusline=
+set hidden                                                                 " Allow buffer switching without saving files
+set switchbuf=useopen,usetab                                                " Which window to use when switching buffers
+set splitbelow                                                      " Open new split below current one when using :split
+set splitright                                           " Open new split to the right of current one when using :vsplit
+
+
+"
+" 7.  MULTIPLE TAB PAGES                                                                                            {{{1
+"
+if DISABLE_FROM == 7 | finish | endif
+
+set showtabline=1                                                                 " Only when at least two tabs are open
+set tabpagemax=20                                                                         " Max no. of tab pages to open
+set guitablabel=%{my#GuiTabLabel()}
+set guitabtooltip=%{my#GuiTabToolTip()}
+
+
+"
+" 8.  TERMINAL                                                                                                      {{{1
+"
+if DISABLE_FROM == 8 | finish | endif
+
+set esckeys                                                                    " Allow use of cursor keys in insert mode
+
+" Setup default highlight groups for the cursors
+set gcr=n:block-NormalCursor/lCursor
+set gcr+=v:block-VisualCursor/lCursor
+set gcr+=c:ver25-CommandCursor/lCursor
+set gcr+=ve:ver35-VisualCursor/lCursor
+set gcr+=o:hor20-CommandCursor/lCursor
+set gcr+=i-ci:ver25-InsertCursor/lCursor
+set gcr+=r-cr:hor20-ReplaceCursor/lCursor
+set gcr+=sm:block-InsertCursor-blinkwait175-blinkoff150-blinkon175
+
+set title                                                      " Set title of VIM window to <filename> (<filepath>) type
+set titlestring=%t%(\ %M%)%(\ (%{expand(\"%:~:.:h\")})%)%(\ %a%)
+set t_Co=256                                                                     " Enable use of 256 colors in terminals
+set t_ut=                                                               "Disable Background Color Erase by clearing t_ut
+
+
+"
+" 9.  USING THE MOUSE                                                                                               {{{1
+"
+if DISABLE_FROM == 9 | finish | endif
+
+" Refer $MYGVIMRC
+
+
+"
+" 10. GUI                                                                                                           {{{1
+"
+if DISABLE_FROM == 10 | finish | endif
+
+" Refer $MYGVIMRC for the rest
+
+
+"
+" 11. PRINTING                                                                                                      {{{1
+"
+if DISABLE_FROM == 11 | finish | endif
+
+
+"
+" 12. MESSAGES AND INFO                                                                                             {{{1
+"
+if DISABLE_FROM == 12 | finish | endif
+
+set shortmess=ilsI                                         " To avoid intro screen, search direction change notification
+set showcmd                                              " Display an incomplete command in lower right corner of window
+set showmode                                                                                      " Display current mode
+set ruler                                                      " Display cursor position in lower-right corner of window
+set report=0                          " Show a report when N lines were changed. report=0 thus means "show all changes"!
+set noerrorbells                                                                                   " Damn this beep! ;-)
+set novisualbell                                                                    " Use visual bell instead of beeping
+
+
+"
+" 13. SELECTING TEXT                                                                                                {{{1
+"
+if DISABLE_FROM == 13 | finish | endif
+
+" Clipboard settings
+" Linux/X11 has two clipboards. If Vim is compiled correctly, the selection
+" clipboard is bound to "* while the cut/copy/paste clipboard is bound to "+.
+" Setting cb=unnamed, p and "*p are equivalent but "+p is different.
+"set clipboard=unnamed
+
+
+"
+" 14. EDITING TEXT                                                                                                  {{{1
+"
+if DISABLE_FROM == 14 | finish | endif
+
+set textwidth=0                                              " Line length above which to break a line. 0 => Don't break
+set wrapmargin=0                                                             " Margin to the right at which to wrap text
+set backspace=indent,eol,start        " Allow backspace to erase previously entered characters, autoindent, and newlines
+set formatoptions+=j                                                        " Remove a comment leader when joining lines
+set formatoptions+=n                                                                          " Recognize numbered lists
+set complete=.,w,b,u,t                              " Scan current buffer, other buffers and tags but not included files
+set completeopt=longest,menu
+set omnifunc=syntaxcomplete#Complete                             " Function for filetype-specific Insert mode completion
+set showmatch                                                                                     " Show matching braces
+set nojoinspaces                                   " Don't insert two spaces after a period with every joining of lines.
+
+
+"
+" 15. TABS AND INDENTING                                                                                            {{{1
+"
+if DISABLE_FROM == 15 | finish | endif
+
+set tabstop=8                                                                                     " Set manual tab-width
+set shiftwidth=2                                                  " Set software tab-width (for eg in case of << and >>)
+set softtabstop=2                                          " No. of spaces to insert for a tab when expandtab is enabled
+set shiftround                                                                 " Round to 'shiftwidth' for "<<" and ">>"
+set expandtab                                                                                 " Replace tabs with spaces
+set autoindent                                                                                   " Auto-indent new lines
+set cinkeys-=0#                                                          " Prevent forcing of C-preprocessor to column 1
+
+
+"
+" 16. FOLDING                                                                                                       {{{1
+"
+if DISABLE_FROM == 16 | finish | endif
+
+"set foldcolumn=3                                                               " Width of column used to indicate folds
+set foldtext=my#FoldText()
+set foldmethod=marker
+"set foldmarker={{{,}}                                                     " Markers used when 'foldmethod' is "marker"}
+"set foldmarker=>_>,<_<                                                     " Markers used when 'foldmethod' is "marker"
+set foldnestmax=2                                      " Maximum fold depth for when 'foldmethod is "indent" or "syntax"
+
+
+"
+" 17. DIFF MODE                                                                                                     {{{1
+"
+if DISABLE_FROM == 17 | finish | endif
+
+"set diffopt+=iwhite                                                                                 " Ignore whitespace
+
+
+"
+" 18. MAPPING                                                                                                       {{{1
+"
+if DISABLE_FROM == 18 | finish | endif
+
+"set timeout timeoutlen=1000 ttimeoutlen=50                  " Added to reduce the delay in display when mode is changed
+                                                         " ( http://lin-techdet.blogspot.nl/2012/01/vim-powerline.html )
+
+
+"
+" 19. READING AND WRITING FILES                                                                                     {{{1
+"
+if DISABLE_FROM == 19 | finish | endif
+
+" Allow the last line to be a modeline
+" Useful when the last line in sig gives the preferred textwidth for replies.
+"set modeline
+
+if &modifiable
+  set fileformat=unix                                                                                       " EOL format
+endif
+set writebackup                                                          " Write a backup file before overwriting a file
+set backup                                                              " Create backup of files before overwriting them
+execute 'set backupdir=' . g:dotvim . '/tmp/backups'
+if !isdirectory(&backupdir) | call mkdir(&backupdir, 'p') | endif
+set noshortname                                                                       " Don't restrict to 8.3 file names
+
+
+"
+" 20. THE SWAP FILE                                                                                                 {{{1
+"
+if DISABLE_FROM == 20 | finish | endif
+
+execute 'set directory=' . g:dotvim . '/tmp/swaps'
+" List of directories to use for the swap file
+if !isdirectory(&directory) | call mkdir(&directory, 'p') | endif
+set noswapfile
+set updatetime=1000             " Time in msec after which the swap file will be updated/CursorHold autocmd is triggered
+
+
+"
+" 21. COMMAND LINE EDITING                                                                                          {{{1
+"
+if DISABLE_FROM == 21 | finish | endif
+
+set history=1000                                                                      " No. of command lines to remember
+set suffixes=.aux,.dvi,.gz,.idx,.ps,.swp,~,.o,.info,.obj,.so                       " Ignore these files when using :edit
+set wildmenu                                                           " Command-line completion shows a list of matches
+set wildchar=<Tab>                                                            " Key that triggers command-line expansion
+set wildmode=list:longest,full                                  " Specifies command line completion to behave like shell
+set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.o,*.obj                 " List of patterns to ignore for file name completion
+
+if exists('+undofile')
+  set undofile                                                             " Automatically save and restore undo history
+  execute 'set undodir=' . g:dotvim . '/tmp/undos'
+  " List of directories to save undofile
+  if !isdirectory(&undodir) | call mkdir(&undodir, 'p') | endif
+endif
+
+
+"
+" 22. EXECUTING EXTERNAL COMMANDS                                                                                   {{{1
+"
+if DISABLE_FROM == 22 | finish | endif
+
+set formatprg=clang-format\ --style=google                                                      " Set formatting program
+
+
+"
+" 23. RUNNING MAKE AND JUMPING TO ERRORS                                                                            {{{1
+"
+if DISABLE_FROM == 23 | finish | endif
+
+if     executable('ag')  | let &grepprg = 'ag  --nogroup --nocolor --follow'    .(&smartcase ? ' --smart-case' : '')
+elseif executable('pt')  | let &grepprg = 'pt  --nogroup --nocolor --follow'    .(&smartcase ? ' --smart-case' : '')
+elseif executable('ack') | let &grepprg = 'ack --nogroup --nocolor --follow -H' .(&smartcase ? ' --smart-case' : '')
+endif
+
+
+
+"
+" 24. LANGUAGE SPECIFIC                                                                                             {{{1
+"
+if DISABLE_FROM == 24 | finish | endif
+
+
+"
+" 25. MULTI-BYTE CHARACTERS                                                                                         {{{1
+"
+if DISABLE_FROM == 25 | finish | endif
+
+
+"
+" 26. VARIOUS                                                                                                       {{{1
+"
+if DISABLE_FROM == 26 | finish | endif
+
+"set gdefault                                                                          " Enable global search by default
+set noexrc                                              " Disable reading of .vimrc/.exrc/.gvimrc from current directory
+execute 'set viewdir=' . g:dotvim . '/tmp/views'
+" Directory to save views to
+if !isdirectory(&viewdir) | call mkdir(&viewdir, 'p') | endif
+set viminfo='20,<50                                                                 " What to write in the .viminfo file
+
+
+"
+" 27. MISC                                                                                                          {{{1
+"
+if DISABLE_FROM == 27 | finish | endif
+
+" Netrw
+let g:netrw_liststyle=3
+
+" Change size of fonts
+command! -bar -nargs=0 IncFontSize :let &guifont = substitute(&guifont, '\d\+', '\=submatch(0)+1', 'g')
+command! -bar -nargs=0 DecFontSize :let &guifont = substitute(&guifont, '\d\+', '\=submatch(0)-1', 'g')
+
+command! -bar -nargs=0 P4DIFF execute "!p4 diff " . expand('%:p') . " &"
+
+""" Autocommands                                                                                                    {{{2
+if has('autocmd')
+  " File and view saving related
+  augroup Saving
+    autocmd!
+    "autocmd FocusLost   * silent! wall
+    "autocmd BufWinLeave * silent! mkview
+    "autocmd BufWinEnter * silent! loadview
+    "" Jump to the last cursor position
+    "autocmd BufReadPost *
+    "  \ if line("'\"") > 0 && line("'\"") <= line("$") |
+    "  \   execute 'normal! g`"zvzz' |
+    "  \ endif
+    "autocmd BufWritePost * call my#UpdateTags()
+    autocmd BufWritePost * if &diff | diffupdate | endif
+  augroup END
+
+  " Resize split windows when size of xterm's window changes
+  augroup Geometry
+    autocmd!
+    autocmd VimResized * wincmd =
+  augroup END
+
+  " Perforce related
+  augroup Perforce
+    autocmd!
+    autocmd FileChangedRO * call perforce#Checkout()
+  augroup END
+
+  " Diff related
+  augroup Diff
+    autocmd!
+    autocmd VimEnter * if &diff|call my#SetDiffFileType()|endif
+  augroup END
+endif

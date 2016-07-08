@@ -1,0 +1,52 @@
+--exclude=.SOS
+--exclude=.git
+--exclude=nobackup
+--exclude=nobkp
+--exclude=results
+--exclude=*.log
+
+/*--regex-vim=/^"= (.*) +=$/\1/h,heading/          */
+/*--regex-vim=/^"== (.*) +-$/\1/s,subheading/      */
+/*--regex-vim=/^"=== (.*) +~$/\1/S,subsubheading/  */
+
+/*--regex-sh=/^#= (.*) +=$/\1/h,heading/           */
+/*--regex-sh=/^#== (.*) +-$/\1/s,subheading/       */
+/*--regex-sh=/^#=== (.*) +~$/\1/S,subsubheading/   */
+
+/*--langdef=conf                                   */
+/*--regex-conf=/^#= (.*) +=$/\1/h,heading/         */
+/*--regex-conf=/^#== (.*) +-$/\1/s,subheading/     */
+/*--regex-conf=/^#=== (.*) +~$/\1/S,subsubheading/ */
+
+/*--regex-vhdl=/^--= (.*) +=$/\1/h,heading/        */
+/*--regex-vhdl=/^--== (.*) +-$/\1/s,subheading/    */
+/*--regex-vhdl=/^--=== (.*) +~$/\1/S,subsubheading/*/
+
+/**********************************************************************************************************************/
+/*                                                   System Verilog                                                   */
+/**********************************************************************************************************************/
+--langdef=SystemVerilog
+--langmap=SystemVerilog:.sv.v.svh.tv.vg.vinc
+
+--regex-SystemVerilog=/^\s*(\b(static|local|virtual|protected)\b)*\s*\bclass\b\s*(\b\w+\b)/\3/c,class/
+--regex-SystemVerilog=/^\s*(\b(static|local|virtual|protected)\b)*\s*\btask\b\s*(\b(static|automatic)\b)*\s*(\w+::)*\s*(\b\w+\b)/\6/t,task/
+--regex-SystemVerilog=/^\s*(\b(static|local|virtual|protected)\b)*\s*\bfunction\b\s*(\b(\w+)\b)*\s*(\w+::)*\s*(\b\w+\b)/\6/f,function/
+
+--regex-SystemVerilog=/^\s*\bmodule\b\s*(\b\w+\b)/\1/m,module/
+--regex-SystemVerilog=/^\s*\bprogram\b\s*(\b\w+\b)/\1/p,program/
+--regex-SystemVerilog=/^\s*\binterface\b\s*(\b\w+\b)/\1/i,interface/
+--regex-SystemVerilog=/^\s*\btypedef\b\s+.*\s+(\b\w+\b)\s*;/\1/e,typedef/
+--regex-SystemVerilog=/^\s*`define\b\s*(\w+)/`\1/d,define/
+--regex-SystemVerilog=/}\s*(\b\w+\b)\s*;/\1/e,typedef/
+
+--regex-SystemVerilog=/^\s*(\b(static|local|private|rand)\b)*\s*(\b(shortint|int|longint)\b)\s*(\bunsigned\b)?(\s*\[.+\])*\s*(\b\w+\b)/\7/v,variable/
+--regex-SystemVerilog=/^\s*(\b(static|local|private|rand)\b)*\s*(\b(byte|bit|logic|reg|integer|time)\b)(\s*\[.+\])*\s*(\b\w+\b)/\6/v,variable/
+--regex-SystemVerilog=/^\s*(\b(static|local|private)\b)*\s*(\b(real|shortreal|chandle|string|event)\b)(\s*\[.+\])*\s*(\b\w+\b)/\6/v,variable/
+--regex-SystemVerilog=/(\b(input|output|inout)\b)?\s*(\[.+\])*\s*(\b(wire|reg|logic)\b)\s*(\[.+\])*\s*(#(\(.+\)|\S+)\))?\s*(\b\w+\b)/\9/v,variable/
+--regex-SystemVerilog=/(\b(parameter|localparam)\b).+(\b\w+\b)\s*=/\3/a,parameter/
+
+--SystemVerilog-kinds=+ctfmpied
+
+
+
+--languages=SystemVerilog,C,C++,Perl,Python,Sh

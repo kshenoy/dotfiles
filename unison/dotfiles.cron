@@ -1,0 +1,4 @@
+# MIN HOUR DAY MONTH WEEKDAY CMD
+
+# Sync with AMD dotfiles every 5 minutes
+  */5 *    *   *     *       ifconfig vpn0 &> /dev/null && unison dotfiles >| $HOME/.unison/dotfiles.cron.log 2>&1

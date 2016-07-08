@@ -1,0 +1,193 @@
+#==========
+# Aliases
+#==========
+
+#================
+# Spice aliases
+#
+alias hspice '/apps/ame/bin/hspice -mp'
+alias hsp hspice
+
+
+#=============
+# ls aliases
+#
+alias ls 'ls -FLH --color=always'
+alias l ls
+alias ll 'ls -lh'
+alias la 'ls -a'
+alias lla 'll -a'
+alias lal 'll -a'
+alias ld 'ls -d *(-/DN)'
+alias ltr 'll -tr'
+
+
+#====================
+# Directory aliases
+#
+alias mkdir 'mkdir -p'
+alias md mkdir
+alias mcd "mkdir -p \!* && cd \!*"
+alias cd.. '..'
+alias .. 'cd ..'
+alias ... 'cd ../..'
+alias dirs 'dirs -v'
+alias pu 'pushd'
+alias po 'popd'
+
+
+#==============
+# tar aliases
+#
+alias untgz 'tar -zxf'
+alias untbz 'tar -jxf'
+
+
+#================
+# Shell aliases
+#
+alias c  clear
+alias cl "c;l"
+
+#alias echo '\echo -e'
+alias be 'bindkey -e'
+alias bv 'bindkey -v'
+alias rm 'rm -vi'
+alias rd 'rm -rvf'
+alias cp 'cp -vi'
+alias mv 'mv -vi'
+alias ln 'ln -svi'
+alias df 'df -h'
+alias du='du -kh'
+alias du1='du -kh --max-depth=1'
+
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias grep='grep -P --color=always'
+alias grep 'grep -P'
+alias g 'grep'
+alias grepi 'grep -i'
+alias gi 'grepi'
+alias pgrep '/bin/ps -aef | grep -i'
+
+alias h history
+alias hgrep 'history | grep -i'
+
+alias find. 'find -maxdepth 1'
+alias xargs 'xargs -t'
+
+alias lock '/usr/local/bin/xlock'
+alias x exit
+alias k9 'kill -9'
+
+
+#================
+# Combo aliases
+#
+#alias sim 'echo /proj/gateway4/products/`pwd | cut -d'/' -f4`/expts/a0393831/simulations'
+#alias pwdsn 'set PWDSN   \`pwd | sed 's#\(products\)#.snapshot/nightly.0/\1#'\` && \`pwd | sed 's#\(products\)#.snapshot/nightly.0/\1#'\`'
+
+
+#=================
+# Editor aliases
+#
+alias v   /tool/pandora64/binlatest/gvim
+alias vc  'v config*'
+alias vco 'v command*'
+alias vd  'v *.deck'
+alias vr  'v run*'
+alias vu  'v -u NONE -N -U NONE'
+alias vv  'v ~/.vimrc'
+
+
+#===============
+# File Aliases
+#
+alias readme 'v ~/Dropbox/Softwares/Linux/readmes/README.toc'
+#alias ref_tispice 'acroread /user/a0393831/documents/manuals/spice_ref.pdf &'
+#alias ref_hspice 'acroread /apps/synopsys/hspice/2010.03/hspice/docs_help/home.pdf &'
+#alias ref_hsp ref_hspice
+#alias ref_codac 'acroread /user/a0393831/documents/manuals/codac_users_manual.pdf &'
+#alias ref_codacfd 'acroread /user/a0393831/documents/manuals/codac_function_dict.pdf &'
+#alias ref_perl 'acroread /user/a0393831/documents/ebooks/Learning\ Perl.pdf &'
+
+
+#===============
+# User related
+#
+alias eda  'v ~/Dropbox/Softwares/Linux/tcsh/tcsh_aliases'
+alias edrc 'v ~/.cshrc'
+alias src  "source ~/.cshrc; echo Sourced ~/.cshrc"
+alias s    src
+
+
+#=======
+# Misc
+#
+alias archdate 'date +%Y-%m-%d'
+alias so source
+alias sco 'source command'
+alias psmall "perl -lne 'BEGIN{"'$s=<>};$s=$_ if $_<$s;END{print "$s"}'"'"
+alias pbig "perl -lne 'BEGIN{"'chomp($s=<>)};$s=$_ if $_>$s;END{print "$s"}'"'"
+
+
+#============
+# Locations
+#
+
+
+#==============
+# apt Aliases
+#
+alias apt-ins   'sudo apt-fast install'
+alias apt-rem   'sudo apt-fast remove'
+alias apt-upd   'sudo apt-fast update'
+alias apt-aurem 'sudo apt-fast autoremove'
+
+
+#===============
+# Tool Aliases
+#
+alias pf   'p4w'
+alias pfso 'source /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.csh'
+alias sopf 'pfso'
+alias pfre 'pfso && bootenv'
+alias pfa  'pf add'
+alias pfd  'pf diff'
+alias pfe  'pf edit'
+alias pfo  'pf opened'
+alias pfr  'pf revert'
+alias pfs  'pf submit'
+alias pfy  'pf sync'
+#alias pfre='pfso && bootenv && PATH=/bin:/usr/bin:/usr/local/bin:${PATH%:/bin:/usr/bin:/usr/local/bin}'
+
+
+#==============
+# Git Aliases
+#
+alias ga   'git add'
+alias gA   'git add -A'
+alias gb   'git branch'
+alias gchk 'git checkout'
+alias gcl  'git clone'
+alias gcld 'git clone --depth=1'
+alias gcom 'git commit'
+alias gd   'git diff'
+alias gdt  'git difftool'
+alias gh   'git help'
+alias gi   'git init'
+alias gpu  'git push'
+alias gp   'git pull'
+alias gs   'git status -s'
+alias gS   'git status'
+alias grst 'git reset --hard HEAD'
+
+
+#============
+# Compiling
+#
+alias m   'make'
+alias mc  'make clean'
+alias mcm 'make clean; make'
+alias ma  'make all'
+alias mi  'make install'

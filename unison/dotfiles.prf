@@ -1,0 +1,131 @@
+# Roots of the synchronization
+root = /home/ks/Dropbox
+root = ssh://kshenoy@atlr5n4-0537//home/kshenoy/Dropbox
+
+#          Causes Unison to double-check, at the end of update detection,
+#          that PATH exists and abort if it does not. This is useful when
+#          Unison is used to synchronize removable media. This preference
+#          can be given more than once.
+#mountpoint = /mnt/cifs/amd/Dropbox/Softwares/Linux
+
+# Paths to synchronize
+#path = current
+#path = common
+#path = .netscape/bookmarks.html
+path = Softwares
+path = Documents/Notes
+
+# Some regexps specifying names and paths to ignore
+#ignore = Path stats    ## ignores <root>/stats
+#ignore = Path stats/*  ## ignores <root>/stats/*
+#ignore = Path */stats  ## ignores <root>/somedir/stats, but not /var/www/a/b/c/stats
+#ignore = Name *stats   ## ignores all files/directories that end with "stats"
+#ignore = Name stats*   ## ignores all files/directories that begin with "stats"
+#ignore = Name *.tmp    ## ignores all files with the extension .tmp
+ignore = Name {.git*}
+ignore = Name *.tags
+ignore = Name tags
+ignore = Name .nfs*
+ignore = Name *.tmp
+ignore = Name .netrwhist
+#ignore = Name *history
+ignore = Path Documents/Notes/Personal
+ignore = Path Softwares/Emacs/auto-save-list
+ignore = Path Softwares/Emacs/elpa
+ignore = Path Softwares/Emacs/tmp
+ignore = Path Softwares/Vim/bundle
+ignore = Path Softwares/Vim/tmp
+ignore = Path Softwares/linux/compiz
+ignore = Path Softwares/linux/scripts/ti
+ignore = Path Softwares/linux/unity
+
+#          When set to true, this flag causes the user interface to skip
+#          asking for confirmations on non-conflicting changes. (More
+#          precisely, when the user interface is done setting the
+#          propagation direction for one entry and is about to move to the
+#          next, it will skip over all non-conflicting entries and go
+#          directly to the next conflict.)
+auto=true
+
+#          The backups are stored locally creating a new folder for each
+#          version.
+backuplocation = local
+backupprefix = .unison/$VERSION.
+backupsuffix =
+
+#          When this is set to true, the user interface will ask no
+#          questions at all. Non-conflicting changes will be propagated;
+#          conflicts will be skipped.
+batch=true
+
+#          !When this is set to true, Unison will request an extra
+#          confirmation if it appears that the entire replica has been
+#          deleted, before propagating the change. If the batch flag is
+#          also set, synchronization will be aborted. When the path
+#          preference is used, the same confirmation will be requested for
+#          top-level paths. (At the moment, this flag only affects the
+#          text user interface.) See also the mountpoint preference.
+confirmbigdel=false
+
+#          When this preference is set to true, Unison will use the
+#          modification time and length of a file as a `pseudo inode
+#          number' when scanning replicas for updates, instead of reading
+#          the full contents of every file. Under Windows, this may cause
+#          Unison to miss propagating an update if the modification time
+#          and length of the file are both unchanged by the update.
+#          However, Unison will never overwrite such an update with a
+#          change from the other replica, since it always does a safe
+#          check for updates just before propagating a change. Thus, it is
+#          reasonable to use this switch under Windows most of the time
+#          and occasionally run Unison once with fastcheck set to false,
+#          if you are worried that Unison may have overlooked an update.
+#          The default value of the preference is auto, which causes
+#          Unison to use fast checking on Unix replicas (where it is safe)
+#          and slow checking on Windows replicas. For backward
+#          compatibility, yes, no, and default can be used in place of
+#          true, false, and auto. See the section "Fast Checking" for more
+#          information.
+fastcheck=true
+
+#          When this flag is set to true, the group attributes of the
+#          files are synchronized. Whether the group names or the group
+#          identifiers are synchronizeddepends on the preference numerids.
+group=false
+
+#          When this flag is set to true, the owner attributes of the
+#          files are synchronized. Whether the owner names or the owner
+#          identifiers are synchronizeddepends on the preference
+#          extttnumerids.
+owner=false
+
+#          Including the preference -prefer root causes Unison always to
+#          resolve conflicts in favor of root, rather than asking for
+#          guidance from the user. (The syntax of root is the same as for
+#          the root preference, plus the special values newer and older.)
+#          This preference is overridden by the preferpartial preference.
+#          This preference should be used only if you are sure you know
+#          what you are doing!
+prefer=newer
+
+#          When this preference is set to true, the textual user interface
+#          will print nothing at all, except in the case of errors.
+#          Setting silent to true automatically sets the batch preference
+#          to true.
+#silent=true
+
+#          When this flag is set to true, file modification times (but not
+#          directory modtimes) are propagated.
+times=true
+
+#          permissions line is necessary for FAT filesystem on the memory stick to work
+#          otherwise you keep getting an error message
+perms=0
+
+#          name of unison executable on remote server
+servercmd=/tool/pandora64/.package/unison-2.50.0/bin/unison
+
+#          Arguments to pass to SSH
+sshargs = -C
+
+#          Arguments to pass to RSH
+rshargs = -C

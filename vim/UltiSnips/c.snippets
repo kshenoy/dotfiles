@@ -1,0 +1,233 @@
+# vim:ft=snippets:
+
+#===========================================================================
+# vim-snippets sets priority of c.snippets to -50
+# Hence, we set it to -49 to overwrite vim-snippets/c.snippets but not vim-snippets/cpp.snippets
+priority -49
+
+#===========================================================================
+# Global functions
+#
+global !p
+def complete(t, opts, default=""):
+  if t == "":
+    return default
+  elif t:
+    opts = [ m[len(t):] for m in opts if m.startswith(t) ]
+  if len(opts) == 1:
+    return opts[0]
+  return "(" + "|".join(opts) + ")"
+endglobal
+
+
+#===========================================================================
+# Headers
+#
+snippet inc "#include <>" b
+#include <$1`!p snip.rv = complete( t[1], ['stdio.h', 'stdlib.h'], snip.basename + '.h' )`>
+endsnippet
+
+snippet Inc "Include stdio, stdlib" b
+#include <stdio.h>
+#include <stdlib.h>
+endsnippet
+
+
+
+#===========================================================================
+# #defines
+#
+snippet '#?ifn(def)?' "#ifndef...#define...#endif" br
+#ifndef ${1/([A-Za-z0-9_]+).*/$1/}
+#define ${1:${VISUAL:SYMBOL}} ${2:value}
+#endif
+endsnippet
+
+snippet '#?if(def)?' "#ifdef...#define...#endif" br
+#ifdef ${1}
+  ${VISUAL}${0:${VISUAL/(.*)/(?1::code)/}}
+#endif
+endsnippet
+
+snippet #if "#if...#endif" b
+#if ${1:0}
+  ${VISUAL}${0:${VISUAL/(.*)/(?1::code)/}}
+#endif
+endsnippet
+
+snippet once "Include header once only guard"
+#ifndef ${1:`!p
+if not snip.c:
+  snip.rv = re.sub(r'[^A-Za-z0-9]+','_', snip.fn).upper()
+else:
+  snip.rv = snip.c`}
+#define $1
+
+${VISUAL}${0}
+
+#endif /* end of include guard: $1 */
+endsnippet
+
+
+
+#===========================================================================
+# main()
+#
+snippet main "main()"
+int main(${1: int argc, const char *argv[] }){
+$0
+  return 0;
+}
+endsnippet
+
+
+
+#===========================================================================
+# Conditionals
+#
+snippet if "if..." w
+if (${1:/* condition */}) {
+  ${VISUAL}${0}
+}
+endsnippet
+
+snippet ife "if...else" w
+if (${1:/* condition */}) {
+  ${0:/* code */}
+} else {
+}
+endsnippet
+
+snippet eli "else if..." w
+else if (${1:/* condition */}) {
+  ${0:/* code */}
+}
+endsnippet
+
+snippet el "else..." w
+else {
+  ${0:/* else */}
+}
+endsnippet
+
+snippet ter "Ternary operator"
+${1:/* condition */} ? ${2:a} : ${3:b}
+endsnippet
+snippet ?: "Ternary operator"
+${1:/* condition */} ? ${2:a} : ${3:b}
+endsnippet
+
+snippet sw "switch"
+switch (${1:Variable}) {
+case ${2}:
+  ${0}
+  break;
+
+default:
+  break;
+}
+endsnippet
+snippet switch "switch"
+case ${2}:
+  ${0}
+  break;
+
+default:
+  break;
+}
+endsnippet
+
+
+
+#===========================================================================
+# Loops
+#
+snippet forc "C style for..."
+for (${3:i} = ${2:0}; $3 < ${1:count}; ${4:++}$3) {
+  ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
+}
+endsnippet
+
+snippet wh' "while loop"
+while (${1:/* condition */}) {
+  ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
+}
+endsnippet
+snippet while "while loop"
+while (${1:/* condition */}) {
+  ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
+}
+endsnippet
+
+snippet do "do...while loop"
+do {
+  ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
+} while (${1:/* condition */});
+endsnippet
+
+
+
+#===========================================================================
+# Typedefs & Structs/Enums
+#
+snippet td "Typedef"
+typedef ${1:int} ${2:MyCustomType};
+endsnippet
+
+snippet st "Struct..."
+struct ${1:`!v Filename('$1_s', 'name')`}${1/.+/ /}{
+  ${0:/* data */}
+}${2/.+/ /}${2:/* optional variable list */};
+endsnippet
+snippet struct "Struct..."
+struct ${1:`!v Filename('$1_s', 'name')`}${1/.+/ /}{
+  ${0:/* data */}
+}${2/.+/ /}${2:/* optional variable list */};
+endsnippet
+
+snippet tds "typedef struct..."
+typedef struct ${1:`!v Filename('$1_s', 'name')`}${1/.+/ /}{
+  ${0:/* data */}
+}${2/.+/ /}${2:/* optional variable list */};
+endsnippet
+
+snippet en "Enumeration"
+enum ${1:name} { $0 };
+endsnippet
+snippet enum "Enumeration"
+enum ${1:name} { $0 };
+endsnippet
+
+snippet tde "typedef enum"
+typedef enum {
+  ${1:/* data */}
+}${2:foo};
+endsnippet
+
+
+
+#===========================================================================
+# Misc
+#
+snippet pr "printf"
+printf("${1:%s}\n"${1/([^%]|%%)*(%.)?.*/(?2:, :\);)/}$2${1/([^%]|%%)*(%.)?.*/(?2:\);)/}
+endsnippet
+snippet printf "printf"
+printf("${1:%s}\n"${1/([^%]|%%)*(%.)?.*/(?2:, :\);)/}$2${1/([^%]|%%)*(%.)?.*/(?2:\);)/}
+endsnippet
+
+snippet fpr "fprintf..."
+fprintf(${1:stderr}, "${2:%s}\n"${2/([^%]|%%)*(%.)?.*/(?2:, :\);)/}$3${2/([^%]|%%)*(%.)?.*/(?2:\);)/}
+endsnippet
+snippet fprintf "fprintf..."
+fprintf(${1:stderr}, "${2:%s}\n"${2/([^%]|%%)*(%.)?.*/(?2:, :\);)/}$3${2/([^%]|%%)*(%.)?.*/(?2:\);)/}
+endsnippet
+
+snippet mark "#pragma mark (mark)"
+#if 0
+${1:#pragma mark -
+}#pragma mark $2
+#endif
+
+$0
+endsnippet

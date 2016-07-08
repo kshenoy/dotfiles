@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# Script for installing tmux on systems where you don't have root access.
+# tmux will be installed in $HOME/local/bin.
+# It's assumed that wget and a C/C++ compiler are installed.
+
+# exit on error
+set -e
+
+export WORK_DIR=$HOME/local
+mkdir -p ${WORK_DIR}
+cd ${WORK_DIR}
+
+############
+# libevent
+#
+export VERSION=2.0.21
+
+# Download source files for libevent
+#wget https://github.com/downloads/libevent/libevent/libevent-2.0.21-stable.tar.gz
+
+# Extract files, configure, and compile
+tar -xzf libevent-${VERSION}-stable.tar.gz
+cd libevent-${VERSION}-stable
+
+./configure --prefix=$WORK_DIR --disable-shared
+make
+make install
+
+
+###########
+# ncurses
+#
+export VERSION=5.9
+
+# Download source files for ncurses
+wget ftp://ftp.gnu.org/gnu/ncurses/ncurses-${VERSION}.tar.gz
+
+# Extract files, configure, and compile
+tar -xzf ncurses-${VERSION}.tar.gz
+cd ncurses-${VERSION} install
+
+./configure --prefix=$WORK_DIR
+make
+make install
+
+
+########
+# tmux
+#
+export VERSION=1.8
+
+# Download source files for tmux
+wget -O tmux-${VERSION}.tar.gz http://sourceforge.net/projects/tmux/files/tmux/tmux-${VERSION}/tmux-${VERSION}.tar.gz/download
+
+# Extract files, configure, and compile
+tar -xzf tmux-${VERSION}.tar.gz
+cd tmux-${VERSION} install
+
+./configure CFLAGS="-I${WORK_DIR}/include -I${WORK_DIR}/include/ncurses" LDFLAGS="-L${WORK_DIR}/lib -L${WORK_DIR}/include/ncurses -L${WORK_DIR}/include"
+CPPFLAGS="-I${WORK_DIR}/include -I${WORK_DIR}/include/ncurses" LDFLAGS="-static -L${WORK_DIR}/include -L${WORK_DIR}/include/ncurses -L${WORK_DIR}/lib" make
+cp tmux ${WORK_DIR}/bin
+
+
+cd
+echo "${WORK_DIR}/bin/tmux is now available. You can optionally add ${WORK_DIR}/bin to your PATH."

@@ -1,0 +1,91 @@
+#!/tool/pandora64/bin/bash
+
+function _print_help_() {
+  echo "Usage:"
+  echo "  `basename $0` [OPTIONS]"
+  echo
+  echo "Options:"
+  echo "  -h            Print this help"
+  echo "  -s SERVER     Start the daemon"
+  echo "  -k SERVER     Kill the daemon"
+  echo "  -K            Kill all daemons"
+  echo "  -l, --list    List all running daemons"
+}
+
+# Defaults
+_verbose=1
+_test=0
+_emacs_path="/home/kshenoy/bin/emacs_path"
+_server=""
+
+# Colors for echo!
+_bold=$(tput bold)
+_fg_green=$(tput setaf 2)
+_reset=$(tput sgr0)
+
+for _i in "$@"; do
+  if [[ $1 =~ ^-h$ ]] || [[ $1 =~ ^--help$ ]]; then
+    _print_help_
+    return 0
+  fi
+done
+
+while (( $# > 0 )); do
+  case "$1" in
+    -s)
+      #echo "DEBUG: -s was used."
+      if [[ ! "$2" =~ ^- ]]; then
+        _server="$2"
+        shift
+      fi
+      _server=${_server:-${REPO_PATH:+$(echo $REPO_PATH | tr '/' '_')}}
+
+      echo "${_fg_green}[Creating emacs daemon: '${_server}']${_reset}"
+      ${_emacs_path}/bin/emacs --daemon${_server:+=$_server}
+      ;;
+
+    -K)
+      #echo "DEBUG: -K was used"
+      while read; do
+        $0 -k $REPLY
+      done < <($0 -l | command grep -v '^\s*$')
+      ;;
+
+    -k)
+      #echo "DEBUG: -k was used"
+      if [[ ! "$2" =~ ^- ]]; then
+        _server="$2"
+        shift
+      fi
+      _server=${_server:-${REPO_PATH:+$(echo $REPO_PATH | tr '/' '_')}}
+      #echo $_server
+
+      echo "${_fg_green}[Killing emacs daemon: $_server]${_reset}"
+      #echo "${_emacs_path}/bin/emacsclient -a '' -t -q -n ${_server:+--socket-name=$_server} --eval '(kill-emacs)'"
+      ${_emacs_path}/bin/emacsclient -a '' -t -q -n ${_server:+--socket-name=$_server} --eval '(kill-emacs)'
+      ;;
+
+    --list|-l)
+      #echo "DEBUG: -l was used"
+      #echo "${_fg_green}[Currently running daemons]${_reset}"
+      #lsof -c emacs | command grep STREAM | tr -s " " | cut -d " " -f9 | sed 's,.*/,  ,'
+      command ls -1 ${TMPDIR:-/tmp}/emacs$(id -u)
+      ;;
+
+    #--verbose|-v)
+    #  _verbose=1
+    #  ;;
+
+    #--test|-t)
+    #  _test=1
+    #  ;;
+
+    *)
+      echo "ERROR: Invalid option: ${1}" >&2; echo
+      print_help
+      exit 1
+      ;;
+  esac
+  shift
+done
+exit 0

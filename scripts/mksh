@@ -1,0 +1,9 @@
+#!/usr/local/bin/tcsh
+#
+# Script to make a shell script template
+
+echo "#\!/usr/local/bin/tcsh" > $1
+chmod 755 $1
+v $1
+
+exit

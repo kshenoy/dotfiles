@@ -1,0 +1,129 @@
+#!/bin/bash -f
+# Function to simplify using tmux
+
+unset -f _tmux_attach_or_new_
+_tmux_attach_or_new_() {                                                                                          # {{{1
+  # Attach to existing session or else create a new one
+  if [[ ! -z "$TMUX" ]]; then return; fi
+
+  if [[ -z "$1" ]]; then
+    tmux -2 attach-session || tmux -2 new-session
+  else
+    # The commented one-liner doesn't work when the supplied argument is a subset of an already existing session name
+    # For eg. if we have a session called DebugBus, and we check if the session "Debug" exists, tmux returns true
+    #tmux -2 attach-session -t "$@" || ( echo "Creating new session..." && tmux -2 new-session -s "$@" )
+
+    if [[ $(tm ls | grep -P "^$1\b" 2> /dev/null) ]]; then
+      #echo "Attaching to exising session..."
+      tmux -2 attach-session -t "$@"
+    else
+      echo "Creating new session $1 ..."
+      tmux -2 new-session -s "$1"
+    fi
+  fi
+}
+
+unset -f _tmux_update_env_
+_tmux_update_env_() {                                                                                             # {{{1
+  # Update environment variables in TMUX
+  # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
+  echo "Updating to latest tmux environment...";
+
+  local _line;
+  while read _line; do
+    if [[ $_line == -* ]]; then
+      unset ${_line/#-/}
+    else
+      _line=${_line/=/=\"}
+      _line=${_line/%/\"}
+      eval export $_line;
+    fi;
+  done < <(tmux show-environment)
+
+  echo "...done"
+}
+
+unset -f _tmux_send_keys_other_panes_
+_tmux_send_keys_other_panes_() {                                                                                  # {{{1
+  local _pane_current=$(tmux display-message -p '#P')
+  for _pane in $(tmux list-panes -F '#P'); do
+    if (( "$_pane" != "$_pane_current" )); then
+      tmux send-keys -t ${_pane} "$@"
+    fi
+  done
+}
+
+unset -f _tmux_send_keys_all_panes_
+_tmux_send_keys_all_panes_() {                                                                                    # {{{1
+  for _pane in $(tmux list-panes -F '#P'); do
+    tmux send-keys -t ${_pane} "$@"
+  done
+}
+
+unset -f _tmux_send_keys_all_
+_tmux_send_keys_all_() {                                                                                          # {{{1
+  for _window in $(tmux list-windows -F '#I'); do
+    for _pane in $(tmux list-panes -t ${_window} -F '#P'); do
+      tmux send-keys -t ${_window}.${_pane} "$@"
+    done
+  done
+}
+
+unset -f _tmux_select_session_
+_tmux_select_session_() {                                                                                         # {{{1
+  tmux list-sessions | awk -F: '{ print $1 " \"" $2 "\""; }' |\
+    xargs dialog --ok-label 'Attach' --cancel-label 'New session' --menu tmux 20 80 20 2>/tmp/tmux-session \
+    && tmux attach-session -t $(cat /tmp/tmux-session; rm /tmp/tmux-session) \
+    || tmux
+}
+
+
+unset -f tmux_pp
+tmux_pp() {                                                                                                       # {{{1
+  # We can't make the helper functions private because doing so will run tmux_pp in a subshell
+  # However, since we can't export variables from a subshell to its parent shell, tmux_update_env won't work
+
+  local cmd=$1; shift;
+
+  case $cmd in
+    attach-new|an)
+      # if (( $(command tmux -V) < 2.3 )); then
+        _tmux_attach_or_new_ "$@"
+      # else
+        # command tmux new-session -A -s "$@"
+      # fi
+      ;;
+
+    update-env|ue)
+      if (( $# > 0 )); then echo "Ignoring extra arguments: '$@'"; fi
+      _tmux_update_env_
+      ;;
+
+    update-env-all-panes|ueap)
+      tmux_pp send-keys-all-panes "tmux_pp ue" C-m
+      ;;
+
+    update-env-all|uea)
+      tmux_pp send-keys-all "tmux_pp ue" C-m
+      ;;
+
+    sk)
+      ~/bin/tmux send-keys "$@"
+      ;;
+
+    send-keys-other-panes|skop)
+      _tmux_send_keys_other_panes_ "$@"
+      ;;
+
+    send-keys-all-panes|skap)
+      _tmux_send_keys_all_panes_ "$@"
+      ;;
+
+    send-keys-all|ska)
+      _tmux_send_keys_all_ "$@"
+      ;;
+
+    *)
+      command tmux ${cmd} "$@"
+  esac
+}

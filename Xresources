@@ -1,0 +1,133 @@
+!! Simply trying to load the defaults results in an error as it can not parse the #include
+!! Thus, go to the directory /usr/share/X11/app-defaults/XTerm and then load it
+!
+!sh -c "cd /usr/share/X11/app-defaults && xrdb -load XTerm-color && xrdb -merge ~/.Xresources"
+!sh -c "cd /etc/X11/app-defaults && xrdb -load XTerm-color && xrdb -merge ~/.Xresources"
+!
+!! To check the loaded options, use
+!xrdb -query -all
+!
+!! Check if xterm has been compiled with freetype support or not by passing xterm binary as argument to the ldd command
+!ldd path/to/xterm/binary
+!! Show font names (with freetype support):
+!/tool/pandora64/.package/fontconfig-2.10.91/bin/fc-list :scalable=true:spacing=mono: family
+!! faceName and faceSize only work if xterm has been compiled with freetype support
+!! Search for render font in `man xterm`
+
+!=======================================================================================================================
+! XTerm settings                                                                                                    {{{1
+!=======================================================================================================================
+!! Most settings are from the ArchWiki: https://wiki.archlinux.org/index.php/Xterm
+
+!! To allow the terminal itself to set the TERM variable correctly; instead of forcing in .bashrc etc.
+XTerm*termName: xterm-256color
+
+!! Interpret all incoming data as UTF-8
+XTerm*locale: true
+
+!! Allow the use of Alt key for shortcuts
+XTerm*metaSendsEscape: true
+
+XTerm*saveLines: 10000
+XTerm*cursorBlink: true
+
+! XTerm*faceName: FuraMonoForPowerline\ Nerd\ Font:style=Regular
+XTerm*faceName: mplus\ Nerd\ Font
+!XTerm*faceName: SauceCodePro\ Nerd\ Font
+XTerm*faceSize: 10
+XTerm*scaleHeight: 1.15
+
+XTerm*on3Clicks: regex ([[:alpha:]]+://)?([[:alnum:]!#+,./=?@_~-]|(%[[:xdigit:]][[:xdigit:]]))+
+XTerm*rightScrollBar: false
+XTerm*scrollBar: false
+
+
+!=======================================================================================================================
+! UXTerm settings                                                                                                   {{{1
+!=======================================================================================================================
+!! Most settings are from the ArchWiki: https://wiki.archlinux.org/index.php/Xterm
+
+UXTerm*termName: xterm-256color
+
+!! Interpret all incoming data as UTF-8
+UXTerm*locale: true
+
+!! Allow the use of Alt key for shortcuts
+UXTerm*metaSendsEscape: true
+
+UXTerm*saveLines: 10000
+UXTerm*cursorBlink: true
+
+! UXTerm*faceName: FuraMonoForPowerline\ Nerd\ Font:style=Regular
+UXTerm*faceName: mplus\ Nerd\ Font
+UXTerm*faceSize: 13
+UXTerm*scaleHeight: 1.15
+
+UXTerm*on3Clicks: regex ([[:alpha:]]+://)?([[:alnum:]!#+,./=?@_~-]|(%[[:xdigit:]][[:xdigit:]]))+
+UXTerm*rightScrollBar: false
+UXTerm*scrollBar: false
+!UXTerm*printerCommand: xterm -T History -e sh -c 'less -r <&3' 3<&0
+!UXTerm*translations:   #override Ctrl <Key>slash: print-everything()
+
+
+!=======================================================================================================================
+! URxvt settings                                                                                                    {{{1
+!=======================================================================================================================
+! urxvt --help 2>&1| sed -n '/:  /s/^\s*/! URxvt./gp'
+! TERM=dump command man -Pcat urxvt | sed -n '/depth: b/,/^BACKGROUND/p'|sed '$d'| sed 's/@/%-.-%/g; s/\^/%-+-%/g' | sed '/^       [a-z]/s/^ */^/g' | tr -s "\n" |\
+! sed -e :a -e 'N;s/\n/@@/g;ta;P;D' | sed 's,\^\([^@]\+\)@*[\t ]*\([^\^]\+\),! \2\n! URxvt.\1\n\n,g' | sed 's,@@           ,\n           ,g' | sed 's,@*$,,g' |sed '/^[^!]/d'
+
+URxvt.cursorBlink:          true
+URxvt.externalBorder:       0
+URxvt.fading:               20
+! URxvt.font:                 xft:FuraMonoForPowerline\ Nerd\ Font:style=Regular:pixelsize=12
+! URxvt.font:                 xft:DejaVu\ Sans\ Mono:style=Book:size=10, xft:FreeSerif:style=Regular
+URxvt.font:                 xft:mplus\ Nerd\ Font:pixelsize=13
+URxvt.geometry:             240x84
+URxvt.internalBorder:       2
+! URxvt.jumpScroll:         boolean
+URxvt.letterSpace:          -1
+URxvt.lineSpace:            3
+URxvt.loginShell:           true
+URxvt.mouseWheelScrollPage: false
+URxvt.rightScrollBar:       false
+URxvt.saveLines:            100000
+URxvt.scrollBar:            false
+URxvt.scrollBar_floating:   true
+URxvt.scrollBar_right:      true
+URxvt.scrollColor:          #777777
+URxvt.scrollTtyKeypress:    true
+URxvt.scrollTtyOutput:      false
+URxvt.scrollWithBuffer:     false
+URxvt.scrollstyle:          plain
+URxvt.secondaryScreen:      true
+URxvt.secondaryScroll:      true
+URxvt.skipScroll:           true
+URxvt.termName:             xterm-256color
+! URxvt.tripleclickwords:   boolean
+URxvt.visualBell:           false
+
+!=======================================================================================================================
+! Xft settings                                                                                                      {{{1
+!=======================================================================================================================
+Xft.dpi:        96
+Xft.antialias:  true
+Xft.rgba:       rgb
+Xft.hinting:    true
+Xft.hintstyle:  hintslight
+
+
+!=======================================================================================================================
+! Colors                                                                                                            {{{1
+!=======================================================================================================================
+!! Color 0/8:   Black
+!! Color 1/9:   Red
+!! Color 2/10:  Green
+!! Color 3/11:  Yellow
+!! Color 4/12:  Blue
+!! Color 5/13:  Magenta
+!! Color 6/14:  Cyan
+!! Color 7/15:  White
+
+!! Apply base16-colors using the command: color <scheme> <background>
+#include ".Xresources.d/base16_color"

@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+#
+# Modifies the "bjobs -w" to show the Jobname last, and aligns all the colums
+#
+
+$_=<>;
+my @w=split /\s+/;
+printf("%-6s %-8s %-4s %-7s %-14s %-12s %-12s %s\n",$w[0],$w[1],$w[2],$w[3],$w[4],$w[5],$w[7],$w[6]);
+
+while($_=<>){
+@w=split /\s+/;
+printf("%-6s %-8s %-4s %-7s %-14s %-12s %s %02s %-5s %s\n",$w[0],$w[1],$w[2],$w[3],$w[4],$w[5],$w[7],$w[8],$w[9],$w[6]);
+}

@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+use strict;
+use diagnostics;
+use English;
+
+# Syntax >pbc "<expression>" [OPTION]
+#	-s, --scale		precision after the decimal
+#	-i, --ibase		input base
+#	-o, --obase		output base
+#
+
+# tie the file 'pbc' to the array '@pbc'.  From this point on
+# the lines of 'pbc' are the entries in @pbc and vice versa
+use Tie::File;
+tie my @pbc, "Tie::File", "/user/a0393831/scripts/pbc";
+
+my ($scale, $ibase, $obase);
+
+use Getopt::Long;
+GetOptions(
+	'scale|s=i' => \$scale,
+	'ibase|i=i' => \$ibase,
+	'obase|o=i' => \$obase,
+);
+
+
+foreach my $i (@pbc){
+	$i = "\$scale = $scale unless(\$scale);" if(($i =~ /^\$scale/) && defined($scale));
+	$i = "\$ibase = $ibase unless(\$ibase);" if(($i =~ /^\$ibase/) && defined($ibase));
+	$i = "\$obase = $obase unless(\$obase);" if(($i =~ /^\$obase/) && defined($obase));
+}
+
+$scale = 9 unless($scale);
+$ibase = 10 unless($ibase);
+$obase = 10 unless($obase);
+
+
+$_ = $ARGV[0] if(defined($ARGV[0]));
+
+s/(\d+.?\d*)\|\|(\d+.?\d*)/$1*$2\/($1+$2)/;
+s/log\s?\((\d+.?\d*)\)/l($1)\/l(10)/g if(/log/);
+s/ln\s?\((\d+.?\d*)\)/l($1)/ if(/ln/);
+s/lg\s?\((\d+.?\d*)\)/l($1)\/l(2)/ if(/lg/);
+
+#print "$_\t$scale\t$ibase\t$obase\n";
+
+system "echo \"scale=$scale;ibase=$ibase;obase=$obase;$_\" | bc -l";

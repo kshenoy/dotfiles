@@ -1,0 +1,72 @@
+#!/bin/bash
+#
+########################################################################################################################
+#
+#  REGULAR COLORS:
+#            |  Normal      |  Bold                |  Underline            |  Background
+#    --------+--------------+----------------------+-----------------------+---------------
+#    Black   |  ${Black}    |  ${Bold}${Black}     |  ${Uline}${Black}     |  ${BlackBG}
+#    Red     |  ${Red}      |  ${Bold}${Red}       |  ${Uline}${Red}       |  ${RedBG}
+#    Green   |  ${Green}    |  ${Bold}${Green}     |  ${Uline}${Green}     |  ${GreenBG}
+#    Yellow  |  ${Yellow}   |  ${Bold}${Yellow}    |  ${Uline}${Yellow}    |  ${YellowBG}
+#    Blue    |  ${Blue}     |  ${Bold}${Blue}      |  ${Uline}${Blue}      |  ${BlueBG}
+#    Purple  |  ${Purple}   |  ${Bold}${Purple}    |  ${Uline}${Purple}    |  ${PurpleBG}
+#    Cyan    |  ${Cyan}     |  ${Bold}${Cyan}      |  ${Uline}${Cyan}      |  ${CyanBG}
+#    White   |  ${White}    |  ${Bold}${White}     |  ${Uline}${White}     |  ${WhiteBG}
+#
+#  LIGHT COLORS:
+#            |  Normal      |  Bold                |  Underline            |  Background
+#    --------+--------------+----------------------+-----------------------+----------------
+#    Black   |  ${IBlack}   |  ${Bold}${IBlack}    |  ${Uline}${IBlack}    |  ${IBlackBG}
+#    Red     |  ${IRed}     |  ${Bold}${IRed}      |  ${Uline}${IRed}      |  ${IRedBG}
+#    Green   |  ${IGreen}   |  ${Bold}${IGreen}    |  ${Uline}${IGreen}    |  ${IGreenBG}
+#    Yellow  |  ${IYellow}  |  ${Bold}${IYellow}   |  ${Uline}${IYellow}   |  ${IYellowBG}
+#    Blue    |  ${IBlue}    |  ${Bold}${IBlue}     |  ${Uline}${IBlue}     |  ${IBlueBG}
+#    Purple  |  ${IPurple}  |  ${Bold}${IPurple}   |  ${Uline}${IPurple}   |  ${IPurpleBG}
+#    Cyan    |  ${ICyan}    |  ${Bold}${ICyan}     |  ${Uline}${ICyan}     |  ${ICyanBG}
+#    White   |  ${IWhite}   |  ${Bold}${IWhite}    |  ${Uline}${IWhite}    |  ${IWhiteBG}
+#
+#=======================================================================================================================
+#
+# A better way to go about this is by using tput. Eg. http://stackoverflow.com/a/20983251/734153
+#
+########################################################################################################################
+
+_cecho_gen_() {
+  Norm=$(tput sgr0)
+  Bold=$(tput bold)
+  Uline=$(tput smul)
+
+  local color=""
+  for color in Black Red Green Yellow Blue Purple Cyan White; do
+    local color_code=""
+    case "$color" in
+      Black ) color_code="0";;
+      Red   ) color_code="1";;
+      Green ) color_code="2";;
+      Yellow) color_code="3";;
+      Blue  ) color_code="4";;
+      Purple) color_code="5";;
+      Cyan  ) color_code="6";;
+      White ) color_code="7";;
+    esac
+    eval "${color}=\\\\e[3${color_code}"
+    eval "${color}BG=\\\\e[4${color_code}"
+  done
+}
+_cecho_gen_
+
+#cecho_demo() {
+#  for color in Black Red Green Yellow Blue Purple Cyan White; do
+#    local color_bg="${color}BG"
+#    local icolor="I${color}"
+#    local icolor_bg="I${color}BG"
+#    echo -e "Regular:"
+#    eval str='echo -e "  ${Norm}'${color}'NORMAL    ${Bold}${color}BOLD    ${Uline}${color}Underline ${color_bg}Background"'
+#    echo $str
+#    echo -e "  ${Norm}\$${color}NORMAL    ${Bold}${color}BOLD    ${Uline}${color}Underline    ${color_bg}Background"
+#    echo -e "Light:"
+#    echo -e "  ${Norm}${icolor}NORMAL    ${Bold}${icolor}BOLD    ${Uline}${icolor}Underline    ${i_color_bg}Background"
+#    echo
+#  done
+#}

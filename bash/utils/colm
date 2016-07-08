@@ -1,0 +1,14 @@
+#!/bin/bash -f
+#
+# Function to print column no. n of space-separated input
+# SYNTAX:
+#   echo " 1  2  3" | col 1
+#     should print 2
+#   echo " 1  2  3" | col -1
+#     should print 3
+unset -f colm
+colm() {
+  while read stdin; do
+    echo $stdin | perl -alne 'print $F['$1']';
+  done
+}

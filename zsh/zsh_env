@@ -1,0 +1,17 @@
+#!/bin/zsh -f
+# File .zshrc
+# Last Modified on: Mon Jul 16 11:47:53 2001
+# Description: zsh startup file - environmental vars
+
+setopt all_export
+# variables
+PAGER=less
+
+PATH_ZSHENV=
+
+HOSTNAME=${HOST%%.*}
+
+PATH=.:~/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+unsetopt all_export
+# end of file .zshenv

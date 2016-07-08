@@ -1,0 +1,69 @@
+#!/usr/bin/perl
+#==============================================================================#
+#                                                                              #
+#  Script to                                                                   #
+#  Created by Kartik Shenoy (a0393831)                                         #
+#                                                                              #
+#  REQUIRED:                                                                   #
+#                                                                              #
+#  OPTIONAL:                                                                   #
+#                                                                              #
+#  SYNTAX:                                                                     #
+#                                                                              #
+#  DESCRIPTION:                                                                #
+#                                                                              #
+#==============================================================================#
+
+## Modules
+use Getopt::Long;
+use Carp;
+
+## Pragmas
+use strict;
+use warnings;
+use diagnostics;
+
+local $SIG{__DIE__} = \&croak;
+local $SIG{__WARN__} = \&carp;
+
+## Command-line parameter handling
+GetOptions(
+    "n=i" => \my $n,
+    "m=i" => \my $m,
+    "v"   => \my $v,
+);
+
+
+## Input Handling
+$n||=$ARGV[0] unless defined $n;
+defined($n) or die("ERROR: Input not specified\n");
+$m||=$ARGV[1]||2 unless defined $m;
+
+my %hash;
+for(my $i=1; $i<=$n; $i++){
+    $hash{$i}=1;
+}
+print "N : $n\tM : $m\n" if($v);
+
+my $last=$n-1;
+my $count=0;
+while($last){
+    for(my $i=0; $i<$m; ){
+        $count++;
+        $count-=$n if($count>$n);
+        $i++ if($hash{$count}==1);
+    }
+
+    $hash{$count}=0;
+    $last--;
+    print "  $count ==> 0\n" if($v);
+}
+
+foreach(sort keys %hash){
+    if($hash{$_}==1){
+        print "\nLast man standing is $_\n";
+        last;
+    }
+}
+
+exit 0;

@@ -1,0 +1,182 @@
+## Reference: http://grml.org/zsh/zsh-lovers.html
+
+
+## Command-line input mode setting
+# v : VI Insert Mode
+# a : VI Command Mode
+# e : EMacs Mode
+# m : Support for metachars
+bindkey -e # EMacs Mode, support for Metachars
+#bindkey -v # VI Mode, support for Metachars
+bindkey "\e[1~" beginning-of-line  # Home
+bindkey "\e[7~" beginning-of-line  # Home rxvt
+bindkey "\e[2~" overwrite-mode     # Ins
+bindkey "\e[3~" delete-char        # Delete
+bindkey "\e[4~" end-of-line        # End
+bindkey "\e[8~" end-of-line        # End rxvt
+WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
+
+
+#===============================================================================
+# Auto-completion
+#
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path /home/ks/.zsh/cache
+
+# Ignore CVS files from being completed
+zstyle ':completion:*:(all-|)files' ignored-patterns '(|*/)CVS'
+zstyle ':completion:*:cd:*' ignored-patterns '(*/)#CVS'
+
+# Fuzzy matching of completions for when you mistype them
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
+# Increase the number of errors allowed by _approximate with the length of what has been typed
+zstyle -e ':completion:*:approximate:*' max-errors 'reply=($((($#PREFIX+$#SUFFIX)/3))numeric)'
+
+# Ignore completion functions for commands you don't have
+zstyle ':completion:*:functions' ignored-patterns '_*'
+xdvi() { command xdvi ${*:-*.dvi(om[1])} }
+zstyle ':completion:*:*:xdvi:*' menu yes select
+zstyle ':completion:*:*:xdvi:*' file-sort time
+
+# Completing with menu selection:
+zstyle ':completion:*' menu select=2
+zstyle ':completion:*:*:kill:*' menu yes select
+zstyle ':completion:*:kill:*'   force-list always
+
+# Remove the trailing slash (useful in ln)
+zstyle ':completion:*' squeeze-slashes true
+
+# cd will never select the parent directory (e.g.: cd ../<TAB>):
+zstyle ':completion:*:cd:*' ignore-parents parent pwd
+
+eval "$(dircolors -b)"
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' list-colors ''
+
+#autoload -Uz compinit
+#compinit
+#zstyle ':completion:*' auto-description 'specify: %d'
+##zstyle ':completion:*' completer _expand _complete _correct _approximate
+#zstyle ':completion:*' completer _expand _complete _correct
+#zstyle ':completion:*' format 'Completing %d'
+#zstyle ':completion:*' group-name ''
+##zstyle ':completion:*' menu select=2
+#eval "$(dircolors -b)"
+#zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+#zstyle ':completion:*' list-colors ''
+#zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
+#zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=* l:|=*'
+#zstyle ':completion:*' menu select=long
+#zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
+#zstyle ':completion:*' use-compctl false
+#zstyle ':completion:*' verbose true
+
+
+
+## Misc Options
+umask 002
+unsetopt BEEP
+
+
+
+## Compatability Options
+#setopt  SH_WORD_SPLIT
+setopt   NO_BG_NICE
+setopt   NO_HUP
+setopt   NOTIFY
+unsetopt RM_STAR_SILENT
+setopt   PROMPT_SUBST
+
+
+
+## CSH Options
+setopt CSH_JUNKIE_HISTORY
+setopt CSH_NULL_GLOB
+unsetopt CSH_JUNKIE_QUOTES
+
+
+
+#===============================================================================
+# History Options
+#
+HISTSIZE=5000
+SAVEHIST=5000
+# Triggers too many Dropbox updates
+#if [[ -f ~/Dropbox/Softwares/Linux/zsh/zsh_history ]]; then
+  #HISTFILE=~/Dropbox/Softwares/Linux/zsh/zsh_history
+#fi
+
+setopt   HIST_VERIFY
+setopt   APPEND_HISTORY
+setopt   INC_APPEND_HISTORY
+unsetopt SHARE_HISTORY
+setopt   EXTENDED_HISTORY
+setopt   HIST_IGNORE_DUPS
+setopt   HIST_IGNORE_ALL_DUPS
+setopt   HIST_EXPIRE_DUPS_FIRST
+setopt   HIST_FIND_NO_DUPS
+setopt   HIST_REDUCE_BLANKS
+
+
+
+#===============================================================================
+# Fast Navigation Options
+#
+setopt   AUTO_CD
+setopt   AUTO_NAME_DIRS
+setopt   CD_ABLE_VARS
+setopt   MULTIOS
+setopt   CORRECT
+unsetopt NO_CLOBBER
+
+# Rationalise dot (just enter 'cd ..../dir' to see)
+rationalise-dot() {
+  if [[ $LBUFFER = *.. ]]; then
+    LBUFFER+=/..
+  else
+    LBUFFER+=.
+  fi
+}
+zle -N rationalise-dot
+bindkey . rationalise-dot
+
+# Directory Stack Options
+DIRSTACKSIZE=25
+setopt AUTO_PUSHD
+setopt PUSHD_IGNORE_DUPS
+setopt EXTENDED_GLOB
+
+
+
+#===============================================================================
+# 256 colors for console
+#
+if [[ -e /usr/share/terminfo/x/xterm-256color ]]; then
+  export TERM='screen-256color'
+else
+  export TERM='xterm-color'
+fi
+
+
+#===============================================================================
+# Source files
+#
+for i in \
+  ~/.linux/zsh/zshrc-func    \
+  ~/.linux/zsh/zshrc-prompt  \
+  ~/.zshrc_local             \
+  ~/.linux/aliases           \
+  ; do
+  if [[ -f ${i} ]]; then
+  # echo "  Sourcing ${i} ..."
+  . ${i}
+  # echo "  ... done"
+  fi
+done
+
+# Automatically remove duplicates from these arrays
+typeset -U path cdpath fpath manpath
+#str_u=`echo $str | perl -e 'foreach $i(<>=~/([^:\n]+)/g){push(@o,$i) if(!grep(/$i/,@o))};print join(":",@o)'`
+#str=`echo $str | perl -e 'BEGIN{$c=0;@i=<>=~/([^:\n]+)/g}foreach(@i){$h{$_}=++$c if !$h{$_}}END{%r=reverse %h;foreach(sort keys %r){push @o,$r{$_}}print join(":",@o)}'`

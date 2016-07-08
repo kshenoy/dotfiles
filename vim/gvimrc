@@ -1,0 +1,48 @@
+" .gvimrc file
+
+
+"
+" Mouse pointer specific options
+"
+  " Enable mouse in (c)ommand, (i)nsert, (n)ormal, (v)isual or (a)ll modes
+  set mouse=a
+
+  " Disable auto focus window with mouse pointer
+  set nomousefocus
+
+  " Hide mouse pointer while typing
+  set mousehide
+
+
+"
+" GUI
+"
+  " Set Font
+  if has('unix')
+    set guifont=MesloLGLDZ\ Nerd\ Font\ 8
+    set guifont+=Monospace\ 8
+  elseif has('win32')
+    set guifont=Consolas:h9:cANSI
+  endif
+
+  set guioptions-=b    " Disable horizontal scrollbar
+  set guioptions-=l    " Disable left-hand scrollbar
+  set guioptions-=L    " Disable left-hand vertically split window scrollbar
+  set guioptions-=m    " Disable menu-bar
+  set guioptions-=r    " Disable right-hand scrollbar
+  set guioptions-=R    " Disable right-hand vertically split window scrollbar
+  set guioptions-=T    " Disable toolbar
+
+  " Disable <Alt> key shortcuts used to access menu
+  set winaltkeys=no
+
+  " Number of pixel lines to use between characters
+  set linespace=0
+
+  " Make 'File Open' use current directory
+  set browsedir=buffer
+
+  set background=light
+  colorscheme solarized
+  "set background=dark
+  "colorscheme base16-ocean

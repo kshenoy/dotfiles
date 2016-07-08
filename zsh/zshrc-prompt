@@ -1,0 +1,143 @@
+#=============================================================================
+# Misc Info
+#=============================================================================
+# Using colors based on the color command
+# Color command generates the hashes 'fg', 'fg_bold', 'fg_no_bold', 'bg', 'bg_bold', 'bg_no_bold'
+# The keys of the above hashes are 'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan' and 'white'
+#
+# The following code is required to use hash based call
+#    setopt PROMPT_SUBST
+#    autoload colors zsh/terminfo
+#    if [[ "$terminfo[colors]" -ge 8 ]]; then
+#        colors
+#    fi
+#
+# Syntax : %{$bg_bold[red]$fg[white]%}
+# normal=$terminfo[sgr0]
+
+
+#=============================================================================
+# Elegance Zsh Prompt
+#=============================================================================
+function git_curr_br() {
+  local ref=$(git symbolic-ref HEAD 2> /dev/null) || return
+  PR_GIT_BR=${ref#refs/heads/}
+}
+
+
+function precmd {
+  local TERMWIDTH
+  (( TERMWIDTH = ${COLUMNS} - 1 ))
+
+  ###
+  # Truncate the path if it's too long.
+  PR_FILLBAR=""
+  PR_PWDLEN=""
+  PR_GIT_INFO=""
+  modPWD="${PWD/#$HOME/~}"
+
+  PR_VCS_SEP="%{$fg_no_bold[blue]%}∙"
+  PR_VCS_DIRTY="%{$fg_no_bold[red]%}✗"
+  PR_VCS_CLEAN="%{$fg_no_bold[green]%}✔"
+  PR_VCS_AHEAD="%{$fg_bold[yellow]%}⚡"
+
+  local pwdsize=${#${(%):-${modPWD}}}
+
+  if git rev-parse --git-dir > /dev/null 2>&1; then
+    local promptsize=${#${(%):-()--(%h)-(_**+)}}
+    git_curr_br
+    (( promptsize = $promptsize + ${#PR_GIT_BR} ))
+
+    if $(echo "$(git log origin/$PR_GIT_BR..HEAD 2> /dev/null)" | grep '^commit' &> /dev/null); then
+      PR_VCS_STAT=$PR_VCS_AHEAD
+    elif [[ -n $(git status -s --ignore-submodules=dirty  2> /dev/null) ]]; then
+      PR_VCS_STAT=$PR_VCS_DIRTY
+    else
+      PR_VCS_STAT=$PR_VCS_CLEAN
+    fi
+
+    PR_VCS_INFO="%{$fg_bold[black]%}($PR_VCS_STAT$PR_VCS_SEP\
+%{$fg_bold[cyan]%}$PR_GIT_BR$PR_VCS_SEP$normal±%{$fg_bold[black]%})"
+
+  else
+    local promptsize=${#${(%):-()--(%h)-}}
+    PR_VCS_INFO=""
+  fi
+
+  if [[ "$promptsize + $pwdsize" -gt $TERMWIDTH ]]; then
+    ((PR_PWDLEN=$TERMWIDTH - $promptsize))
+  else
+    #PR_FILLBAR="\${(l.(($TERMWIDTH - ($promptsize + $pwdsize)))..${PR_DASH}.)}"
+    PR_FILLBAR=""
+    (( fillsize = $TERMWIDTH - ($promptsize + $pwdsize) ))
+    while [ $fillsize -gt 0 ]; do
+      PR_FILLBAR="$PR_FILLBAR$PR_HBAR"
+      (( fillsize = $fillsize - 1 ))
+    done
+  fi
+
+  # To print a newline before the prompt
+  print
+}
+
+
+setprompt_philmod () {
+  ###
+  # Need this so the prompt will work.
+  setopt PROMPT_SUBST
+
+
+  ###
+  # See if we can use colors.
+  autoload colors zsh/terminfo
+  #if [[ "$terminfo[colors]" -ge 8 ]]; then
+    colors
+  #fi
+  blink=$'\e[5m'
+  blink_off=$'\e[25m'
+  normal="%{$terminfo[sgr0]%}"
+
+
+  ###
+  # See if we can use extended characters to look nicer.
+  typeset -A altchar
+  set -A altchar ${(s..)terminfo[acsc]}
+  PR_SET_CHARSET="%{$terminfo[enacs]%}"
+  PR_DASH=─
+
+  PR_ULCORNER="%{$fg_no_bold[white]%}┌"
+  PR_URCORNER="%{$fg_no_bold[white]%}┐"
+  PR_LLCORNER="%{$fg_no_bold[white]%}└"
+  PR_LRCORNER="%{$fg_no_bold[white]%}┘"
+  PR_HISTNUM="%{$fg_bold[black]%}(%{$fg_no_bold[green]%}%h%{$fg_bold[black]%})"
+  PR_HBAR="%{$fg_no_bold[white]%}$PR_DASH"
+  PR_CMD_STAT="%{$fg_bold[black]%}(%(?.%{$fg_bold[green]%}^_^.%{$fg_bold[red]%}@_@)%{$fg_bold[black]%})"
+  PR_PROMPT_CHAR="%{%(!.$fg_bold[red].$fg_no_bold[white])%}➤"
+  #»➤→╰╮╭╯└┐┌┘
+  PR_TIME="%{$fg_bold[black]%}(%{$fg_no_bold[yellow]%}%D{%H:%M %b %d, %a}%{$fg_bold[black]%})"
+
+  ###
+  # Decide if we need to set titlebar text.
+  case $TERM in
+    xterm*)
+      PR_TITLEBAR=$'%{\e]0;%n@%m: %~\a%}'
+      ;;
+    *)
+      PR_TITLEBAR=''
+      ;;
+  esac
+
+
+  ###
+  # Finally, the prompt.
+  PROMPT='$PR_SET_CHARSET${(e)PR_TITLEBAR}\
+$PR_ULCORNER$PR_HISTNUM$PR_HBAR\
+%{$fg_bold[black]%}(%{%(?.$fg_bold[green].$fg_bold[red])%}%$PR_PWDLEN<...<${modPWD}%<<%{$fg_bold[black]%})\
+%{$fg_no_bold[white]%}${(e)PR_FILLBAR}$PR_VCS_INFO$PR_URCORNER\
+
+$PR_LLCORNER$PR_HBAR$PR_CMD_STAT$PR_HBAR$PR_PROMPT_CHAR $normal'
+
+  RPROMPT=' $PR_TIME$PR_LRCORNER$normal'
+
+  PS2='%{$fg_no_bold[white]%}%_ ➤$normal '
+}

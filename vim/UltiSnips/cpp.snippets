@@ -1,0 +1,102 @@
+# vim:ft=snippets:
+priority -49
+extends c
+# We want to overwrite everything in parent ft.
+priority -48
+#===========================================================================
+# Global functions
+#
+global !p
+def complete(t, opts, default=""):
+  if t == "":
+    return default
+  elif t:
+    opts = [ m[len(t):] for m in opts if m.startswith(t) ]
+  if len(opts) == 1:
+    return opts[0]
+  return "(" + "|".join(opts) + ")"
+endglobal
+
+
+
+#===========================================================================
+# Headers/Namespaces
+#
+snippet inc "#include <>" b
+#include <$1`!p snip.rv = complete( t[1], ['cassert', 'cstdio', 'cstdlib', 'cstring', 'fstream', 'iostream', 'sstream'], snip.basename + '.h')`>
+endsnippet
+
+snippet Inc "C++ includes" b
+#include <iostream>
+endsnippet
+
+snippet ns "namespace ..."
+namespace${1/.+/ /m}${1:`!p snip.rv = snip.basename or "name"`} {
+  ${VISUAL}${0}
+} // END namespace${1/.+/ /m}$1
+endsnippet
+
+snippet uns "using namespace ..."
+using namespace ${1:std};
+endsnippet
+
+
+
+#===========================================================================
+# Loops
+#
+snippet for "C++ style for..."
+for (${4:unsigned} ${3:i} = ${2:0}; $3 < ${1:count}; ${5:++}$3) {
+  ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
+}
+endsnippet
+
+
+
+#===========================================================================
+# Classes
+#
+snippet 'cl(ass)?' "class" r
+class ${1:`!p snip.rv = snip.basename or "name"`} {
+  public:
+    ${1/(\w+).*/$1/}( ${2:arguments} );
+    virtual ~${1/(\w+).*/$1/}(){}
+
+  private:
+};
+endsnippet
+
+
+
+#===========================================================================
+# STL
+#
+snippet be "$1.begin(), $1.end()"
+${1:v}${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}begin(); $1${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}end()
+endsnippet
+
+snippet 'vec(tor)?' "::std::vector" r
+::std::vector<${1:char}> ${0};
+endsnippet
+
+
+
+#===========================================================================
+# Misc
+#
+snippet forbe "Iterate over STL container"
+${1:::std::vector<int>}::const_iterator it, it_last;
+for (${3:it} = ${2:v}.begin(), ${4:it_last}=$2.end(); $3 != $4; ${5:++}$3) {
+  ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
+}
+endsnippet
+
+snippet readfile "readfile"
+std::vector<char> v;
+if (FILE *${2:fp} = fopen(${1:"filename"}, "r")) {
+  char buf[1024];
+  while (size_t len = fread(buf, 1, sizeof(buf), $2))
+    v.insert(v.end(), buf, buf + len);
+  fclose($2);
+}$0
+endsnippet

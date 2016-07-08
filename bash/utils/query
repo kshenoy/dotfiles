@@ -1,0 +1,275 @@
+#!/bin/bash -f
+# Author: Kartik Shenoy
+#
+# Query: which on steroids
+#
+# NOTE: Since this function deals with aliases, it cannot be made into a stand-alone script since aliases are not
+#       accessible inside subshells. Thus, this must be sourced to work
+
+unset -f query
+query() (
+# Yep, parentheses is correct. It makes this a subshell function allowing the definition to be inaccessible from outside
+# Thus, no more polluting of shell space with helper functions
+
+_query_help_() {                                                                                                  # {{{1
+  echo "Usage:"
+  echo "    query [OPTION]... INPUT..."
+  echo
+  echo "INPUT can be one or more alias, file, command, function etc. but must be specified last"
+  echo
+  echo "Options:"
+  echo "    -h, --help             Print this help"
+  echo "        --ascii            Use ASCII instead of extended characters"
+  echo "        --color            Colorize output"
+  echo "        --nocolor          Don't colorize output"
+  echo "    -d, --max-depth <N>    Recurse only N-levels deep. If N=0, query only the specified input"
+  echo "        --nodefine         Don't print the function definition"
+}
+
+
+_query_parse_args_() {                                                                                            # {{{1
+  #echo "DEBUG: Parse:'$@'"
+
+  # Default values of options
+  _query_opts[ascii]=0
+  _query_opts[color]=1
+  _query_opts[define]=1
+  _query_opts[depth]=-1
+  _query_opts[input]=""
+  _query_opts[level]=0
+
+  local _i
+  for _i in "$@"; do
+    if [[ $_i =~ ^-h$ ]] || [[ $_i =~ ^--help$ ]]; then
+      _query_help_
+      return 0
+    fi
+  done
+
+  local _opt_end=0
+  while (( $# > 0 )); do
+    #echo "DEBUG: Arg:'$1'"
+    case $1 in
+      --?*)
+        ;&
+      -[[:alpha:]])
+        if [[ "$_opt_end" == "0" ]] && [[ ! $1 =~ ^-l$ ]] && [[ ! $1 =~ ^--level$ ]]; then
+          _cmd_recurse+=("$1")
+        fi
+        ;;&
+
+      --ascii)
+        _query_opts[ascii]=1
+        ;;
+
+      --color)
+        _query_opts[color]=1
+        ;;
+      --nocolor)
+        _query_opts[color]=0
+        ;;
+
+      --level|-l)
+        # Internal use only. Should not be specified by the user
+        shift
+        if [[ ! $1 =~ ^[0-9]+$ ]]; then
+          echo "ERROR: Current level must be a number"
+          return 1;
+        fi
+        _query_opts[level]=$1
+        ;;
+
+      --max-depth|-d)
+        shift
+        if [[ ! $1 =~ ^[0-9]+$ ]]; then
+          echo -e "ERROR: Max-depth must be a number\n"
+          _query_help_
+          return 1;
+        fi
+        _query_opts[depth]=$1
+        ;;
+
+      --nodefine)
+        #echo "Don't print function definition"
+        _query_opts[define]=0
+        ;;
+
+      --)
+        # Standard shell separator between options and arguments
+        if [[ "$_opt_end" == "0" ]]; then
+          _opt_end=1
+        fi
+        ;;
+
+      -*)
+        if [[ "$_opt_end" == "0" ]]; then
+          echo -e "ERROR: Invalid option: '$1'"
+          _query_help_
+          return 1;
+        fi
+        ;&
+
+      *)
+        # To support multiple inputs
+        while (( $# > 1 )); do
+          query ${_cmd_recurse[@]} --level 0 $1
+          shift
+          echo -e "\n"
+        done
+        _query_opts[input]=$1
+        ;;
+    esac
+    shift
+  done
+
+  # If you don't give me something to work with, then what am I supposed to do?
+  if [[ -z ${_query_opts[input]} ]]; then
+    echo "ERROR: No input specified"
+    return 1;
+  fi
+}
+
+
+_query_alias_() {                                                                                                 # {{{1
+  echo "${_query_pp[sep]}${_query_pp[input]} (${_query_pp[type]})"
+  while read; do
+    echo "${_query_pp[spc]}${REPLY}";
+  done < <(command type -a -- "${_query_opts[input]}" | command head -n2)
+
+  # Recurse
+  if (( ${_query_opts[depth]} == -1 )) || (( ${_query_opts[level]} < ${_query_opts[depth]} )); then
+    local _out_arr=()
+    read -a _out_arr <<< $(command type -a -- ${_query_opts[input]} | command grep -Po "(?<=aliased to .).*(?='$)")
+    local _query_next=()
+    local _level_next=$((${_query_opts[level]} + 1))
+    _query_tree[$_level_next]=0
+
+    local _i=0
+    for _i in ${_out_arr[@]}; do
+      if [[ "$_i" != "${_query_opts[input]}" ]]; then
+        if [[ $(command type -t -- "$_i") =~ file|function|alias ]]; then
+          _query_tree[$_level_next]=$(( ${_query_tree[$_level_next]} + 1 ))
+          _query_next+=("$_i")
+        fi
+      fi
+    done
+    for _i in ${_query_next[@]}; do
+      _query_tree[${_level_next}]=$(( ${_query_tree[$_level_next]} - 1 ))
+      query "${_cmd_recurse[@]}" --level ${_level_next} $_i
+    done
+  fi
+}
+
+
+_query_file_() {                                                                                                  # {{{1
+  echo "${_query_pp[sep]}${_query_pp[input]} (${_query_pp[type]})"
+  while read; do
+    echo "${_query_pp[spc]}${REPLY}";
+  done < <(command type -a -- "${_query_opts[input]}" | command head -n1)
+}
+
+
+_query_function_() {                                                                                              # {{{1
+  echo "${_query_pp[sep]}${_query_pp[input]} (${_query_pp[type]})"
+  shopt -s extdebug
+  IFS=" " read -a _arr <<< $(command declare -F -- "${_query_opts[input]}")
+  shopt -u extdebug
+  echo -e "${_query_pp[spc]}Defined in ${_arr[2]} at line ${_arr[1]}"
+
+  # Print the function definition
+  if [[ "${_query_opts[define]}" == "1" ]]; then
+    while read; do
+      echo "${_query_pp[spc]}${REPLY}";
+    done < <(command type -a -- "${_query_opts[input]}" | command tail -n+2)
+  fi
+}
+
+
+_query_pp_() {                                                                                                    # {{{1
+
+  _query_pp[spc]=""
+  _query_pp[sep]=""
+
+  # Setup the tree-drawing characters
+  if [[ "${_query_opts[ascii]}" == "1" ]]; then
+    local _v_bar='|'
+    local _h_bar='-'
+    local _x_bar='+'
+    local _xl_bar='\'
+  else
+    local _v_bar='│'
+    local _h_bar='─'
+    local _x_bar='├'
+    local _xl_bar='└'
+  fi
+  _query_pp[xl]=${_query_pp[xl]:-$_x_bar}
+
+  # Colorize the output?
+  if [[ "${_query_opts[color]}" == "1" ]]; then
+    local _c_type="$(tput setaf 4)"
+    local _c_input="$(tput bold)$(tput setaf 2)"
+    local _c_reset="$(tput sgr0)"
+  else
+    local _c_type=""
+    local _c_input=""
+    local _c_reset=""
+  fi
+
+  if [[ "${_query_opts[level]}" != "0" ]]; then
+    local _i=0
+    for (( _i=1; _i <= ${_query_opts[level]}; _i++ )); do
+      #echo ${_query_tree[$_i]}
+      if (( ${_query_tree[$_i]} > 0 )); then
+        _query_pp[spc]="${_query_pp[spc]}${_v_bar}   "
+      else
+        _query_pp[spc]="${_query_pp[spc]}    "
+      fi
+    done
+    if (( ${_query_tree[${_query_opts[level]}]} == 0 )); then
+      _x_bar=${_xl_bar}
+    fi
+    _query_pp[sep]="${_query_pp[spc]%????}${_x_bar}${_h_bar}${_h_bar} "
+    echo "${_query_pp[spc]%????}${_v_bar}"
+  fi
+
+  _query_pp[type]="${_c_type}${_type}${_c_reset}"
+  _query_pp[input]="${_c_input}${_query_opts[input]}${_c_reset}"
+}
+# }}}1
+
+  #echo "DEBUG: Cmd='$@'"
+  # Default values for options
+  local -A _query_opts=()
+  local -a _cmd_recurse=()
+  _query_parse_args_ "$@"
+  local _ret_val=$?
+  if [[ "$_ret_val" != "0" ]]; then
+    return $_ret_val;
+  fi
+
+  local _type=$(command type -t -- "${_query_opts[input]}")
+  #echo "DEBUG: Input='${_query_opts[input]}', Type='${_type}'"
+
+  # Pretty-print the tree structure for recursive lookups
+  local -A _query_pp=()
+  if (( ${_query_opts[level]} == 0 )); then
+    echo
+    local -a _query_tree=()
+  fi
+  _query_pp_
+
+  case $_type in
+    "file")
+      _query_file_
+      ;;
+    "function")
+      _query_function_
+      ;;
+    "alias")
+      _query_alias_
+      ;;
+    *)
+      command type -a -- "${_query_opts[input]}"
+      ;;
+  esac
+)

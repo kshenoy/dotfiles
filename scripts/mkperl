@@ -1,0 +1,59 @@
+#!/bin/zsh
+# Script to make a perl template
+echo '#!/usr/bin/perl' > $1
+echo '#==============================================================================#' >> $1
+echo '#                                                                              #' >> $1
+echo '#  Script to                                                                   #' >> $1
+echo '#  Created by Kartik Shenoy (a0393831)                                         #' >> $1
+echo '#                                                                              #' >> $1
+echo '#  REQUIRED:                                                                   #' >> $1
+echo '#                                                                              #' >> $1
+echo '#  OPTIONAL:                                                                   #' >> $1
+echo '#                                                                              #' >> $1
+echo '#  SYNTAX:                                                                     #' >> $1
+echo '#                                                                              #' >> $1
+echo '#  DESCRIPTION:                                                                #' >> $1
+echo '#                                                                              #' >> $1
+echo '#==============================================================================#' >> $1
+echo >> $1
+echo '## Modules' >> $1
+echo 'use Getopt::Long;' >> $1
+echo '#use carp;' >> $1
+echo >> $1
+echo '## Pragmas' >> $1
+echo 'use strict;' >> $1
+echo 'use warnings;' >> $1
+echo 'use diagnostics;' >> $1
+echo >> $1
+echo '#local $SIG{__DIE__} = \&croak;' >> $1
+echo '#local $SIG{__WARN__} = \&carp;' >> $1
+echo >> $1
+echo '## Command-line parameter handling' >> $1
+echo 'GetOptions(' >> $1
+echo '#	"ifile|i=s" => \my $ifile,' >> $1
+echo '#	"ofile|o=s" => \my $ofile,' >> $1
+echo ');' >> $1
+echo >> $1
+echo >> $1
+echo '## File Handling' >> $1
+echo '$ifile||=$ARGV[0] unless defined $ifile;' >> $1
+echo 'defined($ifile) or die("ERROR: Input file not specified\\n");' >> $1
+echo 'die("ERROR : $ifile not found\\n") unless(-e $ifile);' >> $1
+echo 'open(my $fin,"<",$ifile) or die("ERROR: Unable to open $ifile for reading\\n");' >> $1
+echo >> $1
+echo '$ofile||=$ARGV[2] unless defined $ofile;' >> $1
+echo 'defined($ofile) or warn("WARN: Output file not specified\\n");' >> $1
+echo 'open(my $fout,">",$ofile) or die("ERROR: Unable to open $ofile for writing\\n");' >> $1
+echo >> $1
+echo >> $1
+echo 'while(<$fin>){' >> $1
+echo '    chomp;' >> $1
+echo '}' >> $1
+echo >> $1
+echo >> $1
+echo 'close $fin;' >> $1
+echo 'close $fout;' >> $1
+echo 'exit 0;' >> $1
+chmod 755 $1
+
+exit

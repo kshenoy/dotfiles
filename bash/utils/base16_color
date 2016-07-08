@@ -1,0 +1,77 @@
+#! /usr/bin/env bash
+
+unset -f base16_color
+base16_color() (
+  local _base16_cfg=~/.config/base16_config
+  local _base16_shell=~/.linux/base16/shell
+  local _base16_xres=~/.linux/base16/xresources
+
+  help_dump() {
+    echo -e '\nUsage :'
+    echo '  base16_color                       :  Displays the current colorscheme'
+    echo '  base16_color -h|--help|help        :  Displays this help'
+    echo '  base16_color <scheme> <background> :  Changes the colorscheme'
+    echo
+    echo "When a colorscheme is selected, it is saved to ${_base16_cfg} to be used by other applications"
+    echo
+    echo 'Available schemes:'
+    find ${_base16_shell} -name 'base16-*.sh' \
+      | sed -r -e 's|^.+/base16-||' -e 's/\.(dark|light).sh/ \1/' \
+      | column
+  }
+
+  if [[ "$1" =~ -h|help ]]; then
+    help_dump
+    return
+  fi
+
+  # If no argument is given, print the current scheme being used
+  if (( $# == 0 )); then
+    if [[ -s "${_base16_cfg}" ]]; then
+      # paste -d ' ' -s ${_base16_cfg}
+      cat ${_base16_cfg}
+    else
+      help_dump
+    fi
+    return
+  fi
+
+  local _scheme="${1:-monokai}"
+  local _background="${2:-dark}"
+  local _retval=/bin/true
+
+  # If '!' is the first argument, read from the config file and apply colorscheme
+  if (( $# == 1 )); then
+    if [[ ("$1" == "!") && (-s "${_base16_cfg}") ]]; then
+      _scheme=$(head -n1 ${_base16_cfg} | cut -d' ' -f1)
+      _background=$(head -n1 ${_base16_cfg} | cut -d' ' -f2)
+    fi
+  fi
+
+  # Change the Tmux/Screen colorscheme
+  local _file="${_base16_shell}/base16-${_scheme}.${_background}.sh"
+  if [[ -x "$_file" ]]; then
+    "$_file"
+  else
+    _retval=/bin/false
+  fi
+
+  # Change the XTerm colorscheme
+  _file="${_base16_xres}/base16-${_scheme}.${_background}.256.xresources"
+  if [[ -f "$_file" ]]; then
+    command mkdir -p ~/.Xresources.d
+    perl -ne 'if(/^#define/){print;}elsif(/^\*\./){foreach $r (qw(XTerm UXTerm URxvt)){print "$r$_"}}' "$_file" >| ~/.Xresources.d/base16_color
+    xrdb -merge ~/.Xresources.d/base16_color
+  else
+    _retval=/bin/false
+  fi
+
+  if $_retval; then
+    echo -e "${_scheme} ${_background}" >| "${_base16_cfg}"
+    return
+  fi
+
+  echo "Error : Couldn't find colorscheme $_scheme $_background"
+  help_dump
+  "$_retval"
+)

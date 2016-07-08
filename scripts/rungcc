@@ -1,0 +1,34 @@
+#!/bin/bash
+
+if [ $# -eq 0 ] ; then
+	echo -e "Error, no arguments supplied" ;
+	exit 1
+
+elif [ $# -eq 1 ] ; then
+	if [ -f ./$1 ] ; then
+		gcc $1 -o $1.out
+		clear
+		./$1.out
+		rm $1.out
+	else
+		echo -e "The file doesn't exist"
+	fi
+
+elif [ $# -eq 2 ]; then
+	if [ $1 = -o ] ; then
+		name=$2;
+	elif [ $2 = -o ] ; then
+		name=$1;
+	else 
+		echo -e "Error, incorrect argument supplied"
+		exit 1
+	fi
+
+	newname=`basename $name .c`
+
+	gcc $name -o $newname.out
+	clear
+	./$newname.out
+fi
+
+exit 0

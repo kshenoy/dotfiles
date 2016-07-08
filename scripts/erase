@@ -1,0 +1,13 @@
+#!/bin/bash
+# Erase a CD-RW/DVD-RW
+
+if [$# -ne 1]
+then
+	echo "The command is \'erase something\'"
+else
+	echo "Now erasing..."
+	sudo umount /dev/$1
+	cdrecord dev=/dev/$1 blank=fast
+fi
+
+exit

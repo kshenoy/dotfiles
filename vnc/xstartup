@@ -1,0 +1,28 @@
+#!/bin/sh
+
+if [ -r $HOME/.Xresources ]; then
+  xrdb $HOME/.Xresources
+fi
+
+# run the autocutsel program to sync selections between vnc and winders
+if [ -x /tool/pandora/bin/autocutsel ]; then
+  /tool/pandora/bin/autocutsel &
+fi
+
+# run vncconfig if available
+if [ -x /tool/pandora/bin/vncconfig ]; then
+  vncconfig -iconic &
+fi
+
+if [ -x /usr/bin/gnome-session ]; then
+  # Run Gnome if available
+  exec /usr/bin/gnome-session
+elif [ -x /usr/bin/startkde ]; then
+  # Run KDE if available
+  exec /usr/bin/startkde
+fi
+
+# No kde so start an xterm and try for fvwm followed by twm (ugh!)
+#xsetroot -solid grey
+#xterm -geometry 80x24+10+10 -ls -title "$VNCDESKTOP Desktop" &
+#(fvwm2 || twm) &

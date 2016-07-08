@@ -1,0 +1,340 @@
+#!/bin/bash
+#=========
+# Aliases
+#=========
+# Identify the current shell
+MYSHELL=$(basename $(ps h p $$ | awk '{ print $NF }' | sed 's/-//g'))
+
+
+#=================================
+# Global aliases (Zsh specific)
+#
+if [[ $MYSHELL =~ "zsh" ]]; then
+  #alias -g ...='../..'
+  #alias -g ....='../../..'
+  #alias -g .....='../../../..'
+  #alias -g CA="2>&1 | cat -A"
+  alias -g WCL='| wc -l'
+  #alias -g D="DISPLAY=:0.0"
+  alias -g DN=/dev/null
+  #alias -g ED="export DISPLAY=:0.0"
+  #alias -g EG='|& egrep'
+  #alias -g EH='|& head'
+  #alias -g EL='|& less'
+  #alias -g ELS='|& less -S'
+  #alias -g ETL='|& tail -20'
+  #alias -g ET='|& tail'
+  #alias -g F=' | fmt -'
+  alias -g G='| grep'
+  alias -g H='| head'
+  #alias -g HL='|& head -20'
+  #alias -g Sk="*~(*.bz2|*.gz|*.tgz|*.zip|*.z)"
+  #alias -g LL="2>&1 | less"
+  alias -g L="| less"
+  #alias -g LS='| less -S'
+  #alias -g MM='| most'
+  #alias -g M='| more'
+  #alias -g NE="2> /dev/null"
+  #alias -g NS='| sort -n'
+  #alias -g NUL="> /dev/null 2>&1"
+  #alias -g PIPE='|'
+  #alias -g R=' > /c/aaa/tee.txt '
+  alias -g RD='| rm -rf'
+  #alias -g RNS='| sort -nr'
+  alias -g S='| sort'
+  #alias -g TL='| tail -20'
+  alias -g T='| tail'
+  alias -g SU='| sort -u'
+  #alias -g VM=/var/log/messages
+  #alias -g X0G='| xargs -0 egrep'
+  #alias -g X0='| xargs -0'
+  #alias -g XG='| xargs egrep'
+  alias -g X='| xargs'
+fi
+
+
+#=============
+# ls aliases
+#
+alias ls='ls -FLH --color=always'
+alias l=ls
+alias l1='ls -1'
+alias ll='ls -lh'
+alias la='ls -A'
+alias lla='ll -A'
+alias all=lla
+alias lal=lla
+alias ltr='ll -tr'
+if [[ $MYSHELL =~ "zsh" ]]; then
+  alias ld='ls -d *(-/DN)'
+elif [[ $MYSHELL =~ "bash" ]]; then
+  alias ld='\ls -F | grep "/"'
+fi
+
+
+#====================
+# Directory aliases
+#
+alias mkdir='mkdir -p'
+alias md=mkdir
+#alias cd..='..'
+alias dirs='dirs -v'
+#if [[ $MYSHELL =~ "bash" ]]; then
+#  alias ..='cd ..'
+#  alias ...='cd ../..'
+#fi
+
+
+#==============
+# tar aliases
+#
+#alias tar='tar -v'
+#alias tcz='tar -xzf'
+#alias txz='tar -xzf'
+#alias txj='tar -xjf'
+#alias untar='tar -xf'
+#alias untgz='tar -zxf'
+#alias untbz='tar -jxf'
+
+
+#===============
+# Shell aliases
+#
+alias c=clear
+alias cl="c;l"
+
+alias d='diff'
+alias ds='diff -y'
+alias dt='meld'
+alias td='tkdiff'
+
+#alias echo '\echo -e'
+#alias lock='/usr/local/bin/xlock'
+alias be='bindkey -me'
+alias bv='bindkey -v'
+alias mv='mv -vi'
+alias cp='cp -vi'
+alias rm='rm -vi'
+alias rd='rm -rvf'
+alias ln='ln -svi'
+alias df='df -h'
+alias du1='duh 1'
+alias du2='duh 2'
+alias du3='duh 3'
+alias space='du1 .'
+alias spc=space
+
+#=================
+# Search related
+#
+alias f=find
+alias fn='f -name'
+alias f.='f -maxdepth 1'
+alias f.n='f -maxdepth 1 -name'
+alias fgrep='fgrep --color=always'
+alias egrep='egrep --color=always'
+unset -f pgrep
+pgrep() {
+  # Bloody hack to make ps ignore this grep
+  local _i='['${1:0:1}']'${1:1}
+  ps aux | command grep -e "[P]ID" -e $_i
+  #echo ps aux \| command grep -e "[P]ID" -e $_i
+}
+
+alias g='grep -sP --color=always'
+alias gi='g -i'
+alias gv='g -v'
+
+# If Ag/Pt/Ack exists, use it!!
+if hash ag 2> /dev/null; then
+  alias a='ag'
+  alias ach='ag -G "\.(c|cc|cpp|C|CC)$"'
+  alias ach='ag -G "\.h$"'
+elif hash pt 2> /dev/null; then
+  alias a='pt'
+elif hash ack 2> /dev/null; then
+  alias a='ack --color'
+  alias ac='a --type=cpp'
+  alias acc='a --type=cpp --nohh'
+  alias ach='a --type=hh'
+fi
+alias ai='a -i'
+alias av='a -v'
+
+alias C=cat
+alias P=$PAGER
+alias H=head
+alias T='tail -n 50'
+if [[ $MYSHELL =~ "zsh" ]]; then
+  alias hi='history 1'         # Displays all history entries ( Zsh specific )
+  alias hh='history -50'       # Displays the last 100 history entries ( Zsh specific )
+else
+  alias hi=history
+  alias hh='hi | T'
+fi
+alias hig='hi | grep -i'
+alias hgrep=hig
+alias xargs='xargs -t'
+#alias lock='/usr/local/bin/xlock'
+alias x=exit
+alias k9='kill -9'
+
+#================
+# Mini-functions
+#
+#alias sim='echo /proj/gateway4/products/`pwd | cut -d'/' -f4`/expts/a0393831/simulations'
+#alias pwdsn 'set PWDSN = \`pwd | sed 's#\(products\)#.snapshot/nightly.0/\1#'\` && \`pwd | sed 's#\(products\)#.snapshot/nightly.0/\1#'\`'
+
+
+#=================
+# Editor aliases
+#
+unset -f gvim_func
+gvim_func() {
+  # If tmux is being used, check that DISPLAY is set correctly
+  if [[ (-n "$TMUX") && ($DISPLAY != "$(tmux show-env | grep DISPLAY | cut -d '=' -f2)") ]]; then
+    tmux_pp update-env >& /dev/null
+  fi
+  gvim "$@" 2> /dev/null
+}
+alias v="gvim_func"
+
+# Using -f keeps the window in the foreground and prevents a whole bunch of diffs opening at the same time
+alias vd='v -df'
+alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
+alias govb='$VISUAL ~/.vim/bundle.vim'
+alias govf='$VISUAL ~/.vim/autoload/my.vim'
+alias govg='$VISUAL ~/.vim/gvimrc'
+alias govm='$VISUAL ~/.vim/plugin/mappings.vim'
+alias govv='$VISUAL ~/.vim/vimrc'
+alias rvv='\rm -rf ~/.vim/junk/views/*'
+
+emacs_func() {
+  echo "emacsclient -a '' -c -q -n $@"
+  emacsclient -a "" -c -q -n "$@"
+}
+alias e="emacs"
+
+#===============
+# Shell config
+#
+if [[ $MYSHELL =~ "bash" ]]; then
+  alias gosc='$VISUAL ~/.bashrc'
+  alias gosf='$VISUAL ~/.dotfiles/bash/bashrc-func'
+  alias gosp='$VISUAL ~/.dotfiles/bash/bashrc-prompt'
+  alias src='. ~/.bashrc && echo Sourced bashrc'
+  alias srf='. ~/.dotfiles/bash/bashrc-func   && echo Sourced bashrc-func'
+  alias srp='. ~/.dotfiles/bash/bashrc-prompt && echo Sourced bashrc-prompt'
+elif [[ $MYSHELL =~ "zsh" ]]; then
+  alias gosc='$VISUAL ~/.zshrc'
+  alias gosf='$VISUAL ~/.zshrc-func'
+  alias src='. ~/.zshrc                && echo Sourced zshrc'
+  alias srf='. ~/.dotfiles/zsh/zshrc-func && echo Sourced zshrc-func'
+fi
+alias gosa='$VISUAL ~/.dotfiles/aliases'
+alias gost='$VISUAL ~/.dotfiles/tmux/tmux.conf'
+alias gosw='$VISUAL ~/.dotfiles/aliases-work'
+alias gosx='$VISUAL ~/.Xresources'
+alias sra='. ~/.dotfiles/aliases && echo Sourced aliases'
+
+
+#=======
+# Misc
+#
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+#alias alert='notify-send --urgency=low -i "$( (( $? == 0 )) && echo terminal || echo error)" "$(fc -nl -1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+unset -f alert
+alert() {
+  local _icon=$( (($? == 0)) && echo terminal || echo error)
+  local _msg=$(fc -nl -1 | sed -e 's/^\s*[0-9]\+\s*//' -e 's/[;&|]\s*alert$//')
+  notify-send --urgency=low -i ${_icon} ${_msg}
+}
+alias j='jobs'
+alias archdate='date +%Y-%m-%d'
+alias so=source
+alias sco='. command'
+alias ,=jumper
+alias que=query
+alias color='. ~/.dotfiles/bash/utils/base16_color && base16_color'
+alias xxx='xrdb -load ~/.Xresources && color monokai dark'
+
+
+#==================
+# Perl one-liners
+#
+alias p='perl -ln'
+alias psmall="perl -lne 'BEGIN{"'$s=<>};$s=$_ if $_<$s;END{print "$s"}'"'"
+alias pbig="perl -lne 'BEGIN{"'chomp($s=<>)};$s=$_ if $_>$s;END{print "$s"}'"'"
+alias par1="perl -pe 'exit if /^\s*$/'"
+alias get_bits='perl -e '"'"'$a=hex($ARGV[0]);$m=$ARGV[1];$l=(defined $ARGV[2]?$ARGV[2]:$m); printf "0x%x\n", (($a >> $l) & ((1 << ($m-$l+1)) - 1))'"'"''
+
+
+#==============
+# FuzzyFinder
+#
+#bind '"\C-f": "fzf\n"'
+# fzf - Ignore .gitignore contents etc. by filtering through ag
+#bind '"\C-f": "ag -l -g \"\" | fzf\n"'
+
+
+#============
+# Locations
+#
+zsh="$HOME/.dotfiles/zsh"
+bash="$HOME/.dotfiles/bash"
+# Locations as named directories
+if [[ $MYSHELL =~ "zsh" ]]; then
+  hash -d dev="$HOME/Documents/dev/scratchy"
+  hash -d zsh="$HOME/.dotfiles/zsh"
+  hash -d bash="$HOME/.dotfiles/bash"
+fi
+alias path='readlink -f'
+
+
+#==============
+# apt Aliases
+#
+alias apt-ins='sudo apt-fast install'
+alias apt-upd='sudo apt-fast update'
+alias apt-rem='sudo apt-fast remove'
+alias apt-aurem='sudo apt-get autoremove'
+
+
+#==============
+# Git Aliases
+#
+alias ga='git add'
+alias gA='git add -A .'
+alias gb='git branch'
+alias gchk='git checkout'
+alias gcl='git clone'
+alias gcld='git clone --depth=1'
+alias gcom='git commit'
+alias gd='git diff'
+alias gD='git diff --word-diff'
+alias gdt='git difftool'
+alias gh='git help'
+alias gpu='git push'
+alias gp='git pull'
+alias grst='git reset --hard HEAD'
+alias gs='git status -sb'
+alias gS='git status'
+alias gl='git lg'
+
+
+#========
+# Tools
+#
+alias tags='ctags --c-kinds=+p --c++-kinds=+p --fields=+Sail --extra=+q *'
+alias tmux='tmux_pp'
+alias tm='tmux'
+alias U='unison dotfiles -terse'
+
+
+#========================
+# Local machine aliases
+#
+if [[ -f ~/.aliases_local ]]; then
+  . ~/.aliases_local
+fi

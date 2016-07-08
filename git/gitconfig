@@ -1,0 +1,36 @@
+[user]
+  name = Kartik Shenoy
+  email = theresmorethanoneway@gmail.com
+
+[core]
+  editor = gvim --nofork
+  excludesfile = /home/ks/.gitignore_global
+  fileMode = false
+
+[color]
+  ui = auto
+
+[push]
+  default = matching
+
+[diff]
+  tool = gvim
+[difftool]
+  prompt = false
+[difftool "gvim"]
+  cmd = gvim -df -c 'set columns=260|set lines=62|wincmd =' $LOCAL $BASE 2> /dev/null
+[difftool "meld"]
+  cmd = meld --diff $LOCAL $BASE
+
+[merge]
+  tool = meld
+  conflictstyle = diff3
+[mergetool "meld"]
+  cmd = meld --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $MERGED $REMOTE
+[mergetool "gvim"]
+  cmd = vimmerge $BASE $REMOTE $LOCAL $MERGED
+[credential]
+  helper = cache --timeout=3600
+
+[alias]
+  lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit
