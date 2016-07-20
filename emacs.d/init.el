@@ -1,24 +1,19 @@
 ;; -*- mode: emacs-lisp -*-
-;;
-;; This file contains only the `requires' needed to load your configs
 
+(setq --init-org-file (expand-file-name "config.org" user-emacs-directory)
+      --init-el-file  (expand-file-name "config.el"  user-emacs-directory)
+      --init-config-loaded nil)
 
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
-(package-initialize)
+(when (>= emacs-major-version 24)
+      ;; Run org-babel-load-file only if config.org is newer than config.el
+      (if (file-exists-p --init-org-file)
+          (unless (and (file-exists-p --init-el-file)
+                       (time-less-p (nth 5 (file-attributes --init-org-file)) (nth 5 (file-attributes --init-el-file))))
+            (if (fboundp 'org-babel-load-file)
+                (progn
+                  (org-babel-load-file --init-org-file)
+                  (setq --init-config-loaded t))
+              (message "Function not found: org-babel-load-file")))
+        (message "Init org file '%s' missing." --init-org-file)))
 
-(add-to-list 'load-path (expand-file-name "conf" user-emacs-directory))
-
-(require 'packages)
-(require 'constants)
-(require 'general)
-(require 'functions)
-(require 'ui)
-(require 'keybindings)
-(require 'filetype)
-
-
-
-;;; .emacs ends here
+(unless --init-config-loaded (load-file --init-el-file))
