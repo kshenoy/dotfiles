@@ -6,3 +6,5 @@
  '(org-agenda-files
    (quote
     ("~/readmes/TOC.org" "~/readmes/emacs.org" "~/readmes/vim.org" "~/readmes/shell.org" "~/readmes/amd/ResourceChk.org" "~/readmes/amd/RangeLocking.org" "~/readmes/amd/BusLock.org" "~/readmes/amd/DebugBus.org" "~/readmes/amd/L3.org" "~/readmes/amd/MeshGating.org" "~/readmes/amd/ErrorLogging.org"))))
+(custom-set-faces
+'(linum-relative-current-face ((t (:inherit linum :foreground "#D33682" :weight bold)))))

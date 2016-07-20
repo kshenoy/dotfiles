@@ -38,6 +38,7 @@ ignore = Path Config/dotfiles/vim/tmp
 ignore = Path Config/dotfiles/compiz
 ignore = Path Config/dotfiles/scripts/ti
 ignore = Path Config/dotfiles/unity
+ignore = Path Config/Fonts/PragmataPro
 
 #          When set to true, this flag causes the user interface to skip
 #          asking for confirmations on non-conflicting changes. (More

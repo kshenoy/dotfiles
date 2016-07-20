@@ -2,15 +2,18 @@
 
 * Pre-Functions
 #+BEGIN_SRC emacs-lisp
-  ;; (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory))
-  ;; (require 'lib/path)
-  ;; (require 'lib/env)
-
   (defun getenv-or (env value)
     "Fetch the value of 'env' or, if it is not set, return 'value'."
     (if (getenv env)
         (getenv env)
       value))
+#+END_SRC
+
+** TODO Figure out how to include "libraries"
+#+BEGIN_SRC emacs-lisp
+  ;; (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory))
+  ;; (require 'lib/path)
+  ;; (require 'lib/env)
 #+END_SRC
 
 * Defines
@@ -59,7 +62,10 @@ Install and load use-package
 ** Org-mode
 #+BEGIN_SRC emacs-lisp
   (require 'org)
+#+END_SRC
 
+*** Misc
+#+BEGIN_SRC emacs-lisp
   (setq org-indent-mode t)
   (setq org-M-RET-may-split-line '((item) (default . t)))
   (setq org-log-done 'time) ; 'time/'note
@@ -70,7 +76,6 @@ Install and load use-package
   (setq org-startup-align-all-tables nil)
   ;(setq org-log-into-drawer nil)
   (setq org-tags-column 1)
-  (setq org-ellipsis "…" )      ; Use fancy arrow to indicate a fold rather than '...'
   (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
   ;(setq org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
   ;(setq org-completion-use-ido t)
@@ -78,10 +83,9 @@ Install and load use-package
   (setq org-link-search-must-match-exact-headline nil)
 #+END_SRC
 
-*** ToDo
-Custom keywords
+**** TODO Replace … with ▼
 #+BEGIN_SRC emacs-lisp
-  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCEL(c)")))
+  (setq org-ellipsis "…" )      ; Use fancy arrow to indicate a fold rather than '...'
 #+END_SRC
 
 *** Clean View
@@ -89,6 +93,18 @@ Custom keywords
   (setq org-startup-indented t)
   (setq org-hide-leading-stars t)
   (setq org-odd-level-only nil)
+#+END_SRC
+
+*** ToDo States
+Custom keywords
+#+BEGIN_SRC emacs-lisp
+  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCEL(c)")))
+#+END_SRC
+
+*** Templates
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-structure-template-alist
+               '("sel" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
 #+END_SRC
 
 *** Fonts
@@ -109,12 +125,6 @@ Custom keywords
   ;(add-hook 'eww-mode-hook 'set-buffer-variable-pitch)
   ;(add-hook 'markdown-mode-hook 'set-buffer-variable-pitch)
   ;(add-hook 'Info-mode-hook 'set-buffer-variable-pitch)
-#+END_SRC
-
-*** Templates
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'org-structure-template-alist
-               '("sel" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
 #+END_SRC
 
 ** Evil
@@ -220,8 +230,7 @@ Relative line-numbers ala vim
     ;; :disabled
     :config
     (setq linum-relative-current-symbol ""))
-
-  ;; (linum-relative-global-mode t)
+  (linum-relative-global-mode t)
 #+END_SRC
 
 ** Themes
@@ -288,12 +297,6 @@ Transparency
   ;; (add-to-list 'default-frame-alist '(alpha 85 85))
 #+END_SRC
 
-** Fonts
-#+BEGIN_SRC emacs-lisp
-  (custom-set-faces '(variable-pitch ((t (:family "Liberation Sans")))))
-  (set-face-attribute 'default nil :height 105)
-#+END_SRC
-
 ** Misc
 #+BEGIN_SRC emacs-lisp
   ;; Disable anoying beep
@@ -305,12 +308,9 @@ Transparency
   ;; Improve rendering performance
   (setq redisplay-dont-pause t)
 
-  ;; Show matching parentheses
-  (show-paren-mode 1)
-
   ;; Line numbers
   (global-linum-mode t)
-  ;; (setq linum-format "%4d ")
+  (setq linum-format "%d ")
 
   ;; Highlight current line
   ;; (global-hl-line-mode 1)
@@ -326,12 +326,6 @@ Start maximized
   
   ;; Start maximized
   ;; (custom-set-variables '(initial-frame-alist (quote ((fullscreen . maximized)))))
-#+END_SRC
-
-** Custom file
-#+BEGIN_SRC emacs-lisp
-  (setq custom-file (concat user-emacs-directory "custom.el"))
-  (load custom-file)
 #+END_SRC
 
 * General
@@ -357,6 +351,22 @@ Start maximized
   (setq auto-save-default t)  ; auto-save every buffer that visits a file
 #+END_SRC
 
+** Fonts
+#+BEGIN_SRC emacs-lisp
+  (setq my-variable-pitch-font "Pragmata Pro-10"
+        my-monospaced-font     "Pragmata Pro Mono-10")
+
+  (set-face-attribute 'default        nil :font my-monospaced-font)
+  (set-face-attribute 'fixed-pitch    nil :font my-monospaced-font)
+  (set-face-attribute 'variable-pitch nil :font my-variable-pitch-font)
+  (set-face-attribute 'linum          nil :inherit 'fixed-pitch :background "#EEE8D5")
+#+END_SRC
+
+*** TODO Move linum-relative-current-face from custom.el
+#+BEGIN_SRC emacs-lisp
+  ;; (set-face-attribute 'linum-relative-current-face nil :inherit 'linum :foreground "#D33682")
+#+END_SRC
+
 ** Tabs and Indentation. 
 Use only spaces and no tabs
 #+BEGIN_SRC emacs-lisp
@@ -365,7 +375,16 @@ Use only spaces and no tabs
 #+END_SRC
 
 ** Misc
-Enable y/n answers
 #+BEGIN_SRC emacs-lisp
+  ;; Enable y/n answers
   (fset 'yes-or-no-p 'y-or-n-p)
+  
+  ;; Show matching parentheses
+  (show-paren-mode 1)
+#+END_SRC
+
+** Custom file
+#+BEGIN_SRC emacs-lisp
+  (setq custom-file (concat user-emacs-directory "custom.el"))
+  (load custom-file)
 #+END_SRC
