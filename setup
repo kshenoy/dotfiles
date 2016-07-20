@@ -19,22 +19,24 @@ ln -svTf "$_dropbox"/Documents/Notes  ~/Notes
 ln -svTf "$_dropbox"/Config/dotfiles  ~/.dotfiles
 ln -svTf "$_dropbox"/Config/Fonts     ~/.local/share/fonts
 
-ln -svTf ~/.dotfiles/emacs.d                 ~/.emacs.d
-ln -svTf ~/.dotfiles/vim                     ~/.vim
-ln -svTf ~/.dotfiles/vim                     ~/.config/nvim
-ln -svTf ~/.dotfiles/bash/history            ~/.history_bash
+ln -svTf ~/.dotfiles/awesome                 ~/.config/awesome
+ln -svTf ~/.dotfiles/bash/bash_logout        ~/.bash_logout
 ln -svTf ~/.dotfiles/bash/bashrc             ~/.bashrc
 ln -svTf ~/.dotfiles/bash/bashrc_local-home  ~/.bashrc_local
-ln -svTf ~/.dotfiles/bash/bash_logout        ~/.bash_logout
+ln -svTf ~/.dotfiles/bash/history            ~/.history_bash
+ln -svTf ~/.dotfiles/ctags                   ~/.ctags
+ln -svTf ~/.dotfiles/dircolors               ~/.dircolors
+ln -svTf ~/.dotfiles/emacs.d                 ~/.emacs.d
 ln -svTf ~/.dotfiles/git/gitconfig           ~/.gitconfig
 ln -svTf ~/.dotfiles/git/gitignore_global    ~/.gitignore_global
 ln -svTf ~/.dotfiles/i3                      ~/.config/i3
-ln -svTf ~/.dotfiles/awesome                 ~/.config/awesome
+ln -svTf ~/.dotfiles/ssh/config              ~/.ssh/config
 ln -svTf ~/.dotfiles/tmux/tmux.conf          ~/.tmux.conf
+ln -svTf ~/.dotfiles/unison/dotfiles.prf     ~/.unison/dotfiles.prf
+ln -svTf ~/.dotfiles/vim                     ~/.config/nvim
+ln -svTf ~/.dotfiles/vim                     ~/.vim
 ln -svTf ~/.dotfiles/xinitrc                 ~/.xinitrc
 ln -svTf ~/.dotfiles/Xresources              ~/.Xresources
-ln -svTf ~/.dotfiles/ssh/config              ~/.ssh/config
-ln -svTf ~/.dotfiles/unison/dotfiles.prf     ~/.unison/dotfiles.prf
 
 ln -svTf ~/.dotfiles/scripts/vipe            ~/bin/vipe
 ln -svTf ~/.dotfiles/scripts/vim_merge       ~/bin/vim_merge

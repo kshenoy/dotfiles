@@ -12,7 +12,7 @@ root = ssh://kshenoy@atlr5n4-0537//home/kshenoy/Dropbox
 #path = current
 #path = common
 #path = .netscape/bookmarks.html
-path = Softwares
+path = Config
 path = Documents/Notes
 
 # Some regexps specifying names and paths to ignore
@@ -30,14 +30,14 @@ ignore = Name *.tmp
 ignore = Name .netrwhist
 #ignore = Name *history
 ignore = Path Documents/Notes/Personal
-ignore = Path Softwares/Emacs/auto-save-list
-ignore = Path Softwares/Emacs/elpa
-ignore = Path Softwares/Emacs/tmp
-ignore = Path Softwares/Vim/bundle
-ignore = Path Softwares/Vim/tmp
-ignore = Path Softwares/linux/compiz
-ignore = Path Softwares/linux/scripts/ti
-ignore = Path Softwares/linux/unity
+ignore = Path Config/dotfiles/emacs.d/auto-save-list
+ignore = Path Config/dotfiles/emacs.d/elpa
+ignore = Path Config/dotfiles/emacs.d/tmp
+ignore = Path Config/dotfiles/vim/bundle
+ignore = Path Config/dotfiles/vim/tmp
+ignore = Path Config/dotfiles/compiz
+ignore = Path Config/dotfiles/scripts/ti
+ignore = Path Config/dotfiles/unity
 
 #          When set to true, this flag causes the user interface to skip
 #          asking for confirmations on non-conflicting changes. (More

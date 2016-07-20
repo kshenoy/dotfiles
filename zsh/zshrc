@@ -164,10 +164,10 @@ fi
 # Source files
 #
 for i in \
-  ~/.linux/zsh/zshrc-func    \
-  ~/.linux/zsh/zshrc-prompt  \
-  ~/.zshrc_local             \
-  ~/.linux/aliases           \
+  ~/.dotfiles/zsh/zshrc-func    \
+  ~/.dotfiles/zsh/zshrc-prompt  \
+  ~/.zshrc_local                \
+  ~/.dotfiles/aliases           \
   ; do
   if [[ -f ${i} ]]; then
   # echo "  Sourcing ${i} ..."

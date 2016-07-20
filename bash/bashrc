@@ -167,9 +167,9 @@ fi
 for i in \
   ~/.dotfiles/bash/bashrc-func    \
   ~/.dotfiles/bash/bashrc-prompt  \
-  ~/.bashrc_local              \
+  ~/.bashrc_local                 \
   ~/.dotfiles/aliases             \
-  ~/.fzf.bash                  \
+  ~/.fzf.bash                     \
   ; do
   if [[ -f ${i} ]]; then
   # echo "  Sourcing ${i} ..."

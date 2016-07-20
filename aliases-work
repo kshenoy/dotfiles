@@ -87,7 +87,7 @@ alias rr='~/bin/rerun'
 alias rrb='rr --norun -b'
 alias rrc='rr --norun -c'
 alias rrcb='rr --norun -bc'
-alias rrca='build -clean_all'
+alias bca='build -clean_all'
 alias rrbr='rr -b'
 alias rrcr='rr -c'
 alias rrdbg='rr -y $as0ks/amdmsg_config.yaml -a "-avf '"'--/ChkL3.Debug/'"'" --fsdb'
@@ -100,7 +100,7 @@ alias bu='bucket'
 alias bus='bucket -s'
 alias bus1='bucket -n 1'
 alias bus3='bucket -n 3'
-alias wbus='watch -n15 "bucket -s"'
+alias busw='watch -n15 "bucket -n 1"'
 alias toclippy='sed -e "s/$/\r/" | tee ~/clippy.txt'
 
 alias xt='xterm -geometry 272x60+0+0 &'
@@ -273,7 +273,7 @@ mkwa_proj() {
 
   # Source aliases
   echo "$(tput setaf 2)[Sourcing aliases...]$(tput sgr0)"
-  [[ -f ~/.linux/aliases ]] && . ~/.linux/aliases
+  [[ -f ~/.dotfiles/aliases ]] && . ~/.dotfiles/aliases
 
   # Create tags
   echo "$(tput setaf 2)[Generating Tags...]$(tput sgr0)"

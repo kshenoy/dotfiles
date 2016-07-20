@@ -3,9 +3,12 @@
 
 #typeset -A lsfjobs
 
+# BASH_SOURCE is an array variable whose members are the source filenames
+# http://stackoverflow.com/a/12694189/734153
+_src_dir=$(dirname ${BASH_SOURCE[0]})
 
 # TMUX                                                                                                              {{{1
-[[ -f ~/.linux/tmux/tmux_scripts ]] && . ~/.linux/tmux/tmux_scripts
+[[ -f $_src_dir/../tmux/tmux_scripts ]] && . $_src_dir/../tmux/tmux_scripts
 
 
 # "alert" for long running commands                                                                                 {{{1
@@ -47,10 +50,10 @@ duh() {
 
 
 # Misc utils                                                                                                        {{{1
-[[ -f ~/.linux/bash/utils/jumper       ]] && . ~/.linux/bash/utils/jumper
-[[ -f ~/.linux/bash/utils/query        ]] && . ~/.linux/bash/utils/query
-[[ -f ~/.linux/bash/utils/colm         ]] && . ~/.linux/bash/utils/colm
-[[ -f ~/.linux/bash/utils/base16_color ]] && . ~/.linux/bash/utils/base16_color
+[[ -f $_src_dir/utils/jumper       ]] && . $_src_dir/utils/jumper
+[[ -f $_src_dir/utils/query        ]] && . $_src_dir/utils/query
+[[ -f $_src_dir/utils/colm         ]] && . $_src_dir/utils/colm
+[[ -f $_src_dir/utils/base16_color ]] && . $_src_dir/utils/base16_color
 
 
 # Silent push and popd. Use dirs -v for vertical dirstack                                                           {{{1

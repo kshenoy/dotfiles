@@ -60,20 +60,20 @@ Install and load use-package
 #+BEGIN_SRC emacs-lisp
   (require 'org)
 
+  (setq org-indent-mode t)
   (setq org-M-RET-may-split-line '((item) (default . t)))
   (setq org-log-done 'time) ; 'time/'note
   ;(setq org-special-ctrl-a/e t)
   ;(setq org-return-follows-link nil)
   (setq org-use-speed-commands nil)
+  ;(setq org-speed-commands-user nil)
   (setq org-startup-align-all-tables nil)
   ;(setq org-log-into-drawer nil)
   (setq org-tags-column 1)
-  (setq org-ellipsis " \u25bc" )      ; Use fancy arrow to indicate a fold rather than '...'
+  (setq org-ellipsis "…" )      ; Use fancy arrow to indicate a fold rather than '...'
   (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
-  ;(setq org-speed-commands-user nil)
   ;(setq org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
   ;(setq org-completion-use-ido t)
-  (setq org-indent-mode t)
   ;(setq org-startup-truncated nil)
   (setq org-link-search-must-match-exact-headline nil)
 #+END_SRC
@@ -119,32 +119,28 @@ Custom keywords
 
 ** Evil
 #+BEGIN_SRC emacs-lisp
-    (use-package evil
-      :disabled
-      :ensure t
-      :config
-        (use-package evil-commentary)
-        (use-package evil-leader)
-        (use-package evil-matchit)
-        (use-package evil-numbers)
-        (use-package evil-search-highlight-persist))
-
-    (evil-mode t)
-    (evil-commentary-mode t)
+  (use-package evil
+    ;; :disabled
+    :config
+    (use-package evil-commentary)
+    (use-package evil-surround)
+    (use-package evil-leader)
+    (use-package evil-matchit)
+    (use-package evil-numbers)
 
     ;; Color the cursor to indicate the Evil mode. White to indicate that we've switched back to Emacs
-    (setq evil-normal-state-cursor   '("#719e07" box))
-    (setq evil-visual-state-cursor   '("#b58900" box))
-    (setq evil-insert-state-cursor   '("#268bd2" bar))
-    (setq evil-replace-state-cursor  '("#dc322f" bar))
-    (setq evil-operator-state-cursor '("#dc322f" hollow))
-    (setq evil-emacs-state-cursor    '("white"   box))
+    (setq evil-normal-state-cursor   '("#719e07" box)
+          evil-visual-state-cursor   '("#b58900" box)
+          evil-insert-state-cursor   '("#268bd2" bar)
+          evil-replace-state-cursor  '("#dc322f" bar)
+          evil-operator-state-cursor '("#dc322f" hollow)
+          evil-emacs-state-cursor    '("white"   box))
 
     ;; Make escape quit everything, whenever possible.
     (defun minibuffer-keyboard-quit ()
       "Abort recursive edit.
-      In Delete Selection mode, if the mark is active, just deactivate it;
-      then it takes a second \\[keyboard-quit] to abort the minibuffer."
+            In Delete Selection mode, if the mark is active, just deactivate it;
+            then it takes a second \\[keyboard-quit] to abort the minibuffer."
       (interactive)
       (if (and delete-selection-mode transient-mark-mode mark-active)
           (setq deactivate-mark  t)
@@ -157,7 +153,11 @@ Custom keywords
     (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-ns-map        )
     (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-completion-map)
     (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-must-match-map)
-    (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-isearch-map   )
+    (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-isearch-map   ))
+
+  (evil-mode t)
+  (evil-commentary-mode t)
+  (global-evil-surround-mode t)
 #+END_SRC
 
 ** Helm
@@ -165,52 +165,63 @@ Custom keywords
   (use-package helm
     ;; :disabled
     :config
-      (require 'helm-config)
-      
-      (setq helm-quick-update                 t  )
-      (setq helm-buffers-fuzzy-matching       t  )
-      (setq helm-recentf-fuzzy-match          t  )
-      (setq helm-split-window-in-side-p       t  )  ; open helm buffer inside current window, not occupy whole other window
-      (setq helm-move-to-line-cycle-in-source t  )  ; move to end or beginning of source when reaching top or bottom of source
-      (setq helm-M-x-fuzzy-match              t  )
-      (setq helm-display-header-line          nil)  ; Disable the header
-      
-      
-      ;; Remove header line if only a single source; keep them for multiple sources
-      ;(set-face-attribute 'helm-source-header nil :height 0.1)  ; Disable the source header
-      (defvar helm-source-header-default-background (face-attribute 'helm-source-header :background))
-      (defvar helm-source-header-default-foreground (face-attribute 'helm-source-header :foreground))
-      (defvar helm-source-header-default-box (face-attribute 'helm-source-header :box))
-      
-      (defun helm-toggle-header-line ()
-        (if (> (length helm-sources) 1)
-            (set-face-attribute 'helm-source-header
-                                nil
-                                :foreground helm-source-header-default-foreground
-                                :background helm-source-header-default-background
-                                :box helm-source-header-default-box
-                                :height 1.0)
-            (set-face-attribute 'helm-source-header
-                                nil
-                                :foreground (face-attribute 'helm-selection :background)
-                                :background (face-attribute 'helm-selection :background)
-                                :box nil
-                                :height 0.1)))
-      
-      ;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
-      ;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
-      ;; cannot change `helm-command-prefix-key' once `helm-config' is loaded.
-      (unbind-key "C-x c")
-      (bind-key* (kbd "M-x") 'helm-M-x)
-      
-      (bind-keys :prefix-map helm-commands
-                 :prefix "C-c h"
-                   ("b" . helm-buffers-list)
-                   ("f" . helm-find-files)
-                   ("m" . helm-mini))
-      
-      (helm-mode            t)
-      (helm-autoresize-mode t))
+    (require 'helm-config)
+    
+    (setq helm-quick-update                 t  )
+    (setq helm-buffers-fuzzy-matching       t  )
+    (setq helm-recentf-fuzzy-match          t  )
+    (setq helm-split-window-in-side-p       t  )  ; open helm buffer inside current window, not occupy whole other window
+    (setq helm-move-to-line-cycle-in-source t  )  ; move to end or beginning of source when reaching top or bottom of source
+    (setq helm-M-x-fuzzy-match              t  )
+    (setq helm-display-header-line          nil)  ; Disable the header
+    
+    
+    ;; Remove header line if only a single source; keep them for multiple sources
+                                          ;(set-face-attribute 'helm-source-header nil :height 0.1)  ; Disable the source header
+    (defvar helm-source-header-default-background (face-attribute 'helm-source-header :background))
+    (defvar helm-source-header-default-foreground (face-attribute 'helm-source-header :foreground))
+    (defvar helm-source-header-default-box (face-attribute 'helm-source-header :box))
+    
+    (defun helm-toggle-header-line ()
+      (if (> (length helm-sources) 1)
+          (set-face-attribute 'helm-source-header
+                              nil
+                              :foreground helm-source-header-default-foreground
+                              :background helm-source-header-default-background
+                              :box helm-source-header-default-box
+                              :height 1.0)
+        (set-face-attribute 'helm-source-header
+                            nil
+                            :foreground (face-attribute 'helm-selection :background)
+                            :background (face-attribute 'helm-selection :background)
+                            :box nil
+                            :height 0.1)))
+    
+    ;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
+    ;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
+    ;; cannot change `helm-command-prefix-key' once `helm-config' is loaded.
+    (unbind-key "C-x c")
+    (bind-key* (kbd "M-x") 'helm-M-x)
+    
+    (bind-keys :prefix-map helm-commands
+               :prefix "C-c h"
+               ("b" . helm-buffers-list)
+               ("f" . helm-find-files)
+               ("m" . helm-mini)))
+
+  (helm-mode            t)
+  (helm-autoresize-mode t)
+#+END_SRC
+
+** linum-relative
+Relative line-numbers ala vim
+#+BEGIN_SRC emacs-lisp
+  (use-package linum-relative
+    ;; :disabled
+    :config
+    (setq linum-relative-current-symbol ""))
+
+  ;; (linum-relative-global-mode t)
 #+END_SRC
 
 ** Themes
@@ -225,13 +236,13 @@ Custom keywords
   (use-package monokai-theme
     :disabled
     :config
-      ;; (setq monokai-use-variable-pitch nil
-      ;;       monokai-height-minus-1     1.0
-      ;;       monokai-height-plus-1      1.0
-      ;;       monokai-height-plus-2      1.0
-      ;;       monokai-height-plus-3      1.0
-      ;;       monokai-height-plus-4      1.0)
-      (load-theme 'monokai t))
+    ;; (setq monokai-use-variable-pitch nil
+    ;;       monokai-height-minus-1     1.0
+    ;;       monokai-height-plus-1      1.0
+    ;;       monokai-height-plus-2      1.0
+    ;;       monokai-height-plus-3      1.0
+    ;;       monokai-height-plus-4      1.0)
+    (load-theme 'monokai t))
 #+END_SRC
 
 *** Solarized
@@ -239,13 +250,13 @@ Custom keywords
   (use-package solarized-theme
     ;; :disabled
     :config
-      ;; (setq solarized-use-variable-pitch nil
-      ;;       solarized-height-minus-1     1.0
-      ;;       solarized-height-plus-1      1.0
-      ;;       solarized-height-plus-2      1.0
-      ;;       solarized-height-plus-3      1.0
-      ;;       solarized-height-plus-4      1.0)
-      (load-theme 'solarized-light t))
+    ;; (setq solarized-use-variable-pitch nil
+    ;;       solarized-height-minus-1     1.0
+    ;;       solarized-height-plus-1      1.0
+    ;;       solarized-height-plus-2      1.0
+    ;;       solarized-height-plus-3      1.0
+    ;;       solarized-height-plus-4      1.0)
+    (load-theme 'solarized-light t))
 #+END_SRC
 
 * UI
@@ -271,50 +282,40 @@ Set size of default frame
           (height . 70)))
 #+END_SRC
 
+Transparency
+#+BEGIN_SRC emacs-lisp
+  ;; (set-frame-parameter (selected-frame) 'alpha '(85 85))
+  ;; (add-to-list 'default-frame-alist '(alpha 85 85))
+#+END_SRC
+
 ** Fonts
 #+BEGIN_SRC emacs-lisp
+  (custom-set-faces '(variable-pitch ((t (:family "Liberation Sans")))))
   (set-face-attribute 'default nil :height 105)
 #+END_SRC
 
-Disable vertical scrolls bars
-#+BEGIN_SRC emacs-lisp
-  ;; (add-to-list 'default-frame-alist '(vertical-scroll-bars . nil))
-#+END_SRC
-
 ** Misc
-Disable anoying beep
 #+BEGIN_SRC emacs-lisp
+  ;; Disable anoying beep
   (setq ring-bell-function 'ignore)
-#+END_SRC
 
-Show column number in bottom bar
-#+BEGIN_SRC emacs-lisp
+  ;; Show column number in bottom bar
   (setq column-number-mode t)
-#+END_SRC
 
-Improve rendering performance
-#+BEGIN_SRC emacs-lisp
+  ;; Improve rendering performance
   (setq redisplay-dont-pause t)
-#+END_SRC
 
-What does this button do?
-#+BEGIN_SRC emacs-lisp
-  (show-paren-mode  1)
-#+END_SRC
+  ;; Show matching parentheses
+  (show-paren-mode 1)
 
-Line numbers
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'linum-mode)
-  (setq linum-format "%4d ")
-#+END_SRC
+  ;; Line numbers
+  (global-linum-mode t)
+  ;; (setq linum-format "%4d ")
 
-Highlight current line
-#+BEGIN_SRC emacs-lisp
+  ;; Highlight current line
   ;; (global-hl-line-mode 1)
-#+END_SRC
 
-Undo and Redo windows
-#+BEGIN_SRC emacs-lisp
+  ;; Undo and Redo windows <= Wut?
   ;; (winner-mode 1)
 #+END_SRC
 
@@ -325,12 +326,6 @@ Start maximized
   
   ;; Start maximized
   ;; (custom-set-variables '(initial-frame-alist (quote ((fullscreen . maximized)))))
-#+END_SRC
-
-Transparency
-#+BEGIN_SRC emacs-lisp
-  ;; (set-frame-parameter (selected-frame) 'alpha '(85 85))
-  ;; (add-to-list 'default-frame-alist '(alpha 85 85))
 #+END_SRC
 
 ** Custom file

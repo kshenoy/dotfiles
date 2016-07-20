@@ -3,8 +3,8 @@
 unset -f base16_color
 base16_color() (
   local _base16_cfg=~/.config/base16_config
-  local _base16_shell=~/.linux/base16/shell
-  local _base16_xres=~/.linux/base16/xresources
+  local _base16_shell=~/.dotfiles/base16/shell
+  local _base16_xres=~/.dotfiles/base16/xresources
 
   help_dump() {
     echo -e '\nUsage :'
