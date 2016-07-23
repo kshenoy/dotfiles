@@ -6,7 +6,7 @@ emacs.d/tmp
 emacs.d/elpa/
 emacs.d/recentf
 emacs.d/projectile-bookmarks.eld
-emacs.d/config.el
+emacs.d/config.el*
 fonts/
 unity/
 vim/autoload/plug*

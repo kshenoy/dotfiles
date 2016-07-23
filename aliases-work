@@ -54,7 +54,7 @@ emacs_func_work() {
   #echo "emacs_func ${_server:+--socket-name=$_server} $@"
   emacs_func "${_server:+--socket-name=$_server}" "$@"
 }
-alias e="emacs_func_work"
+alias e=emacs
 alias ed="~/bin/emacs_daemon"
 alias vlog="v -p *ChkL3.log *Seq.log dsp_ch.txt sim.out -c 'set autoread'"
 
@@ -101,7 +101,7 @@ alias bus='bucket -s'
 alias bus1='bucket -n 1'
 alias bus3='bucket -n 3'
 alias busw='watch -n15 "bucket -n 1"'
-alias toclippy='sed -e "s/$/\r/" | tee ~/clippy.txt'
+alias toclippy="sed -e 's/\\\\n/\\\\n\\\\r/' | tee ~/clippy.txt"
 
 alias xt='xterm -geometry 272x60+0+0 &'
 alias restd='resize -s 60 272'

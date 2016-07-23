@@ -21,7 +21,6 @@ Plug  'vim-scripts/AutoComplPop'
 Plug  'chriskempson/base16-vim'
 Plug  'tpope/vim-commentary',             {'on': '<Plug>Commentary'}
 Plug  'ctrlpvim/ctrlp.vim'
-Plug  'kshenoy/ctrlp-args'
 Plug  'tacahiroy/ctrlp-funky'
 Plug  'FelikZ/ctrlp-py-matcher',          PlugCond(has('python'))
 Plug  'Raimondi/delimitMate'

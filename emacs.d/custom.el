@@ -3,8 +3,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-agenda-files
+ '(custom-safe-themes
    (quote
-    ("~/readmes/TOC.org" "~/readmes/emacs.org" "~/readmes/vim.org" "~/readmes/shell.org" "~/readmes/amd/ResourceChk.org" "~/readmes/amd/RangeLocking.org" "~/readmes/amd/BusLock.org" "~/readmes/amd/DebugBus.org" "~/readmes/amd/L3.org" "~/readmes/amd/MeshGating.org" "~/readmes/amd/ErrorLogging.org"))))
-(custom-set-faces
-'(linum-relative-current-face ((t (:inherit linum :foreground "#D33682" :weight bold)))))
+    ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" default))))
