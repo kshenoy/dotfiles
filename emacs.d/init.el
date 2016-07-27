@@ -1,12 +1,9 @@
 ;; -*- mode: emacs-lisp -*-
 
-
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
-(package-initialize)
-
 (setq my-init-config-org     (expand-file-name "config.org" user-emacs-directory)
       my-init-config-el      (expand-file-name "config.el"  user-emacs-directory)
       my-init-config-el-pass (concat my-init-config-el ".pass")
@@ -29,6 +26,4 @@
               (message "Function not found: org-babel-load-file")))
         (message "Init-config-org file '%s' missing." my-init-config-org)))
 
-(unless my-init-config-loaded
-  (message "Falling back to loading init-config-el file '%s'" my-init-config-el)
-  (load-file my-init-config-el))
+(unless my-init-config-loaded (load-file my-init-config-el))

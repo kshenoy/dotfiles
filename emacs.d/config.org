@@ -3,30 +3,17 @@
 * Init
 ** Archives
 #+BEGIN_SRC emacs-lisp
-  (require 'package)
-  (add-to-list 'package-archives
-               '("melpa" . "http://melpa.milkbox.net/packages/")
-               '("org"   . "http://orgmode.org/elpa/"))
-  (package-initialize)
-#+END_SRC
+  (when (< emacs-major-version 24)
+    ;; For important compatibility libraries like cl-lib
+    (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
 
-* Functions
-#+BEGIN_SRC emacs-lisp
-  (defun getenv-or (env value)
-    "Fetch the value of 'env' or, if it is not set, return 'value'."
-    (if (getenv env)
-        (getenv env)
-      value))
-  
-  (defun my/switch-fullscreen nil
-    "Switch to fullscreen. Works in OSX."
-    (interactive)
-    (let* ((modes '(nil fullboth fullwidth fullheight))
-           (cm (cdr (assoc 'fullscreen (frame-parameters))))
-           (next (cadr (member cm modes))))
-      (modify-frame-parameters
-       (selected-frame)
-       (list (cons 'fullscreen next)))))
+  (when (>= emacs-major-version 24)
+    (require 'package)
+    (add-to-list 'package-archives
+                 '("melpa" . "http://melpa.milkbox.net/packages/")
+                 '("org"   . "http://orgmode.org/elpa/")))
+
+  (package-initialize)
 #+END_SRC
 
 * General
@@ -59,17 +46,26 @@
 #+END_SRC
 
 ** Fonts
+One way to select from multiple fonts
 #+BEGIN_SRC emacs-lisp
-  ;; (setq my-variable-pitch-font "Ubuntu-10.5"
-  ;;       my-monospaced-font     "Ubuntu Mono-10.5")
+  (defun my/font-exist-p (fontname)
+    "Test if 'fontname' exists or not."
+    (if (or (not fontname) (string= fontname "") (not (display-graphic-p)))
+        nil
+      (if (not (x-list-fonts fontname))
+          nil t)))
 
   (when (eq system-type 'gnu/linux)
-    (setq my-variable-pitch-font "Pragmata Pro-10"
-          my-monospaced-font     "Pragmata Pro Mono-10"))
+    (when (my/font-exist-p "Ubuntu")            (setq my-variable-pitch-font "Ubuntu-10.5"))
+    (when (my/font-exist-p "Ubuntu Mono")       (setq my-monospaced-font     "Ubuntu Mono-10.5"))
+
+    (when (my/font-exist-p "Pragmata Pro")      (setq my-variable-pitch-font "Pragmata Pro-10"))
+    (when (my/font-exist-p "Pragmata Pro Mono") (setq my-monospaced-font     "Pragmata Pro Mono-10")))
 
   (when (eq system-type 'windows-nt)
-    (setq my-variable-pitch-font "Consolas-10"
-          my-monospaced-font     "Consolas-10"))
+    (when (my/font-exist-p "Consolas")
+      (setq my-variable-pitch-font "Consolas-10"
+            my-monospaced-font     "Consolas-10")))
 
   (set-face-attribute 'default        nil :font my-monospaced-font)
   (set-face-attribute 'fixed-pitch    nil :font my-monospaced-font)
@@ -89,6 +85,16 @@ Fall back to DejaVu Sans when the font lacks support for some glyphs. Taken from
 
 *** TODO Figure out how to specify fall-back fonts
 To be able to use different fonts on different machines
+
+** UTF-8 Please
+#+BEGIN_SRC emacs-lisp
+  (setq locale-coding-system   'utf-8)
+  (set-terminal-coding-system  'utf-8)
+  (set-keyboard-coding-system  'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (set-language-environment    "UTF-8")
+  (prefer-coding-system        'utf-8)
+#+END_SRC
 
 ** UI
 Clean-up
@@ -112,7 +118,16 @@ Set size of default frame
 Start maximized
 #+BEGIN_SRC emacs-lisp
   ;; Open in fullscreen
-  ;; (switch-fullscreen)
+  (defun my/switch-fullscreen nil
+    "Switch to fullscreen. Works in OSX."
+    (interactive)
+    (let* ((modes '(nil fullboth fullwidth fullheight))
+           (cm (cdr (assoc 'fullscreen (frame-parameters))))
+           (next (cadr (member cm modes))))
+      (modify-frame-parameters
+       (selected-frame)
+       (list (cons 'fullscreen next)))))
+  ;; (my/switch-fullscreen)
 
   ;; Start maximized
   ;; (custom-set-variables '(initial-frame-alist (quote ((fullscreen . maximized)))))
@@ -134,6 +149,9 @@ Misc
 
   ;; Improve rendering performance
   (setq redisplay-dont-pause t)
+
+  ;; Display a special glyph in the fringe of each empty line at the end of the buffer
+  (setq indicate-empty-lines t)
 
   ;; Highlight current line
   ;; (global-hl-line-mode 1)
@@ -159,6 +177,7 @@ Use only spaces and no tabs
 
   ;; Show matching parentheses
   (show-paren-mode 1)
+  ;; (setq show-paren-style 'expression)
 
   ;; Count 1 space after a period as the end of a sentence, instead of 2
   (setq sentence-end-double-space nil)
@@ -189,47 +208,93 @@ Install and load use-package
 #+BEGIN_SRC emacs-lisp
   (use-package evil
     ;; :disabled
-    :init
-    ;; Color the cursor to indicate the Evil mode. White to indicate that we've switched back to Emacs
-    (setq evil-normal-state-cursor   '("#719e07" box)
-          evil-visual-state-cursor   '("#b58900" box)
-          evil-insert-state-cursor   '("#268bd2" bar)
-          evil-replace-state-cursor  '("#dc322f" bar)
-          evil-operator-state-cursor '("#dc322f" hollow)
-          evil-emacs-state-cursor    '("white"   box))
+#+END_SRC
 
-    (evil-mode t)
+*** :init
+#+BEGIN_SRC emacs-lisp
+  :init
+  (evil-mode t)
+#+END_SRC
+  
+**** Color the cursor to indicate the Evil mode. White to indicate that we've switched back to Emacs
+#+BEGIN_SRC emacs-lisp
+  (setq evil-normal-state-cursor   '("#719e07" box)
+        evil-visual-state-cursor   '("#b58900" box)
+        evil-insert-state-cursor   '("#268bd2" bar)
+        evil-replace-state-cursor  '("#dc322f" bar)
+        evil-operator-state-cursor '("#dc322f" hollow)
+        evil-emacs-state-cursor    '("white"   box))
+#+END_SRC
 
-    :config
-    (use-package evil-commentary
-      :diminish evil-commentary-mode
-      :init (evil-commentary-mode t))
+*** :config
+#+BEGIN_SRC emacs-lisp
+  :config
+#+END_SRC
 
-    (use-package evil-surround
-      :init (global-evil-surround-mode t))
+**** evil-commentary
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-commentary
+    :diminish evil-commentary-mode
+    :config (evil-commentary-mode))
+#+END_SRC
 
-    (use-package evil-leader)
-    (use-package evil-matchit)
-    (use-package evil-numbers)
+**** evil-surround
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-surround
+    :config (global-evil-surround-mode))
+#+END_SRC
 
-    ;; Make escape quit everything, whenever possible.
-    (defun minibuffer-keyboard-quit ()
-      "Abort recursive edit.
-            In Delete Selection mode, if the mark is active, just deactivate it;
-            then it takes a second \\[keyboard-quit] to abort the minibuffer."
-      (interactive)
-      (if (and delete-selection-mode transient-mark-mode mark-active)
-          (setq deactivate-mark  t)
-        (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
-        (abort-recursive-edit)))
+**** evil-visualstar
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-visualstar
+    :config (global-evil-visualstar-mode))
+#+END_SRC
 
-    (bind-key [escape] 'keyboard-quit            evil-normal-state-map          )
-    (bind-key [escape] 'keyboard-quit            evil-visual-state-map          )
-    (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-map           )
-    (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-ns-map        )
-    (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-completion-map)
-    (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-must-match-map)
-    (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-isearch-map   ))
+**** evil-exchange
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-exchange
+    :config (evil-exchange-cx-install))
+#+END_SRC
+
+**** evil-leader
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-leader)
+#+END_SRC
+
+**** evil-matchit
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-matchit)
+#+END_SRC
+
+**** evil-numbers
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-numbers)
+#+END_SRC
+
+**** Make escape quit everything, whenever possible.
+#+BEGIN_SRC emacs-lisp
+  (defun minibuffer-keyboard-quit ()
+    "Abort recursive edit.
+          In Delete Selection mode, if the mark is active, just deactivate it;
+          then it takes a second \\[keyboard-quit] to abort the minibuffer."
+    (interactive)
+    (if (and delete-selection-mode transient-mark-mode mark-active)
+        (setq deactivate-mark  t)
+      (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
+      (abort-recursive-edit)))
+
+  (bind-key [escape] 'keyboard-quit            evil-normal-state-map          )
+  (bind-key [escape] 'keyboard-quit            evil-visual-state-map          )
+  (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-map           )
+  (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-ns-map        )
+  (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-completion-map)
+  (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-must-match-map)
+  (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-isearch-map   )
+#+END_SRC
+
+*** END
+#+BEGIN_SRC emacs-lisp
+)
 #+END_SRC
 
 ** helm
@@ -237,66 +302,98 @@ Install and load use-package
   (use-package helm
     ;; :disabled
     :diminish helm-mode
-    :init
-    (require 'helm-config)
+#+END_SRC
 
-    (setq helm-quick-update                 t  )
-    (setq helm-candidate-number-limit       25 )
-    (setq helm-buffers-fuzzy-matching       t  )
-    (setq helm-recentf-fuzzy-match          t  )
-    (setq helm-split-window-in-side-p       t  )  ; open helm buffer inside current window, not occupy whole other window
-    (setq helm-move-to-line-cycle-in-source t  )  ; move to end or beginning of source when reaching top or bottom of source
-    (setq helm-M-x-fuzzy-match              t  )
-    (setq helm-display-header-line          nil)  ; Disable the header
+*** :init
+#+BEGIN_SRC emacs-lisp
+  :init
+  (require 'helm-config)
 
-    (helm-mode            t)
-    (helm-autoresize-mode t)
+  (setq helm-quick-update                     t   )
+  (setq helm-idle-delay                       0.0 )
+  (setq helm-input-idle-delay                 0.01)
+  (setq helm-split-window-in-side-p           t   )  ; open helm buffer inside current window, not occupy whole other window
+  (setq helm-move-to-line-cycle-in-source     t   )  ; move to end or beginning of source when reaching top or bottom of source
+  (setq helm-display-header-line              nil )  ; Disable the header
 
-    :config
-    ;; Remove header line if only a single source; keep them for multiple sources
-    (defvar helm-source-header-default-background (face-attribute 'helm-source-header :background))
-    (defvar helm-source-header-default-foreground (face-attribute 'helm-source-header :foreground))
-    (defvar helm-source-header-default-box        (face-attribute 'helm-source-header :box))
+  (setq helm-mode-fuzzy-match                 t   )
+  (setq helm-apropos-fuzzy-match              t   )
+  (setq helm-buffers-fuzzy-matching           t   )
+  (setq helm-completion-in-region-fuzzy-match t   )
+  (setq helm-lisp-fuzzy-completion            t   )
+  (setq helm-locate-fuzzy-match               t   )
+  (setq helm-recentf-fuzzy-match              t   )
 
-    (defun helm-toggle-header-line ()
-      (if (> (length helm-sources) 1)
-          (set-face-attribute 'helm-source-header nil
-                              :foreground helm-source-header-default-foreground
-                              :background helm-source-header-default-background
-                              :box helm-source-header-default-box
-                              :height 1.0)
+  (helm-mode t)
+  (helm-autoresize-mode t)
+  (semantic-mode t)
+#+END_SRC
+
+*** :config
+#+BEGIN_SRC emacs-lisp
+  :config
+  (unbind-key "C-x c")
+#+END_SRC
+
+**** Remove sub-headers line if only a single source; keep them for multiple sources
+#+BEGIN_SRC emacs-lisp
+  (defvar helm-source-header-default-background (face-attribute 'helm-source-header :background))
+  (defvar helm-source-header-default-foreground (face-attribute 'helm-source-header :foreground))
+  (defvar helm-source-header-default-box        (face-attribute 'helm-source-header :box))
+
+  (defun helm-toggle-header-line ()
+    (if (> (length helm-sources) 1)
         (set-face-attribute 'helm-source-header nil
-                            :foreground (face-attribute 'helm-selection :background)
-                            :background (face-attribute 'helm-selection :background)
-                            :box nil
-                            :height 0.1)))
-    (add-hook 'helm-before-initialize-hook 'helm-toggle-header-line)
+                            :foreground helm-source-header-default-foreground
+                            :background helm-source-header-default-background
+                            :box helm-source-header-default-box
+                            :height 1.0)
+      (set-face-attribute 'helm-source-header nil
+                          :foreground (face-attribute 'helm-selection :background)
+                          :background (face-attribute 'helm-selection :background)
+                          :box nil
+                          :height 0.1)))
+  (add-hook 'helm-before-initialize-hook 'helm-toggle-header-line)
+#+END_SRC
 
-    (unbind-key "C-x c")
+**** helm-descbinds
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-descbinds
+    :init   (helm-descbinds-mode t)
+    :config (setq helm-descbinds-window-style 'split-window)
+    :bind   (("C-h B" . describe-personal-keybindings)))
+#+END_SRC
 
-    (bind-key* (kbd "M-x") 'helm-M-x)
-    (bind-keys :prefix-map helm-command-prefix
-               :prefix "C-c h"
-               ("b" . helm-buffers-list)
-               ("f" . helm-find-files)
-               ("m" . helm-mini)
-               ("o" . helm-imenu)))
+*** :bind
+This allows us to create new custom bindings within helm's default map thereby allowing us to use the default keybindings as well
+#+BEGIN_SRC emacs-lisp
+  :bind (("C-c h" . helm-command-prefix)
+         :map       helm-command-map
+         ("b"     . helm-buffers-list)
+         ("e"     . helm-find-files)    ; Find files in the current directory
+         ("m"     . helm-mini)          ; m-mixed
+         ("/"     . helm-occur))        ; search in all open buffers
+  :bind* ("M-x"   . helm-M-x)
+#+END_SRC
 
-    ;; :bind (:map 'helm-mode-map
-    ;;             ("M-x" . helm-M-x)
-    ;;             :prefix-map helm-command-prefix
-    ;;             :prefix "C-c h"
-    ;;             ("b" . helm-buffers-list)
-    ;;             ("f" . helm-find-files)
-    ;;             ("m" . helm-mini)
-    ;;             ("o" . helm-imenu)))
+Other useful default keybinds:
+|--------------+------------------------+--------------------------------------------------------------|
+| <prefix> a   | helm-apropos           | Unholy amalgam of describe-function, variable, commands etc. |
+| <prefix> i   | helm-semantic-or-imenu | Show outline and major definitions                           |
+| <prefix> r   | helm-regexp            | Construct a regexp                                           |
+| <prefix> C-, | helm-calcul-expression | Interface to calc command                                    |
+|--------------+------------------------+--------------------------------------------------------------|
+
+*** END
+#+BEGIN_SRC emacs-lisp
+)
 #+END_SRC
 
 ** linum-relative
 Relative line-numbers ala vim
 #+BEGIN_SRC emacs-lisp
   (use-package linum-relative
-    ;; :disabled
+    :disabled
     :diminish linum-relative-mode
     :init
     (setq linum-relative-current-symbol "")
@@ -363,6 +460,10 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
 *** Misc
 #+BEGIN_SRC emacs-lisp
   (setq org-indent-mode t)
+
+  (setq org-directory "~/Notes")
+  (setq org-default-notes-file "~/Notes/organizer.org")
+        
   (setq org-M-RET-may-split-line '((item) (default . t)))
   (setq org-log-done 'time) ; 'time/'note
   ;; (setq org-special-ctrl-a/e t)
@@ -377,11 +478,33 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
   ;; (setq org-completion-use-ido t)
   ;; (setq org-startup-truncated nil)
   (setq org-link-search-must-match-exact-headline nil)
+#+END_SRC
 
-  (when (eq system-type 'windows-nt)
-    (setq org-ellipsis "…" ))
-  (when (eq system-type 'gnu/linux)
-    (setq org-ellipsis " ▼" ))  ; Use a fancy arrow to indicate a fold rather than '...'
+*** Org babel languages
+/org-babel-load-languages/ controls which languages are enabled for evaluation.
+By default, only /emacs-lisp/ is enabled
+#+BEGIN_SRC emacs-lisp
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '((python . t)
+                                 (ruby   . t)
+                                 (sh     . t)))
+
+  (defun my/org-babel-evaluate-silent (lang body)
+    "Do not ask for confirmation to evaluate these languages."
+    (not (or (string= lang "emacs-lisp"))))
+  (setq org-confirm-babel-evaluate 'my/org-babel-evaluate-silent)
+#+END_SRC
+
+*** Org babel source blocks
+Enable syntax highlighting within the source blocks and keep the editing popup window within the same window.
+Also, strip leading and trailing empty lines if any. 
+/org-src-preserve-indentation/ will not add an extra level of indentation to the source code
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-fontify-natively                       t
+        org-src-window-setup                           'current-window
+        org-src-strip-leading-and-trailing-blank-lines t
+        ;; org-src-preserve-indentation                   t
+        org-src-tab-acts-natively                      t)
 #+END_SRC
 
 *** Clean View
@@ -389,6 +512,9 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
   (setq org-startup-indented t)
   (setq org-hide-leading-stars t)
   (setq org-odd-level-only nil)
+
+  ;; …▼•
+  (setq org-ellipsis " ▼" )              ; Use a fancy arrow to indicate a fold instead of '...'
 #+END_SRC
 
 *** ToDo States
@@ -400,12 +526,11 @@ Custom keywords
 *** Templates
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'org-structure-template-alist
-               '("sel" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
+               '("sl" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
 #+END_SRC
 
 *** Fonts
 #+BEGIN_SRC emacs-lisp
-  (setq org-src-fontify-natively t)
   ;; Variable pitch for non-code text
   ;(defun set-buffer-variable-pitch ()
   ;  (interactive)
@@ -423,7 +548,7 @@ Custom keywords
   ;(add-hook 'Info-mode-hook 'set-buffer-variable-pitch)
 #+END_SRC
 
-*** TODO Use leuven specifically for org-mode
+*** TODO Always use leuven for org-mode
 #+BEGIN_SRC emacs-lisp
   (defun org-mode-theme-hook ()
     ;; do something here if use-package is deferred?
@@ -432,6 +557,18 @@ Custom keywords
   ;; (add-hook 'org-mode-hook 'org-mode-theme-hook)
 #+END_SRC
 
+*** org-bullets
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    ;; :disable
+    :init   (setq org-bullets-bullet-list '("•"))
+    :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+#+END_SRC
+
+** TODO yasnippet
+** TODO projectile
+** TODO flycheck
+** TODO SLIME
 ** Themes
 *** Theme Directories
 #+BEGIN_SRC emacs-lisp
@@ -465,7 +602,7 @@ Custom keywords
     ;;       solarized-height-plus-3      1.0
     ;;       solarized-height-plus-4      1.0)
     (setq solarized-use-less-bold t)
-    (set-face-attribute 'linum-relative-current-face nil :foreground "#D33682")
+    ;; (set-face-attribute 'linum-relative-current-face nil :foreground "#D33682")
     (load-theme 'solarized-light t))
 #+END_SRC
 
@@ -480,6 +617,18 @@ Custom keywords
 
 *** After theme
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'linum nil :font my-monospaced-font :background (face-attribute 'mode-line :background nil t) :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant 'normal :weight 'normal)
-  (set-face-attribute 'linum-relative-current-face nil :inherit 'linum :weight 'bold :background (face-attribute 'linum :background nil t))
+  ;; (set-face-attribute 'linum nil :font my-monospaced-font :background (face-attribute 'mode-line :background nil t) :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant 'normal :weight 'normal)
+  ;; (set-face-attribute 'linum-relative-current-face nil :inherit 'linum :weight 'bold :background (face-attribute 'linum :background nil t))
+#+END_SRC
+
+* Programming Languages Course on Coursera
+[[http://tuhdo.github.io/emacs-for-proglang.html][Starter Kit]] from [[https://reddit.com/u/tuhdo][tuhdo]]
+
+** sml-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package sml-mode)
+
+  (use-package geiser
+    :config
+    (setq geiser-default-implementation "racket"))
 #+END_SRC
