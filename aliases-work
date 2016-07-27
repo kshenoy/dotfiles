@@ -76,9 +76,9 @@ alias bjj='lsf_bjobs -w | command grep "JOBID\|$$"'
 alias bk='lsf_bkill'
 alias bq='lsf_bqueues'
 
-alias wtf='PAGER="svim -R" WhyTheFail'
+alias wtf='PAGER="wim -u NONE" WhyTheFail'
 alias lmn='ljd -nomail -l'
-alias rgf='regenerate_fail.bash -log mine -r \"-avf \'"'-/ChkL3.Debug/ 1\'"'\"'
+alias rgf_l3='regenerate_fail.bash -log mine -r \"-avf \'"'-/ChkL3.Debug/ 1\'"'\"'
 alias trapbug='P4DIFF= s_trapbug -bug'
 
 
@@ -252,26 +252,40 @@ tel() {
 
 unset -f mkwa_proj
 mkwa_proj() {
-  . /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash && export LANG=en_US.UTF-8
+  local _str=${1}
 
-  local _project="$1"; shift
+  local _project=${_str%/*};
+  if [[ -z "${_project}" ]]; then
+    echo "ERROR: Project not specified"
+  fi
+  # echo "Project    : ${_project}"
+  _str=${_str/#${_project}\//}
 
-  if (( $# == 0 )); then
-    echo p4_mkwa -codeline $_project
-    p4_mkwa -codeline $_project
-  else
-    [[ "$1" == "-configuration_id" ]] && shift;
+  local _branch=${_str%\@*}
+  # echo "Branch     : ${_branch}"
+  _str=${_str/#${_branch}/}
 
-    # Delete aspen/aspen_trunk@ from the front of $1
-    config_id=${1#${_project}/${_project}_trunk}
-    # Delete @ from the front of $1 (Same as above)
-    config_id=${config_id/#@/}
+  local _cl=${_str}
+  # echo "Changelist : ${_cl}"
 
-    echo p4_mkwa -configuration_id ${_project}/${_project}_trunk@${config_id}
-    p4_mkwa -configuration_id ${_project}/${_project}_trunk@${config_id}
+  local _cmd="p4_mkwa -codeline ${_project}"
+  if [[ -n "${_branch}" ]]; then
+    _cmd="${_cmd} -branch_name ${_branch}"
+  fi
+  if [[ -n "${_cl}" ]]; then
+    _cmd="${_cmd} -changelist ${_cl}"
   fi
 
-  # Source aliases
+  echo -e "${_cmd}\n"
+
+  . /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash && export LANG=en_US.UTF-8
+  $_cmd
+
+  if [[ -z "$STEM" ]]; then
+    return
+  fi
+
+  # Source aliases...
   echo "$(tput setaf 2)[Sourcing aliases...]$(tput sgr0)"
   [[ -f ~/.dotfiles/aliases ]] && . ~/.dotfiles/aliases
 
@@ -282,9 +296,22 @@ mkwa_proj() {
   # Start emacs daemon
   #~kshenoy/bin/emacs_daemon -s $(echo $REPO_PATH | tr '/' '_')
 }
-alias mkwa_as="mkwa_proj aspen"
-alias mkwa_ah="mkwa_proj aspen_highlands"
-alias mkwa_zn="mkwa_proj zen"
+
+unset -f mkwa_as
+mkwa_as() {
+  mkwa_proj "aspen/$1"
+}
+
+unset -f mkwa_ah
+mkwa_ah() {
+  mkwa_proj "aspen_highlands/$1"
+}
+
+unset -f mkwa_zn
+mkwa_zn() {
+  mkwa_proj "zen/$1"
+}
+
 
 unset -f dotty
 dotty() {
