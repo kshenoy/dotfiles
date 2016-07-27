@@ -16,6 +16,102 @@
   (package-initialize)
 #+END_SRC
 
+** use-package
+[[https://www.youtube.com/watch?v%3D2TSKxxYEbII][use-package video tutorial]]
+
+Install and load use-package
+#+BEGIN_SRC emacs-lisp
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+
+  (eval-and-compile
+    (defvar use-package-verbose t)
+    (require 'use-package)
+    (require 'bind-key)
+    (setq use-package-always-ensure t))
+
+  (bind-key "C-h B" 'describe-personal-keybindings)
+#+END_SRC
+
+* Visual
+#+BEGIN_SRC emacs-lisp
+  ;; Disable anoying beep
+  (setq ring-bell-function 'ignore)
+
+  ;; Improve rendering performance
+  (setq redisplay-dont-pause t)
+
+  ;; Display a special glyph in the fringe of each empty line at the end of the buffer
+  (setq indicate-empty-lines t)
+
+  ;; Undo and Redo windows <= Wut?
+  ;; (winner-mode 1)
+#+END_SRC
+
+** Frame related
+Set size of default frame
+#+BEGIN_SRC emacs-lisp
+  (setq default-frame-alist
+        '((top    . 0)
+          (left   . 0)
+          (width  . 271)
+          (height . 70)))
+#+END_SRC
+
+Start maximized
+#+BEGIN_SRC emacs-lisp
+  ;; Open in fullscreen
+  (defun my/switch-fullscreen nil
+    "Switch to fullscreen. Works in OSX."
+    (interactive)
+    (let* ((modes '(nil fullboth fullwidth fullheight))
+           (cm (cdr (assoc 'fullscreen (frame-parameters))))
+           (next (cadr (member cm modes))))
+      (modify-frame-parameters
+       (selected-frame)
+       (list (cons 'fullscreen next)))))
+  ;; (my/switch-fullscreen)
+
+  ;; Start maximized
+  ;; (custom-set-variables '(initial-frame-alist (quote ((fullscreen . maximized)))))
+#+END_SRC
+
+Transparency
+#+BEGIN_SRC emacs-lisp
+  ;; (set-frame-parameter (selected-frame) 'alpha '(85 85))
+  ;; (add-to-list 'default-frame-alist '(alpha 85 85))
+#+END_SRC
+
+Avoid Emacs hanging for a while after changing default font:
+#+BEGIN_SRC emacs-lisp
+(modify-frame-parameters nil '((wait-for-wm . nil)))
+#+END_SRC
+
+** Clean-up
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-startup-message t)
+  (setq initial-scratch-message "")
+
+  (when window-system
+    ;; (menu-bar-mode -1)
+    ;; (tooltip-mode -1)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1))
+#+END_SRC
+
+We can also put something like this into =~/.Xresources= to enable/disable certain things as soon as Emacs starts
+#+BEGIN_EXAMPLE
+Emacs.verticalScrollBars: off
+Emacs.toolBar: off
+#+END_EXAMPLE
+
+** Mode line
+#+BEGIN_SRC emacs-lisp
+  ;; Show column number in bottom bar
+  (setq column-number-mode t)
+#+END_SRC
+
 * General
 ** Custom file
 #+BEGIN_SRC emacs-lisp
@@ -43,6 +139,32 @@
   (if (not (file-exists-p autosave-directory)) (make-directory autosave-directory t))
   (setq auto-save-file-name-transforms `(("." ,autosave-directory t)))
   (setq auto-save-default t)  ; auto-save every buffer that visits a file
+#+END_SRC
+
+** History
+Delete identical history entries
+#+BEGIN_SRC emacs-lisp
+(setq history-delete-duplicates t)
+#+END_SRC
+
+Save mini-buffer history
+#+BEGIN_SRC emacs-lisp
+  (use-package savehist
+    :init
+    (setq savehist-file (concat user-emacs-directory "tmp/history.el")
+          history-length 100)
+    :config
+    (savehist-mode t))
+#+END_SRC
+
+** UTF-8 Please
+#+BEGIN_SRC emacs-lisp
+  (setq locale-coding-system   'utf-8)
+  (set-terminal-coding-system  'utf-8)
+  (set-keyboard-coding-system  'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (set-language-environment    "UTF-8")
+  (prefer-coding-system        'utf-8)
 #+END_SRC
 
 ** Fonts
@@ -82,133 +204,80 @@ Fall back to DejaVu Sans when the font lacks support for some glyphs. Taken from
                                  :weight 'normal)))
 #+END_SRC
 
-
 *** TODO Figure out how to specify fall-back fonts
 To be able to use different fonts on different machines
 
-** UTF-8 Please
-#+BEGIN_SRC emacs-lisp
-  (setq locale-coding-system   'utf-8)
-  (set-terminal-coding-system  'utf-8)
-  (set-keyboard-coding-system  'utf-8)
-  (set-selection-coding-system 'utf-8)
-  (set-language-environment    "UTF-8")
-  (prefer-coding-system        'utf-8)
-#+END_SRC
-
-** UI
-Clean-up
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    ;; (menu-bar-mode -1)
-    ;; (tooltip-mode -1)
-    (tool-bar-mode -1)
-    (scroll-bar-mode -1))
-#+END_SRC
-
-Set size of default frame
-#+BEGIN_SRC emacs-lisp
-  (setq default-frame-alist
-        '((top    . 0)
-          (left   . 0)
-          (width  . 271)
-          (height . 70)))
-#+END_SRC
-
-Start maximized
-#+BEGIN_SRC emacs-lisp
-  ;; Open in fullscreen
-  (defun my/switch-fullscreen nil
-    "Switch to fullscreen. Works in OSX."
-    (interactive)
-    (let* ((modes '(nil fullboth fullwidth fullheight))
-           (cm (cdr (assoc 'fullscreen (frame-parameters))))
-           (next (cadr (member cm modes))))
-      (modify-frame-parameters
-       (selected-frame)
-       (list (cons 'fullscreen next)))))
-  ;; (my/switch-fullscreen)
-
-  ;; Start maximized
-  ;; (custom-set-variables '(initial-frame-alist (quote ((fullscreen . maximized)))))
-#+END_SRC
-
-Transparency
-#+BEGIN_SRC emacs-lisp
-  ;; (set-frame-parameter (selected-frame) 'alpha '(85 85))
-  ;; (add-to-list 'default-frame-alist '(alpha 85 85))
-#+END_SRC
-
-Misc
-#+BEGIN_SRC emacs-lisp
-  ;; Disable anoying beep
-  (setq ring-bell-function 'ignore)
-
-  ;; Show column number in bottom bar
-  (setq column-number-mode t)
-
-  ;; Improve rendering performance
-  (setq redisplay-dont-pause t)
-
-  ;; Display a special glyph in the fringe of each empty line at the end of the buffer
-  (setq indicate-empty-lines t)
-
-  ;; Highlight current line
-  ;; (global-hl-line-mode 1)
-
-  ;; Undo and Redo windows <= Wut?
-  ;; (winner-mode 1)
-#+END_SRC
-
-** Tabs and Indentation.
+** Tabs, Indentation and Spacing
 Use only spaces and no tabs
 #+BEGIN_SRC emacs-lisp
   (setq-default indent-tabs-mode nil)
   (setq-default tab-width 2)
+  (setq show-trailing-whitespace t)
+
+  (defun my/toggle-trailing-whitespace ()
+    (interactive)  ; Allows to be called as a command via M-x
+    (setq show-trailing-whitespace (if show-trailing-whitespace nil t)))  
 #+END_SRC
+
+** Highlight current line
+#+BEGIN_SRC emacs-lisp
+  ;; (global-hl-line-mode 1)
+  (bind-key "C-c o c" 'global-hl-line-mode)
+#+END_SRC
+
+** Simpler y/n answers
+#+BEGIN_SRC emacs-lisp
+  (fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+** Matching Parens
+#+BEGIN_SRC emacs-lisp
+  (show-paren-mode 1)
+  (setq show-paren-delay 0)
+  ;; (setq show-paren-style 'expression)
+#+END_SRC
+
+** TODO Emacs server
+- Always start the emacs-server, except when run in daemon mode
+- Already Disable prompt asking you if you want to kill a buffer with a live process attached to it.
+  http://stackoverflow.com/questions/268088/how-to-remove-the-prompt-for-killing-emacsclient-buffers
+
+#+BEGIN_SRC emacs-lisp
+  (use-package server
+    :disabled
+    :config
+    (unless (or (daemonp) (server-running-p))
+      (server-mode 1))
+    (add-hook 'server-switch-hook 'raise-frame))
+#+END_SRC
+
+Alias for emacsclient:
+#+BEGIN_EXAMPLE
+alias e="emacsclient --no-wait --alternate-editor=\"\" --create-frame"
+#+END_EXAMPLE
 
 ** Misc
 #+BEGIN_SRC emacs-lisp
-  (setq inhibit-startup-message t)
-  (setq initial-scratch-message "")
-
-  ;; Enable y/n answers
-  (fset 'yes-or-no-p 'y-or-n-p)
-
-  ;; Show matching parentheses
-  (show-paren-mode 1)
-  ;; (setq show-paren-style 'expression)
-
   ;; Count 1 space after a period as the end of a sentence, instead of 2
   (setq sentence-end-double-space nil)
 
   ;; Enable editing by visual lines
-  (global-visual-line-mode)
+  (global-visual-line-mode t)
   (diminish 'visual-line-mode)
+
+  ;; Let emacs react faster to keystrokes
+  (setq echo-keystrokes 0.1)
+  (setq idle-update-delay 0.35)
 #+END_SRC
 
 * Packages
-** use-package
-[[https://www.youtube.com/watch?v%3D2TSKxxYEbII][use-package video tutorial]]
-
-Install and load use-package
-#+BEGIN_SRC emacs-lisp
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
-
-  (eval-and-compile
-    (defvar use-package-verbose t)
-    (require 'use-package)
-    (require 'bind-key)
-    (setq use-package-always-ensure t))
-#+END_SRC
-
 ** evil
 #+BEGIN_SRC emacs-lisp
   (use-package evil
     ;; :disabled
 #+END_SRC
+
+evil can be toggled using =C-z=
 
 *** :init
 #+BEGIN_SRC emacs-lisp
@@ -297,7 +366,10 @@ Install and load use-package
 )
 #+END_SRC
 
+** TODO flycheck
 ** helm
+[[http://tuhdo.github.io/helm-intro.html][Introduction to Helm by reddit:/u/tuhdo]]
+
 #+BEGIN_SRC emacs-lisp
   (use-package helm
     ;; :disabled
@@ -359,9 +431,7 @@ Install and load use-package
 **** helm-descbinds
 #+BEGIN_SRC emacs-lisp
   (use-package helm-descbinds
-    :init   (helm-descbinds-mode t)
-    :config (setq helm-descbinds-window-style 'split-window)
-    :bind   (("C-h B" . describe-personal-keybindings)))
+    :init (helm-descbinds-mode t))
 #+END_SRC
 
 *** :bind
@@ -384,7 +454,7 @@ Other useful default keybinds:
 | <prefix> C-, | helm-calcul-expression | Interface to calc command                                    |
 |--------------+------------------------+--------------------------------------------------------------|
 
-*** END
+*** use-package END
 #+BEGIN_SRC emacs-lisp
 )
 #+END_SRC
@@ -565,10 +635,23 @@ Custom keywords
     :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+END_SRC
 
-** TODO yasnippet
 ** TODO projectile
-** TODO flycheck
 ** TODO SLIME
+** undo-tree
+This lets us visually walk through the changes we've made, undo back to a certain point (or redo), and go down different branches.
+Default binding is =C-x u=
+#+BEGIN_SRC emacs-lisp
+  (use-package undo-tree
+    :ensure t
+    :diminish undo-tree-mode
+    :commands (undo-tree-visualize)
+    :config
+      (global-undo-tree-mode)
+      (setq undo-tree-visualizer-timestamps t)
+      (setq undo-tree-visualizer-diff t))
+#+END_SRC
+
+** TODO yasnippet
 ** Themes
 *** Theme Directories
 #+BEGIN_SRC emacs-lisp
@@ -621,6 +704,7 @@ Custom keywords
   ;; (set-face-attribute 'linum-relative-current-face nil :inherit 'linum :weight 'bold :background (face-attribute 'linum :background nil t))
 #+END_SRC
 
+**** TODO Adjust evil-cursor colors
 * Programming Languages Course on Coursera
 [[http://tuhdo.github.io/emacs-for-proglang.html][Starter Kit]] from [[https://reddit.com/u/tuhdo][tuhdo]]
 
