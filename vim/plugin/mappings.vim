@@ -115,16 +115,6 @@ vnoremap < <gv
 """ Briefly show CursorLine and CursorColumn
 nnoremap <silent> <F5> :call my#CursorBlind()<cr>
 
-" Transposing words
-"nnoremap <silent> <C-Left>  :let ss=@/<CR>:let hls=&hls<CR>:<C-R>=hls?'se hls!':''<CR><CR>
-"              \"_yiw?\w\+\_W\+\%#<CR>:s/\(\%#\w\+\)\(\_W\+\)\(\w\+\)/\3\2\1/<CR><C-O>
-"              \:let @/=ss<CR>:<C-R>=hls?'set hls':''<CR><CR>
-"imap   <silent> <C-Left>  <C-O><C-Left>
-"nnoremap <silent> <C-Right> :let ss=@/<CR>:let hls=&hls<CR>:<C-R>=hls?'se hls!':''<CR><CR>
-"              \"_yiw:s/\(\%#\w\+\)\(\_W\+\)\(\w\+\)/\3\2\1/<CR><C-O>/\w\+\_W\+<CR>
-"              \:let @/=ss<CR>:<C-R>=hls?'set hls':''<CR><CR>
-"imap   <silent> <C-Right> <C-O><C-Right>
-
 """ Panic Mode (rot13)
 nnoremap <silent> <F9> :call my#Preserve('normal! ggg?G')<CR>
 
