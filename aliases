@@ -127,10 +127,10 @@ alias spc=space
 #=================
 # Search related
 #
-alias f=find
-alias fn='f -name'
-alias f.='f -maxdepth 1'
-alias f.n='f -maxdepth 1 -name'
+alias fn='find . -name'
+alias fnd='find . -type d -name'
+alias f.='find . -maxdepth 1'
+alias f.n='f. -name'
 alias fgrep='fgrep --color=always'
 alias egrep='egrep --color=always'
 unset -f pgrep

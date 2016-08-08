@@ -170,16 +170,14 @@ Save mini-buffer history
 ** Fonts
 One way to select from multiple fonts
 #+BEGIN_SRC emacs-lisp
-  (defun my/font-exist-p (fontname)
-    "Test if 'fontname' exists or not."
-    (if (or (not fontname) (string= fontname "") (not (display-graphic-p)))
-        nil
-      (if (not (x-list-fonts fontname))
-          nil t)))
+  (defun my/font-exist-p (font)
+    " Check if font exists"
+    (if (null (x-list-fonts font)) nil t))
 
   (when (eq system-type 'gnu/linux)
-    (when (my/font-exist-p "Ubuntu")            (setq my-variable-pitch-font "Ubuntu-10.5"))
-    (when (my/font-exist-p "Ubuntu Mono")       (setq my-monospaced-font     "Ubuntu Mono-10.5"))
+    (when (my/font-exist-p "MesloLGMDZ Nerd Font")
+      (setq my-variable-pitch-font "MesloLGMDZ Nerd Font-10"
+            my-monospaced-font     "MesloLGMDZ Nerd Font-10"))
 
     (when (my/font-exist-p "Pragmata Pro")      (setq my-variable-pitch-font "Pragmata Pro-10"))
     (when (my/font-exist-p "Pragmata Pro Mono") (setq my-monospaced-font     "Pragmata Pro Mono-10")))
@@ -204,19 +202,22 @@ Fall back to DejaVu Sans when the font lacks support for some glyphs. Taken from
                                  :weight 'normal)))
 #+END_SRC
 
+Increase/Decrease font size using =C-x C-+= and =C-x C--=. =C-x C-0= resets it
+
 *** TODO Figure out how to specify fall-back fonts
 To be able to use different fonts on different machines
-
 ** Tabs, Indentation and Spacing
 Use only spaces and no tabs
 #+BEGIN_SRC emacs-lisp
-  (setq-default indent-tabs-mode nil)
-  (setq-default tab-width 2)
-  (setq show-trailing-whitespace t)
+    (setq-default indent-tabs-mode nil)
+    (setq-default tab-width 2)
+    (setq show-trailing-whitespace t)
 
-  (defun my/toggle-trailing-whitespace ()
-    (interactive)  ; Allows to be called as a command via M-x
-    (setq show-trailing-whitespace (if show-trailing-whitespace nil t)))  
+    (defun my/toggle-trailing-whitespace ()
+      (interactive)  ; Allows to be called as a command via M-x
+      (setq show-trailing-whitespace (not show-trailing-whitespace)))
+
+    ;; (bind-key "RET" 'newline-and-indent)
 #+END_SRC
 
 ** Highlight current line
@@ -235,6 +236,24 @@ Use only spaces and no tabs
   (show-paren-mode 1)
   (setq show-paren-delay 0)
   ;; (setq show-paren-style 'expression)
+#+END_SRC
+
+** Misc
+#+BEGIN_SRC emacs-lisp
+  ;; Count 1 space after a period as the end of a sentence, instead of 2
+  (setq sentence-end-double-space nil)
+
+  ;; Enable editing by visual lines
+  (global-visual-line-mode t)
+  (diminish 'visual-line-mode)
+
+  ;; Let emacs react faster to keystrokes
+  (setq echo-keystrokes 0.1)
+  (setq idle-update-delay 0.35)
+
+  ;; Jump to the help window when it's opened. 
+  ;; Press q to close it and restore the view to the previous buffer
+  (setq help-window-select t)
 #+END_SRC
 
 ** TODO Emacs server
@@ -256,20 +275,6 @@ Alias for emacsclient:
 alias e="emacsclient --no-wait --alternate-editor=\"\" --create-frame"
 #+END_EXAMPLE
 
-** Misc
-#+BEGIN_SRC emacs-lisp
-  ;; Count 1 space after a period as the end of a sentence, instead of 2
-  (setq sentence-end-double-space nil)
-
-  ;; Enable editing by visual lines
-  (global-visual-line-mode t)
-  (diminish 'visual-line-mode)
-
-  ;; Let emacs react faster to keystrokes
-  (setq echo-keystrokes 0.1)
-  (setq idle-update-delay 0.35)
-#+END_SRC
-
 * Packages
 ** evil
 #+BEGIN_SRC emacs-lisp
@@ -284,7 +289,7 @@ evil can be toggled using =C-z=
   :init
   (evil-mode t)
 #+END_SRC
-  
+
 **** Color the cursor to indicate the Evil mode. White to indicate that we've switched back to Emacs
 #+BEGIN_SRC emacs-lisp
   (setq evil-normal-state-cursor   '("#719e07" box)
@@ -395,6 +400,7 @@ evil can be toggled using =C-z=
   (setq helm-lisp-fuzzy-completion            t   )
   (setq helm-locate-fuzzy-match               t   )
   (setq helm-recentf-fuzzy-match              t   )
+  (setq helm-M-x-fuzzy-match                  t   )
 
   (helm-mode t)
   (helm-autoresize-mode t)
@@ -402,6 +408,7 @@ evil can be toggled using =C-z=
 #+END_SRC
 
 *** :config
+Remove the default prefix =C-x c=. New one will be created in :bind
 #+BEGIN_SRC emacs-lisp
   :config
   (unbind-key "C-x c")
@@ -433,6 +440,9 @@ evil can be toggled using =C-z=
   (use-package helm-descbinds
     :init (helm-descbinds-mode t))
 #+END_SRC
+
+Note that helm-descbinds will replace the default /describe-bindings/.
+Thus =C-h b= can be used for it; no need to create a new binding.
 
 *** :bind
 This allows us to create new custom bindings within helm's default map thereby allowing us to use the default keybindings as well
@@ -531,9 +541,11 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
 #+BEGIN_SRC emacs-lisp
   (setq org-indent-mode t)
 
-  (setq org-directory "~/Notes")
-  (setq org-default-notes-file "~/Notes/organizer.org")
-        
+  (setq org-directory "~/Notes/")
+  (setq org-default-notes-file (concat org-directory "organizer.org"))
+  (setq org-agenda-files (quote ("~/Notes/AMD"
+                                 "~/Notes/Software")))
+
   (setq org-M-RET-may-split-line '((item) (default . t)))
   (setq org-log-done 'time) ; 'time/'note
   ;; (setq org-special-ctrl-a/e t)
@@ -550,31 +562,41 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
   (setq org-link-search-must-match-exact-headline nil)
 #+END_SRC
 
-*** Org babel languages
-/org-babel-load-languages/ controls which languages are enabled for evaluation.
-By default, only /emacs-lisp/ is enabled
-#+BEGIN_SRC emacs-lisp
-  (org-babel-do-load-languages 'org-babel-load-languages
-                               '((python . t)
-                                 (ruby   . t)
-                                 (sh     . t)))
-
-  (defun my/org-babel-evaluate-silent (lang body)
-    "Do not ask for confirmation to evaluate these languages."
-    (not (or (string= lang "emacs-lisp"))))
-  (setq org-confirm-babel-evaluate 'my/org-babel-evaluate-silent)
-#+END_SRC
-
 *** Org babel source blocks
 Enable syntax highlighting within the source blocks and keep the editing popup window within the same window.
-Also, strip leading and trailing empty lines if any. 
+Also, strip leading and trailing empty lines if any.
 /org-src-preserve-indentation/ will not add an extra level of indentation to the source code
 #+BEGIN_SRC emacs-lisp
   (setq org-src-fontify-natively                       t
         org-src-window-setup                           'current-window
         org-src-strip-leading-and-trailing-blank-lines t
-        ;; org-src-preserve-indentation                   t
+        ;; org-src-preserve-indentation                t
         org-src-tab-acts-natively                      t)
+#+end_src
+
+Languages which can be evaluated in Org-mode buffers.
+#+begin_src emacs-lisp
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               (append org-babel-load-languages
+                                       '((python     . t)
+                                         (ruby       . t)
+                                         (perl       . t)
+                                         (sh         . t))))
+#+end_src
+
+Ask for confirmation before evaluating? NO!
+#+begin_src emacs-lisp
+  (defun my/org-babel-evaluate-silent (lang body)
+    "Do not ask for confirmation to evaluate these languages."
+    (not (or (string= lang "emacs-lisp"))))
+
+  ;; (setq org-confirm-babel-evaluate 'my/org-babel-evaluate-silent)
+  (setq org-confirm-babel-evaluate nil)
+#+END_SRC
+
+Delete the result block using =C-c C-v k= where =C-c C-v= is the /org-babel-key-prefix/
+#+begin_src emacs-lisp
+  (bind-key "k" 'org-babel-remove-result org-babel-map)
 #+END_SRC
 
 *** Clean View
@@ -633,6 +655,20 @@ Custom keywords
     ;; :disable
     :init   (setq org-bullets-bullet-list '("•"))
     :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+#+END_SRC
+
+*** Delete links
+#+BEGIN_SRC emacs-lisp
+  (defun my/org-replace-link-with-description ()
+    "Replace an org link with its description. If a description doesn't exist, replace with its address"
+    (interactive)
+    (if (org-in-regexp org-bracket-link-regexp 1)
+        (let ((remove (list (match-beginning 0) (match-end 0)))
+              (description (if (match-end 3)
+                               (org-match-string-no-properties 3)
+                             (org-match-string-no-properties 1))))
+          (apply 'delete-region remove)
+          (insert description))))
 #+END_SRC
 
 ** TODO projectile
@@ -705,13 +741,25 @@ Default binding is =C-x u=
 #+END_SRC
 
 **** TODO Adjust evil-cursor colors
+
 * Programming Languages Course on Coursera
 [[http://tuhdo.github.io/emacs-for-proglang.html][Starter Kit]] from [[https://reddit.com/u/tuhdo][tuhdo]]
 
 ** sml-mode
 #+BEGIN_SRC emacs-lisp
-  (use-package sml-mode)
+  (use-package sml-mode
+    :config
+    (use-package ob-sml
+      :ensure nil
+      :load-path "bundle/ob-sml"
+      :config
+      (org-babel-do-load-languages 'org-babel-load-languages
+                                   (append org-babel-load-languages '((sml . t))))
+      (add-to-list 'org-structure-template-alist
+                   '("sml" "#+BEGIN_SRC sml\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))))
+#+END_SRC
 
+#+BEGIN_SRC emacs-lisp
   (use-package geiser
     :config
     (setq geiser-default-implementation "racket"))

@@ -29,7 +29,6 @@ ignore = Name .nfs*
 ignore = Name *.tmp
 ignore = Name .netrwhist
 #ignore = Name *history
-ignore = Path Documents/Notes/Personal
 ignore = Path Config/dotfiles/emacs.d/auto-save-list
 ignore = Path Config/dotfiles/emacs.d/elpa
 ignore = Path Config/dotfiles/emacs.d/tmp

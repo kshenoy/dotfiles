@@ -1,0 +1,23 @@
+#!/bin/bash -f
+#
+# Converts ...  -> ../../
+#          .... -> ../../../
+#
+# From: https://www.reddit.com/r/commandline/comments/4v1y05/favorite_alias_commands/d5v2i5c
+# It's broken :(
+
+unset -f rationalize_dots
+rationalize_dots() {
+  local -n  n  r=READLINE_LINE  i=READLINE_POINT
+
+  (( n = i > 3 ? i - 3 : 0 ))
+
+  if [[ ${r:n:3} == ?([$' \t\n"\'/']).. ]]; then
+    r=${r:0:i}/..${r:i}
+    (( i += 3 ))
+  else
+    r=${r:0:i}.${r:i}
+    (( i++ ))
+  fi
+}
+# bind -x '".":"rationalize_dots"'

@@ -50,82 +50,17 @@ duh() {
 
 
 # Misc utils                                                                                                        {{{1
-[[ -f $_src_dir/utils/jumper       ]] && . $_src_dir/utils/jumper
-[[ -f $_src_dir/utils/query        ]] && . $_src_dir/utils/query
-[[ -f $_src_dir/utils/colm         ]] && . $_src_dir/utils/colm
-[[ -f $_src_dir/utils/base16_color ]] && . $_src_dir/utils/base16_color
+[[ -f $_src_dir/utils/base16_color     ]] && . $_src_dir/utils/base16_color
+[[ -f $_src_dir/utils/cdpp             ]] && . $_src_dir/utils/cdpp
+[[ -f $_src_dir/utils/colm             ]] && . $_src_dir/utils/colm
+[[ -f $_src_dir/utils/jumper           ]] && . $_src_dir/utils/jumper
+[[ -f $_src_dir/utils/query            ]] && . $_src_dir/utils/query
+[[ -f $_src_dir/utils/rationalize_dots ]] && . $_src_dir/utils/rationalize_dots
 
 
 # Silent push and popd. Use dirs -v for vertical dirstack                                                           {{{1
 pushd() { command pushd $@ > /dev/null ; }
 popd()  { command popd  $@ > /dev/null ; }
-
-# DirStack - Emulate Zsh's behavior of pushd lifting the directory to tos instead of cycling the stack              {{{1
-# 'cd ='      Lists the contents of the stack.
-# 'cd +n'     Exchanges the current directory with the directory stored in 'n'. 'cd +0' is a NOP.
-# 'cd -'      Is the same as 'cd +1'
-# 'cd +'      Pops the current directory off the stack and cd's to the next directory on the stack (equivalent to popd).
-# 'cd'        Goes to $REPO_PATH if it's set else goes to $HOME
-# 'cd ,targ'  Jump to a directory in the path that starts with targ. Case-insensitive and also supports fuzzy matching
-super_cd() {
-  local _dir
-  if (( $#==0 )); then
-    _dir=${REPO_PATH-${HOME/%\//}}
-  else
-    _dir=${1/%\//}
-  fi
-
-  local _dirstack=($(command dirs))
-  case ${_dir} in
-    +[0-9]*)
-      #echo "Jumping to a dir on the stack"
-      # $[#_dirstack[@]] gives the number of elements in _dirstack
-      #if ((${_dir}<$[#_dirstack[@]])); then
-      command popd $1 > /dev/null
-      command pushd ${_dirstack[$1]/#~/$HOME} > /dev/null
-      ;;
-
-    -)
-      #echo "Jumping to the prev dir"
-      command popd +1 > /dev/null
-      command pushd ${_dirstack[1]/#~/$HOME} > /dev/null
-      ;;
-
-    +)
-      #echo "Popping current dir from the stack"
-      command popd > /dev/null
-      ;;
-
-    =)
-      command dirs -v
-      ;;
-
-    ,*)
-      #echo "Jumping to a parent dir in the path"
-      local _targ=${_dir/#,}
-      _dir=$(jumper ${_targ/#,})
-      #echo $_dir
-      ;&
-
-    *)
-      #echo "Pushing $_dir onto the stack"
-      command pushd ${_dir} > /dev/null
-      # Remove any duplicate entries
-      # $[#_dirstack[@]] gives the number of elements in _dirstack
-      local _i=0
-      while (( $_i < ${#_dirstack[@]} )); do
-        #echo $_i / ${#_dirstack[@]} : ${_dir/#~/$HOME} ${_dirstack[$_i]/#~/$HOME}
-        if [ "$PWD" == "${_dirstack[$_i]/#~/$HOME}" ]; then
-          command popd +$((($_i+1))) > /dev/null
-          break
-        fi
-        let _i=$_i+1
-      done
-      ;;
-  esac
-}
-alias cd=super_cd
-
 
 # Intelligent ..                                                                                                    {{{1
 ..() {

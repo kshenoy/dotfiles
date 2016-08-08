@@ -101,7 +101,7 @@ alias bus='bucket -s'
 alias bus1='bucket -n 1'
 alias bus3='bucket -n 3'
 alias busw='watch -n15 "bucket -n 1"'
-alias toclippy="sed -e 's/\\\\n/\\\\n\\\\r/' | tee ~/clippy.txt"
+alias toclippy="sed -e 's/$//' | tee ~/clippy.txt"
 
 alias xt='xterm -geometry 272x60+0+0 &'
 alias restd='resize -s 60 272'

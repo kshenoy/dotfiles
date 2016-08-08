@@ -58,7 +58,8 @@ if DISABLE_FROM == 3 | finish | endif
 
 "set taglength=4                                                           " No. of significant characters in a tag name
 set notagrelative                           " Filenames in tag files are relative to the directory where the tag file is
-set tags=.tags; tags+=tags;
+set tags+=.tags;
+set tags+=tags;
 execute 'set tags+=' . g:dotvim . '/tags/cpp_stl.tags'
 set cscopetag                                                       " Use cscope as well as tags when searching for tags
 set cscopetagorder=0                                                                     " Search cscope.out before tags

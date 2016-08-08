@@ -1,12 +1,11 @@
 *.bak
 bash/history
 compiz/
-emacs.d/projectile-bookmarks.eld/
-emacs.d/tmp
-emacs.d/elpa/
-emacs.d/recentf
-emacs.d/projectile-bookmarks.eld
 emacs.d/config.el*
+emacs.d/elpa/
+emacs.d/projectile-bookmarks.eld
+emacs.d/recentf
+emacs.d/tmp/
 fonts/
 unity/
 vim/autoload/plug*

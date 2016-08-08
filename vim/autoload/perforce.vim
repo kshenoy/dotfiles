@@ -1,16 +1,23 @@
 function! perforce#Checkout()                                                                                     " {{{1
   " Description: Confirm with the user, then checkout a file from perforce.
+
+  " Check that we're not in a regression work-area (not fool-proof)
+  if ($STEM =~ 'regr_build\|regrplatform')
+    setlocal nomodifiable
+    return 0
+  endif
+
   let l:p4path = substitute(split(system("p4 files " . expand('%:p')), '\s\+')[0], '#\d\+$', '', '')
   if (  ( l:p4path =~ '^//depot' )
   \  && ( confirm("Checkout from Perforce?", "&Yes\n&No", 1) == 1 )
   \  )
     call system("p4 edit " . l:p4path . " > /dev/null")
     if (v:shell_error == 0)
-      set noreadonly
+      setlocal noreadonly
       return 1
     endif
   endif
-  set readonly
+
   return 0
 endfunction
 

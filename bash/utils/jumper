@@ -7,22 +7,20 @@ unset -f jumper
 jumper() {
   if (($# == 0)); then
     echo "ERROR: Insufficient number of arguments"
-    echo "SYNTAX: path_jump <dir>"
+    echo "SYNTAX: path_jump <dir>[/subdir]"
   fi
 
-  #echo "Jumping to a parent dir in the path"
-  local _arg="${1%/}/"
-  local _targ=${_arg%%/*}
-  local _subdir="${_arg#*/}"
-  _subdir=${_subdir:+/${_subdir}}
-  #echo "Arg:$_arg, Targ:$_targ, SubDir:$_subdir"
+  # Jumping to a subdirectory of the parent dir in the path
+  local _targ=${1%%/*}
+  local _subdir="${1/${_targ}/}"
+  # echo "Targ:$_targ, SubDir:$_subdir" >> log
+
+  # Plain-old jumping, no fuzziness
+  # local _dir=$(echo $PWD | sed "s,\(^.*${_targ}[^/]*\)/.*$,\1,")
 
   # Remove spaces, escape any bare dots and add fuzzy magic
   local _rx=$(ruby -e "print '${_targ}'.gsub(/\s+/,'').split('').join('.*?').gsub(/\.(?!\*\?)/,'\.')")
-  #echo Matched: $_rx
-  echo $(echo $PWD | ruby -e "print STDIN.read.sub(/(.*?\/${_rx}[^\/]*).*/i,'\1')")${_subdir}
+  local _dir=$(echo $PWD | ruby -e "print STDIN.read.sub(/(.*?\/${_rx}[^\/]*).*/,'\1')")
 
-  # Plain-old jumping, no fuzziness
-  #_dir=$(echo $PWD | sed "s,\(^.*$2[^/]*\)/.*$,\1,")
-  #echo ${_dir}
+  echo ${_dir}/${_subdir}
 }
