@@ -32,6 +32,7 @@ use diagnostics;
 use Getopt::Long;
 use Pod::Usage;
 use Data::Dumper;
+use File::Basename;
 
 
 Getopt::Long::Configure("bundling");
@@ -60,25 +61,53 @@ GetOptions(
                      }
 ) or pod2usage(-verbose => 1);
 
+# FIXME: Find better way to pass in $0
 my @args = qw(vim);
+$_ = $0;
+if (/eview/) {
+  push @args, '-yR';
+} elsif (/evim/) {
+  push @args, '-y';
+} elsif (/ex/) {
+  push @args, '-e';
+} elsif (/gview/) {
+  push @args, '-gR';
+} elsif (/gvim/) {
+  push @args, '-g';
+} elsif (/gvimdiff/) {
+  push @args, '-gd';
+} elsif (/rgview/) {
+  push @args, '-ZgR';
+} elsif (/rgvim/) {
+  push @args, '-Zg';
+} elsif (/rview/) {
+  push @args, '-ZR';
+} elsif (/rvim/) {
+  push @args, '-Z';
+} elsif (/view/) {
+  push @args, '-R';
+} elsif (/vimdiff/) {
+  push @args, '-d';
+}
+
+# Check to see if the user has specified -u and/or -U. If not, add them if it's present in $opts{'config'}
+my $u_set = 0;
+my $U_set = 0;
+foreach (@ARGV) {
+  if (/^-u$/) {
+    $u_set = 1;
+  }
+  if (/^-U$/) {
+    $U_set = 1;
+  }
+}
 
 if ($opts{'config'} eq "NONE") {
-  push @args, qw(-u NORC -N --cmd), 'set rtp=$VIM,$VIMRUNTIME,$VIM/after'
+  push @args, qw(-N --cmd), 'set rtp=$VIM,$VIMRUNTIME,$VIM/after';
+  push @args, qw(-u NORC) if (!$u_set);
+  push @args, qw(-U NORC) if (!$U_set);
 } elsif ($opts{'config'} ne "") {
   push @args, qw(-N --cmd), sprintf("set rtp=%s,\$VIM,\$VIMRUNTIME,\$VIM/after,%s/after", $opts{'config'}, $opts{'config'});
-
-  # Check to see if the user has specified -u and/or -U. If not, add them if it's present in $opts{'config'}
-  my $u_set = 0;
-  my $U_set = 0;
-  foreach (@ARGV) {
-    if (/^-u$/) {
-      $u_set = 1;
-    }
-    if (/^-U$/) {
-      $U_set = 1;
-    }
-  }
-
   push @args, '-u', "$opts{'config'}/vimrc"  if (!$u_set && (-f "$opts{'config'}/vimrc"));
   push @args, '-U', "$opts{'config'}/gvimrc" if (!$U_set && (-f "$opts{'config'}/gvimrc"));
 }
@@ -86,5 +115,5 @@ if ($opts{'config'} eq "NONE") {
 # Push the remaining arguments to be passed to vim
 push @args, @ARGV;
 
-print Dumper \@args;
+# print Dumper \@args;
 exec(@args);

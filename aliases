@@ -214,6 +214,7 @@ emacs_func() {
   emacsclient -a "" -c -q -n "$@"
 }
 alias e="emacs"
+alias edbg="e --debug-init"
 
 #===============
 # Shell config
@@ -258,6 +259,7 @@ alias ,=jumper
 alias que=query
 alias color='. ~/.dotfiles/bash/utils/base16_color && base16_color'
 alias xxx='xrdb -load ~/.Xresources && color monokai dark'
+alias pls='sudo $(history -p !!)'
 
 
 #==================

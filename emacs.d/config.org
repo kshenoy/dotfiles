@@ -31,11 +31,11 @@ Install and load use-package
     (require 'bind-key)
     (setq use-package-always-ensure t))
 
-  (bind-key "C-h B" 'describe-personal-keybindings)
+  (bind-key* "C-h B" 'describe-personal-keybindings)
 #+END_SRC
 
 ** TODO Check if there's a way to keep all the config in this file itself with init.el being empty
-Sacha Chua seems to have something like that. Her init.el is simply a link. 
+Sacha Chua seems to have something like that. Her init.el is simply a link.
 Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/shaving_time_on_emacs_startup_from_org_literate/][reddit thread]].
 
 * Visual
@@ -48,9 +48,6 @@ Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/
 
   ;; Display a special glyph in the fringe of each empty line at the end of the buffer
   (setq indicate-empty-lines t)
-
-  ;; Undo and Redo windows <= Wut?
-  ;; (winner-mode 1)
 #+END_SRC
 
 ** Frame related
@@ -98,7 +95,7 @@ Avoid Emacs hanging for a while after changing default font:
   (setq initial-scratch-message "")
 
   (when window-system
-    ;; (menu-bar-mode -1)
+    (menu-bar-mode -1)
     ;; (tooltip-mode -1)
     (tool-bar-mode -1)
     (scroll-bar-mode -1))
@@ -117,6 +114,47 @@ Emacs.toolBar: off
 #+END_SRC
 
 * General
+** Keybinds
+I think the following would be handy
+  =[= - Enable setting
+  =o= - Toggle setting
+  =]= - Disable setting
+
+#+BEGIN_SRC emacs-lisp
+  (bind-keys* :prefix-map emacs-unimpaired-enable-map
+              :prefix "C-c [")
+  (bind-keys* :prefix-map emacs-unimpaired-disable-map
+              :prefix "C-c ]")
+  (bind-keys  :prefix-map emacs-unimpaired-toggle-map
+              :prefix "C-c o")
+#+END_SRC
+Note the use of /bind-keys*/ for the enable and disable maps and /bind-keys/ for the toggle map.
+This is because /bind-keys*/ will override any maps that are defined by any modes.
+Since =C-c [= and =C-c ]= are defined by org-mode, I want to override those definitions and hence put mine in the /override-global-mode/
+On the other hand, since =C-c a-z= are reserved for the user, there's no need override anything and hence a simple /bind-keys/ will suffice.
+
+Note that since /bind-keys*/ puts everything in the /override-global-mode/ map, it essentially ignores any =:map= that is passed to it.
+Thus, once the prefixes and maps are defined, we have to use /bind-keys/ only to create new keybinds inside them.
+
+By default =C-x == is bound to /what-cursor-position/ but evil maps both =ga= and =g8= to that as well so might as well use it to show something useful.
+#+BEGIN_SRC emacs-lisp
+  (bind-key* "C-x =" 'describe-char)
+#+end_src
+
+#+begin_src emacs-lisp
+  (defun my/revert-buffer-no-confirm ()
+    "Revert buffer without confirmation."
+    (interactive)
+    (revert-buffer :ignore-auto :noconfirm))
+
+  (bind-key* "<f5>" 'my/revert-buffer-no-confirm)
+#+END_SRC
+
+*** TODO Define [o and ]o as prefixes
+Also useful are the prefixes defined in /evil-normal-mode/
+  =[o= - Enable option
+  =]o= - Disable option
+
 ** Custom file
 #+BEGIN_SRC emacs-lisp
   (setq custom-file (concat user-emacs-directory "custom.el"))
@@ -137,12 +175,14 @@ Emacs.toolBar: off
   (setq kept-new-versions         9)  ; newest versions to keep when a new numbered backup is made (default: 2)
 #+END_SRC
 
-** Autosave
+** TODO Autosave
+Freezes the window while autosaving. Bloody annoying!
+
 #+BEGIN_SRC emacs-lisp
   (defvar autosave-directory (concat user-emacs-directory "/tmp/autosaves"))
   (if (not (file-exists-p autosave-directory)) (make-directory autosave-directory t))
   (setq auto-save-file-name-transforms `(("." ,autosave-directory t)))
-  (setq auto-save-default t)  ; auto-save every buffer that visits a file
+  (setq auto-save-default nil)  ; auto-save every buffer that visits a file
 #+END_SRC
 
 ** History
@@ -183,8 +223,9 @@ One way to select from multiple fonts
       (setq my-variable-pitch-font "MesloLGMDZ Nerd Font-10"
             my-monospaced-font     "MesloLGMDZ Nerd Font-10"))
 
-    (when (my/font-exist-p "Pragmata Pro")      (setq my-variable-pitch-font "Pragmata Pro-10"))
-    (when (my/font-exist-p "Pragmata Pro Mono") (setq my-monospaced-font     "Pragmata Pro Mono-10")))
+    ;; (when (my/font-exist-p "DejaVu Sans")      (setq my-variable-pitch-font "DejaVu Sans-10"))
+    ;; (when (my/font-exist-p "DejaVu Sans Mono") (setq my-monospaced-font     "DejaVu Sans Mono-10"))
+  )
 
   (when (eq system-type 'windows-nt)
     (when (my/font-exist-p "Consolas")
@@ -208,26 +249,45 @@ Fall back to DejaVu Sans when the font lacks support for some glyphs. Taken from
 
 Increase/Decrease font size using =C-x C-+= and =C-x C--=. =C-x C-0= resets it
 
-*** TODO Figure out how to specify fall-back fonts
-To be able to use different fonts on different machines
 ** Tabs, Indentation and Spacing
 Use only spaces and no tabs
 #+BEGIN_SRC emacs-lisp
-    (setq-default indent-tabs-mode nil)
-    (setq-default tab-width 2)
-    (setq show-trailing-whitespace t)
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 2)
+  (setq show-trailing-whitespace t)
 
-    (defun my/toggle-trailing-whitespace ()
-      (interactive)  ; Allows to be called as a command via M-x
-      (setq show-trailing-whitespace (not show-trailing-whitespace)))
+  ;; (bind-key "RET" 'newline-and-indent)
+#+end_src
 
-    ;; (bind-key "RET" 'newline-and-indent)
+#+begin_src emacs-lisp
+  (bind-keys :map emacs-unimpaired-enable-map
+             ("SPC" . (lambda () (interactive)(setq show-trailing-whitespace t)))
+             :map emacs-unimpaired-disable-map
+             ("SPC" . (lambda () (interactive)(setq show-trailing-whitespace nil)))
+             :map emacs-unimpaired-toggle-map
+             ("SPC" . (lambda () (interactive)(setq show-trailing-whitespace (not show-trailing-whitespace)))))
 #+END_SRC
+
+*** TODO FIXME
+#+BEGIN_SRC emacs-lisp
+  (defun my/toggle-trailing-whitespace ()
+    "Show trailing whitespace if ARG is positive, else hide it. If ARG is not specified, toggle it"
+    (interactive)  ; Allows to be called as a command via M-x
+    (setq show-trailing-whitespace (not show-trailing-whitespace)))
+#+END_SRC
+
+Enable =show-trailing-whitespace= by default. The /setq/ above doesn't do that.
 
 ** Highlight current line
 #+BEGIN_SRC emacs-lisp
   ;; (global-hl-line-mode 1)
-  (bind-key "C-c o c" 'global-hl-line-mode)
+  (bind-key "c" 'global-hl-line-mode      emacs-unimpaired-toggle-map)
+#+END_SRC
+
+*** TODO FIXME
+#+BEGIN_SRC emacs-lisp
+  (bind-key "c" (global-hl-line-mode 1)  emacs-unimpaired-enable-map)
+  (bind-key "c" (global-hl-line-mode -1) emacs-unimpaired-disable-map)
 #+END_SRC
 
 ** Simpler y/n answers
@@ -255,9 +315,21 @@ Use only spaces and no tabs
   (setq echo-keystrokes 0.1)
   (setq idle-update-delay 0.35)
 
-  ;; Jump to the help window when it's opened. 
+  ;; Jump to the help window when it's opened.
   ;; Press q to close it and restore the view to the previous buffer
   (setq help-window-select t)
+#+END_SRC
+
+** Winner mode
+Undo and Redo changes in window configuration. Use =C-c right= and =C-c left= to switch between different layouts
+#+BEGIN_SRC emacs-lisp
+  (winner-mode 1)
+#+END_SRC
+
+** Theme Directories
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'custom-theme-load-path (concat user-emacs-directory "/themes"))
+  (add-to-list 'load-path (concat user-emacs-directory "/themes"))
 #+END_SRC
 
 ** TODO Emacs server
@@ -279,7 +351,19 @@ Alias for emacsclient:
 alias e="emacsclient --no-wait --alternate-editor=\"\" --create-frame"
 #+END_EXAMPLE
 
+** Mouse
+Mouse-wheel acts on the hovered window rather than the one where the typing focus is
+#+BEGIN_SRC emacs-lisp
+  (setq mouse-wheel-follow-mouse t)
+#+END_SRC
+
 * Packages
+** TODO hydra
+Seems like modular bindings. Very useful for
+- Window movement etc.
+
+More ideas in https::/github.com/kana/vim-submode
+
 ** evil
 evil can be toggled using =C-z=
 
@@ -291,17 +375,18 @@ evil can be toggled using =C-z=
 *** :init
 #+BEGIN_SRC emacs-lisp
   :init
-  (evil-mode t)
 #+END_SRC
 
-**** Color the cursor to indicate the Evil mode. White to indicate that we've switched back to Emacs
+**** COMMENT evil-leader
+/global-evil-leader-mode/ must be enabled before /evil-mode/ to allow /evil-leader/ in initial buffers such as /*scratch*/, /*Messages*/ etc.
 #+BEGIN_SRC emacs-lisp
-  (setq evil-normal-state-cursor   '("#719e07" box)
-        evil-visual-state-cursor   '("#b58900" box)
-        evil-insert-state-cursor   '("#268bd2" bar)
-        evil-replace-state-cursor  '("#dc322f" bar)
-        evil-operator-state-cursor '("#dc322f" hollow)
-        evil-emacs-state-cursor    '("white"   box))
+  (use-package evil-leader
+    :init (global-evil-leader-mode))
+#+END_SRC
+
+**** Enable evil-mode
+#+BEGIN_SRC emacs-lisp
+  (evil-mode t)
 #+END_SRC
 
 *** :config
@@ -334,11 +419,6 @@ evil can be toggled using =C-z=
     :config (evil-exchange-cx-install))
 #+END_SRC
 
-**** evil-leader
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-leader)
-#+END_SRC
-
 **** evil-matchit
 #+BEGIN_SRC emacs-lisp
   (use-package evil-matchit)
@@ -349,9 +429,10 @@ evil can be toggled using =C-z=
   (use-package evil-numbers)
 #+END_SRC
 
-**** Make escape quit everything, whenever possible.
+**** Keybindings
+Make /Escape/ quit everything
 #+BEGIN_SRC emacs-lisp
-  (defun minibuffer-keyboard-quit ()
+  (defun my/minibuffer-keyboard-quit ()
     "Abort recursive edit.
           In Delete Selection mode, if the mark is active, just deactivate it;
           then it takes a second \\[keyboard-quit] to abort the minibuffer."
@@ -370,12 +451,29 @@ evil can be toggled using =C-z=
   (bind-key [escape] 'minibuffer-keyboard-quit minibuffer-local-isearch-map   )
 #+END_SRC
 
+#+BEGIN_SRC emacs-lisp
+  ;; (bind-key "g a" 'describe-char evil-normal-state-map)
+  (bind-key "U" 'redo evil-normal-state-map)
+  (bind-key "] SPC" '(lambda () (interactive)(end-of-line)(newline)) evil-normal-state-map)
+  (bind-key "[ SPC" '(lambda () (interactive)(beginning-of-line)(open-line 1)) evil-normal-state-map)
+#+END_SRC
+
 *** END
 #+BEGIN_SRC emacs-lisp
 )
 #+END_SRC
 
-** TODO flycheck
+** flycheck
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :diminish flycheck-mode
+    :init (global-flycheck-mode t)
+    :config
+    (use-package flycheck-sml
+      :ensure nil
+      :load-path "bundle/flycheck-sml/"))
+#+END_SRC
+
 ** helm
 [[http://tuhdo.github.io/helm-intro.html][Introduction to Helm by reddit:/u/tuhdo]]
 
@@ -412,10 +510,8 @@ evil can be toggled using =C-z=
 #+END_SRC
 
 *** :config
-Remove the default prefix =C-x c=. New one will be created in :bind
 #+BEGIN_SRC emacs-lisp
   :config
-  (unbind-key "C-x c")
 #+END_SRC
 
 **** Remove sub-headers line if only a single source; keep them for multiple sources
@@ -448,26 +544,41 @@ Remove the default prefix =C-x c=. New one will be created in :bind
 Note that helm-descbinds will replace the default /describe-bindings/.
 Thus =C-h b= can be used for it; no need to create a new binding.
 
-*** :bind
+**** swiper-helm
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper-helm
+    :disabled t
+    :init (setq swiper-helm-display-function 'helm-default-display-buffer)
+    :commands (swiper-helm swiper-helm-from-isearch)
+    :bind ("C-s" . swiper-helm))
+#+END_SRC
+
+*** Keybinds
+Remove the default prefix =C-x c=. Note this is still a part of :config
+#+BEGIN_SRC emacs-lisp
+  (unbind-key "C-x c")
+#+END_SRC
+
 This allows us to create new custom bindings within helm's default map thereby allowing us to use the default keybindings as well
 We redefine /helm-command-prefix/ here
 #+BEGIN_SRC emacs-lisp
+  :bind* ("M-x"   . helm-M-x)
   :bind (("C-c h" . helm-command-prefix)
          :map       helm-command-map
          ("b"     . helm-buffers-list)
          ("e"     . helm-find-files)    ; Find files in the current directory
          ("m"     . helm-mini)          ; m-mixed
          ("/"     . helm-occur))        ; search in all open buffers
-  :bind* ("M-x"   . helm-M-x)
 #+END_SRC
 
 Other useful default keybinds:
-|--------------+------------------------+--------------------------------------------------------------|
-| <prefix> a   | helm-apropos           | Unholy amalgam of describe-function, variable, commands etc. |
-| <prefix> i   | helm-semantic-or-imenu | Show outline and major definitions                           |
-| <prefix> r   | helm-regexp            | Construct a regexp                                           |
-| <prefix> C-, | helm-calcul-expression | Interface to calc command                                    |
-|--------------+------------------------+--------------------------------------------------------------|
+|--------------+-------------------------+--------------------------------------------------------------|
+| <prefix> a   | helm-apropos            | Unholy amalgam of describe-function, variable, commands etc. |
+| <prefix> i   | helm-semantic-or-imenu  | Show outline and major definitions                           |
+| <prefix> r   | helm-regexp             | Construct a regexp                                           |
+| <prefix> C-, | helm-calcul-expression  | Interface to calc command                                    |
+| C-x r b      | helm-filtered-bookmarks |                                                              |
+|--------------+-------------------------+--------------------------------------------------------------|
 
 *** use-package END
 #+BEGIN_SRC emacs-lisp
@@ -544,16 +655,10 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
 *** :init
 #+BEGIN_SRC emacs-lisp
   :init
-#+END_SRC
-
-**** Misc
-#+BEGIN_SRC emacs-lisp
   (setq org-indent-mode t)
 
   (setq org-directory "~/Notes/")
   (setq org-default-notes-file (concat org-directory "organizer.org"))
-  (setq org-agenda-files (quote ("~/Notes/AMD"
-                                 "~/Notes/Software")))
 
   (setq org-M-RET-may-split-line '((item) (default . t)))
   (setq org-log-done 'time) ; 'time/'note
@@ -563,12 +668,27 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
   ;; (setq org-speed-commands-user nil)
   (setq org-startup-align-all-tables nil)
   ;; (setq org-log-into-drawer nil)
-  (setq org-tags-column 1)
+  (setq org-tags-column -80)
   (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
-  ;; (setq org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
-  ;; (setq org-completion-use-ido t)
-  ;; (setq org-startup-truncated nil)
+  (setq org-blank-before-new-entry '((heading . t) (plain-list-item . nil)))
   (setq org-link-search-must-match-exact-headline nil)
+#+END_SRC
+
+**** TODO Show the emphasis markers on point
+#+BEGIN_SRC emacs-lisp
+  (defun org-show-emphasis-markers-at-point ()
+    (save-match-data
+      (if (and (org-in-regexp org-emph-re 2)
+           (>= (point) (match-beginning 3))
+           (<= (point) (match-end 4))
+           (member (match-string 3) (mapcar 'car org-emphasis-alist)))
+      (with-silent-modifications
+        (remove-text-properties
+         (match-beginning 3) (match-beginning 5)
+         '(invisible org-link)))
+        (apply 'font-lock-flush (list (match-beginning 3) (match-beginning 5))))))
+
+  (add-hook 'post-command-hook 'org-show-emphasis-markers-at-point nil t)
 #+END_SRC
 
 **** Org babel source blocks
@@ -632,7 +752,7 @@ Custom keywords
 #+END_SRC
 
 **** Fonts
-Variable pitch for non-code text
+Variable pitch for non-code text taken from [[http://www.xiangji.me/2015/07/13/a-few-of-my-org-mode-customizations][here]].
 #+BEGIN_SRC emacs-lisp
   (defun my/set-buffer-variable-pitch ()
     (interactive)
@@ -648,6 +768,8 @@ Variable pitch for non-code text
   (add-hook 'markdown-mode-hook 'my/set-buffer-variable-pitch)
   (add-hook 'Info-mode-hook     'my/set-buffer-variable-pitch)
 #+END_SRC
+
+General configuration [[*Fonts][here]]
 
 **** Delete links
 #+BEGIN_SRC emacs-lisp
@@ -667,16 +789,64 @@ Variable pitch for non-code text
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
     ;; :disable
-    :init   (setq org-bullets-bullet-list '("•"))
+    :init   (setq org-bullets-bullet-list '("●"))
+    ;; :init   (setq org-bullets-bullet-list '("○"))
     :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+END_SRC
 
-*** :bind
-Delete the result block using =C-c C-v k= where =C-c C-v= is the /org-babel-key-prefix/
+**** org-agenda
 #+BEGIN_SRC emacs-lisp
+  (use-package org-agenda
+    :ensure nil
+    :init
+    (setq org-agenda-files
+          (delq nil
+                (mapcar (lambda (x)
+                          (let ((y (concat org-directory x)))
+                            (and (file-exists-p y) y)))
+                        '("Software/" "Personal/" "AMD/"))))
+    ;; (setq org-agenda-files (quote ("~/Notes/Software/" "~/Notes/Personal/")))
+    (setq org-agenda-tags-column            -120) ; Monitors are wide, might as well use it :/
+    (setq org-agenda-skip-scheduled-if-done t)    ; Why isn't this default?
+    (setq org-agenda-skip-deadline-if-done  t)
+
+    ;; :bind (("c" . calendar))
+    :bind* ("C-c a" . org-agenda))
+#+END_SRC
+
+**** org-wunderlist
+#+BEGIN_SRC emacs-lisp
+  (use-package org-wunderlist
+    :init (setq org-wunderlist-file (concat org-directory "Personal/Wunderlist.org")
+                org-wunderlist-dir  (concat user-emacs-directory "tmp/org-wunderlist/")))
+#+END_SRC
+
+Client-ID and Token stored in private.el
+
+**** htmlize
+Syntax highlighting when exporting to HTML? Yes, please!
+#+BEGIN_SRC emacs-lisp
+  (use-package htmlize)
+#+END_SRC
+
+*** Keybinds
+Note that these are still part of the /:config/ block
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :map helm-command-map
+             ("o" . helm-org-in-buffer-headings)
+             ("h" . helm-info-org))
+#+end_src
+
+Delete the result block using =C-c C-v k= where =C-c C-v= is the /org-babel-key-prefix/
+#+begin_src emacs-lisp
   :bind (:map     org-babel-map
          ("k"   . org-babel-remove-result)
          ("C-k" . org-babel-remove-result))
+#+end_src
+
+Replace the default =org-goto= with helm's more useful headings list
+#+begin_src emacs-lisp
+  :bind* ("C-c C-j" . helm-org-in-buffer-headings)
 #+END_SRC
 
 *** use-package END
@@ -710,15 +880,97 @@ Default binding is =C-x u=
       (setq undo-tree-visualizer-diff t))
 #+END_SRC
 
-** TODO yasnippet
-** Themes
-*** Theme Directories
+** yasnippet
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'custom-theme-load-path (concat user-emacs-directory "/themes"))
-  (add-to-list 'load-path (concat user-emacs-directory "/themes"))
+  (use-package yasnippet
+    :init (yas-global-mode t))
 #+END_SRC
 
-*** monokai
+** which-key
+Shows which keys can be pressed next. Eg. if you press =C-x= and wait a few seconds, a window pops up with all the key bindings following the currently entered incomplete command.
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :diminish which-key-mode
+    :config  (which-key-mode))
+#+END_SRC
+
+** ace-window
+When more than 2 windows are open, show a number to jump in each window to jump directly to.
+Similar to Tmux's =<prefix> C-g=
+#+BEGIN_SRC emacs-lisp
+  (use-package ace-window
+    :init
+    (custom-set-faces '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 5.0)))))
+    (setq aw-background t)
+    :bind ("C-x o" . ace-window))
+#+END_SRC
+
+** try
+Allows me to "try" packages i.e. packages are installed only for the current session and won't persist after that.
+#+BEGIN_SRC emacs-lisp
+  (use-package try
+    :commands try)
+#+END_SRC
+
+** avy
+Similar to vim's easy-motion plugin
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :bind (:map evil-normal-state-map
+                ("g s" . avy-goto-char)))
+#+END_SRC
+
+** swiper
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+    :init (setq ivy-display-style 'fancy)
+    :bind ("C-s" . swiper))
+#+END_SRC
+
+** company-mode
+Autocompletion
+Reduce delay and ensure that the popup shows up only if the last command has been an editing command.
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :diminish company-mode
+    :init (setq company-idle-delay 0.25
+                company-begin-commands '(self-insert-command))
+#+end_src
+
+*** :config
+#+begin_src emacs-lisp
+    :config (add-hook 'after-init-hook 'global-company-mode)
+#+END_SRC
+
+Enter by default triggers the completion. This is not what I want. Sometimes I just mean Enter.
+This will complete the selection only if I have explicitly interacted with Company. Taken from [[http://emacs.stackexchange.com/a/24800/9690][here]].
+#+BEGIN_SRC emacs-lisp
+  (defun my/company-active-return ()
+    "Complete the current selection, but only if the user has interacted explicitly with Company."
+    (interactive)
+    (if (company-explicit-action-p)
+        (company-complete)
+      (call-interactively
+       (or (key-binding (this-command-keys))
+           (key-binding (kbd "RET"))))))
+
+  (bind-key "<return>" #'my/company-active-return company-active-map)
+  (bind-key "RET"      #'my/company-active-return company-active-map)
+#+END_SRC
+
+*** END
+#+BEGIN_SRC emacs-lisp
+)
+#+END_SRC
+
+** rainbow-delimiters
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :bind (:map emacs-unimpaired-toggle-map
+                ("r" . rainbow-delimiters-mode)))
+#+END_SRC
+
+** monokai-theme
 #+BEGIN_SRC emacs-lisp
   (use-package monokai-theme
     :disabled
@@ -732,7 +984,7 @@ Default binding is =C-x u=
     (load-theme 'monokai t))
 #+END_SRC
 
-*** solarized
+** solarized-theme
 #+BEGIN_SRC emacs-lisp
   (use-package solarized-theme
     :disabled
@@ -745,25 +997,36 @@ Default binding is =C-x u=
     ;;       solarized-height-plus-4      1.0)
     (setq solarized-use-less-bold t)
     ;; (set-face-attribute 'linum-relative-current-face nil :foreground "#D33682")
+
+    (setq evil-normal-state-cursor   '("#719e07" box)
+          evil-visual-state-cursor   '("#b58900" box)
+          evil-insert-state-cursor   '("#268bd2" bar)
+          evil-replace-state-cursor  '("#dc322f" bar)
+          evil-operator-state-cursor '("#dc322f" hollow)
+          evil-emacs-state-cursor    '("white"   box))
+
     (load-theme 'solarized-light t))
 #+END_SRC
 
-*** leuven
+** leuven-theme
 [[https://github.com/fniessen/emacs-leuven-theme][Github Link]]
 #+BEGIN_SRC emacs-lisp
   (use-package leuven-theme
     ;; :disabled
     :config
+    (set-face-attribute 'org-agenda-date         nil :height 1.4)
+    (set-face-attribute 'org-agenda-date-today   nil :height 1.4)
+    (set-face-attribute 'org-agenda-date-weekend nil :height 1.4)
+
+    (setq evil-normal-state-cursor   '("#008000" box)
+          evil-visual-state-cursor   '("#006FE0" box)
+          evil-insert-state-cursor   '("#0000FF" bar)
+          evil-replace-state-cursor  '("#D0372D" bar)
+          evil-operator-state-cursor '("#D0372D" hollow)
+          evil-emacs-state-cursor    '("white"   box))
+
     (load-theme 'leuven t))
 #+END_SRC
-
-*** After theme
-#+BEGIN_SRC emacs-lisp
-  ;; (set-face-attribute 'linum nil :font my-monospaced-font :background (face-attribute 'mode-line :background nil t) :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant 'normal :weight 'normal)
-  ;; (set-face-attribute 'linum-relative-current-face nil :inherit 'linum :weight 'bold :background (face-attribute 'linum :background nil t))
-#+END_SRC
-
-**** TODO Adjust evil-cursor colors
 
 * Programming Languages Course on Coursera
 [[http://tuhdo.github.io/emacs-for-proglang.html][Starter Kit]] from [[https://reddit.com/u/tuhdo][tuhdo]]
@@ -773,7 +1036,7 @@ Default binding is =C-x u=
   (use-package sml-mode
     :config
     (use-package ob-sml
-      :ensure nil
+      :ensure nil ; Because I've installed it from Github, I don't want package.el to stomp over it
       :load-path "bundle/ob-sml"
       :config
       (org-babel-do-load-languages 'org-babel-load-languages
@@ -787,3 +1050,17 @@ Default binding is =C-x u=
     :config
     (setq geiser-default-implementation "racket"))
 #+END_SRC
+
+* After
+** Private config
+#+BEGIN_SRC emacs-lisp
+  (load (concat user-emacs-directory "private.el") t)
+#+END_SRC
+
+** TODO After theme
+Set the background of the line number column to match that of the modeline
+#+BEGIN_SRC emacs-lisp
+  ;; (set-face-attribute 'linum nil :font my-monospaced-font :background (face-attribute 'mode-line :background nil t) :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant 'normal :weight 'normal)
+  ;; (set-face-attribute 'linum-relative-current-face nil :inherit 'linum :weight 'bold :background (face-attribute 'linum :background nil t))
+#+END_SRC
+

@@ -6,6 +6,10 @@ emacs.d/elpa/
 emacs.d/projectile-bookmarks.eld
 emacs.d/recentf
 emacs.d/tmp/
+emacs.d/private.el
+emacs.d/bookmarks
+emacs.d/org-wunderlist/
+emacs.d/games/
 fonts/
 unity/
 vim/autoload/plug*

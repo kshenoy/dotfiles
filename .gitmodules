@@ -7,3 +7,9 @@
 [submodule "emacs.d/bundle/ob-sml"]
 	path = emacs.d/bundle/ob-sml
 	url = https://github.com/kshenoy/ob-sml
+[submodule "emacs.d/bundle/org-html-themes"]
+	path = emacs.d/bundle/org-html-themes
+	url = https://github.com/fniessen/org-html-themes
+[submodule "emacs.d/bundle/flycheck-sml"]
+	path = emacs.d/bundle/flycheck-sml
+	url = https://github.com/creichert/flycheck-sml

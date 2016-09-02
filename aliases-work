@@ -75,10 +75,12 @@ alias bj='lsf_bjobs -w'
 alias bjj='lsf_bjobs -w | command grep "JOBID\|$$"'
 alias bk='lsf_bkill'
 alias bq='lsf_bqueues'
+alias bjg='bj | g $$'
 
 alias wtf='PAGER="wim -u NONE" WhyTheFail'
 alias lmn='ljd -nomail -l'
 alias rgf_l3='regenerate_fail.bash -log mine -r \"-avf \'"'-/ChkL3.Debug/ 1\'"'\"'
+alias rgf_ras='regenerate_fail.bash -log ras -forceBuild'
 alias trapbug='P4DIFF= s_trapbug -bug'
 
 
@@ -90,7 +92,8 @@ alias rrcb='rr --norun -bc'
 alias bca='build -clean_all'
 alias rrbr='rr -b'
 alias rrcr='rr -c'
-alias rrdbg='rr -y $as0ks/amdmsg_config.yaml -a "-avf '"'--/ChkL3.Debug/'"'" --fsdb'
+alias rrdbg='rr -y $as0ks/amdmsg_config.yaml -a "-avf '"'--/ChkL3.Debug.ByGraph/ --/ChkL3.Debug.ByFeature.RangeLock/'"'" --fsdb'
+alias rrdbg_ras='rr -y $v/debug/ras/amdmsg_config.yaml --fsdb'
 
 alias rg='release_gate'
 alias rgd='release_gate -donate'
@@ -105,6 +108,7 @@ alias toclippy="sed -e 's/$//' | tee ~/clippy.txt"
 
 alias xt='xterm -geometry 272x60+0+0 &'
 alias restd='resize -s 60 272'
+alias tmxvnc='tmux new-window -d -n "XVNC" "x11vnc"'
 
 
 #=======================================================================================================================
@@ -250,39 +254,47 @@ tel() {
   perl -aF/,/ -lne 'print "\nName: $F[1], $F[2]\nCube: $F[0]\nExt : $F[3]" if /'$1'/i' ~/tel.csv;
 }
 
-unset -f mkwa_proj
-mkwa_proj() {
-  local _str=${1}
+unset -f mkwa
+mkwa() {
+  local _proj=${1}
 
-  local _project=${_str%/*};
-  if [[ -z "${_project}" ]]; then
-    echo "ERROR: Project not specified"
+  if [[ "$_proj" =~ @ ]]; then
+    local _cl=" -changelist ${_proj#*@}"
+    _proj=${_proj%@*}
   fi
-  # echo "Project    : ${_project}"
-  _str=${_str/#${_project}\//}
+  # echo $_proj
 
-  local _branch=${_str%\@*}
-  # echo "Branch     : ${_branch}"
-  _str=${_str/#${_branch}/}
-
-  local _cl=${_str}
-  # echo "Changelist : ${_cl}"
-
-  local _cmd="p4_mkwa -codeline ${_project}"
-  if [[ -n "${_branch}" ]]; then
-    _cmd="${_cmd} -branch_name ${_branch}"
+  if [[ "$_proj" =~ / ]]; then
+    local _branch=" -branch_name ${_proj#*/}"
+    _proj=${_proj%/*}
   fi
-  if [[ -n "${_cl}" ]]; then
-    _cmd="${_cmd} -changelist ${_cl}"
-  fi
+  # echo $_proj
 
+  case ${_proj} in
+    as)
+      _proj="aspen"
+      ;;&
+    ah)
+      _proj="aspen_highlands"
+      ;;&
+    zn)
+      _proj="zen"
+      ;;&
+    *)
+      if [[ -z "${_proj}" ]]; then
+        echo "ERROR: Project not specified"
+        return 1
+      fi
+      ;;
+  esac
+
+  local _cmd="p4_mkwa -codeline ${_proj}${_branch}${_cl}"
   echo -e "${_cmd}\n"
-
   . /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash && export LANG=en_US.UTF-8
   $_cmd
 
   if [[ -z "$STEM" ]]; then
-    return
+    return 0
   fi
 
   # Source aliases...
@@ -292,24 +304,6 @@ mkwa_proj() {
   # Create tags
   echo "$(tput setaf 2)[Generating Tags...]$(tput sgr0)"
   ~/bin/gentags --create
-
-  # Start emacs daemon
-  #~kshenoy/bin/emacs_daemon -s $(echo $REPO_PATH | tr '/' '_')
-}
-
-unset -f mkwa_as
-mkwa_as() {
-  mkwa_proj "aspen/$1"
-}
-
-unset -f mkwa_ah
-mkwa_ah() {
-  mkwa_proj "aspen_highlands/$1"
-}
-
-unset -f mkwa_zn
-mkwa_zn() {
-  mkwa_proj "zen/$1"
 }
 
 

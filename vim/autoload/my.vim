@@ -101,19 +101,21 @@ function! my#ReTab( tabsize, ... )
   "   a:1     (int) : The old tabsize to retab from. When not specified, uses &softtabstop
   "                   When specified, the current tabstop settings aren't changed.
   if &expandtab
+    let l:old_ts = &tabstop
+
     let &tabstop = ( a:0 > 0 ? a:1 : &softtabstop )
     set noexpandtab
     retab!
+
     let &tabstop = a:tabsize
     set expandtab
     retab!
+
     if ( a:0 == 0 )
-      let &tabstop     = a:tabsize
       let &softtabstop = a:tabsize
       let &shiftwidth  = a:tabsize
     endif
-  else
-    let &tabstop = a:tabsize
+    let &tabstop = l:old_ts
   endif
 endfunction
 command! -nargs=* ReTab call my#ReTab(<args>)
