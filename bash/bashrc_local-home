@@ -8,7 +8,22 @@ has() {
 has thefuck && eval "$(thefuck --alias pls)"
 
 
+# When leaving the console, clear the screen to increase privacy
+if [[ "$SHLVL" = 1 ]]; then
+    [[ -x /usr/bin/clear_console ]] && /usr/bin/clear_console -q
+fi
+
+
 ##
 # Aliases
 alias amd_vpn='sudo openconnect -u kshenoy --no-cert-check --token-mode=rsa mkm-vpn.amd.com'
 
+
+## Specific to root
+trap_exit() {
+  find $(dirname $HISTFILE) -group root -exec chmod 644 {} +
+}
+if (( $EUID ==  0 )); then
+  # echo "Exiting..."
+  trap trap_exit EXIT
+fi

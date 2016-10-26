@@ -114,7 +114,7 @@ if has('unix')
                                  \ "-type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune " .
                                  \ "-o -type d \\( -name _env -o -name dfx -o -name emu -o -name env_squash -o -name fp ".
                                  \ "-o -name import -o -name libs -o -name powerPro -o -name tools -o -name build" .
-                                 \ "-o -wholename '*/ch/tc' -o -wholename '*/ch/tb' -o -wholename '*/ch/verif/dft' " .
+                                 \ "-o -wholename '*/ch/verif/dft' " .
                                  \ "-o -wholename '*/txn/gen' -o -wholename '*/generated' \\) -prune " .
                                  \ "-o -type f ! \\( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' " .
                                  \ "-o -iname '*.cc.o' -o -iname '*tags*' \\) -print "

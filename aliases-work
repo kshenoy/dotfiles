@@ -69,13 +69,14 @@ alias amdgrep='find $REPO_PATH -path "$REPO_PATH/simenv/build" -prune -or -path 
 # Building and Compiling
 alias sbi='. /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash'
 alias mkv='mkverdi -nolsf $(grep -Po "\-model\s*\S+" sim.out) -rc ~/novas.rc -guiConf ~/novas.conf -tkName "verdi_$(tmux display-message -p "#S#I")"'
+alias findFirstError='findFirstError --tkName "verdi_$(tmux display-message -p "#S#I")"'
 alias cid='cat $REPO_PATH/configuration_id'
 alias cidn='cid | grep -Po "(?<=@)\d+$"'
 alias bj='lsf_bjobs -w'
 alias bjj='lsf_bjobs -w | command grep "JOBID\|$$"'
 alias bk='lsf_bkill'
 alias bq='lsf_bqueues'
-alias bjg='bj | g $$'
+alias bjg='bj | grep $$:'
 
 alias wtf='PAGER="wim -u NONE" WhyTheFail'
 alias lmn='ljd -nomail -l'

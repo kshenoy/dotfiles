@@ -7,38 +7,31 @@ snippet #!
 
 endsnippet
 
-snippet #! "bash interpreter"
+snippet #! "interpreter"
 #!/bin/bash
 
 endsnippet
 
-snippet !env "#!/usr/bin/env (!env)"
-#!/usr/bin/env bash
-
-endsnippet
+# snippet !env "#!/usr/bin/env (!env)"
+# #!/usr/bin/env `!p snip.rv = getShell() + "\n\n"`
+# endsnippet
 
 
 
 #===========================================================================
 # Conditionals
 #
-snippet if "Single-bracket if...then"
-if [ ${1:condition} ]; then
-  ${0:#statements}
-fi
-endsnippet
+# snippet if "General purpose if...then"
+# if [[ ${1:condition} ]]; then
+#   ${0:#statements}
+# fi
+# endsnippet
 
-snippet if "General purpose if...then"
-if [[ ${1:condition} ]]; then
-  ${0:#statements}
-fi
-endsnippet
-
-snippet if "Numeric comparisons if...then"
-if (( ${1:condition} )); then
-  ${0:#statements}
-fi
-endsnippet
+# snippet if "Numeric comparisons if...then"
+# if (( ${1:condition} )); then
+#   ${0:#statements}
+# fi
+# endsnippet
 
 snippet ife "if...then...else"
 if [[ ${1:condition} ]]; then

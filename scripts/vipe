@@ -1,4 +1,5 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
+
 ########################################################################################################################
 # Credits:
 #   reddit.com/u/Neitanod
@@ -6,7 +7,7 @@
 #   reddit.com/u/ParadigmComplex
 #       (https://www.reddit.com/r/vim/comments/4nwj64/is_there_a_mix_between_vim_and_something_like_sed/d47ymtw)
 #
-# Provides a way to put the editor in the middle of a pipe chain
+# Provides a way to put the editor in the middle of a pipe
 #   eg. firstcommand | vipe | othercommand
 # Thus, the output from firstcommand serves as input for othercommand, but also allows edits in the middle
 #
@@ -16,10 +17,13 @@
 # If no arguments are provided to vipe, it opens up vim to allow manual edits.
 ########################################################################################################################
 
-# FIXME: Ignore user config
-# VICMD="command vim - -u NORC -U NORC -N --cmd \"let &rtp=substitute(&rtp, ',\\?'.expand('~/.vim').'[^,]*,\\?', '', 'g')\""
-# echo $VICMD
+# vipe should be invoked as the output of a pipe only
+if [[ -t 0 ]]; then
+  exit
+fi
 
+# If vipe doesn't have any arguments, open an interactive session
+# If any arguments are passed to it, consider them as ex-mode batch commands
 if [[ $# -eq "0" ]]; then
   vimtmp="${TMPDIR:-/tmp}/vipe_$$"
 
@@ -29,9 +33,9 @@ if [[ $# -eq "0" ]]; then
   ## Edit the file
   ## Since this script is used in the middle of a pipe, its input and output channels do not come from the terminal.
   ## This can be checked by uncommenting the following lines:
-  #if [[ ! -t 0 ]]; then echo "stdin is not from terminal"; fi
-  #if [[ ! -t 1 ]]; then echo "stdout is not to terminal"; fi
-  #if [[ ! -t 2 ]]; then echo "stderr is not to terminal"; fi
+  #if [[ -t 0 ]]; then echo "stdin is not from terminal"; fi
+  #if [[ -t 1 ]]; then echo "stdout is not to terminal"; fi
+  #if [[ -t 2 ]]; then echo "stderr is not to terminal"; fi
 
   ## http://superuser.com/a/336020/99982
   ## Vim expects its stdin to be the same as its controlling terminal, and performs various terminal-related ioctl's on
@@ -44,7 +48,8 @@ if [[ $# -eq "0" ]]; then
   ## This could be considered as a bug in vim, since it can open /dev/tty for terminal control, but doesn't.
 
   ## Thus, to make vim interactive again, we need to explicitly connect its input and output to the terminal
-  command vim -u NONE -U NONE ${vimtmp} < /dev/tty > /dev/tty
+  vim --config NONE ${vimtmp} < /dev/tty > /dev/tty
+  # /usr/local/bin/vim -N -u NORC -U NORC --cmd 'set rtp=$VIM,$VIMRUNTIME,$VIM/after' ${vimtmp} < /dev/tty > /dev/tty
 
   ## Dump the modified file to stdout
   command cat ${vimtmp}
@@ -54,5 +59,13 @@ if [[ $# -eq "0" ]]; then
 
 else
   # Run vim in batch mode and execute the given arguments as ex commands
-  command vim - -u NONE -U NONE -es '+1' "+$*" '+%print' '+:qa!' | tail -n +2
+  # Example usage:
+  # printf "foo\nbar\n" | vipe d
+  # -> bar
+  # printf "foo\nbar\n" | vipe 'norm yyp'
+  # -> foo
+  #    foo
+  #    bar
+  # vim --config NONE - -es '+1' "+$*" '+%print' '+:qa!' | tail -n +2
+  /usr/local/bin/vim - -N -u NORC -U NORC --cmd 'set rtp=$VIM,$VIMRUNTIME,$VIM/after' -es '+1' "+$*" '+%print' '+:qa!' | tail -n +2
 fi

@@ -5,7 +5,7 @@
 #=======================================================================================================================
 =head1 NAME
 
- WIM - Wrapper around vIM
+ A wrapper around vim (includes vipe functionality)
 
 =head1 AUTHOR
 
@@ -13,16 +13,22 @@
 
 =head1 SYNOPSIS
 
- A simple wrapper around vim which adds some more options
-
  usage: vim [OPTIONS]
+        command1 | vim | command2
+
+=head1 DESCRIPTION
+
+ A simple wrapper around vim which provides the --config option to allow using a custom directory instead of ~/.vim
+
+ It also allows using vim interactively in the middle of a unix pipeline to edit the data piped between commands.
+ Vim will have the full data being piped from command1 loaded into it, and when you close it, that data will be piped
+ into command2. This is based on vipe from moreutils by Joey Hess.
 
 =head1 OPTIONS
 
       --config <folder>  Use the specified folder instead of ~/.vim.
                          If set to NONE then ignores the user config (~/.vimrc and ~/.vim/*)
   -h, --help             Print this followed by vim's help
-
 
 =cut
 # }}}1
@@ -33,15 +39,25 @@ use Getopt::Long;
 use Pod::Usage;
 use Data::Dumper;
 use File::Basename;
-
+use File::Temp q{tempfile};
 
 Getopt::Long::Configure("bundling");
 Getopt::Long::Configure("pass_through");
 
-
 my %opts = (
   'config' => ""
 );
+
+# Since this is a wrapper, after processing the extra options I have to invoke the non-wrapper version to pass vim its
+# base options.
+my $root_exec;
+foreach my $i (`bash -c "type -a \$(basename $0)"`) {
+  if ($i !~ $0) {
+    $root_exec = (split(/\s+/, $i))[-1];
+    last;
+  }
+}
+# print Dumper $0,$root_exec;
 
 GetOptions(
   \%opts,
@@ -57,40 +73,21 @@ GetOptions(
                      },
   'help|h|?'  => sub { pod2usage(-verbose => 1, -exitval => "NOEXIT");
                        print "\nThe default vim help is as follows\n\n\n";
-                       exec 'vim -h';
+                       exec "$root_exec -h";
                      }
 ) or pod2usage(-verbose => 1);
 
-# FIXME: Find better way to pass in $0
-my @args = qw(vim);
-$_ = $0;
-if (/eview/) {
-  push @args, '-yR';
-} elsif (/evim/) {
-  push @args, '-y';
-} elsif (/ex/) {
-  push @args, '-e';
-} elsif (/gview/) {
-  push @args, '-gR';
-} elsif (/gvim/) {
-  push @args, '-g';
-} elsif (/gvimdiff/) {
-  push @args, '-gd';
-} elsif (/rgview/) {
-  push @args, '-ZgR';
-} elsif (/rgvim/) {
-  push @args, '-Zg';
-} elsif (/rview/) {
-  push @args, '-ZR';
-} elsif (/rvim/) {
-  push @args, '-Z';
-} elsif (/view/) {
-  push @args, '-R';
-} elsif (/vimdiff/) {
-  push @args, '-d';
-}
+# If vim is invoked in the middle of a pipe, default config to NONE if not specified by the user
+# if (  !(-t STDIN)
+#    && ($opts{'config'} eq "")
+#    ) {
+#   $opts{'config'} = "NONE" ;
+# }
 
-# Check to see if the user has specified -u and/or -U. If not, add them if it's present in $opts{'config'}
+
+my @args=($root_exec);
+
+# Check to see if the user has specified -u and/or -U. If not, try to set them sensibly based on --config's argument
 my $u_set = 0;
 my $U_set = 0;
 foreach (@ARGV) {
@@ -103,6 +100,7 @@ foreach (@ARGV) {
 }
 
 if ($opts{'config'} eq "NONE") {
+  # -u NONE prevents loading of system plugins too. Thus, we use NORC instead
   push @args, qw(-N --cmd), 'set rtp=$VIM,$VIMRUNTIME,$VIM/after';
   push @args, qw(-u NORC) if (!$u_set);
   push @args, qw(-U NORC) if (!$U_set);
@@ -114,6 +112,57 @@ if ($opts{'config'} eq "NONE") {
 
 # Push the remaining arguments to be passed to vim
 push @args, @ARGV;
-
 # print Dumper \@args;
-exec(@args);
+
+if (-t STDIN) {
+  # vim is not present in the middle of a pipe
+  exec(@args);
+
+} else {
+  # vim is present in the middle of a pipe
+  # FIXME: Add support for processing batch commands
+
+  # Add -f option to avoid creating a fork if using gvim
+  if ($root_exec =~ /gvim/) {
+    push @args, '-f';
+  }
+
+  $/=undef;
+
+  ## Create a temp file
+  my ($tmp_fh, $tmp)=tempfile();
+  die "Unable to create tempfile" unless $tmp_fh;
+
+  ## Dump the stdin to the temp file
+  print ($tmp_fh <STDIN>) || die "Unable to write stdin to a temp file: $!";
+  close $tmp_fh;
+
+  ## Reconnect stdin and stdout to the terminal
+  # http://superuser.com/a/336020/99982
+  # Vim expects its stdin to be the same as its controlling terminal, and performs various terminal-related ioctl's on
+  # stdin directly. When done on any non-tty file descriptor, those ioctls are meaningless and return ENOTTY, which gets
+  # silently ignored. On startup Vim reads and remembers the old terminal settings, and restores them back when exiting.
+  # Thus, when the "old settings" are requested for a non-tty fd (file descriptor), Vim receives all values empty and all
+  # options disabled, and carelessly sets the same to the terminal.
+  # This can be seen by running vim < /dev/null, exiting it, then running stty, which will output a whole lot of <undef>s.
+  # This could be considered as a bug in vim, since it can open /dev/tty for terminal control, but doesn't.
+
+  # Thus, to make vim interactive again, we need to explicitly connect its input and output to the terminal
+  close STDIN;
+  open(STDIN, "<", "/dev/tty") || die "Unable to reopen stdin: $!";
+  close STDOUT;
+  open(STDOUT, ">", "/dev/tty") || die "Unable to reopen stdout: $!";
+
+  my $ret=system(@args, $tmp);
+  if ($ret != 0) {
+    die "$args[0] exited with a non-zero code; aborting\n";
+  }
+
+  ## Dump the modified file to stdout
+  open($tmp_fh, "<", $tmp) || die "Unable to read $tmp: $!\n";
+  print (STDOUT <$tmp_fh>) || die "Write failure: $!";
+
+  ## Clean-up
+  close $tmp_fh;
+  unlink($tmp);
+}

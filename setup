@@ -1,23 +1,12 @@
 #!/usr/bin/env bash
 
-_root=/media/$(whoami)/LinData
-_dropbox=~/Dropbox
+_dropbox=/home/ks/Dropbox
 
-if [[ ! -d "$_root" ]]; then
-  echo "Folder '$_root' not found"
-  exit 1
-fi
-
-for i in $(command ls -1 "$_root"); do
-  if [[ ! $i =~ lost ]]; then
-    ln -svTf "$_root/$i" ~/$i
-  fi
-done
 mkdir -p ~/.config ~/.local/share ~/.ssh ~/.unison ~/bin
 
-ln -svTf "$_dropbox"/Documents/Notes  ~/Notes
-ln -svTf "$_dropbox"/Config/dotfiles  ~/.dotfiles
-ln -svTf "$_dropbox"/Config/Fonts     ~/.local/share/fonts
+ln -svTf "$_dropbox"/Documents/Notes         ~/Notes
+ln -svTf "$_dropbox"/Config/dotfiles         ~/.dotfiles
+ln -svTf "$_dropbox"/Config/Fonts            ~/.local/share/fonts
 
 ln -svTf ~/.dotfiles/awesome                 ~/.config/awesome
 ln -svTf ~/.dotfiles/bash/bash_logout        ~/.bash_logout
@@ -40,7 +29,8 @@ ln -svTf ~/.dotfiles/Xresources              ~/.Xresources
 
 ln -svTf ~/.dotfiles/scripts/vipe            ~/bin/vipe
 ln -svTf ~/.dotfiles/scripts/vim_merge       ~/bin/vim_merge
-ln -svTf ~/.dotfiles/scripts/wim             ~/bin/wim
+ln -svTf ~/.dotfiles/scripts/wim             ~/bin/vim
+ln -svTf ~/bin/vim                           ~/bin/gvim
 
 # Create a pipe. Woo!
 if [[ ! -p ~/pipe ]]; then

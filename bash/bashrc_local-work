@@ -9,4 +9,3 @@ PATH=~/bin:/tool/pandora64/bin:/tool/pandora/bin:$PATH
 
 complete -f -o default -X '!*.xml' ljd
 complete -f -o default -X '!*.vv' vv
-
