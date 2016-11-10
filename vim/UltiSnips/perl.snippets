@@ -3,7 +3,7 @@
 # Headers
 #
 snippet #! "#!" b
-#!`which perl`
+#!/usr/bin/env perl
 endsnippet
 
 snippet pragma
@@ -24,72 +24,66 @@ endsnippet
 # Conditionals
 #
 snippet if "if ..."
-if ( ${1:/* condition */} ){
+if ( ${1:/* condition */} ) {
   ${0:/* code */}
 }
 endsnippet
+
 
 snippet xif "Inline if"
 ${1:expression} if ${2:condition};
 endsnippet
 
-snippet ife "if ... else"
-if ( ${1:/* condition */} ){
-  ${0:/* code */}
-}else{
-}
-endsnippet
 
-snippet ifee "if ... elsif ... else"
+snippet ife "if ... else"
 if ( ${1:/* condition */} ) {
-  ${0:# body...}
-} elsif () {
+  ${0:/* code */}
 } else {
 }
 endsnippet
 
+
 snippet eli "elsif ..." w
-elsif ( ${1:/* condition */} ){
+elsif ( ${1:/* condition */} ) {
   ${0:/* code */}
 }
 endsnippet
 
+
 snippet el "else ..." w
-else{
+else {
   ${0:/* code */}
 }
 endsnippet
+
 
 snippet ter "Ternary ?: operator"
 ${1:/* condition */} ? ${2:a} : ${3:b}
 endsnippet
+
+
 snippet ?: "Ternary ?: operator"
 ${1:/* condition */} ? ${2:a} : ${3:b}
 endsnippet
 
-snippet unless "unless"
-unless ( ${1:/* condition */} ){
-  ${2:# body...}
-}
-endsnippet
-snippet un "unless"
-unless ( ${1:/* condition */} ){
+
+snippet 'un(less)?' "unless" r
+unless ( ${1:/* condition */} ) {
   ${2:# body...}
 }
 endsnippet
 
-snippet xun "Inline unless"
+
+snippet 'xun(less)?' "Inline unless" r
 ${1:expression} unless ${2:condition};
 endsnippet
-snippet xunless "Inline unless"
-${1:expression} unless ${2:condition};
-endsnippet
+
 
 snippet eval "eval"
-eval{
+eval {
   ${1:# do something risky...}
 };
-if ( $@ ){
+if ( $@ ) {
   ${2:# handle failure...}
 }
 endsnippet
@@ -99,23 +93,17 @@ endsnippet
 #===========================================================================
 # Loops
 #
-#snippet fore "foreach loop"
-#foreach ${1:my $${2:i}} ( @${3:array} ){
-#  ${4:# body...}
-#}
-#endsnippet
-snippet foreach "foreach loop"
+snippet 'fore(ach)?' "foreach loop" r
 foreach ${1:my $${2:i}} ( @${3:array} ){
   ${0:# body...}
 }
 endsnippet
 
-snippet xfore "Inline foreach loop"
+
+snippet 'xfore(ach)?' "Inline foreach loop" r
 ${1:expression} foreach @${2:array};
 endsnippet
-snippet xforeach "Inline foreach loop"
-${1:expression} foreach @${2:array};
-endsnippet
+
 
 snippet for "for loop"
 for ( my $${1:i} = ${2:0}; $$1 < $${3:n}; $$1${4:++} ){
@@ -123,27 +111,23 @@ for ( my $${1:i} = ${2:0}; $$1 < $${3:n}; $$1${4:++} ){
 }
 endsnippet
 
+
 snippet xfor "Inline for loop"
 ${1:expression} for @${2:array};
 endsnippet
 
-snippet while "while loop"
-while ( ${1:/* condition */} ){
-  ${2:# body...}
-}
-endsnippet
-snippet wh "while loop"
+
+snippet 'wh(ile)?' "while loop" r
 while ( ${1:/* condition */} ){
   ${2:# body...}
 }
 endsnippet
 
-snippet xwhile "Inline while loop"
+
+snippet 'xwh(ile)?' "Inline while loop" r
 ${1:expression} while ${2:condition};
 endsnippet
-snippet xwh "Inline while loop"
-${1:expression} while ${2:condition};
-endsnippet
+
 
 
 #===========================================================================
@@ -163,11 +147,12 @@ ${2:use base qw(${3:ParentClass});}${2/.+/\n\n/}sub new {
 
 endsnippet
 
+
 snippet slurp "slurp"
-my $${1:var};
-{ local $/ = undef; local *FILE; open FILE, "<${2:file}"; $$1 = <FILE>; close FILE }
+my $${1:var} = do { local $/ = undef; open my $fh, '<', ${2:$file}; <$fh> };
 
 endsnippet
+
 
 snippet hash "hash"
 %${1:hash_name} = (
@@ -175,7 +160,8 @@ snippet hash "hash"
 );
 endsnippet
 
-snippet perl "perl"
+
+snippet template "sample template"
 #!`which perl`
 
 #=======================================================================================================================

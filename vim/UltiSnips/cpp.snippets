@@ -1,20 +1,22 @@
 # vim:ft=snippets:
+#
+# $0 - Final position of cursor
+#
 priority -49
 extends c
 # We want to overwrite everything in parent ft.
 priority -48
+
 #===========================================================================
 # Global functions
 #
 global !p
-def complete(t, opts, default=""):
-  if t == "":
-    return default
-  elif t:
-    opts = [ m[len(t):] for m in opts if m.startswith(t) ]
+def complete(t, opts):
+  if t:
+    opts = [ m for m in opts if m.startswith(t) ]
   if len(opts) == 1:
-    return opts[0]
-  return "(" + "|".join(opts) + ")"
+    return opts[0][len(t):]
+  return " (" + " | ".join(opts) + ")"
 endglobal
 
 
@@ -23,18 +25,26 @@ endglobal
 # Headers/Namespaces
 #
 snippet inc "#include <>" b
-#include <$1`!p snip.rv = complete( t[1], ['cassert', 'cstdio', 'cstdlib', 'cstring', 'fstream', 'iostream', 'sstream'], snip.basename + '.h')`>
+#include <$1`!p
+opts = ['cassert', 'cstdio', 'cstdlib', 'cstring', 'fstream', 'iostream', 'sstream']
+if snip.basename:
+  opts.insert(0, snip.basename + '.h')
+snip.rv = complete( t[1], opts )
+`>
 endsnippet
+
 
 snippet Inc "C++ includes" b
 #include <iostream>
 endsnippet
+
 
 snippet ns "namespace ..."
 namespace${1/.+/ /m}${1:`!p snip.rv = snip.basename or "name"`} {
   ${VISUAL}${0}
 } // END namespace${1/.+/ /m}$1
 endsnippet
+
 
 snippet uns "using namespace ..."
 using namespace ${1:std};
@@ -46,7 +56,7 @@ endsnippet
 # Loops
 #
 snippet for "C++ style for..."
-for (${4:unsigned} ${3:i} = ${2:0}; $3 < ${1:count}; ${5:++}$3) {
+for (auto ${1:i} = 0; $1 < ${2:count}; ++$1) {
   ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
 }
 endsnippet
@@ -75,6 +85,7 @@ snippet be "$1.begin(), $1.end()"
 ${1:v}${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}begin(); $1${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}end()
 endsnippet
 
+
 snippet 'vec(tor)?' "::std::vector" r
 ::std::vector<${1:char}> ${0};
 endsnippet
@@ -90,6 +101,7 @@ for (${3:it} = ${2:v}.begin(), ${4:it_last}=$2.end(); $3 != $4; ${5:++}$3) {
   ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
 }
 endsnippet
+
 
 snippet readfile "readfile"
 std::vector<char> v;

@@ -55,7 +55,6 @@ Plug  'kana/vim-textobj-indent',          {'on': '<Plug>(textobj-indent'}
 Plug  'kana/vim-textobj-line',            {'on': '<Plug>(textobj-line'}
 Plug  'kshenoy/TWiki-Syntax',             {'for': 'twiki'}
 Plug  'SirVer/ultisnips',                 PlugCond(has('python'))
-Plug  'honza/vim-snippets'
 Plug  'tpope/vim-unimpaired'
 Plug  'tpope/vim-vinegar',                {'on': '<Plug>VinegarUp'}
 Plug  'chaoren/vim-wordmotion'
@@ -474,8 +473,8 @@ let g:UltiSnipsExpandTrigger       = "<Tab>"
 let g:UltiSnipsJumpForwardTrigger  = "<Tab>"
 let g:UltiSnipsJumpBackwardTrigger = "<S-Tab>"
 let g:UltiSnipsListSnippets        = "<C-Tab>"
-" Location of private snippets
-execute 'let g:UltiSnipsSnippetsDir="' . g:dotvim . '/UltiSnips"'
+" Location of snippets
+execute 'let g:UltiSnipsSnippetDirectories=["' . g:dotvim . '/UltiSnips"]'
 
 
 " vim-vinegar ----------------------------------------------------------------------------------------------------  {{{1

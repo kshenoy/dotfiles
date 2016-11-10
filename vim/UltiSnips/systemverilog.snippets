@@ -1,12 +1,38 @@
 # vim:ft=snippets:
+#
+# $0 - Final position of cursor
+#
+priority -49
+
+#===========================================================================
+# Global functions
+#
+global !p
+def complete(t, opts):
+  if t:
+    opts = [ m for m in opts if m.startswith(t) ]
+  if len(opts) == 1:
+    return opts[0][len(t):]
+  # return os.path.commonprefix(opts) + "  (" + " | ".join(opts) + ")"
+  return "  (" + " | ".join(opts) + ")"
+endglobal
+
+
+
 #===========================================================================
 # Always blocks
 #
+# snippet al "always/always_comb/always_ff/always_latch"
+# $1`!p snip.rv = complete( t[1], ['always', 'always_comb', 'always_ff', 'always_latch'] )`
+# endsnippet
+
+
 snippet always "always @( posedge clock ) .."
 always @( ${1:posedge clock} ) begin
   ${0}
 end
 endsnippet
+
 
 snippet always "always @( posedge clock or negedge reset ) .."
 always @( ${1:posedge clock} or negedge reset ) begin
@@ -14,17 +40,20 @@ always @( ${1:posedge clock} or negedge reset ) begin
 end
 endsnippet
 
+
 snippet always_comb "always_comb .."
 always_comb begin
   ${0}
 end
 endsnippet
 
+
 snippet always_ff "always_ff .."
 always_ff @( ${1:posedge clk or negedge reset_n} )
   ${0}
 end
 endsnippet
+
 
 snippet always_latch "always_latch .."
 always_latch
@@ -43,17 +72,20 @@ if ( ${1:condition} ) begin
 end
 endsnippet
 
+
 snippet eli "else if .. "
 else if ( ${1:condition}) begin
   ${2}
 end
 endsnippet
 
+
 snippet el "else .. "
 else begin
   ${0}
 end
 endsnippet
+
 
 snippet case "case() .. "
 case( ${1:expression} )
@@ -65,15 +97,6 @@ case( ${1:expression} )
 endcase
 endsnippet
 
-snippet case "casex() .. "
-casex( ${1:expression} )
-  ${2:value1}: begin
-    ${0}
-  end
-  default: begin
-  end
-endcase
-endsnippet
 
 snippet casex "casex() .. "
 casex( ${1:expression} )
@@ -85,15 +108,6 @@ casex( ${1:expression} )
 endcase
 endsnippet
 
-snippet case "casez() .. "
-casez( ${1:expression} )
-  ${2:value1}: begin
-    ${0}
-  end
-  default: begin
-  end
-endcase
-endsnippet
 
 snippet casez "casez() .. "
 casez( ${1:expression} )
@@ -105,6 +119,7 @@ casez( ${1:expression} )
 endcase
 endsnippet
 
+
 snippet class "class .. endclass"
 class ${1:class_name} ${2:extends ${3:base_class}};
   ${0}
@@ -114,6 +129,7 @@ class ${1:class_name} ${2:extends ${3:base_class}};
 endclass: $1
 endsnippet
 
+
 snippet clocking "clocking .. { .. }"
 clocking ${1:name_cb} @( posedge ${2:clock} );
   default input #${3:setup_time} output #${4:hold_time};
@@ -121,6 +137,7 @@ clocking ${1:name_cb} @( posedge ${2:clock} );
   // Output declarations
 endclocking: $1
 endsnippet
+
 
 snippet final "final .."
 final begin
@@ -139,11 +156,13 @@ for ( ${1:int i = 0}; ${2:i != n}; ${3:++i} ) begin
 end
 endsnippet
 
+
 snippet foreach "foreach(x[i]) .."
 foreach ( ${1:x}[i] ) begin
   ${0}
 end
 endsnippet
+
 
 snippet forever "forever .. "
 forever begin
@@ -151,17 +170,20 @@ forever begin
 end
 endsnippet
 
+
 snippet repeat "repeat(N) .."
 repeat ( ${1:N} ) begin
   ${0}
 end
 endsnippet
 
+
 snippet while "while() .."
 while ( ${1:condition} ) begin
   ${2}
 end
 endsnippet
+
 
 snippet do "do .. while()"
 do begin
@@ -182,6 +204,7 @@ fork
 join
 endsnippet
 
+
 snippet fork "fork .. join_any"
 fork
   begin
@@ -189,6 +212,7 @@ fork
   end
 join_any
 endsnippet
+
 
 snippet fork "fork .. join_none"
 fork
@@ -198,11 +222,13 @@ fork
 join_none
 endsnippet
 
+
 snippet function "function .. endfunction"
 function ${1:void} ${2:function_name} ($3);
   $0
 endfunction: $2
 endsnippet
+
 
 snippet initial "initial .."
 initial begin
@@ -210,11 +236,13 @@ initial begin
 end
 endsnippet
 
+
 snippet init "initial .."
 initial begin
   ${1}
 end
 endsnippet
+
 
 snippet mod "module .. endmodule"
 module ${1:`!v substitute(expand('%:t'), '.v', '', '')`}(
@@ -223,12 +251,14 @@ module ${1:`!v substitute(expand('%:t'), '.v', '', '')`}(
 endmodule
 endsnippet
 
+
 snippet module "module .. endmodule"
 module ${1:`!v substitute(expand('%:t'), '.v', '', '')`}(
   ${2}
 );
 endmodule
 endsnippet
+
 
 snippet inst "Instantiate Module"
 ${1:`!v substitute(expand('%:t'), '_tb.v', '', '')`} $1_dut(${2})

@@ -21,8 +21,10 @@
   if has('unix')
     set guifont=MesloLGLDZ\ Nerd\ Font\ 8
     set guifont+=Monospace\ 8
+    set linespace=0
   elseif has('win32')
     set guifont=Consolas:h9:cANSI
+    set linespace=3
   endif
 
   set guioptions-=b    " Disable horizontal scrollbar
@@ -36,13 +38,10 @@
   " Disable <Alt> key shortcuts used to access menu
   set winaltkeys=no
 
-  " Number of pixel lines to use between characters
-  set linespace=0
-
   " Make 'File Open' use current directory
   set browsedir=buffer
 
-  set background=light
-  colorscheme solarized
-  "set background=dark
-  "colorscheme base16-ocean
+  " set background=light
+  " colorscheme solarized
+  set background=dark
+  colorscheme base16-monokai
