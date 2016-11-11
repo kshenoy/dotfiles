@@ -1,7 +1,8 @@
-# Configuration file for the color ls utility
+# Configuration file for dircolors, a utility to help you set the
+# LS_COLORS environment variable used by GNU ls with the --color option.
+
 # This file goes in the /etc directory, and must be world readable.
-# You can copy this file to .dir_colors in your $HOME directory to override
-# the system defaults.
+# You can copy this file to .dircolors in your $HOME directory to override the system defaults.
 
 # COLOR needs one of these arguments: 'tty' colorizes output to ttys, but not
 # pipes. 'all' adds color characters to all output. 'none' shuts colorization
@@ -50,7 +51,6 @@ TERM uxterm
 
 # Below are the color init strings for the basic file types. A color init
 # string consists of one or more of the following numeric codes:
-#
 # Attribute codes:
 #   00=none
 #   01=bold
@@ -69,18 +69,19 @@ TERM uxterm
 #  | magenta |     35     |     45     |
 #  | cyan    |     36     |     46     |
 #  | white   |     37     |     47     |
-#
+
 NORMAL  00          # global default, although everything should be something.
 FILE    00          # normal file
-DIR     01;34       # directory
+DIR     00;34       # directory
 EXEC    00;32       # files with execute permissions
-LINK    00;36       # symbolic link
+LINK    00;36       # symbolic link. (If this is set to 'target' instead of a numerical value, the color is as for the file pointed to.)
 FIFO    40;33       # pipe
 SOCK    01;35       # socket
+DOOR    01;35       # door
 BLK     40;33;01    # block device driver
 CHR     40;33;01    # character device driver
 ORPHAN  01;37;41    # orphaned syminks
-MISSING 01;37;41    # ... and the files they point to
+MISSING 05;37;41    # ... and the files they point to
 
 # List any file extensions like '.gz' or '.tar' that you would like ls
 # to colorize below. Put the extension, a space, and the color init string.
@@ -149,10 +150,10 @@ MISSING 01;37;41    # ... and the files they point to
 # *command  01;37
 
 # Documents
-.csv 00;33
-.xls 00;33
-.pdf 00;33
-.doc 00;33
-.txt 00;33
-.md  00;33
-.ppt 00;33
+# .csv 00;00
+# .xls 00;00
+# .pdf 00;00
+# .doc 00;00
+# .txt 00;00
+# .md  00;00
+# .ppt 00;00

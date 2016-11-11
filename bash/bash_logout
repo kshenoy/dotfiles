@@ -1,5 +1,9 @@
 # ~/.bash_logout: executed by bash(1) when login shell exits.
 
+# shopt -q login_shell && echo "Login shell" || echo "Not a login shell"
+# [[ $- == *i* ]] && echo "This is an interactive shell" || echo "This is a script"
+
+
 if (( $EUID ==  0 )); then
   echo "Exiting..."
   chmod 644 $(dirname $HISTFILE)/*

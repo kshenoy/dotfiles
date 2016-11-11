@@ -212,7 +212,8 @@ _setprompt_sjlmod_() {
   fi
 
   # The info variables
-  local pr_pwd=$PWD
+  local pr_pwd=$(_get_compact_pwd_)
+
   #for k in "${!dir_alias[@]}"; do
     #echo "$k => ${dir_alias[$k]}"
     #echo ${pr_pwd/#$k/${dir_alias[$k]}}
@@ -220,15 +221,6 @@ _setprompt_sjlmod_() {
   #for i in ${!dir_alias[@]}; do
   #  [ -n "$i" ] && pr_pwd=${pr_pwd/#$i/${dir_alias[$i]}}
   #done
-  if   [[(-n "$HOME"    ) && ("$pr_pwd" =~ ^"$HOME"    )]]; then pr_pwd=${pr_pwd/#$HOME/\~};
-  elif [[(-n "$as0ks/as") && ("$pr_pwd" =~ ^"$as0ks/as")]]; then pr_pwd=${pr_pwd/#"$as0ks/as"/\~AS0};
-  elif [[(-n "$as0"     ) && ("$pr_pwd" =~ ^"$as0"     )]]; then pr_pwd=${pr_pwd/#$as0/\~AS0};
-  elif [[(-n "$as1ks/as") && ("$pr_pwd" =~ ^"$as1ks/as")]]; then pr_pwd=${pr_pwd/#"$as1ks/as"/\~AS1};
-  elif [[(-n "$as1"     ) && ("$pr_pwd" =~ ^"$as1"     )]]; then pr_pwd=${pr_pwd/#$as1/\~AS1};
-  elif [[(-n "$ass0"    ) && ("$pr_pwd" =~ ^"$ass0"    )]]; then pr_pwd=${pr_pwd/#$ass0/\~ASS0};
-  elif [[(-n "$ass1"    ) && ("$pr_pwd" =~ ^"$ass1"    )]]; then pr_pwd=${pr_pwd/#$ass1/\~ASS1};
-  elif [[(-n "$ass2"    ) && ("$pr_pwd" =~ ^"$ass2"    )]]; then pr_pwd=${pr_pwd/#$ass2/\~ASS2};
-  fi
 
   # Force time to US Mountain Time (we do this here as well as in .bashrc as sourcing some env files overwrites this)
   local pr_time="$(TZ=US/Mountain date +%I:%M%P\ %b\ %d,\ %a) "
@@ -373,4 +365,30 @@ _get_vcs_branch_() {                                                            
   else
     echo ""
   fi
+}
+
+
+unset -f _get_compact_pwd_
+_get_compact_pwd_() {
+  # Contract the following:
+  #   /proj/ch_func_dev{1:0}/ASPEN_HIGHLANDS -> ~AH{1:0}
+  # Contract more if it's my directory
+  local cpwd=${PWD}
+  if [[(-n "$HOME") && ("$cpwd" =~ ^"$HOME")]]; then
+    cpwd=${cpwd/#$HOME/\~};
+  else
+    local _proj
+    for _proj in AS AH BR; do
+      local _proj_full=$(sed -e 's/AS/ASPEN/i' -e 's/AH/ASPEN_HIGHLANDS/i' -e 's/BR/BRECKENRIDGE/i' <<< ${_proj})
+      local _proj_lcase=$(tr 'A-Z' 'a-z' <<< ${_proj})
+      local _me=$(whoami)
+      if [[ "$cpwd" =~ ^"/proj/ch_func_gen_scratch" ]]; then
+        cpwd=$(sed -e "s:^/proj/ch_func_gen_scratch\([0-9]\)/${_proj_full}/:~${_proj}\1_Scratch/:" <<< $cpwd)
+      elif [[ "$cpwd" =~ ^/proj/ch_func_dev ]]; then
+        cpwd=$(sed -e "s:^/proj/ch_func_dev\([0-9]\)/\(${_proj}\|${_proj_full}\)/:~${_proj}\1/:" <<< $cpwd)
+        cpwd=$(sed -e "s:^\(~${_proj}[0-9]\)/${_me}/${_proj_lcase}:\1:" <<< $cpwd)
+      fi
+    done
+  fi
+  echo $cpwd
 }

@@ -5,7 +5,8 @@
 # This file is used only for local settings
 export TZ="US/Mountain"
 
-PATH=~/bin:/tool/pandora64/bin:/tool/pandora/bin:$PATH
+# Putting this before ruby because ruby binary is in pandora
+PATH=/tool/pandora64/bin:/tool/pandora/bin:$PATH
 
 complete -f -o default -X '!*.xml' ljd
 complete -f -o default -X '!*.vv' vv

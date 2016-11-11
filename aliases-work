@@ -1,4 +1,4 @@
-#!/tool/pandora/bin/bash -a
+#!/usr/bin/env bash
 
 # Identify the current shell
 MYSHELL=$(basename $(ps h p $$ | /bin/awk '{ print $NF }' | sed 's/-//g'))
@@ -33,7 +33,7 @@ gvim_func_work() {
 
   gvim_func -geometry 318x67+1911+0 ${_server:+--servername $_server} "$@"
 }
-alias v="gvim_func -geometry 318x67+1911+0"
+alias v="gvim_func -geometry 273x63+0+0"
 
 
 unset -f emacs_func_work
@@ -107,8 +107,9 @@ alias bus3='bucket -n 3'
 alias busw='watch -n15 "bucket -n 1"'
 alias toclippy="sed -e 's/$//' | tee ~/clippy.txt"
 
-alias xt='xterm -geometry 272x60+0+0 &'
-alias restd='resize -s 60 272'
+alias xt='xterm -geometry 273x60+1920+21 &'
+alias xtr='resize -s 60 273'
+# alias xtr='wmctrl -i -r $(printf "0x0%x" $(xdotool getactivewindow)) -b add,maximized_vert; wmctrl -i -r $(printf "0x0%x" $(xdotool getactivewindow)) -e 0,1920,25,1915,1144'
 alias tmxvnc='tmux new-window -d -n "XVNC" "x11vnc"'
 
 
@@ -135,32 +136,51 @@ pfop() {
     sed "s:$d:$f:" <<< $REPLY;
   done < <(p4w opened)
 }
-pfu() { pf update_env "$@" && ~/bin/gentags --create && sra; }
+pfu() {
+  # Save ENV variables
+  local env_tmux=$TMUX
+  local env_tmux_pane=$TMUX_PANE
+
+  pf update_env "$@"
+  local ret=$?
+
+  # Restore ENV variables
+  export TMUX=$env_tmux
+  export TMUX_PANE=$env_tmux_pane
+
+  if [[ $ret != 0 ]]; then return; fi
+
+  ~/bin/gentags --create
+  sosa
+  [[ -f ~/.fzf.bash ]] && . ~/.fzf.bash
+}
 
 
 #=======================================================================================================================
 # Locations
 #============
 # Declaring these as environment variables instead of regular ones allows access from within vim
-export as0='/proj/aspen_func_dev0/ASPEN'
-export as0ks='/proj/aspen_func_dev0/ASPEN/kshenoy'
-export as01='/proj/aspen_func_dev0/ASPEN/kshenoy/as1'
-export as02='/proj/aspen_func_dev0/ASPEN/kshenoy/as2'
-export as03='/proj/aspen_func_dev0/ASPEN/kshenoy/as3'
-export as04='/proj/aspen_func_dev0/ASPEN/kshenoy/as4'
-export as05='/proj/aspen_func_dev0/ASPEN/kshenoy/as5'
+unset -f make_wa
+make_wa() {
+  local _proj _ch _wa _scr
+  for _proj in as ah br; do
+    local _proj_ucase=$(tr 'a-z' 'A-Z' <<< ${_proj})
+    local _proj_ucase_full=$(sed -e 's/as/ASPEN/i' -e 's/ah/ASPEN_HIGHLANDS/i' -e 's/br/BRECKENRIDGE/i' <<< ${_proj_ucase})
 
-export as1='/proj/aspen_func_dev1/ASPEN'
-export as1ks='/proj/aspen_func_dev1/ASPEN/kshenoy'
-export as11='/proj/aspen_func_dev1/ASPEN/kshenoy/as1'
-export as12='/proj/aspen_func_dev1/ASPEN/kshenoy/as2'
-export as13='/proj/aspen_func_dev1/ASPEN/kshenoy/as3'
-export as14='/proj/aspen_func_dev1/ASPEN/kshenoy/as4'
-export as15='/proj/aspen_func_dev1/ASPEN/kshenoy/as5'
+    for _ch in {0..1}; do
+      eval "export ${_proj}${_ch}='/proj/ch_func_dev${_ch}/${_proj_ucase}'"
+      eval "export ${_proj}${_ch}ks='/proj/ch_func_dev${_ch}/${_proj_ucase}/kshenoy'"
+      for _wa in {1..5}; do
+        eval "export ${_proj}${_ch}${_wa}='/proj/ch_func_dev${_ch}/${_proj_ucase}/kshenoy/${_proj}${_wa}'"
+      done
+    done
 
-export ass0='/proj/aspen_func_gen_scratch0/ASPEN'
-export ass1='/proj/aspen_func_gen_scratch1/ASPEN'
-export ass2='/proj/aspen_func_gen_scratch2/ASPEN'
+    for _scr in {0..2}; do
+      eval "export ${_proj}s${_scr}='/proj/ch_func_gen_scratch${_scr}/${_proj_ucase_full}'"
+    done
+  done
+}
+make_wa
 
 # Dynamic variables (Recomputed everytime path changes via preprompt or equivalent)
 # If $REPO_PATH is set, expand ${...} to $REPO_PATH/ (append trailing slash)
@@ -183,16 +203,16 @@ dyn_vars
 # ${!dir_alias[@]} gives a list of keys
 # ${dir_alias[@]}  gives a list of values
 # if [[ ${dir_alias[$as]} ]]; then echo "Found"; else echo "Not Found"; fi
-declare -A dir_alias=(
-  ['$HOME']='~'
-  ['$as0ks/as']='~AS0'
-  ['$as0']='~AS0'
-  ['$as1ks/as']='~AS1'
-  ['$as1']='~AS1'
-  ['$ass0']='~ASS0'
-  ['$ass1']='~ASS1'
-  ['$ass2']='~ASS2'
-)
+# declare -A dir_alias=(
+#   ['$HOME']='~'
+#   ['$ch0ks/wa']='~WA0'
+#   ['$ch0']='~CH0'
+#   ['$ch1ks/wa']='~WA1'
+#   ['$ch1']='~CH1'
+#   ['$scr0']='~Scratch0'
+#   ['$scr1']='~Scratch1'
+#   ['$scr2']='~Scratch2'
+# )
 
 #=======================================================================================================================
 # Functions
@@ -200,8 +220,23 @@ declare -A dir_alias=(
 
 unset -f benv
 benv() {
+  # Save ENV variables
+  local env_tmux=$TMUX
+  local env_tmux_pane=$TMUX_PANE
+
   (( $# > 0 )) && command cd "$1"
-  sbi && bootenv && sra && srf
+  sbi && bootenv
+  local ret=$?
+
+  # Restore ENV variables
+  export TMUX=$env_tmux
+  export TMUX_PANE=$env_tmux_pane
+
+  if [[ $ret != 0 ]]; then return; fi
+
+  sosa; sosf
+  [[ -f ~/.fzf.bash ]] && . ~/.fzf.bash
+
   (( $# > 0 )) && command cd ~-
 }
 
@@ -257,19 +292,26 @@ tel() {
 
 unset -f mkwa
 mkwa() {
-  local _proj=${1}
+  # Eg. mkwa proj_name[/branch_name][@changelist_num]
 
-  if [[ "$_proj" =~ @ ]]; then
-    local _cl=" -changelist ${_proj#*@}"
-    _proj=${_proj%@*}
-  fi
-  # echo $_proj
+  local _temp=${1}
+  local _proj=""
+  local _branch=""
+  local _cl=""
 
-  if [[ "$_proj" =~ / ]]; then
-    local _branch=" -branch_name ${_proj#*/}"
-    _proj=${_proj%/*}
+  if [[ "${_temp}" =~ @ ]]; then
+    local _cl=" -changelist ${_temp#*@}"
+    _temp=${_temp%@*}
   fi
-  # echo $_proj
+  # echo $_temp
+
+  if [[ "$_temp" =~ / ]]; then
+    local _branch=" -branch_name ${_temp#*/}"
+    _proj=${_temp%/*}
+  else
+    _proj=$_temp
+  fi
+  # echo $_temp
 
   case ${_proj} in
     as)
@@ -277,6 +319,9 @@ mkwa() {
       ;;&
     ah)
       _proj="aspen_highlands"
+      ;;&
+    br)
+      _proj="breckenridge"
       ;;&
     zn)
       _proj="zen"
@@ -289,13 +334,21 @@ mkwa() {
       ;;
   esac
 
+  # Save ENV variables
+  local _env_tmux=$TMUX
+  local _env_tmux_pane=$TMUX_PANE
+
   local _cmd="p4_mkwa -codeline ${_proj}${_branch}${_cl}"
   echo -e "${_cmd}\n"
   . /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash && export LANG=en_US.UTF-8
   $_cmd
 
+  # Restore ENV variables
+  export TMUX=$_env_tmux
+  export TMUX_PANE=$_env_tmux_pane
+
   if [[ -z "$STEM" ]]; then
-    return 0
+    return 1
   fi
 
   # Source aliases...

@@ -5,7 +5,7 @@
 #=======================================================================================================================
 =head1 NAME
 
- A wrapper around vim (includes vipe functionality)
+ wim
 
 =head1 AUTHOR
 
@@ -50,7 +50,7 @@ my %opts = (
 
 # Since this is a wrapper, after processing the extra options I have to invoke the non-wrapper version to pass vim its
 # base options.
-my $root_exec;
+my $root_exec="/tool/pandora64/.package/vim-7.4-a/bin/" . basename($0);
 foreach my $i (`bash -c "type -a \$(basename $0)"`) {
   if ($i !~ $0) {
     $root_exec = (split(/\s+/, $i))[-1];

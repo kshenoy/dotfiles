@@ -2,7 +2,6 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # Kartik Shenoy (kartik.shenoy@amd.com)
 
-
 #=======================================================================================================================
 # SHELL CONFIGURATION
 #======================
@@ -29,7 +28,9 @@ shopt -s sourcepath
 # Force commands entered on multiple lines to be shown on a single line in history file
 shopt -s cmdhist
 # Append to the history file, don't overwrite it
-shopt -s histappend histreedit histverify
+shopt -s histappend histreedit
+# History commands (!, !!, etc.) will print to shell for confirmation and not auto-execute
+shopt -s histverify
 
 set -o noclobber
 #set -o vi
@@ -88,8 +89,6 @@ complete -f -o default -X '!*.gif'  kview
 # Default LS_COLORS (Disabled as I use dir_colors)
 #export CLICOLOR=1
 
-[ -f ~/.dotfiles/tmux/tmux_completion_bash ] && . ~/.dotfiles/tmux/tmux_completion_bash
-
 
 #=======================================================================================================================
 # ENVIRONMENT VARIABLES
@@ -101,7 +100,7 @@ HISTFILESIZE=65535
 HISTTIMEFORMAT="%F %T  "
 # Ignore duplicates and trivial one- and two-char commands
 HISTCONTROL=ignoreboth #same as export HISTCONTROL=ignoredups:ignorespace
-HISTIGNORE='?:??:history*:sra:src:srf:srp'
+HISTIGNORE='?:??:history*:sosa:sosc:sosf:sosp'
 HOSTNAME="$(hostname)"
 # Keeps history forever. Requires PROMPT_COMMAND='history -a; history -r'
 HISTFILE="${HOME}/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
@@ -109,13 +108,8 @@ mkdir -p $(dirname ${HISTFILE})
 
 ## TERMINAL
 # Set terminal to mimic titeInhibit = true
-PATH=~/bin:$PATH
 MANPAGER=less
-PAGER=less
-# vim needs to be explicitly told that it should open from stdin using the '-' option.
-# Because of this, we can't arbitrarily set the PAGER variable and replace less in both `less <filename>` and
-# `cat <filename> | less`
-# PAGER='svim -R -c "syntax on"'
+PAGER='~/bin/vim --config NONE -R -c "nnoremap <silent> q :qall!<CR>" -c "syntax on"'
 EDITOR=vim
 VISUAL=gvim
 
@@ -123,11 +117,6 @@ VISUAL=gvim
 
 #GREP_OPTIONS="--color=auto"
 GREP_COLOR=32
-
-# Ruby gem path
-if which ruby >/dev/null && which gem >/dev/null; then
-  PATH="$(ruby -rubygems -e 'puts Gem.user_dir')/bin":$PATH
-fi
 
 LANG=en_US.UTF-8
 
@@ -150,14 +139,29 @@ fi
 
 
 #=======================================================================================================================
+# Bindings
+#===========
+# Bang! Previous Command Hotkeys: Print nth argument of the previous command using Alt+1, Alt+2 ...etc
+# http://www.softpanorama.org/Scripting/Shellorama/bash_command_history_reuse.shtml#Bang_commands
+bind '"\e`": "!:0"'
+# bind '"\e1": "!:1 \n"'
+# bind '"\e2": "!:2 \n"'
+# bind '"\e3": "!:3 \n"'
+# bind '"\e4": "!:4 \n"'
+# bind '"\e5": "!:5 \n"'
+
+
+#=======================================================================================================================
 # EXTERNAL CUSTOMISATIONS
 #==========================
 
 # If not running interactively, don't do anything
 [[ -z "$PS1" ]] && return
 
+# ls uses the value of the environment variable LS_COLORS to display
+# dircolors is a tool to set LS_COLORS
 if [[ -x /usr/bin/dircolors ]]; then
-  test -r ~/.dircolors && eval "$(dircolors -b ${HOME}/.dircolors)" || eval "$(dircolors -b)"
+  [[ -r ~/.dircolors ]] && eval "$(/usr/bin/dircolors -b ${HOME}/.dircolors)" || eval "$(/usr/bin/dircolors -b)"
 fi
 
 if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
@@ -165,11 +169,12 @@ if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
 fi
 
 for i in \
-  ~/.dotfiles/bash/bashrc-func    \
-  ~/.dotfiles/bash/bashrc-prompt  \
-  ~/.bashrc_local                 \
-  ~/.dotfiles/aliases             \
-  ~/.fzf.bash                     \
+  ~/.dotfiles/bash/bashrc-func          \
+  ~/.dotfiles/bash/bashrc-prompt        \
+  ~/.bashrc_local                       \
+  ~/.dotfiles/aliases                   \
+  ~/.fzf.bash                           \
+  ~/.dotfiles/tmux/tmux_completion_bash \
   ; do
   if [[ -f ${i} ]]; then
   # echo "  Sourcing ${i} ..."
@@ -177,6 +182,15 @@ for i in \
   # echo "  ... done"
   fi
 done
+
+
+# Keep PATH customizations at the end
+# Ruby gem path
+if ((which ruby &> /dev/null) && (which gem &> /dev/null)); then
+  PATH="$(ruby -rubygems -e 'puts Gem.user_dir')/bin":$PATH
+fi
+PATH=${HOME}/bin:$PATH
+
 
 # Automatically add completion for all aliases to commands having completion functions. Should be called at the end
 alias_completion

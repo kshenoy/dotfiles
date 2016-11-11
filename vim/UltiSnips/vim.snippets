@@ -1,6 +1,15 @@
 # vim:ft=snippets:
 
 #===========================================================================
+# Global functions
+#
+global !p
+from UltiSnips_globals import *
+endglobal
+
+
+
+#===========================================================================
 # Conditionals
 #
 snippet if "if..." b
@@ -24,4 +33,20 @@ endsnippet
 snippet el "else..." w
 else
   $0
+endsnippet
+
+
+snippet test "Test"
+`!p snip.rv = path`
+endsnippet
+snippet fu "function" b
+function! ${1:`!p
+if "autoload" in path:
+  basename = os.path.splitext(path)[0]
+  snip.rv = re.sub(r'^.*?autoload/', '', basename).replace('/','#')
+else:
+  snip.rv = path`} (${2})
+
+  $0
+endfunction " $1
 endsnippet

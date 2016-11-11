@@ -7,7 +7,7 @@ nnoremap <silent> <leader>so :so $MYVIMRC<BAR>so $MYGVIMRC<CR>
 nnoremap <leader>sr :reg<CR>
 nnoremap <leader>sm :marks<CR>
 " Set size
-nnoremap <silent> <expr> <leader>sd ':set lines=' . (tabpagenr("$") == 1 ? '67' : '65') . ' columns=318<CR>'
+nnoremap <silent> <expr> <leader>sd ':set lines=' . (tabpagenr("$") == 1 ? '65' : '63') . ' columns=273<CR>'
 
 
 
@@ -24,7 +24,7 @@ execute 'nnoremap <silent> govb :e ' . g:dotvim . '/bundle.vim<CR>'
 nnoremap <silent> gosa :e ~/.dotfiles/aliases<CR>
 nnoremap <silent> gosf :e ~/.dotfiles/bash/bashrc-func<CR>
 nnoremap <silent> gosp :e ~/.dotfiles/bash/bashrc-prompt<CR>
-nnoremap <silent> gosr :e ~/.bashrc<CR>
+nnoremap <silent> gosc :e ~/.bashrc<CR>
 nnoremap <silent> gost :e ~/.dotfiles/tmux/tmux.conf<CR>
 nnoremap <silent> gosw :e ~/.dotfiles/aliases-work<CR>
 nnoremap <silent> gosx :e ~/.Xresources<CR>
@@ -73,7 +73,7 @@ cabbrev <expr> h (( getcmdtype() == ':' && getcmdpos() <= 2 ) ? 'vert bo h' : 'h
 " By default, p/P in visual mode pastes the contents of the default register and replaces it with the visual selection.
 " This will preserve the original contents of the default register. For the default behavior, P can be used
 " For named registers, it will behave like default
-xnoremap <expr> p v:register=='"':'pgvy':'p'
+xnoremap <expr> p v:register=='"'?'pgvy':'p'
 
 """ Jumping to next/previous start/end of Methods
 noremap <silent> ][ :call my#SectionJump('next', 'start')<CR>

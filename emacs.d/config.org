@@ -1,4 +1,5 @@
 #+TITLE: Emacs Configuration
+#+PROPERTY: header-args  :tangle yes
 
 * Init
 ** Archives
@@ -281,7 +282,7 @@ Enable =show-trailing-whitespace= by default. The /setq/ above doesn't do that.
 ** Highlight current line
 #+BEGIN_SRC emacs-lisp
   ;; (global-hl-line-mode 1)
-  (bind-key "c" 'global-hl-line-mode      emacs-unimpaired-toggle-map)
+  (bind-key "c" 'global-hl-line-mode emacs-unimpaired-toggle-map)
 #+END_SRC
 
 *** TODO FIXME
@@ -572,13 +573,13 @@ We redefine /helm-command-prefix/ here
 #+END_SRC
 
 Other useful default keybinds:
-|--------------+-------------------------+--------------------------------------------------------------|
-| <prefix> a   | helm-apropos            | Unholy amalgam of describe-function, variable, commands etc. |
-| <prefix> i   | helm-semantic-or-imenu  | Show outline and major definitions                           |
-| <prefix> r   | helm-regexp             | Construct a regexp                                           |
-| <prefix> C-, | helm-calcul-expression  | Interface to calc command                                    |
-| C-x r b      | helm-filtered-bookmarks |                                                              |
-|--------------+-------------------------+--------------------------------------------------------------|
+|--------------+-------------------------+-----------------------------------------------------------|
+| <prefix> a   | helm-apropos            | Combination of describe-function, variable, commands etc. |
+| <prefix> i   | helm-semantic-or-imenu  | Show outline and major definitions                        |
+| <prefix> r   | helm-regexp             | Construct a regexp                                        |
+| <prefix> C-, | helm-calcul-expression  | Interface to calc command                                 |
+| C-x r b      | helm-filtered-bookmarks |                                                           |
+|--------------+-------------------------+-----------------------------------------------------------|
 
 *** use-package END
 #+BEGIN_SRC emacs-lisp
@@ -672,6 +673,7 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
   (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
   (setq org-blank-before-new-entry '((heading . t) (plain-list-item . nil)))
   (setq org-link-search-must-match-exact-headline nil)
+  (setq org-startup-with-inline-images t)
 #+END_SRC
 
 **** TODO Show the emphasis markers on point
@@ -883,6 +885,7 @@ Default binding is =C-x u=
 ** yasnippet
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
+    :diminish yas-minor-mode
     :init (yas-global-mode t))
 #+END_SRC
 
@@ -938,7 +941,7 @@ Reduce delay and ensure that the popup shows up only if the last command has bee
 #+end_src
 
 *** :config
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
     :config (add-hook 'after-init-hook 'global-company-mode)
 #+END_SRC
 
@@ -957,6 +960,10 @@ This will complete the selection only if I have explicitly interacted with Compa
   (bind-key "<return>" #'my/company-active-return company-active-map)
   (bind-key "RET"      #'my/company-active-return company-active-map)
 #+END_SRC
+
+**** TODO Completion for Org
+http://orgmode.org/manual/Completion.html
+http://emacs.stackexchange.com/a/21173/9690
 
 *** END
 #+BEGIN_SRC emacs-lisp

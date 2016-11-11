@@ -106,26 +106,28 @@ if has('unix')
   " The 'while read fname' section sorts the filenames in descending order by length thereby allowing to find the
   " shortest occurence of a string
   let g:ctrlp_user_command = {
-                             \ 'types': {
-                               \ 1: ['.git', 'cd %s && git ls-files --cached --exclude-standard --others'],
-                               \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
-                               \ 3: ['P4CONFIG', "find %s " .
-                                 \ "-type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune " .
-                                 \ "-o -type d \\( -name _env -o -name dfx -o -name emu -o -name env_squash -o -name fp ".
-                                 \ "-o -name import -o -name libs -o -name powerPro -o -name tools -o -name build" .
-                                 \ "-o -wholename '*/ch/verif/dft' " .
-                                 \ "-o -wholename '*/txn/gen' -o -wholename '*/generated' \\) -prune " .
-                                 \ "-o -type f ! \\( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' " .
-                                 \ "-o -iname '*.cc.o' -o -iname '*tags*' \\) -print "
-                                 \ ]
-                               \ },
-                             \ 'fallback': "find %s " .
-                                 \ "-type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune " .
-                                 \ "-o -type f ! \\( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' " .
-                                 \ "-o -iname '*.cc.o' -o -iname *tags*' \\) -print " .
-                                 \ "| while read filename; do echo ${#filename} $filename; done " .
-                                 \ "| sort -n | awk '{print $2}'"
-                             \ }
+    \ 'types': {
+      \ 1: ['.git', 'cd %s && git ls-files --cached --exclude-standard --others'],
+      \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
+      \ 3: ['P4CONFIG', "find %s -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune -o " .
+                              \ "-type d \\( -name build -o -name .ccache -o -name dfx -o -name emu -o -name _env -o " .
+                              \ "            -name env_squash -o -name fp -o -name import -o -name tools -o " .
+                              \ "            -name powerPro -o -name release_gate_tmp -o -name sdpx -o -name sim -o " .
+                              \ "            -wholename '*/libs/rtl' -o -wholename '*/ch/variants' -o " .
+                              \ "            -wholename '*/ch/verif/dft' -o -wholename '*/ch/rtl/defines/old' -o " .
+                              \ "            -wholename '*/txn/gen' -o -wholename '*/ch/verif/txn/yml' -o " .
+                              \ "            -wholename '*/ch/syn' \\) -prune -o " .
+                              \ "-type f \\( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' -o " .
+                              \ "            -iname '*.cc.o' -o -iname '*tags*' \\) -prune -o " .
+                              \ "-type f -print"
+         \ ]
+    \ },
+    \ 'fallback': "find %s -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune -o " .
+                        \ "-type f ! \\( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' -o " .
+                        \ "              -iname '*.cc.o' -o -iname *tags*' \\) -print " .
+                        \ "| while read filename; do echo ${#filename} $filename; done " .
+                        \ "| sort -n | awk '{print $2}'"
+  \ }
 elseif executable('ag')
   let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 elseif executable('pt')
@@ -468,11 +470,7 @@ let g:targets_separators = ', . ; : + - = ~ * # / | \ & $'
 
 
 " UltiSnips ------------------------------------------------------------------------------------------------------  {{{1
-let g:UltiSnipsEditSplit           = "vertical"
-let g:UltiSnipsExpandTrigger       = "<Tab>"
-let g:UltiSnipsJumpForwardTrigger  = "<Tab>"
-let g:UltiSnipsJumpBackwardTrigger = "<S-Tab>"
-let g:UltiSnipsListSnippets        = "<C-Tab>"
+let g:UltiSnipsEditSplit = "vertical"
 " Location of snippets
 execute 'let g:UltiSnipsSnippetDirectories=["' . g:dotvim . '/UltiSnips"]'
 

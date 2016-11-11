@@ -10,14 +10,8 @@ priority -49
 # Global functions
 #
 global !p
-def complete(t, opts):
-  if t:
-    opts = [ m for m in opts if m.startswith(t) ]
-  if len(opts) == 1:
-    return opts[0][len(t):]
-  return " (" + " | ".join(opts) + ")"
+from UltiSnips_globals import *
 endglobal
-
 
 
 #===========================================================================
@@ -89,7 +83,7 @@ endsnippet
 #
 snippet main "main()"
 int main(${1: int argc, const char *argv[] }){
-$0
+  $0
   return 0;
 }
 endsnippet
@@ -206,6 +200,13 @@ endsnippet
 #===========================================================================
 # Misc
 #
+snippet fu "function"
+${1:void} ${2:function_name}(${3}) {
+  $0
+}
+endsnippet
+
+
 snippet 'pr(intf)?' "printf" r
 printf("${1:%s}\n"${1/([^%]|%%)*(%.)?.*/(?2:, :\);)/}$2${1/([^%]|%%)*(%.)?.*/(?2:\);)/}
 endsnippet
@@ -222,5 +223,21 @@ ${1:#pragma mark -
 }#pragma mark $2
 #endif
 
+$0
+endsnippet
+
+
+
+#===========================================================================
+# Skeleton
+##
+snippet _skeleton "Template for new files" b
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(${1: int argc, const char *argv[] }){
+$0
+  return 0;
+}
 $0
 endsnippet

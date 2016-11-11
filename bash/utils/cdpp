@@ -54,6 +54,8 @@ super_cd() {
     *)
       #echo "Pushing $_dir onto the stack"
       command pushd ${_dir} > /dev/null
+      if [[ $? != 0 ]]; then return; fi
+
       # Remove any duplicate entries
       # $[#_dirstack[@]] gives the number of elements in _dirstack
       local _i=0

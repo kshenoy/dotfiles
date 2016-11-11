@@ -1,9 +1,20 @@
 # vim:ft=snippets:
+#
+#===========================================================================
+# Global functions
+#
+global !p
+from UltiSnips_globals import *
+endglobal
+
+
+
 #===========================================================================
 # Headers
 #
 snippet #!
 #!/usr/bin/env sh
+$0
 endsnippet
 
 
@@ -88,4 +99,14 @@ snippet here "here document (here)" w
 <<-${2:'${1:TOKEN}'}
   $0
 ${1/['"`](.+)['"`]/$1/}
+endsnippet
+
+
+
+#===========================================================================
+# Skeleton
+##
+snippet _skeleton "Template for new files" b
+#!/usr/bin/env sh
+$0
 endsnippet

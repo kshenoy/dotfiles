@@ -31,7 +31,7 @@ if has('autocmd')
   autocmd!
 endif
 
-if filereadable(expand(g:dotvim . '/bundle.vim'))
+if filereadable(glob(g:dotvim . '/bundle.vim'))
   execute 'source ' . g:dotvim . '/bundle.vim'
 endif
 filetype plugin indent on
@@ -428,4 +428,11 @@ if has('autocmd')
     autocmd!
     autocmd VimEnter * if &diff|call my#SetDiffFileType()|endif
   augroup END
+endif
+" }}}2 }}}1
+
+""" Local vimrc
+let s:user = substitute(g:dotvim, '\v/home/(\w+)/.*', '\1', '')
+if filereadable(glob('~' . s:user . '/.vimrc_local'))
+  execute 'source ' . '~' . s:user . '/.vimrc_local'
 endif

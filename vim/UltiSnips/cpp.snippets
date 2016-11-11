@@ -11,12 +11,7 @@ priority -48
 # Global functions
 #
 global !p
-def complete(t, opts):
-  if t:
-    opts = [ m for m in opts if m.startswith(t) ]
-  if len(opts) == 1:
-    return opts[0][len(t):]
-  return " (" + " | ".join(opts) + ")"
+from UltiSnips_globals import *
 endglobal
 
 

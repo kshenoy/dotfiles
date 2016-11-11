@@ -1,4 +1,14 @@
 # vim:ft=snippets:
+#
+#===========================================================================
+# Global functions
+#
+global !p
+from UltiSnips_globals import *
+endglobal
+
+
+
 #===========================================================================
 # Headers
 #
@@ -58,12 +68,12 @@ endsnippet
 
 
 snippet ter "Ternary ?: operator"
-${1:/* condition */} ? ${2:a} : ${3:b}
+${1:/* condition */} ? ${2:<true>} : ${3:<false>}
 endsnippet
 
 
 snippet ?: "Ternary ?: operator"
-${1:/* condition */} ? ${2:a} : ${3:b}
+${1:/* condition */} ? ${2:<true>} : ${3:<false>}
 endsnippet
 
 
@@ -132,7 +142,7 @@ endsnippet
 
 #===========================================================================
 # Misc
-#
+##
 snippet 'cl(ass)?' "class" r
 package ${1:ClassName};
 
@@ -161,8 +171,38 @@ snippet hash "hash"
 endsnippet
 
 
-snippet template "sample template"
-#!`which perl`
+snippet pod "POD" b
+=head1 NAME
+
+ ${1:`!p snip.rv = snip.basename`}
+
+=head1 AUTHOR
+
+ Kartik Shenoy
+
+=head1 SYNOPSIS
+
+ $1 [OPTIONS]
+
+=head1 DESCRIPTION
+
+ <Description>
+
+=head1 OPTIONS
+
+  -t, --test          Test run
+  -v, --verbose       Verbose mode. Print values of all arguments
+
+=cut
+endsnippet
+
+
+
+#===========================================================================
+# Skeleton
+#
+snippet _skeleton "Template for new files" b
+#!/usr/bin/env perl
 
 #=======================================================================================================================
 # Documentation                                                                                                     {{{1

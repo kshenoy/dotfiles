@@ -1,0 +1,19 @@
+"
+" LOCAL SETTINGS
+"
+function! s:SetLocalSettings(filename)
+  if ($STEM != "")
+    let s:p4path = substitute(split(system("p4 files " . a:filename), '\s\+')[0], '#\d\+$', '', '')
+    if (s:p4path =~ '^//depot')
+      " Current file is under a REPO
+      setlocal textwidth=100
+      setlocal colorcolumn=+1
+      let b:OrigamiFoldAtCol=97
+    endif
+  endif
+endfunction
+
+augroup AMD
+  autocmd!
+  autocmd BufRead * call s:SetLocalSettings(expand('<afile>'))
+augroup END

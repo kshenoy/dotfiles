@@ -6,36 +6,23 @@ priority -49
 
 #===========================================================================
 # Global functions
-#
+##
 global !p
-def complete(t, opts):
-  if t:
-    opts = [ m for m in opts if m.startswith(t) ]
-  if len(opts) == 1:
-    return opts[0][len(t):]
-  # return os.path.commonprefix(opts) + "  (" + " | ".join(opts) + ")"
-  return "  (" + " | ".join(opts) + ")"
+from UltiSnips_globals import *
 endglobal
 
 
 
 #===========================================================================
 # Always blocks
-#
-# snippet al "always/always_comb/always_ff/always_latch"
-# $1`!p snip.rv = complete( t[1], ['always', 'always_comb', 'always_ff', 'always_latch'] )`
-# endsnippet
-
-
-snippet always "always @( posedge clock ) .."
-always @( ${1:posedge clock} ) begin
-  ${0}
-end
+##
+snippet al "always/always_comb/always_ff/always_latch"
+always$1`!p snip.rv = complete( t[1], ['_comb', '_ff', '_latch'] )`
 endsnippet
 
 
-snippet always "always @( posedge clock or negedge reset ) .."
-always @( ${1:posedge clock} or negedge reset ) begin
+snippet always "always @( posedge clock ) .."
+always @(${1:posedge clock}${2: or negedge reset}) begin
   ${0}
 end
 endsnippet
@@ -65,7 +52,7 @@ endsnippet
 
 #===========================================================================
 # Conditional blocks
-#
+##
 snippet if "if() .. "
 if ( ${1:condition} ) begin
   ${0}
@@ -149,7 +136,7 @@ endsnippet
 
 #===========================================================================
 # Loops
-#
+##
 snippet for "for() .. "
 for ( ${1:int i = 0}; ${2:i != n}; ${3:++i} ) begin
   ${0}
@@ -195,31 +182,13 @@ endsnippet
 
 #===========================================================================
 # Misc
-#
-snippet fork "fork .. join"
+##
+snippet fork "fork .. join/join_any/join_none"
 fork
   begin
     ${0}
   end
-join
-endsnippet
-
-
-snippet fork "fork .. join_any"
-fork
-  begin
-    ${0}
-  end
-join_any
-endsnippet
-
-
-snippet fork "fork .. join_none"
-fork
-  begin
-    ${0}
-  end
-join_none
+join$1`!p snip.rv = complete( t[1], ['_any', '_none'] );`
 endsnippet
 
 
@@ -230,29 +199,14 @@ endfunction: $2
 endsnippet
 
 
-snippet initial "initial .."
+snippet 'init(ial)?' "initial .."
 initial begin
   ${1}
 end
 endsnippet
 
 
-snippet init "initial .."
-initial begin
-  ${1}
-end
-endsnippet
-
-
-snippet mod "module .. endmodule"
-module ${1:`!v substitute(expand('%:t'), '.v', '', '')`}(
-  ${2}
-);
-endmodule
-endsnippet
-
-
-snippet module "module .. endmodule"
+snippet 'mod(ule)?' "module .. endmodule" br
 module ${1:`!v substitute(expand('%:t'), '.v', '', '')`}(
   ${2}
 );
@@ -262,4 +216,38 @@ endsnippet
 
 snippet inst "Instantiate Module"
 ${1:`!v substitute(expand('%:t'), '_tb.v', '', '')`} $1_dut(${2})
+endsnippet
+
+
+
+#===========================================================================
+# Sequences & Properties
+##
+snippet prop "Property" b
+${1:Label}: ${2:assert}`!p snip.rv = complete(t[2], ['assert', 'cover'] )` property (@(posedge L3CLK)) $0;
+endsnippet
+
+
+
+#===========================================================================
+# OVLs
+##
+snippet ovl "OVL Select" b
+ovl_$1`!p snip.rv = complete( t[1], ['always', 'never', 'zero_one_hot'] )`
+endsnippet
+
+
+snippet 'ovl_al(ways)?' "ovl_always" br
+ovl_always #(.msg(${1})) assert_${2} (${0});
+endsnippet
+
+
+snippet 'ovl_n(ever)?' "ovl_never" br
+ovl_never #(.msg(${1})) assert_${2} (${0});
+endsnippet
+
+
+snippet 'ovl_(01h|zero_one_hot)' "ovl_zero_one_hot" br
+ovl_zero_one_hot #(.msg(${1})) assert_${2}
+   (.test_expr(${0}), .clock(CONV_ABV_CLK), .reset(1'b1), .enable(CONV_ABV_EN), .fire());
 endsnippet

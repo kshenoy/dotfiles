@@ -1,11 +1,11 @@
 ;; -*- mode: emacs-lisp -*-
 
-;; This is here to prevent org from loading the built-in version instead of the latest installed version
-;; http://sachachua.com/blog/2014/05/update-org-7-comes-emacs-org-8-configuration-better-exports/
-;; (package-initialize nil)
-;; (setq package-enable-at-startup nil)
-;;
-;; Commenting this to stay locked to version 8.2.0 because the org-block-background face was removed in 8.3.1
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
 
 (setq my-init-config-org     (expand-file-name "config.org" user-emacs-directory)
       my-init-config-el      (expand-file-name "config.el"  user-emacs-directory)

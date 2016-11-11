@@ -123,6 +123,7 @@ alias du2='duh 2'
 alias du3='duh 3'
 alias space='du1 .'
 alias spc=space
+alias pppath='tr ":" "\n" <<< $PATH'
 
 #=================
 # Search related
@@ -223,20 +224,20 @@ if [[ $MYSHELL =~ "bash" ]]; then
   alias gosc='$VISUAL ~/.bashrc'
   alias gosf='$VISUAL ~/.dotfiles/bash/bashrc-func'
   alias gosp='$VISUAL ~/.dotfiles/bash/bashrc-prompt'
-  alias src='. ~/.bashrc && echo Sourced bashrc'
-  alias srf='. ~/.dotfiles/bash/bashrc-func   && echo Sourced bashrc-func'
-  alias srp='. ~/.dotfiles/bash/bashrc-prompt && echo Sourced bashrc-prompt'
+  alias sosc='. ~/.bashrc && echo Sourced bashrc'
+  alias sosf='. ~/.dotfiles/bash/bashrc-func   && echo Sourced bashrc-func'
+  alias sosp='. ~/.dotfiles/bash/bashrc-prompt && echo Sourced bashrc-prompt'
 elif [[ $MYSHELL =~ "zsh" ]]; then
   alias gosc='$VISUAL ~/.zshrc'
   alias gosf='$VISUAL ~/.zshrc-func'
-  alias src='. ~/.zshrc                && echo Sourced zshrc'
-  alias srf='. ~/.dotfiles/zsh/zshrc-func && echo Sourced zshrc-func'
+  alias sosc='. ~/.zshrc                && echo Sourced zshrc'
+  alias sosf='. ~/.dotfiles/zsh/zshrc-func && echo Sourced zshrc-func'
 fi
 alias gosa='$VISUAL ~/.dotfiles/aliases'
 alias gost='$VISUAL ~/.dotfiles/tmux/tmux.conf'
 alias gosw='$VISUAL ~/.dotfiles/aliases-work'
 alias gosx='$VISUAL ~/.Xresources'
-alias sra='. ~/.dotfiles/aliases && echo Sourced aliases'
+alias sosa='. ~/.dotfiles/aliases && echo Sourced aliases'
 
 
 #=======
