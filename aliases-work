@@ -78,7 +78,7 @@ alias bk='lsf_bkill'
 alias bq='lsf_bqueues'
 alias bjg='bj | grep $$:'
 
-alias wtf='PAGER="wim -u NONE" WhyTheFail'
+alias wtf='WhyTheFail'
 alias lmn='ljd -nomail -l'
 alias rgf_l3='regenerate_fail.bash -log mine -r \"-avf \'"'-/ChkL3.Debug/ 1\'"'\"'
 alias rgf_ras='regenerate_fail.bash -log ras -forceBuild'

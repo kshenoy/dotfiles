@@ -24,6 +24,8 @@
  Vim will have the full data being piped from command1 loaded into it, and when you close it, that data will be piped
  into command2. This is based on vipe from moreutils by Joey Hess.
 
+ Note that if vim is used in the middle of a pipe in read-only mode, we assume that it's used as a pager and don't dump the contents to the terminal as
+
 =head1 OPTIONS
 
       --config <folder>  Use the specified folder instead of ~/.vim.
@@ -50,7 +52,7 @@ my %opts = (
 
 # Since this is a wrapper, after processing the extra options I have to invoke the non-wrapper version to pass vim its
 # base options.
-my $root_exec="/tool/pandora64/.package/vim-7.4-a/bin/" . basename($0);
+my $root_exec;
 foreach my $i (`bash -c "type -a \$(basename $0)"`) {
   if ($i !~ $0) {
     $root_exec = (split(/\s+/, $i))[-1];
@@ -88,16 +90,8 @@ GetOptions(
 my @args=($root_exec);
 
 # Check to see if the user has specified -u and/or -U. If not, try to set them sensibly based on --config's argument
-my $u_set = 0;
-my $U_set = 0;
-foreach (@ARGV) {
-  if (/^-u$/) {
-    $u_set = 1;
-  }
-  if (/^-U$/) {
-    $U_set = 1;
-  }
-}
+my $u_set = grep(/^-u$/, @ARGV);
+my $U_set = grep(/^-U$/, @ARGV);
 
 if ($opts{'config'} eq "NONE") {
   # -u NONE prevents loading of system plugins too. Thus, we use NORC instead
@@ -113,6 +107,9 @@ if ($opts{'config'} eq "NONE") {
 # Push the remaining arguments to be passed to vim
 push @args, @ARGV;
 # print Dumper \@args;
+
+# print "STDOUT connected to " . (-t STDOUT ? "terminal" : "pipe") . "\n";
+# print "STDIN connected to "  . (-t STDIN  ? "terminal" : "pipe") . "\n";
 
 if (-t STDIN) {
   # vim is not present in the middle of a pipe
@@ -137,30 +134,53 @@ if (-t STDIN) {
   print ($tmp_fh <STDIN>) || die "Unable to write stdin to a temp file: $!";
   close $tmp_fh;
 
+  ## Save if vim was originally connected to terminal/pipe
+  ## We need to save this because we'll be reconnecting vim to tty
+  my $stdout_tty = (-t STDOUT);
+
   ## Reconnect stdin and stdout to the terminal
   # http://superuser.com/a/336020/99982
   # Vim expects its stdin to be the same as its controlling terminal, and performs various terminal-related ioctl's on
   # stdin directly. When done on any non-tty file descriptor, those ioctls are meaningless and return ENOTTY, which gets
   # silently ignored. On startup Vim reads and remembers the old terminal settings, and restores them back when exiting.
-  # Thus, when the "old settings" are requested for a non-tty fd (file descriptor), Vim receives all values empty and all
+  # Thus, when the "old settings" are requested for a non-tty file descriptor, Vim receives all values empty and all
   # options disabled, and carelessly sets the same to the terminal.
   # This can be seen by running vim < /dev/null, exiting it, then running stty, which will output a whole lot of <undef>s.
   # This could be considered as a bug in vim, since it can open /dev/tty for terminal control, but doesn't.
-
   # Thus, to make vim interactive again, we need to explicitly connect its input and output to the terminal
   close STDIN;
   open(STDIN, "<", "/dev/tty") || die "Unable to reopen stdin: $!";
   close STDOUT;
   open(STDOUT, ">", "/dev/tty") || die "Unable to reopen stdout: $!";
 
-  my $ret=system(@args, $tmp);
-  if ($ret != 0) {
-    die "$args[0] exited with a non-zero code; aborting\n";
+  # +------+------------------+-------------------------------------------------------------------------+
+  # | Mode | Location in Pipe | Action                                                                  |
+  # +------+------------------+-------------------------------------------------------------------------+
+  # | RO   | End              | Vim is probably being used a pager => Open vim but don't dump to STDOUT |
+  # | RO   | Middle           | Weird case; behave like less does in this situation, i.e. like cat =>   |
+  # |      |                  |   Don't open vim and don't dump to STDOUT                               |
+  # |!RO   | End/Middle       | Vim is probably being used in vipe mode => Open vim and dump to STDOUT  |
+  # +------+------------------+-------------------------------------------------------------------------+
+
+  if (  !(  scalar(grep(/^-R$/, @args))
+         || ($root_exec =~ /view$/)
+         )
+     || $stdout_tty
+     ) {
+    my $ret=system(@args, $tmp);
+    if ($ret != 0) {
+      die "$args[0] exited with a non-zero code; aborting\n";
+    }
   }
 
-  ## Dump the modified file to stdout
-  open($tmp_fh, "<", $tmp) || die "Unable to read $tmp: $!\n";
-  print (STDOUT <$tmp_fh>) || die "Write failure: $!";
+  unless (  (  grep(/^-R$/, @args)
+            || ($root_exec =~ /view$/)
+            )
+         && $stdout_tty
+         ) {
+    open($tmp_fh, "<", $tmp) || die "Unable to read $tmp: $!\n";
+    print (STDOUT <$tmp_fh>) || die "Write failure: $!";
+  }
 
   ## Clean-up
   close $tmp_fh;

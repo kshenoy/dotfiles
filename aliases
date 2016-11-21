@@ -124,6 +124,7 @@ alias du3='duh 3'
 alias space='du1 .'
 alias spc=space
 alias pppath='tr ":" "\n" <<< $PATH'
+alias clnpath='export PATH=$(tr ":" "\n" <<< $PATH | perl -ne "print unless \$seen{\$_}++" | paste -s -d":")'
 
 #=================
 # Search related
@@ -202,13 +203,13 @@ alias v="gvim_func"
 
 # Using -f keeps the window in the foreground and prevents a whole bunch of diffs opening at the same time
 alias vd='v -df'
-alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
+# alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
+alias vi='vim --config NONE'
 alias govb='$VISUAL ~/.vim/bundle.vim'
 alias govf='$VISUAL ~/.vim/autoload/my.vim'
 alias govg='$VISUAL ~/.vim/gvimrc'
 alias govm='$VISUAL ~/.vim/plugin/mappings.vim'
 alias govv='$VISUAL ~/.vim/vimrc'
-alias rvv='\rm -rf ~/.vim/junk/views/*'
 
 emacs_func() {
   echo "emacsclient -a '' -c -q -n $@"
