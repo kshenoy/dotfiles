@@ -1,6 +1,6 @@
 " Vim Functions file
 
-function! my#FoldText()
+function! my#FoldText()                                                                                           " {{{1
   " Description: Dhruv Sagar's foldtext
   let line             = getline(v:foldstart)
   let lines_count      = v:foldend - v:foldstart + 1
@@ -15,26 +15,7 @@ function! my#FoldText()
 endfunction
 
 
-"inoremap <Tab> <C-R>=VaryTabs()<CR>
-function! my#VaryTabs()
-  " Description: Make <Tab> put tabs at start of line and spaces elsewhere
-  if &expandtab
-    return "\<Tab>"
-  else
-    let nonwhite = matchend(getline('.'),'\S')
-    if nonwhite < 0 || col('.') <= nonwhite
-      return "\<Tab>"
-    else
-      let pos = virtcol('.')
-      let num = pos + &tabstop
-      let num = num - (num % &tabstop) - pos +1
-      return repeat(" ",num)
-    endif
-  endif
-endfunction
-
-
-function! my#CycleNumbering(...)
+function! my#CycleNumbering(...)                                                                                  " {{{1
   " Description: Cycle through different numbering modes
   " Arguments:
   "   None : Cycle through numbering modes
@@ -60,7 +41,7 @@ function! my#CycleNumbering(...)
 endfunction
 
 
-function! my#MapKey( rhs, mode )
+function! my#MapKey( rhs, mode )                                                                                  " {{{1
   " Description: Get LHS of a mapping. Inverse of maparg().
   " Note that hasmapto() returns a binary result while MapKey() returns the value of the LHS.
   " Pass in a key sequence and the first letter of a vim mode.
@@ -93,7 +74,7 @@ function! my#MapKey( rhs, mode )
 endfunction
 
 
-function! my#ReTab( tabsize, ... )
+function! my#ReTab( tabsize, ... )                                                                                " {{{1
   " Description: Change indentation when tab size is changed.
   "              Primarily used to convert an indentation of eg. 4 to 2 or vice-versa
   " Arguments:
@@ -121,7 +102,7 @@ endfunction
 command! -nargs=* ReTab call my#ReTab(<args>)
 
 
-function! my#UpdateTags()
+function! my#UpdateTags()                                                                                         " {{{1
   " Description: Generate tags ( requires exuberant_ctags )
 
   if (empty($REPO_PATH))
@@ -132,7 +113,7 @@ function! my#UpdateTags()
   execute "!gentags --create -w $REPO_PATH &"
 endfunction
 
-function! my#LoadCscopeDB()
+function! my#LoadCscopeDB()                                                                                       " {{{1
   if !has('cscope')
     return
   endif
@@ -154,7 +135,7 @@ function! my#LoadCscopeDB()
 endfunction
 
 
-function! my#Preserve(command, ...)
+function! my#Preserve(command, ...)                                                                               " {{{1
   " Description: Function to execute commands without modifying the original settings like cursor position, search string etc.
 
   " Find if the command should be executed in visual mode or normal mode
@@ -180,7 +161,7 @@ function! my#Preserve(command, ...)
 endfunction
 
 
-function! my#SynTrace()
+function! my#SynTrace()                                                                                           " {{{1
   " Description: Show syntax highlighting groups for word under cursor
   if !exists("*synstack")
     return
@@ -214,7 +195,7 @@ endfunc
 command! -nargs=0 SynTrace call my#SynTrace()
 
 
-function! my#FoldAllBut( foldminlines )
+function! my#FoldAllBut( foldminlines )                                                                           " {{{1
   " Description: Function to open folds that have less than the specified number of lines
   " We assume that the folds are initially closed
   " If a fold exists and is closed and has lesser number of lines than specified, open it and all nested folds
@@ -226,7 +207,7 @@ function! my#FoldAllBut( foldminlines )
 endfunction
 
 
-function! my#SearchSaveAndRestore(...)
+function! my#SearchSaveAndRestore(...)                                                                            " {{{1
   " Description: Save and restore search strings
   if a:0 && a:1 ==# "get"
     return s:search_str
@@ -241,7 +222,7 @@ function! my#SearchSaveAndRestore(...)
 endfunction
 
 
-function! my#MethodJump( arg )
+function! my#MethodJump( arg )                                                                                    " {{{1
   " Description: Small modification to ]m, [m, ]M, [M to skip over the end of class when using ]m and [m and the start
   "              of the class when using ]M and [M
   " Arguments:
@@ -261,7 +242,7 @@ function! my#MethodJump( arg )
 endfunction
 
 
-function! my#SectionJump(dir, pos)
+function! my#SectionJump(dir, pos)                                                                                " {{{1
   " Description: Jump to next/previous start/end of method
   "              Assumes that the end of the function can be identified by a "}" in the first column
   " Arguments:
@@ -308,7 +289,7 @@ function! my#SectionJump(dir, pos)
 endfunction
 
 
-function! my#FillTW(...)
+function! my#FillTW(...)                                                                                          " {{{1
   " Description: Insert spaces to make the current line as wide as specified by textwidth or the supplied width
   " Arguments:  If argument is supplied use the provided value instead of textwidth to fill
   let l:filler    = nr2char(getchar())
@@ -321,13 +302,13 @@ endfunction
 command! -nargs=? FTW call my#FillTW(<args>)
 
 
-function! my#EatChar( pat )
+function! my#EatChar( pat )                                                                                       " {{{1
   let c = nr2char( getchar(0) )
   return (c =~ a:pat) ? '' : c
 endfunc
 
 
-function! my#CmdIsk( mode )
+function! my#CmdIsk( mode )                                                                                       " {{{1
   " Description: Modify the value of iskeyword by adding a dot or restoring to original value depending upon input arg
   "              Used mainly to make traversing up the directory tree easier in cmd-mode
   " Arguments:
@@ -343,7 +324,7 @@ function! my#CmdIsk( mode )
 endfunction
 
 
-function! my#MagicSave(...)
+function! my#MagicSave(...)                                                                                       " {{{1
   " Description: If directory does not exist, create while saving the file
   if a:0
     let directory = fnamemodify(a:1, ':p:h')
@@ -360,7 +341,7 @@ endfunction
 command! -nargs=? WW call my#MagicSave(<q-args>)
 
 
-function! my#CursorBlind()
+function! my#CursorBlind()                                                                                        " {{{1
   " Description: Flash the cursorcolumn and cursorline till the cursor is moved
   if &cuc || &cul
     set nocursorline nocursorcolumn
@@ -377,8 +358,9 @@ function! my#CursorBlind()
 endfunction
 
 
-" Motion for "next/last object". For example, "din(" would go to the next "()" pair and delete its contents.
-function! s:NextTextObject(motion, dir)
+function! s:NextTextObject(motion, dir)                                                                           " {{{1
+  " Description: Motion for "next/last object".
+  "              eg. "din(" would go to the next "()" pair and delete its contents.
   let c = nr2char(getchar())
 
   if c ==# "b"
@@ -402,18 +384,9 @@ endfunction
 "onoremap ip :<C-U>call <SID>NextTextObject('i', 'F')<CR>
 "xnoremap ip :<C-U>call <SID>NextTextObject('i', 'F')<CR>
 
-function! my#TabularChar()
-  " Description:
-  let char = escape(nr2char( getchar() ), '$*[]\/')
-  "echo "Tabularize /" . char . "/l0r0"
-  normal! gv
-  execute "Tabularize /" . char . "/l0r0"
-endfunction
 
-
-""
-" Description: Returns a list of open buffers
-function! my#BuffersList()
+function! my#BuffersList()                                                                                        " {{{1
+  " Description: Returns a list of open buffers
   let res = []
   for b in range(1, bufnr('$'))
     if buflisted(b)
@@ -424,16 +397,15 @@ function! my#BuffersList()
 endfunction
 
 
-""
-" Description: Find all the lines that contain the search term and display them in the location list
-" Arguments:
-"   scope (str) "local"    : Find only with the current buffer and display results in a location list
-"               "global"   : Find across all windows and display results in a quickfix list
-"   mode  (str) "normal"   : The default mode. Use the default value if provided one
-"               "visual"   : Use the value stored in @* to search
-"               "prev"     : Use the previously searched term
-"   default (a:1, str)     : Default value to be specified at the "Find:" prompt. Meaningful only in "normal" mode
-function! my#FindAndList( scope, mode, ... )
+function! my#FindAndList( scope, mode, ... )                                                                      " {{{1
+  " Description: Find all the lines that contain the search term and display them in the location list
+  " Arguments:
+  "   scope (str) "local"    : Find only with the current buffer and display results in a location list
+  "               "global"   : Find across all windows and display results in a quickfix list
+  "   mode  (str) "normal"   : The default mode. Use the default value if provided one
+  "               "visual"   : Use the value stored in @* to search
+  "               "prev"     : Use the previously searched term
+  "   default (a:1, str)     : Default value to be specified at the "Find:" prompt. Meaningful only in "normal" mode
   let prompt = ( a:0 > 0 ? a:1 : "" )
   if a:mode ==? "visual"
     let prompt = escape(@*, '$*[]/')
@@ -463,8 +435,8 @@ function! my#FindAndList( scope, mode, ... )
 endfunction
 
 
-" Set up tab labels with tab number, buffer name, number of windows
-function! my#GuiTabLabel()
+function! my#GuiTabLabel()                                                                                        " {{{1
+  " Description: Set up tab labels with tab number, buffer name, number of windows
   if (exists('t:guitablabel'))
     return t:guitablabel
   endif
@@ -500,8 +472,8 @@ function! my#GuiTabLabel()
 endfunction
 
 
-" Set up tab tooltips to show every buffer name
-function! my#GuiTabToolTip()
+function! my#GuiTabToolTip()                                                                                      " {{{1
+  " Description: Set up tab tooltips to show every buffer name
   let tip = ''
   let bufnrlist = tabpagebuflist(v:lnum)
   for bufnr in bufnrlist
@@ -534,8 +506,8 @@ function! my#GuiTabToolTip()
   return tip
 endfunction
 
-" Copy/modify highlight groups
-function! my#GetHighLightInfo( hl_group )
+function! my#GetHighLightInfo( hl_group )                                                                         " {{{1
+  " Description: Copy/modify highlight groups
   let l:hlTrace = [a:hl_group]
   redir => l:hl_info_str
   execute 'silent highlight ' . a:hl_group
@@ -562,7 +534,8 @@ function! my#GetHighLightInfo( hl_group )
   return l:hl_info
 endfunction
 
-function! my#SetHighLightInfo( hl_group, hl_info )
+
+function! my#SetHighLightInfo( hl_group, hl_info )                                                                " {{{1
   let l:hl_cmd = 'highlight ' . a:hl_group . ' '
   for l:attr in keys(a:hl_info)
     if (l:attr ==? 'trace')
@@ -574,7 +547,8 @@ function! my#SetHighLightInfo( hl_group, hl_info )
   execute l:hl_cmd
 endfunction
 
-function! my#WindowSwap()
+
+function! my#WindowSwap()                                                                                         " {{{1
   " Description: Swap windows. Works similar to tommcdo's vim-exchange plugin but with windows
   "              When only 2 windows are open in the current tab, execute '<C-W>x'
   "              Calling this the first time selects the 1st window of the pair to swap.
@@ -610,7 +584,8 @@ function! my#WindowSwap()
   unlet g:WindowSwap_Win1
 endfunction
 
-function! my#CscopeMap(view, exec, ...)
+
+function! my#CscopeMap(view, exec, ...)                                                                           " {{{1
   " Description: One function to execute cscope commands instead of a ton of mappings
   " Arguments:
   "   view (char) : How to display results (l: Location list, s: Horizontal split, v: Vertical split)
@@ -681,18 +656,8 @@ function! my#CscopeMap(view, exec, ...)
 endfunction
 
 
-function! my#Set(var, default)
-  if !exists(a:var)
-    if type(a:default)
-      execute 'let' a:var '=' string(a:default)
-    else
-      execute 'let' a:var '=' a:default
-    endif
-  endif
-endfunction
-
-" Modify selected text using combining diacritics
-function! my#CombineSelection(line1, line2, cp)
+function! my#CombineSelection(line1, line2, cp)                                                                   " {{{1
+  " Description: Modify selected text using combining diacritics
   execute 'let char = "\u' . a:cp . '"'
   execute a:line1 . ',' . a:line2 . 's/\%V[^[:cntrl:]]/&' . char . '/ge'
 endfunction
@@ -702,26 +667,28 @@ command! -range -nargs=0 DoubleUnderline call my#CombineSelection(<line1>, <line
 command! -range -nargs=0 Strikethrough   call my#CombineSelection(<line1>, <line2>, '0336')
 
 
-function! my#WindowMoveWrap(dir)
-  let l:dir_opposite = { 'h':'l', 'j':'k', 'k':'j', 'l':'h' }
-  let l:win_curr = winnr()
-  execute "wincmd " . dir
-endfunction
+function! my#SetupMergeLayout()                                                                                   " {{{1
+  " Description: Setup layout for merges
+  "              Tab 1: Main window with all 4 panes (Clockwise from top-left)
+  "                - Base (Original), Remote (Theirs), Local (Yours) and Merge
+  "              Tab 2: Diff of Base v/s Remote
+  "              Tab 3: Diff of Base v/s Local
+  "              Tab 4: Diff of Remote v/s Local
+  "              Tab 5: Diff of Remote v/s Merge
+  "              Tab 6: Diff of Local  v/s Merge
+  "
+  "              Git     v/s  Perforce
+  "              Base     |   Original
+  "              Remote   |   Theirs
+  "              Local    |   Yours
+  "              Merge    |   Merge
 
+  " Arguments: All arguments are optional and the only thing they're used for is to name the tabs
+  let l:base_str   = get(a:000, 0, 'Base')
+  let l:remote_str = get(a:000, 1, 'Remote')
+  let l:local_str  = get(a:000, 2, 'Local')
+  let l:merge_str  = get(a:000, 3, 'Merge')
 
-" Setup layout for merges
-" Tab 1: Main window with all 4 panes (Clockwise from top-left) - Base (Original), Remote (Theirs), Local (Yours) and Merge
-" Tab 2: Diff of Base v/s Remote
-" Tab 3: Diff of Base v/s Local
-" Tab 4: Diff of Remote v/s Local
-" Tab 5: Diff of Remote v/s Merge
-" Tab 6: Diff of Local  v/s Merge
-function! my#SetupMergeLayout()
-  " ArgList:
-  " 0. Base
-  " 1. Remote/Theirs
-  " 2. Local/Yours
-  " 3. Merge
   let l:base   = argv(0)
   let l:remote = argv(1)
   let l:local  = argv(2)
@@ -748,7 +715,7 @@ function! my#SetupMergeLayout()
   wincmd v
   exec "b " . l:remote
   windo diffthis
-  let t:guitablabel='Original v/s Theirs'
+  let t:guitablabel = l:base_str . ' v/s ' . l:remote_str
 
   " Diff - Base vs Local
   exec "tabe " . l:base
@@ -756,7 +723,7 @@ function! my#SetupMergeLayout()
   exec "b " . l:local
   set readonly
   windo diffthis
-  let t:guitablabel='Original v/s Yours'
+  let t:guitablabel = l:base_str . ' v/s ' . l:local_str
 
   " Diff - Remote vs Local
   exec "tabe " . l:remote
@@ -764,14 +731,14 @@ function! my#SetupMergeLayout()
   exec "b " . l:local
   set readonly
   windo diffthis
-  let t:guitablabel='Theirs v/s Yours'
+  let t:guitablabel = l:remote_str . ' v/s ' . l:local_str
 
   " Diff - Remote vs Merge
   exec "tabe " . l:remote
   wincmd v
   exec "b " . l:merge
   windo diffthis
-  let t:guitablabel='Theirs v/s Merge'
+  let t:guitablabel = l:remote_str . ' v/s Merge'
 
   " Diff - Local vs Merge
   exec "tabe " . l:local
@@ -779,87 +746,22 @@ function! my#SetupMergeLayout()
   exec "b " . l:merge
   set readonly
   windo diffthis
-  let t:guitablabel='Yours v/s Merge'
+  let t:guitablabel = l:local_str . ' v/s Merge'
 
-  set columns=420
+  set columns=400
   tabdo wincmd =
   tabfirst
 endfunction
 
 
-function! my#P4ConflictMarker(reverse, ...)
-  let l:flags = 'W' . (a:reverse ? 'b' : '') . get(a:000, 0, '')
-  return search('\M^\(>>>> ORIGINAL\|==== THEIRS\|==== YOURS\|<<<<\)', l:flags)
-endfunction
-
-function! my#P4ConflictMotion(ai, ...)
-  let l:block = get(a:000, 0, '')
-  let l:start_pat = '\M^\(>>>> ORIGINAL\|==== THEIRS\|==== YOURS\|<<<<\)'
-  let l:end_pat   = '\M^\(==== THEIRS\|==== YOURS\|<<<<\)'
-
-  if (l:block ==# 'ORIGINAL')
-    let l:start_pat = '\M^>>>> ORIGINAL'
-    let l:end_pat   = '\M^\(==== THEIRS\|==== YOURS\|<<<<\)'
-  elseif (l:block ==# 'THEIRS')
-    let l:start_pat = '\M^==== THEIRS'
-    let l:end_pat   = '\M^\(==== YOURS\|<<<<\)'
-  elseif (l:block ==# 'YOURS')
-    let l:start_pat = '\M^==== YOURS'
-    let l:end_pat   = '\M^<<<<'
-  endif
-
-  " Find starting line of any block
-  if (getline('.') =~ '\M^<<<<')
-    -
-  endif
-  if (search(l:start_pat, 'bWc') != 0)
-    let l:start = line('.')
-  elseif (search(l:start_pat, 'W') != 0)
-    let l:start = line('.')
-  else
-    echo "DEBUG: No start in sight"
-    return
-  endif
-  if (a:ai ==# 'i')
-    +
-    let l:start += 1
-  endif
-
-  " Find ending line of any block
-  let l:end = search(l:end_pat, 'Wn')
-  if (l:end == 0)
-    echo "DEBUG: No end in sight"
-    return
-  endif
-  let l:end -= 1
-
-  if (l:start > l:end)
-    echoe "Shit's fucked up!"
-  else
-    execute 'normal! V' . (l:end - l:start) . 'j'
-  endif
-endfunction
-
-noremap  ]C :call my#P4ConflictMarker(0)<CR>
-noremap  [C :call my#P4ConflictMarker(1)<CR>
-xnoremap iC :call my#P4ConflictMotion('i')<CR>
-xnoremap aC :call my#P4ConflictMotion('a')<CR>
-onoremap iC :call my#P4ConflictMotion('i')<CR>
-onoremap aC :call my#P4ConflictMotion('a')<CR>
-
-nmap dgo d:call my#P4ConflictMotion('a', 'THEIRS')<CR>d:call my#P4ConflictMotion('a','YOURS')<CR>dd[Cdd
-nmap dgt d:call my#P4ConflictMotion('a', 'ORIGINAL')<CR>d:call my#P4ConflictMotion('a','YOURS')<CR>dd[Cdd
-nmap dgy d:call my#P4ConflictMotion('a', 'ORIGINAL')<CR>d:call my#P4ConflictMotion('a','THEIRS')<CR>dd]Cdd
+" function! my#SetDiffFileType()                                                                                  " {{{1
+"   let l:filetype=''
+"   windo if (l:filetype == '')|let l:filetype=&filetype|endif
+"   windo let &filetype=l:filetype
+" endfunction
 
 
-function! my#SetDiffFileType()
-  let l:filetype=''
-  windo if (l:filetype == '')|let l:filetype=&filetype|endif
-  windo let &filetype=l:filetype
-endfunction
-
-
-function! my#GetWindowColumnsWidth()
+function! my#GetWindowColumnsWidth()                                                                              " {{{1
   " Get the width of the decorative columns of the CURRENT window
 
   let l:width = 0
@@ -899,7 +801,7 @@ function! my#GetWindowColumnsWidth()
 endfunction
 
 
-function! my#Journal(cmd, ...)
+function! my#Journal(cmd, ...)                                                                                    " {{{1
   " Description: Execute cmd and return the output as a list of lines.
   "              If an additional argument is provided, use it to filter the output.
   " Arguments:   cmd - The command to execute
@@ -921,17 +823,39 @@ function! my#Journal(cmd, ...)
   endif
 endfunction
 
+
+function! my#WindowToggleZoom ()                                                                                  " {{{1
+  " Description: Zoom/unzoom similar to TMUX
+
+  if (winnr('$') == 1)
+    return
+  endif
+
+  let l:restore_cmd = winrestcmd()
+  wincmd |
+  wincmd _
+
+  " If zomming has no effect, we need to undo it.
+  if (l:restore_cmd ==# winrestcmd())
+    exe t:zoom_restore
+  else
+    let t:zoom_restore = l:restore_cmd
+  endif
+endfunction
+" }}}1
+
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Temporary function only
+" Temporary functions only
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! my#_RemoveAllErrInBut_(num)
+function! my#_RemoveAllErrInBut_(num)                                                                             " {{{1
   silent! execute '%g/L3ErrPkt/ s/\v,? \[(0x)?[^' . a:num . ']\]\=[^,}]+//g'
   silent! execute '%g/L3ErrPkt/ s/\vErrIn\w*\=\zs\{\[' . a:num . '\]\=([^}]+)\}/\1/g'
 endfunction
 "nnoremap K :<C-U>call my#TestFunc(v:count, v:count1)<CR>
 
 
-function! my#Bisect()
+function! my#Bisect()                                                                                             " {{{1
   let l:pos=getpos('.')
   norm %
   let l:pos[1]=(l:pos[1]+line('.'))/2

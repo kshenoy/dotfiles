@@ -712,7 +712,8 @@ Languages which can be evaluated in Org-mode buffers.
                                        '((python     . t)
                                          (ruby       . t)
                                          (perl       . t)
-                                         (sh         . t))))
+                                         (sh         . t)
+                                         (dot        . t))))
 #+end_src
 
 Ask for confirmation before evaluating? NO!

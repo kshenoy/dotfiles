@@ -1,6 +1,6 @@
 # Roots of the synchronization
 root = /home/ks/Dropbox
-root = ssh://kshenoy@atlr5n4-0537//home/kshenoy/Dropbox
+root = ssh://kshenoy@atlhen-vdi0653//home/kshenoy/Dropbox
 
 #          Causes Unison to double-check, at the end of update detection,
 #          that PATH exists and abort if it does not. This is useful when

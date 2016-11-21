@@ -24,19 +24,32 @@ endfunction
 
 function! perforce#MergeInit()                                                                                    " {{{1
   " Description: Sets up merge layout and creates keybindings
-  call s:SetupMergeLayout()
+  call s:SetupMergeLayout('Original', 'Theirs', 'Yours', 'Merge')
   call s:CreateMaps()
 endfunction
 
 
-function! s:SetupMergeLayout()                                                                                    " {{{1
+function! s:SetupMergeLayout(...)                                                                                 " {{{1
   " Description: Setup layout for merges
-  "              Tab 1: Main window with all 4 panes (Clockwise from top-left) - Base (Original), Remote (Theirs), Local (Yours) and Merge
+  "              Tab 1: Main window with all 4 panes (Clockwise from top-left)
+  "                - Base (Original), Remote (Theirs), Local (Yours) and Merge
   "              Tab 2: Diff of Base v/s Remote
   "              Tab 3: Diff of Base v/s Local
   "              Tab 4: Diff of Remote v/s Local
   "              Tab 5: Diff of Remote v/s Merge
   "              Tab 6: Diff of Local  v/s Merge
+  "
+  "              Git     v/s  Perforce
+  "              Base     |   Original
+  "              Remote   |   Theirs
+  "              Local    |   Yours
+  "              Merge    |   Merge
+
+  " Arguments: All arguments are optional and the only thing they're used for is to name the tabs
+  let l:base_str   = get(a:000, 0, 'Base')
+  let l:remote_str = get(a:000, 1, 'Remote')
+  let l:local_str  = get(a:000, 2, 'Local')
+  let l:merge_str  = get(a:000, 3, 'Merge')
 
   let l:base   = argv(0)
   let l:remote = argv(1)
@@ -64,7 +77,7 @@ function! s:SetupMergeLayout()                                                  
   wincmd v
   exec "b " . l:remote
   windo diffthis
-  let t:guitablabel='Original v/s Theirs'
+  let t:guitablabel = l:base_str . ' v/s ' . l:remote_str
 
   " Diff - Base vs Local
   exec "tabe " . l:base
@@ -72,7 +85,7 @@ function! s:SetupMergeLayout()                                                  
   exec "b " . l:local
   set readonly
   windo diffthis
-  let t:guitablabel='Original v/s Yours'
+  let t:guitablabel = l:base_str . ' v/s ' . l:local_str
 
   " Diff - Remote vs Local
   exec "tabe " . l:remote
@@ -80,14 +93,14 @@ function! s:SetupMergeLayout()                                                  
   exec "b " . l:local
   set readonly
   windo diffthis
-  let t:guitablabel='Theirs v/s Yours'
+  let t:guitablabel = l:remote_str . ' v/s ' . l:local_str
 
   " Diff - Remote vs Merge
   exec "tabe " . l:remote
   wincmd v
   exec "b " . l:merge
   windo diffthis
-  let t:guitablabel='Theirs v/s Merge'
+  let t:guitablabel = l:remote_str . ' v/s Merge'
 
   " Diff - Local vs Merge
   exec "tabe " . l:local
@@ -95,15 +108,17 @@ function! s:SetupMergeLayout()                                                  
   exec "b " . l:merge
   set readonly
   windo diffthis
-  let t:guitablabel='Yours v/s Merge'
+  let t:guitablabel = l:local_str . ' v/s Merge'
 
-  set columns=420
+  set columns=400
   tabdo wincmd =
   tabfirst
 endfunction
 
 
-function! s:ConflictInnerMotion(fwd, ...)                                                                         " {{{1
+function! s:ConflictMotion(fwd, ...)                                                                              " {{{1
+  " Description: Jump to the next/previous conflict marker.
+  "              The optional argument can be used to specify any additional flags
   let l:flags = 'W' . (a:fwd ? '' : 'b') . get(a:000, 0, '')
   return search('\M^\(>>>> ORIGINAL\|==== THEIRS\|==== YOURS\|<<<<\)', l:flags)
 endfunction
@@ -157,7 +172,7 @@ function! s:ConflictInnerMotion(ai, ...)                                        
   endif
 endfunction
 
-function! s:CreateMaps()
+function! s:CreateMaps()                                                                                          " {{{1
   noremap  ]C :call <SID>ConflictMotion(0)<CR>
   noremap  [C :call <SID>ConflictMotion(1)<CR>
   xnoremap iC :call <SID>ConflictInnerMotion('i')<CR>

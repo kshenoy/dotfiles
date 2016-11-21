@@ -51,20 +51,16 @@ onoremap <silent> <expr> W (v:count > 1 ? ":normal! " . v:count . "W<CR>" : ":no
 """ Save read-only files with sudo
 command! W w !sudo tee % > /dev/null
 
-""" Making line-completion consistent with word-completion for Ctrl+N
-inoremap <C-X><C-L> <C-X><C-L><C-N><C-N>
-
 """ Show full file path while opening file
 cabbrev %% <C-R>=fnameescape( expand( '%:p' ))<CR>
 nnoremap <leader>s% :source <C-R>=fnameescape( expand( '%:p' ))<CR><CR>
 cabbrev <expr> E (( getcmdtype() == ':' && getcmdpos() <= 2 ) ? 'e <C-R>=fnameescape( expand( "%:p:h" ))."/"<CR><C-R>=my#EatChar("\\s")<CR>' : 'E' )
 
 """ Display full path and filename
-" nnoremap <silent> <C-G> :redir => info<BAR>silent! exe "norm! 2\<C-G>"<BAR>silent! exe "normal! g\<C-G>"<BAR>redir END<BAR>echo join(split(g:info, "\n"))<CR>
 nnoremap <C-G> 2<C-G>
 
-" Copy the file name to unix visual select buffer
-" nnoremap <expr> z<C-g> ':let @' . (has('win_32') ? '+' : '*') . "'" . <C-R>=join([expand("%:p"), line(".")], ":")\<CR> . "'"
+""" Copy the file name to unix visual select buffer
+nnoremap <expr> y<C-G> ':let @' . (has('win_32') ? '+' : '*') . '="' . expand("%:p") . '"<CR>'
 
 """ Open help in a vertically split window. Use `:set splitright` to open on the right
 cabbrev <expr> h (( getcmdtype() == ':' && getcmdpos() <= 2 ) ? 'vert bo h' : 'h' )
@@ -131,7 +127,7 @@ nnoremap <silent> <f  :<C-U>DecFontSize<CR>
 nnoremap =f :set guifont=*<CR>
 
 """ Fill Text Width
-nnoremap <silent> <leader>fw :FTW 120<CR>
+nnoremap <silent> <leader>fw :FTW<CR>
 
 """ Toggle ColorColumn
 nnoremap <silent> <expr> cok ':set colorcolumn=' . (&colorcolumn=='0' ? '+1' : 0) . '<CR>'
@@ -202,18 +198,23 @@ nnoremap <S-BS>   :bp<BAR>bd#<CR>
 """ Windows
 " Swap Windows
 nnoremap <silent> <C-W><C-X> :call my#WindowSwap()<CR>
+
 " Force close and re-split
 nnoremap <silent> <C-W><S-V> <C-W><C-O><C-W><C-V>
 nnoremap <silent> <C-W><S-S> <C-W><C-O><C-W><C-S>
+
 " Close windows above/below/to the left/right of the current one
 nnoremap <silent> <C-W><S-C>h <C-W><C-H><C-W>c
 nnoremap <silent> <C-W><S-C>j <C-W><C-J><C-W>c
 nnoremap <silent> <C-W><S-C>k <C-W><C-K><C-W>c
 nnoremap <silent> <C-W><S-C>l <C-W><C-L><C-W>c
 
+" Toggle Zoom
+nnoremap + :<C-U>call my#WindowToggleZoom()<CR>
+
 
 """ Tab operations
-if v:version >= 700 && has('gui_running')
+if v:version >= 700
   " Open file in new tab next to current tab
   "nnoremap <silent> gt :let tabnum=tabpagenr()<CR><C-W>gf:execute 'silent! tabmove '.tabnum<CR>
 

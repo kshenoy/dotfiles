@@ -6,7 +6,7 @@
 export TZ="US/Mountain"
 
 # Putting this before ruby because ruby binary is in pandora
-PATH=/tool/pandora64/bin:/tool/pandora/bin:$PATH
+PATH=/tool/pandora64/.package/vim-7.4-a/bin:/tool/pandora64/bin:/tool/pandora/bin:$PATH
 
 complete -f -o default -X '!*.xml' ljd
 complete -f -o default -X '!*.vv' vv

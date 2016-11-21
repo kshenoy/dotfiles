@@ -15,6 +15,7 @@ unity/
 vim/autoload/plug*
 vim/bundle
 vim/tmp
+vim/pythonx/UltiSnips_globals.pyc
 wallpapers/
 zsh/history
 zsh/oh-my-zsh/

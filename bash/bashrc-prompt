@@ -369,7 +369,7 @@ _get_vcs_branch_() {                                                            
 
 
 unset -f _get_compact_pwd_
-_get_compact_pwd_() {
+_get_compact_pwd_() {                                                                                             # {{{2
   # Contract the following:
   #   /proj/ch_func_dev{1:0}/ASPEN_HIGHLANDS -> ~AH{1:0}
   # Contract more if it's my directory

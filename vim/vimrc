@@ -122,7 +122,7 @@ set hlsearch                                                                 " S
 "set cursorcolumn                                                                     " Highlight the line of the cursor
 "set cursorline                                                                     " Highlight the column of the cursor
 if exists('+colorcolumn')
-  set colorcolumn=121
+  set colorcolumn=+1
 endif
 "set spell
 set spelllang=en_us
@@ -233,8 +233,9 @@ set wrapmargin=0                                                             " M
 set backspace=indent,eol,start        " Allow backspace to erase previously entered characters, autoindent, and newlines
 set formatoptions+=j                                                        " Remove a comment leader when joining lines
 set formatoptions+=n                                                                          " Recognize numbered lists
-set complete=.,w,b,u,t                              " Scan current buffer, other buffers and tags but not included files
-set completeopt=longest,menu
+set complete=.,w,b,u,t,kspell   " Scan current buffer, open windows, other unloaded buffers, tags but not included files
+set completeopt=menu,menuone,noinsert                                                           " Insert mode completion
+set pumheight=20
 set omnifunc=syntaxcomplete#Complete                             " Function for filetype-specific Insert mode completion
 set showmatch                                                                                     " Show matching braces
 set nojoinspaces                                   " Don't insert two spaces after a period with every joining of lines.
@@ -392,24 +393,23 @@ let g:netrw_liststyle=3
 command! -bar -nargs=0 IncFontSize :let &guifont = substitute(&guifont, '\d\+', '\=submatch(0)+1', 'g')
 command! -bar -nargs=0 DecFontSize :let &guifont = substitute(&guifont, '\d\+', '\=submatch(0)-1', 'g')
 
-command! -bar -nargs=0 P4DIFF execute "!p4 diff " . expand('%:p') . " &"
+" command! -bar -nargs=0 P4DIFF execute "!p4 diff " . expand('%:p') . " &"
 
 """ Autocommands                                                                                                    {{{2
 if has('autocmd')
   " File and view saving related
-  augroup Saving
-    autocmd!
-    "autocmd FocusLost   * silent! wall
-    "autocmd BufWinLeave * silent! mkview
-    "autocmd BufWinEnter * silent! loadview
-    "" Jump to the last cursor position
-    "autocmd BufReadPost *
-    "  \ if line("'\"") > 0 && line("'\"") <= line("$") |
-    "  \   execute 'normal! g`"zvzz' |
-    "  \ endif
-    "autocmd BufWritePost * call my#UpdateTags()
-    autocmd BufWritePost * if &diff | diffupdate | endif
-  augroup END
+  " augroup Saving
+  "   autocmd!
+  "   autocmd FocusLost   * silent! wall
+  "   autocmd BufWinLeave * silent! mkview
+  "   autocmd BufWinEnter * silent! loadview
+  "   " Jump to the last cursor position
+  "   autocmd BufReadPost *
+  "     \ if line("'\"") > 0 && line("'\"") <= line("$") |
+  "     \   execute 'normal! g`"zvzz' |
+  "     \ endif
+  "   autocmd BufWritePost * call my#UpdateTags()
+  " augroup END
 
   " Resize split windows when size of xterm's window changes
   augroup Geometry
@@ -426,7 +426,8 @@ if has('autocmd')
   " Diff related
   augroup Diff
     autocmd!
-    autocmd VimEnter * if &diff|call my#SetDiffFileType()|endif
+    autocmd BufWritePost * if &diff | diffupdate | endif
+    " autocmd VimEnter * if &diff|call my#SetDiffFileType()|endif
   augroup END
 endif
 " }}}2 }}}1
