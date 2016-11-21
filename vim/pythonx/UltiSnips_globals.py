@@ -1,4 +1,5 @@
 ## Python helper functions for UltiSnips
+# vim:fileencoding=utf-8:
 
 # Provides completion menu for snippets
 def complete(t, opts):
@@ -9,4 +10,4 @@ def complete(t, opts):
   elif len(opts) == 0:
     return ""
   # return os.path.commonprefix(opts) + "  (" + " | ".join(opts) + ")"
-  return "  (" + " | ".join(opts) + ")"
+  return "  ...(" + " | ".join(opts) + ")"

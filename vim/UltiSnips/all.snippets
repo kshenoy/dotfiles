@@ -2,7 +2,7 @@
 # have snippets for signatures and often needed texts
 
 # sligthly lower priority than everything else since specialized versions
-# should overwrite. The user needs to adjust her priority in her snippets to
+# should overwrite. The user needs to adjust the priority in their snippets to
 # ~-55 so that other filetypes will still overwrite.
 priority -60
 
@@ -73,5 +73,6 @@ endsnippet
 snippet modeline "Vim modeline"
 vim`!v ':set '. (&expandtab ? printf('et sw=%i ts=%i', &sw, &ts) : printf('noet sts=%i sw=%i ts=%i', &sts, &sw, &ts)) . (&tw ? ' tw='. &tw : '') . ':'`
 endsnippet
+
 
 # vim:ft=snippets:

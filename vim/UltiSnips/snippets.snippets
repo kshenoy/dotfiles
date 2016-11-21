@@ -1,3 +1,5 @@
+# snippets.snippets - Snippets for snippets file type
+#
 priority -50
 
 #===========================================================================
@@ -26,5 +28,18 @@ endsnippet
 snippet vis "${VISUAL}" i
 \$\{VISUAL${1:${2:default}${3:/transform/}}\}
 endsnippet
+
+
+
+#===========================================================================
+# Skeleton
+##
+snippet _skel "Template for new files" b
+`!p snip.rv = "# " + snip.basename + ".snippets - Snippets for " + snip.basename + " file type"`
+# vim:ft=snippets:
+#
+$0
+endsnippet
+
 
 # vim:ft=snippets:

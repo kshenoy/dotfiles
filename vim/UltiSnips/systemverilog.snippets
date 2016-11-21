@@ -1,4 +1,4 @@
-# vim:ft=snippets:
+# systemverilog.snippets - Snippets for systemverilog file type
 #
 # $0 - Final position of cursor
 #
@@ -21,29 +21,33 @@ always$1`!p snip.rv = complete( t[1], ['_comb', '_ff', '_latch'] )`
 endsnippet
 
 
+pre_expand "snip.buffer[snip.line] = 'always'; snip.cursor.preserve()"
 snippet always "always @( posedge clock ) .."
-always @(${1:posedge clock}${2: or negedge reset}) begin
+ @(${1:posedge clock}${2: or negedge reset}) begin
   ${0}
 end
 endsnippet
 
 
+pre_expand "snip.buffer[snip.line] = 'always_comb'; snip.cursor.preserve()"
 snippet always_comb "always_comb .."
-always_comb begin
+ begin
   ${0}
 end
 endsnippet
 
 
+pre_expand "snip.buffer[snip.line] = 'always_ff'; snip.cursor.preserve()"
 snippet always_ff "always_ff .."
-always_ff @( ${1:posedge clk or negedge reset_n} )
+ @( ${1:posedge clk or negedge reset_n} )
   ${0}
 end
 endsnippet
 
 
+pre_expand "snip.buffer[snip.line] = 'always_latch'; snip.cursor.preserve()"
 snippet always_latch "always_latch .."
-always_latch
+
   ${0}
 end
 endsnippet
@@ -251,3 +255,6 @@ snippet 'ovl_(01h|zero_one_hot)' "ovl_zero_one_hot" br
 ovl_zero_one_hot #(.msg(${1})) assert_${2}
    (.test_expr(${0}), .clock(CONV_ABV_CLK), .reset(1'b1), .enable(CONV_ABV_EN), .fire());
 endsnippet
+
+
+# vim:ft=snippets:

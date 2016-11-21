@@ -1,5 +1,5 @@
-# vim:ft=snippets:
-
+# vim.snippets - Snippets for vim file type
+#
 #===========================================================================
 # Global functions
 #
@@ -14,7 +14,7 @@ endglobal
 #
 snippet if "if..." b
 if ($1)
-  $0
+  ${VISUAL}$0
 endif
 endsnippet
 
@@ -27,26 +27,30 @@ endsnippet
 
 snippet eli "elseif..." w
 elseif ($1)
-  $0
+  ${VISUAL}$0
 endsnippet
 
 snippet el "else..." w
 else
-  $0
+  ${VISUAL}$0
 endsnippet
 
 
-snippet test "Test"
-`!p snip.rv = path`
-endsnippet
 snippet fu "function" b
-function! ${1:`!p
-if "autoload" in path:
-  basename = os.path.splitext(path)[0]
-  snip.rv = re.sub(r'^.*?autoload/', '', basename).replace('/','#')
-else:
-  snip.rv = path`} (${2})
+function! `!v substitute(substitute((expand('%:p') =~ "autoload" ? expand('%:p:r') : ""), '^.*autoload/', '', ''), '/', '#', '') . '#'`${1:funcName} (${2})
+  " Description:
 
   $0
-endfunction " $1
+endfunction
 endsnippet
+
+
+snippet aug "autogroup" b
+augroup ${1:augroup_Name}
+  autocmd!
+  ${VISUAL}$0
+augroup END
+endsnippet
+
+
+# vim:ft=snippets:

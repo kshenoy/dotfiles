@@ -4,7 +4,7 @@ if !has('python') && !has('python3')
 endif
 
 function! s:InsertSkeleton()
-  execute "normal! i_skeleton\<C-R>=UltiSnips#ExpandSnippet()\<CR>"
+  execute "normal! i_skel\<C-R>=UltiSnips#ExpandSnippet()\<CR>"
 
   if !g:ulti_expand_res
     silent! undo
