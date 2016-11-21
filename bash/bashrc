@@ -109,7 +109,7 @@ mkdir -p $(dirname ${HISTFILE})
 ## TERMINAL
 # Set terminal to mimic titeInhibit = true
 MANPAGER=less
-PAGER='~/bin/vim --config NONE -R -c "nnoremap <silent> q :qall!<CR>" -c "syntax on"'
+PAGER='~/bin/vim --config NONE -R -c "nnoremap <silent> q :qall!<CR>" -c "syntax on" -c "set cursorline"'
 EDITOR=vim
 VISUAL=gvim
 
@@ -182,6 +182,11 @@ for i in \
   # echo "  ... done"
   fi
 done
+
+
+# Base16 Color scheme for terminal
+BASE16_SHELL=$HOME/.config/base16-shell
+[[ -n "$PS1" ]] && [[ -s $BASE16_SHELL/profile_helper.sh ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
 
 
 # Keep PATH customizations at the end
