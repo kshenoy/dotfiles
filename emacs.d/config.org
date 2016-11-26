@@ -340,7 +340,7 @@ Undo and Redo changes in window configuration. Use =C-c right= and =C-c left= to
 
 #+BEGIN_SRC emacs-lisp
   (use-package server
-    :disabled
+    ;; :disabled
     :config
     (unless (or (daemonp) (server-running-p))
       (server-mode 1))
@@ -348,8 +348,9 @@ Undo and Redo changes in window configuration. Use =C-c right= and =C-c left= to
 #+END_SRC
 
 Alias for emacsclient:
+This will launch emacsclient if a server is already running and launch emacs if not
 #+BEGIN_EXAMPLE
-alias e="emacsclient --no-wait --alternate-editor=\"\" --create-frame"
+  alias e='emacsclient --alternate-editor="emacs" --create-frame'
 #+END_EXAMPLE
 
 ** Mouse
@@ -669,6 +670,7 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
   ;; (setq org-speed-commands-user nil)
   (setq org-startup-align-all-tables nil)
   ;; (setq org-log-into-drawer nil)
+  (setq org-use-property-inheritance t)
   (setq org-tags-column -80)
   (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
   (setq org-blank-before-new-entry '((heading . t) (plain-list-item . nil)))
@@ -1039,7 +1041,7 @@ http://emacs.stackexchange.com/a/21173/9690
 * Programming Languages Course on Coursera
 [[http://tuhdo.github.io/emacs-for-proglang.html][Starter Kit]] from [[https://reddit.com/u/tuhdo][tuhdo]]
 
-** sml-mode
+** COMMENT sml-mode
 #+BEGIN_SRC emacs-lisp
   (use-package sml-mode
     :config

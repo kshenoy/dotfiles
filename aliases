@@ -211,11 +211,9 @@ alias govg='$VISUAL ~/.vim/gvimrc'
 alias govm='$VISUAL ~/.vim/plugin/mappings.vim'
 alias govv='$VISUAL ~/.vim/vimrc'
 
-emacs_func() {
-  echo "emacsclient -a '' -c -q -n $@"
-  emacsclient -a "" -c -q -n "$@"
+e() {
+  emacsclient -a "emacs" -c -q "$@" &
 }
-alias e="emacs"
 alias edbg="e --debug-init"
 
 #===============
