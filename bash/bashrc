@@ -2,6 +2,9 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # Kartik Shenoy (kartik.shenoy@amd.com)
 
+# shopt -q login_shell && echo "Login shell" || echo "Not a login shell"
+# [[ $- == *i* ]] && echo "This is an interactive shell" || echo "This is a script"
+
 #=======================================================================================================================
 # SHELL CONFIGURATION
 #======================
