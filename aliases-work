@@ -93,7 +93,7 @@ alias rrcb='rr --norun -bc'
 alias bca='build -clean_all'
 alias rrbr='rr -b'
 alias rrcr='rr -c'
-alias rrdbg='rr -y $as0ks/amdmsg_config.yaml -a "-avf '"'--/ChkL3.Debug.ByGraph/ --/ChkL3.Debug.ByFeature.RangeLock/'"'" --fsdb'
+alias rrdbg=$'rr -a \'-avf "--/ChkL3.Debug/"\' --fsdb --dsp'
 alias rrdbg_ras='rr -y $v/debug/ras/amdmsg_config.yaml --fsdb'
 
 alias rg='release_gate'

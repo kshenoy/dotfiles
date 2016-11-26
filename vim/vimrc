@@ -427,7 +427,7 @@ if has('autocmd')
   augroup Diff
     autocmd!
     autocmd BufWritePost * if &diff | diffupdate | endif
-    " autocmd VimEnter * if &diff|call my#SetDiffFileType()|endif
+    autocmd VimEnter * if &diff|call my#SetDiffFileType()|endif
   augroup END
 endif
 " }}}2 }}}1

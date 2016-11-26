@@ -754,11 +754,11 @@ function! my#SetupMergeLayout()                                                 
 endfunction
 
 
-" function! my#SetDiffFileType()                                                                                  " {{{1
-"   let l:filetype=''
-"   windo if (l:filetype == '')|let l:filetype=&filetype|endif
-"   windo let &filetype=l:filetype
-" endfunction
+function! my#SetDiffFileType()                                                                                  " {{{1
+  let l:filetype=''
+  windo if (l:filetype == '')|let l:filetype=&filetype|endif
+  windo let &filetype=l:filetype
+endfunction
 
 
 function! my#GetWindowColumnsWidth()                                                                              " {{{1

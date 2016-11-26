@@ -1,6 +1,7 @@
 *.bak
 bash/history
 compiz/
+emacs.d/bundle/
 emacs.d/config.el*
 emacs.d/elpa/
 emacs.d/projectile-bookmarks.eld
