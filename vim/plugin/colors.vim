@@ -1,4 +1,4 @@
-let s:config_file = expand('~/.config/base16_config')
+let s:config_file = glob('~/.vimrc_background')
 
 function! s:ReadBase16Config()                                                                                    " {{{1
   if has('gui_running')
@@ -11,23 +11,9 @@ function! s:ReadBase16Config()                                                  
     let base16colorspace=256
   " endif
 
-  let l:scheme="monokai"
-  let l:bg="dark"
-
-  if filereadable(s:config_file)
-    let [l:scheme, l:bg] = split(readfile(s:config_file, '', 1)[0], ' ')
-
-    if l:bg !~# '^dark\|light$'
-      echoerr 'Bad background "' . l:bg . '" in ' . s:config_file
-    endif
-
-    if !filereadable(expand(g:dotvim . '/bundle/base16-vim/colors/base16-' . l:scheme . '.vim'))
-      echoerr 'Bad scheme "' . l:scheme . '" in ' . s:config_file
-    endif
+  if filereadable(expand('~/.vimrc_background'))
+    source ~/.vimrc_background
   endif
-
-  execute 'set background=' . l:bg
-  execute 'color base16-' . l:scheme
 endfunction
 
 
@@ -56,7 +42,7 @@ function! s:After()                                                             
     return
   endif
 
-  call s:WriteBase16Config()
+  " call s:WriteBase16Config()
 
   let l:color_file = g:dotvim . "/after/colors/" . g:colors_name . ".vim"
   if filereadable(l:color_file)
