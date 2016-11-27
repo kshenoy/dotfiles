@@ -88,6 +88,7 @@ mcd() { mkdir -p $1 && cd $1; }
 #}
 
 
+# Case conversion                                                                                                   {{{1
 lc() { echo $@ | /usr/bin/tr "[A-Z]" "[a-z]"; }
 uc() { echo $@ | /usr/bin/tr "[a-z]" "[A-Z]"; }
 
@@ -95,16 +96,42 @@ uc() { echo $@ | /usr/bin/tr "[a-z]" "[A-Z]"; }
 # Simple calc                                                                                                       {{{1
 unset -f =
 =() {
-  echo "$@" | irb | sed -e '1d' -e '/^\s*$/d'
+  local _input=${1:-$(</dev/stdin)}
+  local _output=$(echo "$_input" | irb -m --noverbose | command sed 's/"//g' | command head -n1)
+
+  # Infer type to format output
+  if [[ $_input =~ 'to_s(16)' ]]; then
+    echo $_output | tr '[a-f]' '[A-F]' | command sed -e 's/^/0x/'
+  elif [[ $_input =~ 'to_s(2)' ]]; then
+    echo $_output | command sed -e 's/^/0b/'
+  elif [[ ! $_input =~ 'to_s' ]]; then
+    # If there's no output formatting, try to match output base to that of input
+    if [[ $_input =~ 0x ]]; then
+      = "($_output).to_s(16)"
+    elif [[ $_input =~ 0b ]]; then
+      = "($_output).to_s(2)"
+    fi
+  else
+    echo $_output
+  fi
 }
+
+unset -f =b
+=b() {
+  local _input=${1:-$(</dev/stdin)}
+  = "($_input).to_s(2)"
+}
+
 unset -f =d
 =d() {
-  = "($@).to_s(10)" | command sed -e '$ s/"//g'
+  local _input=${1:-$(</dev/stdin)}
+  = "($_input).to_s(10)"
 }
+
 unset -f =h
 =h() {
-  # Call the main IRB function. Remove quotes etc. and add 0x at the beginning of the last line only
-  = "($@).to_s(16).upcase()" | command sed -e '$ s/"//g' -e '$ s/^/0x/'
+  local _input=${1:-$(</dev/stdin)}
+  = "($_input).to_s(16)"
 }
 
 
@@ -140,7 +167,7 @@ rm_rf_silent() {
 }
 alias rdj='rm_rf_silent'
 
-# Delete all but...
+# Delete all but...                                                                                                 {{{1
 unset -f rm_but
 rm_but() {
   # Delete all files except the specified ones.
@@ -165,7 +192,7 @@ rm_but() {
 }
 alias rmb='rm_but'
 
-# dos2unix                                                                                                          {{{1
+# dos2unix/unix2dos                                                                                                 {{{1
 unset -f dos2unix
 dos2unix() {
   command sed -i -e 's/\r*$//' "$@"
