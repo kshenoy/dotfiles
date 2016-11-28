@@ -101,9 +101,9 @@ HISTSIZE=65535
 HISTFILESIZE=65535
 # Show timestamps in history
 HISTTIMEFORMAT="%F %T  "
-# Ignore duplicates and trivial one- and two-char commands
 HISTCONTROL=ignoreboth #same as export HISTCONTROL=ignoredups:ignorespace
-HISTIGNORE='?:??:history*:sosa:sosc:sosf:sosp'
+# Ignore duplicates and trivial one- and two-char commands
+HISTIGNORE='?:??:history*:sosa:sosc:sosf:sosp:cd:que*:lla*:=*'
 HOSTNAME="$(hostname)"
 # Keeps history forever. Requires PROMPT_COMMAND='history -a; history -r'
 HISTFILE="${HOME}/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"

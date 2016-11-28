@@ -14,14 +14,15 @@ alias amd_vpn='sudo openconnect -u kshenoy --no-cert-check --token-mode=rsa atl-
 
 
 ## Specific to root
-__histfile_perm_update() {
-  echo "Changing permissions of HISTFILE..."
-  find $(dirname $HISTFILE) \( -user root -o -group root \) \
-    -exec chmod 640 {} \; -exec chown ks {} \; -exec chgrp ks {} \;
+__histfile_perm_update__() {
+  if [[ -f $HISTFILE ]]; then
+    echo "Changing permissions of HISTFILE..."
+    chown ks $HISTFILE
+    chgrp ks $HISTFILE
+    chmod 640 $HISTFILE
+  fi
 }
-if (( $EUID ==  0 )); then
-  trap __histfile_perm_update EXIT
-fi
+trap __histfile_perm_update__ EXIT
 
 # When leaving the console, clear the screen to increase privacy
 if [[ "$SHLVL" = 1 ]]; then
