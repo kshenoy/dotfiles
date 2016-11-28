@@ -4,10 +4,30 @@ __fzf_select__() {                                                              
     -o -type f -print \
     -o -type d -print \
     -o -type l -print 2> /dev/null | sed -e '1d' -e 's:$_arg/::' "}"
-  eval "$_cmd | fzf -m $FZF_CTRL_T_OPTS" | while read -r item; do
-    printf '%q ' "$item"
-  done
-  echo
+
+  # The while loop is required to print them all out in one line
+  # eval "$_cmd | fzf -m $FZF_CTRL_T_OPTS" | while read -r item; do
+  #   printf '%q ' "$item"
+  # done
+  # echo
+  local _out=($(eval "$_cmd | fzf -m $FZF_CTRL_T_OPTS --expect=alt-v,alt-e,alt-c"))
+  local _key=$(head -n1 <<< "$_out")
+
+  case ${_key} in
+    "alt-v")
+      _out[0]="gvim"
+      ;;
+    "alt-e")
+      _out[0]="emacs"
+      ;;
+    "alt-c")
+      if [[ -d ${_out[1]} ]]; then
+        _out[0]="cd"
+      fi
+      ;;
+  esac
+
+  paste -s -d' ' <<< ${_out[@]}
 }
 # }}}1
 
@@ -69,7 +89,7 @@ __fzf_history_all__() {                                                         
 }
 
 
-fzf_file_widget() {                                                                                               # {{{1
+__fzf_file_widget__() {                                                                                           # {{{1
   local _arg=${1:-'.'}
   if __fzf_use_tmux__; then
     __fzf_select_tmux__ ${_arg}
@@ -78,6 +98,30 @@ fzf_file_widget() {                                                             
     READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}${_selected}${READLINE_LINE:$READLINE_POINT}"
     READLINE_POINT=$(( READLINE_POINT + ${#_selected} ))
   fi
+}
+
+
+__fzf_bookmarks__() {                                                                                             # {{{1
+  local _cmd="cat <(command find -L ~/Notes -type f -name '*.org' 2> /dev/null) ~/bookmarks"
+
+  local _out=($(eval "$_cmd | sed "s:${HOME}:~:g" | fzf -m --expect=alt-v,alt-e"))
+  local _key=$(head -n1 <<< "$_out")
+
+  case ${_key} in
+    "alt-v")
+      _out[0]="gvim 2> /dev/null"
+      eval "$(paste -s -d' ' <<< ${_out[@]})"
+      ;;
+    "alt-e")
+      _out[0]="emacs"
+      eval "$(paste -s -d' ' <<< ${_out[@]})"
+      ;;
+    *)
+      local _selected=$(paste -s -d' ' <<< ${_out[@]})
+      READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}${_selected}${READLINE_LINE:$READLINE_POINT}"
+      READLINE_POINT=$(( READLINE_POINT + ${#_selected} ))
+    ;;
+  esac
 }
 # }}}1
 
@@ -89,7 +133,7 @@ if [[ ! -o vi ]]; then                                                          
 
   # CTRL-T - Paste the selected file path into the command line
   if (( $__use_bind_x == 1 )); then
-    bind -x '"\C-f\C-f": "fzf_file_widget"'
+    bind -x '"\C-f\C-f": "__fzf_file_widget__"'
   elif (( $__use_tmux == 1 )); then
     bind '"\C-f\C-f": " \C-u \C-a\C-k$(__fzf_select_tmux__)\e\C-e\C-y\C-a\C-d\C-y\ey\C-h"'
   else
@@ -103,6 +147,11 @@ if [[ ! -o vi ]]; then                                                          
 
   # ALT-C - cd into the selected directory
   bind '"\C-f\ec": " \C-e\C-u`__fzf_cd__`\e\C-e\er\C-m"'
+
+  # CTRL-B - Bookmarks and notes
+  if (( $__use_bind_x == 1 )); then
+    bind -x '"\C-f\C-b": "__fzf_bookmarks__"'
+  fi
 else                                                                                                              # {{{1
   # We'd usually use "\e" to enter vi-movement-mode so we can do our magic,
   # but this incurs a very noticeable delay of a half second or so,
@@ -120,7 +169,7 @@ else                                                                            
   # CTRL-T - Paste the selected file path into the command line
   # - FIXME: Selected items are attached to the end regardless of cursor position
   if [ $__use_bind_x -eq 1 ]; then
-    bind -x '"\C-t": "fzf_file_widget"'
+    bind -x '"\C-t": "__fzf_file_widget__"'
   elif [ $__use_tmux -eq 1 ]; then
     bind '"\C-t": "\C-x\C-a$a \C-x\C-addi$(__fzf_select_tmux__)\C-x\C-e\C-x\C-a0P$xa"'
   else
