@@ -97,7 +97,7 @@ uc() { echo $@ | /usr/bin/tr "[a-z]" "[A-Z]"; }
 unset -f =
 =() {
   local _input=${1:-$(</dev/stdin)}
-  local _output=$(echo "$_input" | irb -m --noverbose | command sed 's/"//g' | command head -n1)
+  local _output=$(echo "$_input" | irb -m --noverbose | command sed 's/"//g')
 
   # Infer type to format output
   if [[ $_input =~ 'to_s(16)' ]]; then
@@ -110,9 +110,9 @@ unset -f =
       = "($_output).to_s(16)"
     elif [[ $_input =~ 0b ]]; then
       = "($_output).to_s(2)"
+    else
+      echo $_output
     fi
-  else
-    echo $_output
   fi
 }
 
