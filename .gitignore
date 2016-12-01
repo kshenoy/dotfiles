@@ -1,6 +1,7 @@
 *.bak
 bash/history
 compiz/
+emacs.d/ac-comphist.dat
 emacs.d/bundle/
 emacs.d/config.el*
 emacs.d/elpa/

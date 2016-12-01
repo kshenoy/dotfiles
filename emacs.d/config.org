@@ -30,6 +30,7 @@ Install and load use-package
     (defvar use-package-verbose t)
     (require 'use-package)
     (require 'bind-key)
+    (require 'diminish)
     (setq use-package-always-ensure t))
 
   (bind-key* "C-h B" 'describe-personal-keybindings)
@@ -372,23 +373,8 @@ evil can be toggled using =C-z=
 #+BEGIN_SRC emacs-lisp
   (use-package evil
     ;; :disabled
-#+END_SRC
-
-*** :init
-#+BEGIN_SRC emacs-lisp
-  :init
-#+END_SRC
-
-**** COMMENT evil-leader
-/global-evil-leader-mode/ must be enabled before /evil-mode/ to allow /evil-leader/ in initial buffers such as /*scratch*/, /*Messages*/ etc.
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-leader
-    :init (global-evil-leader-mode))
-#+END_SRC
-
-**** Enable evil-mode
-#+BEGIN_SRC emacs-lisp
-  (evil-mode t)
+    :init
+    (evil-mode t)
 #+END_SRC
 
 *** :config
@@ -426,11 +412,6 @@ evil can be toggled using =C-z=
   (use-package evil-matchit)
 #+END_SRC
 
-**** evil-numbers
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-numbers)
-#+END_SRC
-
 **** Keybindings
 Make /Escape/ quit everything
 #+BEGIN_SRC emacs-lisp
@@ -456,7 +437,7 @@ Make /Escape/ quit everything
 #+BEGIN_SRC emacs-lisp
   ;; (bind-key "g a" 'describe-char evil-normal-state-map)
   (bind-key "U" 'redo evil-normal-state-map)
-  (bind-key "] SPC" '(lambda () (interactive)(end-of-line)(newline)) evil-normal-state-map)
+  (bind-key "] SPC" '(lambda () (interactive)(end-of-line)(newline))           evil-normal-state-map)
   (bind-key "[ SPC" '(lambda () (interactive)(beginning-of-line)(open-line 1)) evil-normal-state-map)
 #+END_SRC
 
@@ -468,6 +449,7 @@ Make /Escape/ quit everything
 ** flycheck
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
+    :disabled
     :diminish flycheck-mode
     :init (global-flycheck-mode t)
     :config
@@ -545,15 +527,6 @@ Make /Escape/ quit everything
 
 Note that helm-descbinds will replace the default /describe-bindings/.
 Thus =C-h b= can be used for it; no need to create a new binding.
-
-**** swiper-helm
-#+BEGIN_SRC emacs-lisp
-  (use-package swiper-helm
-    :disabled t
-    :init (setq swiper-helm-display-function 'helm-default-display-buffer)
-    :commands (swiper-helm swiper-helm-from-isearch)
-    :bind ("C-s" . swiper-helm))
-#+END_SRC
 
 *** Keybinds
 Remove the default prefix =C-x c=. Note this is still a part of :config
@@ -828,6 +801,16 @@ General configuration [[*Fonts][here]]
 
 Client-ID and Token stored in private.el
 
+**** org-ac
+Autocomplete sources for org mode
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-ac
+    :init
+    (require 'org-ac)
+    (org-ac/config-default))
+#+END_SRC
+
 **** htmlize
 Syntax highlighting when exporting to HTML? Yes, please!
 #+BEGIN_SRC emacs-lisp
@@ -911,12 +894,7 @@ Similar to Tmux's =<prefix> C-g=
     :bind ("C-x o" . ace-window))
 #+END_SRC
 
-** try
-Allows me to "try" packages i.e. packages are installed only for the current session and won't persist after that.
-#+BEGIN_SRC emacs-lisp
-  (use-package try
-    :commands try)
-#+END_SRC
+Note that we're rebinding =C-x o=
 
 ** avy
 Similar to vim's easy-motion plugin
@@ -926,18 +904,20 @@ Similar to vim's easy-motion plugin
                 ("g s" . avy-goto-char)))
 #+END_SRC
 
-** swiper
+** auto-complete
 #+BEGIN_SRC emacs-lisp
-  (use-package swiper
-    :init (setq ivy-display-style 'fancy)
-    :bind ("C-s" . swiper))
+  (use-package auto-complete
+    :init
+    (progn (ac-config-default)
+           (global-auto-complete-mode t)))
 #+END_SRC
 
-** company-mode
+** TODO company-mode
 Autocompletion
 Reduce delay and ensure that the popup shows up only if the last command has been an editing command.
 #+BEGIN_SRC emacs-lisp
   (use-package company
+    :disabled
     :diminish company-mode
     :init (setq company-idle-delay 0.25
                 company-begin-commands '(self-insert-command))
@@ -945,7 +925,7 @@ Reduce delay and ensure that the popup shows up only if the last command has bee
 
 *** :config
 #+BEGIN_SRC emacs-lisp
-    :config (add-hook 'after-init-hook 'global-company-mode)
+  :config (add-hook 'after-init-hook 'global-company-mode)
 #+END_SRC
 
 Enter by default triggers the completion. This is not what I want. Sometimes I just mean Enter.
@@ -1036,29 +1016,6 @@ http://emacs.stackexchange.com/a/21173/9690
           evil-emacs-state-cursor    '("white"   box))
 
     (load-theme 'leuven t))
-#+END_SRC
-
-* Programming Languages Course on Coursera
-[[http://tuhdo.github.io/emacs-for-proglang.html][Starter Kit]] from [[https://reddit.com/u/tuhdo][tuhdo]]
-
-** COMMENT sml-mode
-#+BEGIN_SRC emacs-lisp
-  (use-package sml-mode
-    :config
-    (use-package ob-sml
-      :ensure nil ; Because I've installed it from Github, I don't want package.el to stomp over it
-      :load-path "bundle/ob-sml"
-      :config
-      (org-babel-do-load-languages 'org-babel-load-languages
-                                   (append org-babel-load-languages '((sml . t))))
-      (add-to-list 'org-structure-template-alist
-                   '("sml" "#+BEGIN_SRC sml\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))))
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-  (use-package geiser
-    :config
-    (setq geiser-default-implementation "racket"))
 #+END_SRC
 
 * After
