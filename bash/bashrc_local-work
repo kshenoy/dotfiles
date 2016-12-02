@@ -4,6 +4,7 @@
 #
 # This file is used only for local settings
 export TZ="US/Mountain"
+export FZF_PATH="$HOME/install/fzf"
 
 # Putting this before ruby because ruby binary is in pandora
 PATH=/tool/pandora64/.package/vim-7.4-a/bin:/tool/pandora64/bin:/tool/pandora/bin:$PATH

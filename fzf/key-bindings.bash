@@ -29,6 +29,31 @@ __fzf_select__() {                                                              
 
   paste -s -d' ' <<< ${_out[@]}
 }
+
+__fzf_select_work__() {
+  local _arg=${1:-'.'}
+  if [[ (-n "$REPO_PATH") && ($_arg =~ $REPO_PATH) ]]; then
+    local cmd="find -L ${_arg} -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune \
+                      -o -type d \\( -name build -o -name .ccache -o -name dfx -o -name emu -o -name _env -o \
+                                     -name env_squash -o -name fp -o -name import -o -name libs -o -name powerPro -o \
+                                     -name release_gate_tmp -o -name sdpx -o -name sim -o -name tools -o \
+                                     -wholename '*/ch/syn' -o -wholename '*/ch/rtl/defines/old' -o \
+                                     -wholename '*/ch/variants' -o -wholename '*/ch/verif/dft' -o \
+                                     -wholename '*/txn/gen' -o -wholename '*/ch/verif/txn/yml' \\) -prune \
+                      -o -type f \\( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' -o \
+                                     -iname '*.cc.o' -o -iname '*tags*' \\) -prune \
+                      -o -type f -print -o -type d -print -o -type l -print 2> /dev/null | sed -e '1d' -e 's:$_arg/::' "
+  else
+    local cmd="${FZF_CTRL_T_COMMAND:-"command find -L . \\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -prune \
+      -o -type f -print \
+      -o -type d -print \
+      -o -type l -print "}"
+  fi
+  eval "$cmd 2> /dev/null | sed 1d | cut -b3- | fzf -m $FZF_CTRL_T_OPTS" | while read -r item; do
+    printf '%q ' "$item"
+  done
+  echo
+}
 # }}}1
 
 [[ ! $- =~ i ]] && return

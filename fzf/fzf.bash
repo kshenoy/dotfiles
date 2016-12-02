@@ -1,19 +1,23 @@
 # Setup fzf
 # ---------
-if [[ ! "$PATH" == */usr/local/install/fzf/bin* ]]; then
-  export PATH="$PATH:/usr/local/install/fzf/bin"
+if [[ ! "$PATH" == *$FZF_PATH/bin* ]]; then
+  export PATH="$PATH:$FZF_PATH/bin"
 fi
 
 # Man path
 # --------
-if [[ ! "$MANPATH" == */usr/local/install/fzf/man* && -d "/usr/local/install/fzf/man" ]]; then
-  export MANPATH="$MANPATH:/usr/local/install/fzf/man"
+if [[ ! "$MANPATH" == *$FZF_PATH/man* && -d "$FZF_PATH/man" ]]; then
+  export MANPATH="$MANPATH:$FZF_PATH/man"
 fi
 
 # Auto-completion
 # ---------------
-[[ $- == *i* ]] && source "/usr/local/install/fzf/shell/completion.bash" 2> /dev/null
+[[ $- == *i* ]] && source "$FZF_PATH/shell/completion.bash" 2> /dev/null
 
 # Key bindings
 # ------------
 source ~/.dotfiles/fzf/key-bindings.bash
+
+# Customisations
+# --------------
+export FZF_DEFAULT_OPTS='--ansi'
