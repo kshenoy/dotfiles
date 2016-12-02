@@ -237,7 +237,7 @@ endsnippet
 # OVLs
 ##
 snippet ovl "OVL Select" b
-ovl_$1`!p snip.rv = complete( t[1], ['always', 'never', 'zero_one_hot'] )`
+ovl_$1`!p snip.rv = complete( t[1], ['always', 'never', 'never_unknown', 'zero_one_hot'] )`
 endsnippet
 
 
@@ -252,8 +252,14 @@ endsnippet
 
 
 snippet 'ovl_(01h|zero_one_hot)' "ovl_zero_one_hot" br
-ovl_zero_one_hot #(.msg(${1})) assert_${2}
-   (.test_expr(${0}), .clock(CONV_ABV_CLK), .reset(1'b1), .enable(CONV_ABV_EN), .fire());
+ovl_zero_one_hot #(.msg(${0}), .width(1)) assert_${1}
+   (.test_expr(), .clock(CONV_ABV_CLK), .reset(1'b1), .enable(CONV_ABV_EN), .fire());
+endsnippet
+
+
+snippet 'ovl_never_unknown' "ovl_never_unknown" b
+ovl_never_unknown #(.msg(${0}), .width(1)) assert_${1}
+   (.test_expr(), .qualifier(), .clock(CONV_ABV_CLK), .reset(1'b1), .enable(CONV_ABV_EN), .fire());
 endsnippet
 
 

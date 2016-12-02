@@ -17,7 +17,7 @@ endfunction
 
 Plug  'tpope/vim-abolish'
 Plug  'PeterRincker/vim-argumentative'
-Plug  'vim-scripts/AutoComplPop'
+" Plug  'vim-scripts/AutoComplPop'
 Plug  'chriskempson/base16-vim'
 Plug  'tpope/vim-commentary',             {'on': '<Plug>Commentary'}
 Plug  'ctrlpvim/ctrlp.vim'
@@ -180,6 +180,13 @@ nnoremap <silent>  <Plug>my(CtrlP)o :CtrlPFunky<CR>
 nnoremap <silent>  <Plug>my(CtrlP)] :CtrlPtjump<CR>
 vnoremap <silent>  <Plug>my(CtrlP)] :CtrlPtjumpVisual<CR>
 nnoremap <silent>  <leader><leader> :CtrlPBuffer<CR>
+
+
+" delimitMate ----------------------------------------------------------------------------------------------------  {{{1
+augroup delimitMate_my
+  autocmd!
+  autocmd FileType systemverilog let b:delimitMate_quotes = "\" '"
+augroup END
 
 
 " vim-easy-align -------------------------------------------------------------------------------------------------  {{{1
@@ -472,7 +479,8 @@ let g:targets_separators = ', . ; : + - = ~ * # / | \ & $'
 " UltiSnips ------------------------------------------------------------------------------------------------------  {{{1
 let g:UltiSnipsEditSplit = "vertical"
 " Location of snippets
-execute 'let g:UltiSnipsSnippetDirectories=["' . g:dotvim . '/UltiSnips"]'
+execute 'let g:UltiSnipsSnippetDirectories="' . g:dotvim . '/UltiSnips"'
+let g:UltiSnipsEnableSnipMate=0
 
 
 " vim-vinegar ----------------------------------------------------------------------------------------------------  {{{1

@@ -228,7 +228,7 @@ if DISABLE_FROM == 13 | finish | endif
 "
 if DISABLE_FROM == 14 | finish | endif
 
-set textwidth=0                                              " Line length above which to break a line. 0 => Don't break
+set textwidth=120                                            " Line length above which to break a line. 0 => Don't break
 set wrapmargin=0                                                             " Margin to the right at which to wrap text
 set backspace=indent,eol,start        " Allow backspace to erase previously entered characters, autoindent, and newlines
 set formatoptions+=j                                                        " Remove a comment leader when joining lines

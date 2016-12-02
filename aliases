@@ -211,15 +211,15 @@ alias govg='$VISUAL ~/.vim/gvimrc'
 alias govm='$VISUAL ~/.vim/plugin/mappings.vim'
 alias govv='$VISUAL ~/.vim/vimrc'
 
-ec() {
-  emacsclient -a "emacs" -c -q "$@" &
+unset -f e
+e() {
+  if [[ $(hostname) =~ loki ]]; then
+    XLIB_SKIP_ARGB_VISUALS=1 emacsclient -a "emacs" -c -q "$@" &
+  else
+    emacsclient -a "emacs" -c -q "$@" &
+  fi
 }
-if [[ $(hostname) =~ loki ]]; then
-  alias e='XLIB_SKIP_ARGB_VISUALS=1 emacs'
-else
-  alias e=emacs
-fi
-alias edbg="e --debug-init"
+alias edbg="emacs --debug-init"
 
 
 #===============

@@ -3,12 +3,17 @@
 "
 function! s:SetLocalSettings(filename)
   if ($STEM != "")
-    let s:p4path = substitute(split(system("p4 files " . a:filename), '\s\+')[0], '#\d\+$', '', '')
-    if (s:p4path =~ '^//depot')
+    let l:p4path = substitute(split(system("p4 files " . a:filename), '\s\+')[0], '#\d\+$', '', '')
+    if (l:p4path =~ '^//depot')
       " Current file is under a REPO
-      setlocal textwidth=100
-      setlocal colorcolumn=+1
-      let b:OrigamiFoldAtCol=97
+      if (l:p4path =~ 'ch/rtl')
+        setlocal textwidth=80
+        let &colorcolumn=(&tw+1)
+      elseif (l:p4path =~ 'ch/verif/(chk_)?l3')
+        setlocal textwidth=100
+        let &colorcolumn=(&tw+1)
+      endif
+      let b:OrigamiFoldAtCol=(&tw - 3)
     endif
   endif
 endfunction
