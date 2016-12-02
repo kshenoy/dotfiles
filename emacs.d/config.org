@@ -88,7 +88,7 @@ Transparency
 
 Avoid Emacs hanging for a while after changing default font:
 #+BEGIN_SRC emacs-lisp
-(modify-frame-parameters nil '((wait-for-wm . nil)))
+  ;; (modify-frame-parameters nil '((wait-for-wm . nil)))
 #+END_SRC
 
 ** Clean-up
@@ -96,11 +96,10 @@ Avoid Emacs hanging for a while after changing default font:
   (setq inhibit-startup-message t)
   (setq initial-scratch-message "")
 
-  (when window-system
-    (menu-bar-mode -1)
-    ;; (tooltip-mode -1)
-    (tool-bar-mode -1)
-    (scroll-bar-mode -1))
+  (menu-bar-mode -1)
+  ;; (tooltip-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
 #+END_SRC
 
 We can also put something like this into =~/.Xresources= to enable/disable certain things as soon as Emacs starts
@@ -213,34 +212,40 @@ Save mini-buffer history
   (prefer-coding-system        'utf-8)
 #+END_SRC
 
-** Fonts
-One way to select from multiple fonts
+** TODO Fonts
+The reason for adding the hook is that if I try to create a daemon, it errors out with
+  /error: Window system is not in use or not initialized/
+This is because we try to set a face-attribute before a frame is created which is a no-no for some reason.
+
+However, the downside to this is that if I have multiple such 'when' sections (like in private.el) we can't dictate the order in which they're applied.
 #+BEGIN_SRC emacs-lisp
   (defun my/font-exist-p (font)
     " Check if font exists"
     (if (null (x-list-fonts font)) nil t))
 
-  (when (eq system-type 'gnu/linux)
-    (when (my/font-exist-p "MesloLGMDZ Nerd Font")
-      (setq my-variable-pitch-font "MesloLGMDZ Nerd Font-10"
-            my-monospaced-font     "MesloLGMDZ Nerd Font-10"))
+  (add-hook 'after-make-frame-functions
+            (lambda (frame)
+              (select-frame frame)
+              ;; (when (eq system-type 'gnu/linux)
+              ;;   (when (my/font-exist-p "MesloLGMDZ Nerd Font")
+              ;;     (setq my-variable-pitch-font "MesloLGMDZ Nerd Font-10"
+              ;;           my-monospaced-font     "MesloLGMDZ Nerd Font-10"))
 
-    ;; (when (my/font-exist-p "DejaVu Sans")      (setq my-variable-pitch-font "DejaVu Sans-10"))
-    ;; (when (my/font-exist-p "DejaVu Sans Mono") (setq my-monospaced-font     "DejaVu Sans Mono-10"))
-  )
+              ;;   (when (my/font-exist-p "DejaVu Sans")      (setq my-variable-pitch-font "DejaVu Sans-10"))
+              ;;   (when (my/font-exist-p "DejaVu Sans Mono") (setq my-monospaced-font     "DejaVu Sans Mono-10")))
 
-  (when (eq system-type 'windows-nt)
-    (when (my/font-exist-p "Consolas")
-      (setq my-variable-pitch-font "Consolas-10"
-            my-monospaced-font     "Consolas-10")))
-
-  ;; (set-face-attribute 'default        nil :font my-variable-pitch-font)
-  ;; (set-face-attribute 'fixed-pitch    nil :font my-monospaced-font)
-  ;; (set-face-attribute 'variable-pitch nil :font my-variable-pitch-font)
+              (when (eq system-type 'windows-nt)
+                (when (my/font-exist-p "Consolas")
+                  (setq my-variable-pitch-font "Consolas-10"
+                        my-monospaced-font     "Consolas-10"))
+                  (set-face-attribute 'default        nil :font my-variable-pitch-font)
+                  (set-face-attribute 'fixed-pitch    nil :font my-monospaced-font)
+                  (set-face-attribute 'variable-pitch nil :font my-variable-pitch-font))))
 #+END_SRC
 
 Fall back to DejaVu Sans when the font lacks support for some glyphs. Taken from [[https://github.com/joodie/emacs-literal-config/blob/c66e30ce961b140dd3e84116f4d45cbc19d0d944/emacs.org#font][github:joodie]]
-#+BEGIN_SRC emacs-lisp
+How does this work? What is it supposed to do?
+#+BEGIN_SRC emacs-lisp :tangle no
   (when (functionp 'set-fontset-font)
     (set-fontset-font "fontset-default" 'unicode
                       (font-spec :family "DejaVu Sans Mono"
@@ -335,7 +340,7 @@ This is useful when I close a window by mistake to undo it and restore the windo
   (add-to-list 'load-path (concat user-emacs-directory "/themes"))
 #+END_SRC
 
-** TODO Emacs server
+** Emacs server
 - Always start the emacs-server, except when run in daemon mode
 - Already Disable prompt asking you if you want to kill a buffer with a live process attached to it.
   http://stackoverflow.com/questions/268088/how-to-remove-the-prompt-for-killing-emacsclient-buffers
@@ -352,7 +357,7 @@ This is useful when I close a window by mistake to undo it and restore the windo
 Alias for emacsclient:
 This will launch emacsclient if a server is already running and launch emacs if not
 #+BEGIN_EXAMPLE
-  alias e='emacsclient --alternate-editor="emacs" --create-frame'
+  alias e='emacsclient --alternate-editor="emacs" --create-frame --quiet'
 #+END_EXAMPLE
 
 ** Mouse
@@ -934,7 +939,9 @@ Similar to vim's easy-motion plugin
                 ("g s" . avy-goto-char)))
 #+END_SRC
 
-** auto-complete
+** TODO FIXME auto-complete
+Completion doesn't work if evil is installed
+
 #+BEGIN_SRC emacs-lisp
   (use-package auto-complete
     :init
