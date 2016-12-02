@@ -234,9 +234,9 @@ One way to select from multiple fonts
       (setq my-variable-pitch-font "Consolas-10"
             my-monospaced-font     "Consolas-10")))
 
-  (set-face-attribute 'default        nil :font my-variable-pitch-font)
-  (set-face-attribute 'fixed-pitch    nil :font my-monospaced-font)
-  (set-face-attribute 'variable-pitch nil :font my-variable-pitch-font)
+  ;; (set-face-attribute 'default        nil :font my-variable-pitch-font)
+  ;; (set-face-attribute 'fixed-pitch    nil :font my-monospaced-font)
+  ;; (set-face-attribute 'variable-pitch nil :font my-variable-pitch-font)
 #+END_SRC
 
 Fall back to DejaVu Sans when the font lacks support for some glyphs. Taken from [[https://github.com/joodie/emacs-literal-config/blob/c66e30ce961b140dd3e84116f4d45cbc19d0d944/emacs.org#font][github:joodie]]
@@ -323,7 +323,8 @@ Enable =show-trailing-whitespace= by default. The /setq/ above doesn't do that.
 #+END_SRC
 
 ** Winner mode
-Undo and Redo changes in window configuration. Use =C-c right= and =C-c left= to switch between different layouts
+Undo and Redo changes in window configuration. Use =C-c right= and =C-c left= to switch between different layouts.
+This is useful when I close a window by mistake to undo it and restore the window layout.
 #+BEGIN_SRC emacs-lisp
   (winner-mode 1)
 #+END_SRC
@@ -479,14 +480,16 @@ Make /Escape/ quit everything
   (setq helm-move-to-line-cycle-in-source     t   )  ; move to end or beginning of source when reaching top or bottom of source
   (setq helm-display-header-line              nil )  ; Disable the header
 
-  (setq helm-mode-fuzzy-match                 t   )
+  (setq helm-M-x-fuzzy-match                  t   )
   (setq helm-apropos-fuzzy-match              t   )
   (setq helm-buffers-fuzzy-matching           t   )
   (setq helm-completion-in-region-fuzzy-match t   )
+  (setq helm-imenu-fuzzy-match                t   )
   (setq helm-lisp-fuzzy-completion            t   )
   (setq helm-locate-fuzzy-match               t   )
+  (setq helm-mode-fuzzy-match                 t   )
   (setq helm-recentf-fuzzy-match              t   )
-  (setq helm-M-x-fuzzy-match                  t   )
+  (setq helm-semantic-fuzzy-match             t   )
 
   (helm-mode t)
   (helm-autoresize-mode t)
@@ -528,6 +531,13 @@ Make /Escape/ quit everything
 Note that helm-descbinds will replace the default /describe-bindings/.
 Thus =C-h b= can be used for it; no need to create a new binding.
 
+**** helm-projectile
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-projectile
+    :config
+    (helm-projectile-on))
+#+END_SRC
+
 *** Keybinds
 Remove the default prefix =C-x c=. Note this is still a part of :config
 #+BEGIN_SRC emacs-lisp
@@ -541,15 +551,17 @@ We redefine /helm-command-prefix/ here
   :bind (("C-c h" . helm-command-prefix)
          :map       helm-command-map
          ("b"     . helm-buffers-list)
-         ("e"     . helm-find-files)    ; Find files in the current directory
-         ("m"     . helm-mini)          ; m-mixed
+         ("f"     . helm-find-files)    ; Find files in the current directory
+         ("m"     . helm-mini)          ; m - mixed
+         ("p"     . helm-projectile)
          ("/"     . helm-occur))        ; search in all open buffers
 #+END_SRC
+
+=C-x C-s= can be used after =helm-occur= to save the results to a buffer.
 
 Other useful default keybinds:
 |--------------+-------------------------+-----------------------------------------------------------|
 | <prefix> a   | helm-apropos            | Combination of describe-function, variable, commands etc. |
-| <prefix> i   | helm-semantic-or-imenu  | Show outline and major definitions                        |
 | <prefix> r   | helm-regexp             | Construct a regexp                                        |
 | <prefix> C-, | helm-calcul-expression  | Interface to calc command                                 |
 | C-x r b      | helm-filtered-bookmarks |                                                           |
@@ -649,6 +661,7 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
   (setq org-blank-before-new-entry '((heading . t) (plain-list-item . nil)))
   (setq org-link-search-must-match-exact-headline nil)
   (setq org-startup-with-inline-images t)
+  (setq org-imenu-depth 10)
 #+END_SRC
 
 **** TODO Show the emphasis markers on point
@@ -708,7 +721,7 @@ Ask for confirmation before evaluating? NO!
   (setq org-odd-level-only nil)
 
   ;; …▼•
-  (setq org-ellipsis " ▼" )              ; Use a fancy arrow to indicate a fold instead of '...'
+  ;; (setq org-ellipsis " ▼" )              ; Use a fancy arrow to indicate a fold instead of '...'
 #+END_SRC
 
 **** ToDo States
@@ -736,16 +749,18 @@ Variable pitch for non-code text taken from [[http://www.xiangji.me/2015/07/13/a
     (interactive)
     (variable-pitch-mode t)
     (setq line-spacing 3)
-    (set-face-attribute 'org-table            nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-code             nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-block            nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-block-background nil :inherit 'fixed-pitch))
+    (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code  nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-block nil :inherit 'fixed-pitch))
 
   (add-hook 'org-mode-hook      'my/set-buffer-variable-pitch)
   (add-hook 'eww-mode-hook      'my/set-buffer-variable-pitch)
   (add-hook 'markdown-mode-hook 'my/set-buffer-variable-pitch)
   (add-hook 'Info-mode-hook     'my/set-buffer-variable-pitch)
 #+END_SRC
+
+NOTE: =org-block-background= has been removed in Org 8.3.1 and from 9.0.0,
+has been completely deprecated and it inherits from =org-block=
 
 General configuration [[*Fonts][here]]
 
@@ -767,9 +782,11 @@ General configuration [[*Fonts][here]]
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
     ;; :disable
-    :init   (setq org-bullets-bullet-list '("●"))
-    ;; :init   (setq org-bullets-bullet-list '("○"))
-    :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+    :init
+    ;; (setq org-bullets-bullet-list '("●"))
+    ;; (setq org-bullets-bullet-list '("○"))
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+END_SRC
 
 **** org-agenda
@@ -852,14 +869,26 @@ Replace the default =org-goto= with helm's more useful headings list
 #+END_SRC
 
 *** TODO Diminish org-indent-mode
-** TODO projectile
+** projectile
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :diminish projectile-mode
+    :init
+    (setq-default projectile-keymap-prefix (kbd "C-x p"))
+    (setq projectile-enable-caching t)
+    (setq projectile-completion-system 'helm)
+    :config
+    (add-to-list 'projectile-other-file-alist '("cc" "h")) ; .cc -> .h
+    (add-to-list 'projectile-other-file-alist '("h" "cc")) ; .h -> .cc
+    (projectile-global-mode))
+#+END_SRC
+
 ** TODO SLIME
 ** undo-tree
 This lets us visually walk through the changes we've made, undo back to a certain point (or redo), and go down different branches.
 Default binding is =C-x u=
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
-    :ensure t
     :diminish undo-tree-mode
     :commands (undo-tree-visualize)
     :config
@@ -871,6 +900,7 @@ Default binding is =C-x u=
 ** yasnippet
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
+    :disabled
     :diminish yas-minor-mode
     :init (yas-global-mode t))
 #+END_SRC
