@@ -1,5 +1,4 @@
 #+TITLE: Emacs Configuration
-#+PROPERTY: header-args  :tangle yes
 
 * Init
 ** Archives
@@ -990,9 +989,20 @@ http://emacs.stackexchange.com/a/21173/9690
 )
 #+END_SRC
 
-** rainbow-delimiters
+** FIXME rainbow-delimiters
+Use brighter colors
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
+    :config
+    ;; (progn
+    ;;   (rainbow-delimiters-depth-1-face (t (:foreground "dark orange")))
+    ;;   (rainbow-delimiters-depth-2-face (t (:foreground "deep pink")))
+    ;;   (rainbow-delimiters-depth-3-face (t (:foreground "chartreuse")))
+    ;;   (rainbow-delimiters-depth-4-face (t (:foreground "deep sky blue")))
+    ;;   (rainbow-delimiters-depth-5-face (t (:foreground "yellow")))
+    ;;   (rainbow-delimiters-depth-6-face (t (:foreground "orchid")))
+    ;;   (rainbow-delimiters-depth-7-face (t (:foreground "spring green")))
+    ;;   (rainbow-delimiters-depth-8-face (t (:foreground "sienna1"))))
     :bind (:map emacs-unimpaired-toggle-map
                 ("r" . rainbow-delimiters-mode)))
 #+END_SRC

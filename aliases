@@ -229,13 +229,13 @@ if [[ $MYSHELL =~ "bash" ]]; then
   alias gosc='$VISUAL ~/.bashrc'
   alias gosf='$VISUAL ~/.dotfiles/bash/bashrc-func'
   alias gosp='$VISUAL ~/.dotfiles/bash/bashrc-prompt'
-  alias sosc='. ~/.bashrc && echo Sourced bashrc'
+  alias sosc='. ~/.bashrc && clnpath && echo Sourced bashrc'
   alias sosf='. ~/.dotfiles/bash/bashrc-func   && echo Sourced bashrc-func'
   alias sosp='. ~/.dotfiles/bash/bashrc-prompt && echo Sourced bashrc-prompt'
 elif [[ $MYSHELL =~ "zsh" ]]; then
   alias gosc='$VISUAL ~/.zshrc'
   alias gosf='$VISUAL ~/.zshrc-func'
-  alias sosc='. ~/.zshrc                && echo Sourced zshrc'
+  alias sosc='. ~/.zshrc && clnpath && echo Sourced zshrc'
   alias sosf='. ~/.dotfiles/zsh/zshrc-func && echo Sourced zshrc-func'
 fi
 alias gosa='$VISUAL ~/.dotfiles/aliases'
