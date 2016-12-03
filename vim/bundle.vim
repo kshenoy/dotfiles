@@ -35,11 +35,12 @@ Plug  'sjl/gundo.vim',                    {'on': 'GundoToggle'}
 Plug  'Valloric/ListToggle',              {'on': ['LToggle', 'QToggle']}
 Plug  'kshenoy/vim-mark'
 Plug  'matchit.zip'
-Plug  'vim-scripts/OmniCppComplete'
+" Plug  'lifepillar/vim-mucomplete'
 Plug  'kshenoy/vim-origami'
 Plug  'tpope/vim-repeat'
 Plug  'kshenoy/vim-signature'
-Plug  'justinmk/vim-sneak'
+" Plug  'maxboisvert/vim-simple-complete'
+" Plug  'justinmk/vim-sneak'
 Plug  'kshenoy/vim-sol'
 "Plug 'sjl/splice.vim',                   {'on': 'SpliceInit'}
 "Plug 'kana/vim-submode'
@@ -58,7 +59,7 @@ Plug  'SirVer/ultisnips',                 PlugCond(has('python'))
 Plug  'tpope/vim-unimpaired'
 Plug  'tpope/vim-vinegar',                {'on': '<Plug>VinegarUp'}
 Plug  'chaoren/vim-wordmotion'
-"Plug 'Valloric/YouCompleteMe'
+" Plug  'Valloric/YouCompleteMe',           {'do': './install.py --clang-completer'}
 
 call plug#end()
 
@@ -69,7 +70,7 @@ let g:acp_completeoptPreview = 0                                              " 
 
 
 " Base16 ---------------------------------------------------------------------------------------------------------  {{{1
-let g:base16_shell_path=expand('~/.dotfiles/base16/shell')
+let g:base16_shell_path=glob('~/.dotfiles/base16/shell/scripts')
 
 
 " CommandT -------------------------------------------------------------------------------------------------------  {{{1
@@ -274,6 +275,15 @@ let g:markdown_fold_override_foldtext = 0
 
 
 " OmniCpp --------------------------------------------------------------------------------------------------------  {{{1
+let g:mucomplete#chains = {
+  \ 'default': ['path', 'omni', 'keyn', 'dict', 'c-n', 'user', 'ulti'],
+  \ 'c':       ['path', 'omni', 'keyn', 'dict', 'c-n', 'user', 'ulti', 'tags'],
+  \ 'cpp':     ['path', 'omni', 'keyn', 'dict', 'c-n', 'user', 'ulti', 'tags']
+  \ }
+let g:mucomplete#enable_auto_at_startup = 1
+
+
+" OmniCpp --------------------------------------------------------------------------------------------------------  {{{1
 let OmniCpp_ShowPrototypeInAbbr = 1
 let OmniCpp_MayCompleteScope    = 1
 
@@ -309,8 +319,8 @@ nnoremap <silent> U     :<C-U>call repeat#wrap("\<Lt>C-R>",v:count)<CR>
 
 
 " Signature ------------------------------------------------------------------------------------------------------  {{{1
-"let g:SignatureMarkTextHLDynamic   = 0
-"let g:SignatureMarkerTextHLDynamic = 0
+let g:SignatureMarkTextHLDynamic   = 1
+let g:SignatureMarkerTextHLDynamic = 1
 if exists('*signature#marker#Goto')
   for i in range(1,9)
     execute 'nnoremap <silent> ]' . i . ' :<C-U>call signature#marker#Goto("next", ' . i .', v:count)<CR>'
@@ -320,21 +330,21 @@ endif
 
 
 " Sneak ----------------------------------------------------------------------------------------------------------  {{{1
-highlight link SneakPluginScope  CursorLine
-highlight link SneakPluginTarget Normal
+" highlight link SneakPluginScope  CursorLine
+" highlight link SneakPluginTarget Normal
 
-" Mimic Clever-f
-let g:sneak#s_next = 1
+" " Mimic Clever-f
+" let g:sneak#s_next = 1
 
-" Disable the 's' map and next/prev maps
-map gs <Plug>Sneak_s
-map gS <Plug>Sneak_S
-" 1-character _inclusive_ Sneak (for enhanced 'f')
-map f <Plug>Sneak_f
-map F <Plug>Sneak_F
-" 1-character _exclusive_ Sneak (for enhanced 't')
-map t <Plug>Sneak_t
-map T <Plug>Sneak_T
+" " Disable the 's' map and next/prev maps
+" map gs <Plug>Sneak_s
+" map gS <Plug>Sneak_S
+" " 1-character _inclusive_ Sneak (for enhanced 'f')
+" map f <Plug>Sneak_f
+" map F <Plug>Sneak_F
+" " 1-character _exclusive_ Sneak (for enhanced 't')
+" map t <Plug>Sneak_t
+" map T <Plug>Sneak_T
 
 
 " Submode --------------------------------------------------------------------------------------------------------  {{{1
@@ -496,3 +506,8 @@ let g:wordmotion_mappings = {
 \ 'aw': 'a<M-w>',
 \ 'iw': 'i<M-w>'
 \ }
+
+
+" YouCompleteMe --------------------------------------------------------------------------------------------------  {{{1
+let g:ycm_key_list_select_completion   = ['<C-N>']
+let g:ycm_key_list_previous_completion = ['<C-P>']
