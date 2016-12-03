@@ -135,6 +135,28 @@ unset -f =h
 }
 
 
+# @: Simpler/faster alternative to globstar                                                                         {{{1
+unset -f @
+@() {
+  # Description:
+  # @ ls /some/long/path/**/that/I/dont/want/to/type is converted to
+  #   ls $(find /some/long/path/ -path '*/that/I/dont/want/to/type')
+
+  local _cmd=()
+  for i in "$@"; do
+    if [[ $i =~ '**' ]]; then
+      _cmd+=('$(find'     $(command awk 'BEGIN {FS="**"} {print $1}' <<< "$i"))
+      _cmd+=('-path'  "'*"$(command awk 'BEGIN {FS="**"} {print $2}' <<< "$i")"')")
+    else
+      _cmd+=("$i")
+    fi
+  done
+  echo "${_cmd[@]}"
+  echo
+  eval "${_cmd[@]}"
+}
+
+
 # Coloured man pages with less                                                                                      {{{1
 man() {
   env \
