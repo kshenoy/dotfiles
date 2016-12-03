@@ -15,7 +15,24 @@ fi
 #  alias precmd 'set prompt = "<%c> "'
 #endif
 
-# Editor Aliases
+unalias P
+unset -f P
+P() {
+  if [[ (-f ${1}) && ("${1}" =~ sim\.out) ]]; then
+    if [[ $PAGER =~ vim ]]; then
+      eval "$PAGER -c '/error:\|Backtrace:' -c 'norm zt' $@"
+    elif [[ $PAGER =~ less ]]; then
+      eval "$PAGER -p error: $@"
+    fi
+  else
+    eval "$PAGER $@"
+  fi
+}
+
+
+#=======================================================================================================================
+# Editor Aliases                                                                                                    {{{1
+##
 unset -f vim_func_work
 gvim_func_work() {
   # This is a hack to weed out the arguments. The last argument is more likely to be a file than any of the other ones
@@ -114,7 +131,7 @@ alias tmxvnc='tmux new-window -d -n "XVNC" "x11vnc"'
 
 
 #=======================================================================================================================
-# Perforce
+# Perforce                                                                                                          {{{1
 #===========
 alias pf='p4w'
 alias pfa='pf add'
@@ -157,7 +174,7 @@ pfu() {
 
 
 #=======================================================================================================================
-# Locations
+# Locations                                                                                                         {{{1
 #============
 # Declaring these as environment variables instead of regular ones allows access from within vim
 unset -f make_wa
