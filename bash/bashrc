@@ -112,7 +112,7 @@ mkdir -p $(dirname ${HISTFILE})
 ## TERMINAL
 # Set terminal to mimic titeInhibit = true
 MANPAGER=less
-PAGER='~/bin/vim --config NONE -R -c "nnoremap <silent> q :qall!<CR>" -c "syntax on" -c "set cursorline"'
+export PAGER='~/bin/vim --config NONE -u ~/.vim/vimrc_pager'
 EDITOR=vim
 VISUAL=gvim
 
