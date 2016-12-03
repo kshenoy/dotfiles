@@ -23,14 +23,15 @@
   cmd = meld --diff $LOCAL $BASE
 
 [merge]
-  tool = meld
+  tool = gvim
   conflictstyle = diff3
 [mergetool "meld"]
   cmd = meld --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $MERGED $REMOTE
 [mergetool "gvim"]
-  cmd = vimmerge $BASE $REMOTE $LOCAL $MERGED
+  cmd = vim_merge $BASE $REMOTE $LOCAL $MERGED
 [credential]
   helper = cache --timeout=3600
 
 [alias]
-  lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit
+  lg   = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit
+  sync = !git stash && git pull && git stash pop
