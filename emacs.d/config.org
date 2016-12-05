@@ -8,6 +8,8 @@
     (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
 
   (when (>= emacs-major-version 24)
+    (when (>= emacs-minor-version 4)
+      (setq load-prefer-newer t))
     (require 'package)
     (add-to-list 'package-archives
                  '("melpa" . "http://melpa.milkbox.net/packages/")
@@ -122,11 +124,14 @@ I think the following would be handy
 
 #+BEGIN_SRC emacs-lisp
   (bind-keys* :prefix-map emacs-unimpaired-enable-map
+              :prefix-docstring "This map is used to enable settings ala vim-unimpaired"
               :prefix "C-c [")
   (bind-keys* :prefix-map emacs-unimpaired-disable-map
+              :prefix-docstring "This map is used to disable settings ala vim-unimpaired"
               :prefix "C-c ]")
   (bind-keys  :prefix-map emacs-unimpaired-toggle-map
-              :prefix "C-c o")
+              :prefix-docstring "This map is used to toggle settings ala vim-unimpaired"
+              :prefix "C-c g")
 #+END_SRC
 Note the use of /bind-keys*/ for the enable and disable maps and /bind-keys/ for the toggle map.
 This is because /bind-keys*/ will override any maps that are defined by any modes.
@@ -213,7 +218,7 @@ Save mini-buffer history
 
 ** TODO Fonts
 The reason for adding the hook is that if I try to create a daemon, it errors out with
-  /error: Window system is not in use or not initialized/
+    /error: Window system is not in use or not initialized/
 This is because we try to set a face-attribute before a frame is created which is a no-no for some reason.
 
 However, the downside to this is that if I have multiple such 'when' sections (like in private.el) we can't dictate the order in which they're applied.
@@ -260,29 +265,26 @@ Use only spaces and no tabs
 #+BEGIN_SRC emacs-lisp
   (setq-default indent-tabs-mode nil)
   (setq-default tab-width 2)
-  (setq show-trailing-whitespace t)
+  (setq-default show-trailing-whitespace t)
 
   ;; (bind-key "RET" 'newline-and-indent)
 #+end_src
+Since these are buffer-local variables, I have to use =setq-default=
 
-#+begin_src emacs-lisp
-  (bind-keys :map emacs-unimpaired-enable-map
-             ("SPC" . (lambda () (interactive)(setq show-trailing-whitespace t)))
-             :map emacs-unimpaired-disable-map
-             ("SPC" . (lambda () (interactive)(setq show-trailing-whitespace nil)))
-             :map emacs-unimpaired-toggle-map
-             ("SPC" . (lambda () (interactive)(setq show-trailing-whitespace (not show-trailing-whitespace)))))
-#+END_SRC
-
-*** TODO FIXME
+*** Enable/Disable/Toggle Trailing whitespace
 #+BEGIN_SRC emacs-lisp
   (defun my/toggle-trailing-whitespace ()
-    "Show trailing whitespace if ARG is positive, else hide it. If ARG is not specified, toggle it"
+    "Toggle trailing whitespace"
     (interactive)  ; Allows to be called as a command via M-x
-    (setq show-trailing-whitespace (not show-trailing-whitespace)))
-#+END_SRC
+    (setq-default show-trailing-whitespace (not show-trailing-whitespace)))
 
-Enable =show-trailing-whitespace= by default. The /setq/ above doesn't do that.
+  (bind-keys :map emacs-unimpaired-enable-map
+             ("SPC" . (lambda () (interactive)(setq-default show-trailing-whitespace t)))
+             :map emacs-unimpaired-disable-map
+             ("SPC" . (lambda () (interactive)(setq-default show-trailing-whitespace nil)))
+             :map emacs-unimpaired-toggle-map
+             ("SPC" . my/toggle-trailing-whitespace))
+#+END_SRC
 
 ** Highlight current line
 #+BEGIN_SRC emacs-lisp
@@ -364,6 +366,9 @@ Mouse-wheel acts on the hovered window rather than the one where the typing focu
 #+BEGIN_SRC emacs-lisp
   (setq mouse-wheel-follow-mouse t)
 #+END_SRC
+
+** TODO Scratch
+Mode-specific scratch buffers?
 
 * Packages
 ** TODO hydra
@@ -564,12 +569,14 @@ We redefine /helm-command-prefix/ here
 =C-x C-s= can be used after =helm-occur= to save the results to a buffer.
 
 Other useful default keybinds:
-|--------------+-------------------------+-----------------------------------------------------------|
-| <prefix> a   | helm-apropos            | Combination of describe-function, variable, commands etc. |
-| <prefix> r   | helm-regexp             | Construct a regexp                                        |
-| <prefix> C-, | helm-calcul-expression  | Interface to calc command                                 |
-| C-x r b      | helm-filtered-bookmarks |                                                           |
-|--------------+-------------------------+-----------------------------------------------------------|
+|--------------+-----------------------------+-----------------------------------------------------------|
+| <prefix> a   | helm-apropos                | Combination of describe-function, variable, commands etc. |
+| <prefix> i   | helm-semantic-or-imenu      | Similar to outline mode (in vim)                          |
+| <prefix> o   | helm-org-in-buffer-headings | Jump to org section heading                               |
+| <prefix> r   | helm-regexp                 | Construct a regexp                                        |
+| <prefix> C-, | helm-calcul-expression      | Interface to calc command                                 |
+| C-x r b      | helm-filtered-bookmarks     |                                                           |
+|--------------+-----------------------------+-----------------------------------------------------------|
 
 *** use-package END
 #+BEGIN_SRC emacs-lisp
@@ -769,6 +776,7 @@ has been completely deprecated and it inherits from =org-block=
 General configuration [[*Fonts][here]]
 
 **** Delete links
+This is a counter-part to =org-insert-link=. From [[http://emacs.stackexchange.com/a/10714/9690][here]].
 #+BEGIN_SRC emacs-lisp
   (defun my/org-replace-link-with-description ()
     "Replace an org link with its description. If a description doesn't exist, replace with its address"
@@ -807,11 +815,10 @@ General configuration [[*Fonts][here]]
     ;; (setq org-agenda-files (quote ("~/Notes/Software/" "~/Notes/Personal/")))
     (setq org-agenda-tags-column            -120) ; Monitors are wide, might as well use it :/
     (setq org-agenda-skip-scheduled-if-done t)    ; Why isn't this default?
-    (setq org-agenda-skip-deadline-if-done  t)
-
-    ;; :bind (("c" . calendar))
-    :bind* ("C-c a" . org-agenda))
+    (setq org-agenda-skip-deadline-if-done  t))
 #+END_SRC
+
+[[#General*org*Keybinds][Keybinds]]
 
 **** org-wunderlist
 #+BEGIN_SRC emacs-lisp
@@ -832,6 +839,24 @@ Autocomplete sources for org mode
     (org-ac/config-default))
 #+END_SRC
 
+**** org-capture
+From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 - Capture 1]] and [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][Using Emacs 24 - Capture 2]]
+#+BEGIN_SRC emacs-lisp
+  (setq org-capture-templates
+        '(("w"  "Capture templates for work")
+          ("wl" "L3 related"     entry (file+headline "~/Notes/AMD/AspenHighlands.org" "L3"))
+          ("wf" "Formal related" entry (file "~/Notes/AMD/Formal.org"))
+          ("s"  "Capture templates for snippets")
+          ("se" "Emacs snippets" entry (file "~/Notes/Software/emacs.org"))
+          ("ss" "Shell snippets" entry (file "~/Notes/Software/shell.org"))
+          ("sv" "Vim snippets"   entry (file "~/Notes/Software/vim.org"))))
+#+END_SRC
+
+NOTE: When using several keys, keys using the same prefix key must be sequential in the list and preceded by a 2-element entry explaining the prefix key.
+[[http://orgmode.org/manual/Template-elements.html#Template-elements][Template elements]], [[http://orgmode.org/manual/Template-elements.html#Template-expansion][Template expansion]]
+
+***** TODO Add sensible expansion templates
+
 **** htmlize
 Syntax highlighting when exporting to HTML? Yes, please!
 #+BEGIN_SRC emacs-lisp
@@ -839,6 +864,20 @@ Syntax highlighting when exporting to HTML? Yes, please!
 #+END_SRC
 
 *** Keybinds
+:PROPERTIES:
+:CUSTOM_ID: General*org*Keybinds
+:END:
+
+Custom keymap for org-mode bindings
+#+BEGIN_SRC emacs-lisp
+  (bind-keys  :prefix-map my-org-bindings-map
+              :prefix-docstring "This map is used to group together all org-mode settings"
+              :prefix "C-c o"
+              ("a" . org-agenda)
+              ("c" . org-capture))
+  ;; :bind (("c" . calendar))
+#+END_SRC
+
 Note that these are still part of the /:config/ block
 #+BEGIN_SRC emacs-lisp
   (bind-keys :map helm-command-map
@@ -852,11 +891,6 @@ Delete the result block using =C-c C-v k= where =C-c C-v= is the /org-babel-key-
          ("k"   . org-babel-remove-result)
          ("C-k" . org-babel-remove-result))
 #+end_src
-
-Replace the default =org-goto= with helm's more useful headings list
-#+begin_src emacs-lisp
-  :bind* ("C-c C-j" . helm-org-in-buffer-headings)
-#+END_SRC
 
 *** use-package END
 #+BEGIN_SRC emacs-lisp
@@ -873,6 +907,22 @@ Replace the default =org-goto= with helm's more useful headings list
 #+END_SRC
 
 *** TODO Diminish org-indent-mode
+
+** noflet
+We use this to create frames for org-capture directly from the OS as shown [[http://cestlaz.github.io/posts/using-emacs-24-capture-2/][here]].
+#+BEGIN_SRC emacs-lisp
+  (use-package noflet)
+
+  (defun my/make-capture-frame ()
+    "Create a new frame and run org-capture."
+    (interactive)
+    (make-frame '((name . "capture")))
+    (select-frame-by-name "capture")
+    (delete-other-windows)
+    (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
+            (org-capture)))
+#+END_SRC
+
 ** projectile
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
@@ -923,8 +973,10 @@ Similar to Tmux's =<prefix> C-g=
 #+BEGIN_SRC emacs-lisp
   (use-package ace-window
     :init
-    (custom-set-faces '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 5.0)))))
     (setq aw-background t)
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j? ?k? ?l))
+    :config
+    (set-face-attribute 'aw-leading-char-face nil :foreground "red" :height 2.5)
     :bind ("C-x o" . ace-window))
 #+END_SRC
 
@@ -937,6 +989,9 @@ Similar to vim's easy-motion plugin
     :bind (:map evil-normal-state-map
                 ("g s" . avy-goto-char)))
 #+END_SRC
+
+** TODO evil-snipe
+Replaces avy
 
 ** TODO FIXME auto-complete
 Completion doesn't work if evil is installed
@@ -989,23 +1044,33 @@ http://emacs.stackexchange.com/a/21173/9690
 )
 #+END_SRC
 
-** FIXME rainbow-delimiters
+** rainbow-mode
+When a color is specified as a hex code or with its name, set the background of the face to the value of the color itself
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-mode)
+#+END_SRC
+
+Provides command =rainbow-mode= to toggle this
+
+** rainbow-delimiters
 Use brighter colors
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
     :config
-    ;; (progn
-    ;;   (rainbow-delimiters-depth-1-face (t (:foreground "dark orange")))
-    ;;   (rainbow-delimiters-depth-2-face (t (:foreground "deep pink")))
-    ;;   (rainbow-delimiters-depth-3-face (t (:foreground "chartreuse")))
-    ;;   (rainbow-delimiters-depth-4-face (t (:foreground "deep sky blue")))
-    ;;   (rainbow-delimiters-depth-5-face (t (:foreground "yellow")))
-    ;;   (rainbow-delimiters-depth-6-face (t (:foreground "orchid")))
-    ;;   (rainbow-delimiters-depth-7-face (t (:foreground "spring green")))
-    ;;   (rainbow-delimiters-depth-8-face (t (:foreground "sienna1"))))
-    :bind (:map emacs-unimpaired-toggle-map
-                ("r" . rainbow-delimiters-mode)))
+    (progn
+      (set-face-attribute 'rainbow-delimiters-depth-1-face nil :foreground "dark orange")
+      (set-face-attribute 'rainbow-delimiters-depth-2-face nil :foreground "deep pink")
+      (set-face-attribute 'rainbow-delimiters-depth-3-face nil :foreground "chartreuse")
+      (set-face-attribute 'rainbow-delimiters-depth-4-face nil :foreground "deep sky blue")
+      (set-face-attribute 'rainbow-delimiters-depth-5-face nil :foreground "yellow")
+      (set-face-attribute 'rainbow-delimiters-depth-6-face nil :foreground "orchid")
+      (set-face-attribute 'rainbow-delimiters-depth-7-face nil :foreground "spring green")
+      (set-face-attribute 'rainbow-delimiters-depth-8-face nil :foreground "sienna1"))
+
+    :bind (:map emacs-unimpaired-toggle-map ("r" . rainbow-delimiters-mode)))
 #+END_SRC
+
+*** TODO Find Better colors for leuven theme
 
 ** monokai-theme
 #+BEGIN_SRC emacs-lisp
@@ -1051,9 +1116,7 @@ Use brighter colors
   (use-package leuven-theme
     ;; :disabled
     :config
-    (set-face-attribute 'org-agenda-date         nil :height 1.4)
-    (set-face-attribute 'org-agenda-date-today   nil :height 1.4)
-    (set-face-attribute 'org-agenda-date-weekend nil :height 1.4)
+    (load-theme 'leuven t)
 
     (setq evil-normal-state-cursor   '("#008000" box)
           evil-visual-state-cursor   '("#006FE0" box)
@@ -1062,8 +1125,13 @@ Use brighter colors
           evil-operator-state-cursor '("#D0372D" hollow)
           evil-emacs-state-cursor    '("white"   box))
 
-    (load-theme 'leuven t))
+    (set-face-attribute 'org-agenda-date         nil :height 1.4)
+    (set-face-attribute 'org-agenda-date-today   nil :height 1.4)
+    (set-face-attribute 'org-agenda-date-weekend nil :height 1.4)
+    (set-face-attribute 'trailing-whitespace     nil :background "#DDDDFF"))
 #+END_SRC
+
+Load theme first and then override the colors
 
 * After
 ** Private config
@@ -1078,3 +1146,6 @@ Set the background of the line number column to match that of the modeline
   ;; (set-face-attribute 'linum-relative-current-face nil :inherit 'linum :weight 'bold :background (face-attribute 'linum :background nil t))
 #+END_SRC
 
+* ToDo Items
+** TODO Add CUSTOM_ID property to all headings
+CUSTOM_ID value is the full hierarchical path to the section heading eg. =org*org-capture=
