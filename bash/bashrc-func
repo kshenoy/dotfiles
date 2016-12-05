@@ -137,7 +137,7 @@ unset -f =h
 
 # @: Simpler/faster alternative to globstar                                                                         {{{1
 unset -f @
-@() {
+function @ {
   # Description:
   # @ ls /some/long/path/**/that/I/dont/want/to/type is converted to
   #   ls $(find /some/long/path/ -path '*/that/I/dont/want/to/type')
