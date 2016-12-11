@@ -33,7 +33,7 @@ Plug  'sjl/gundo.vim',                    {'on': 'GundoToggle'}
 "Plug 'nathanaelkane/vim-indent-guides',  {'on': ['IndentGuidesToggle', 'IndentGuidesEnable']}
 "Plug 'Yggdroot/indentLine',              PlugCond(has('conceal'), {'on': 'IndentLinesToggle'})
 Plug  'Valloric/ListToggle',              {'on': ['LToggle', 'QToggle']}
-Plug  'kshenoy/vim-mark'
+Plug  'Yggdroot/vim-mark'
 Plug  'matchit.zip'
 " Plug  'lifepillar/vim-mucomplete'
 Plug  'kshenoy/vim-origami'

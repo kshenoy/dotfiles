@@ -7,7 +7,7 @@ nnoremap <silent> <leader>so :so $MYVIMRC<BAR>so $MYGVIMRC<CR>
 nnoremap <leader>sr :reg<CR>
 nnoremap <leader>sm :marks<CR>
 " Set size
-nnoremap <silent> <expr> <leader>sd ':set lines=' . (tabpagenr("$") == 1 ? '65' : '63') . ' columns=273<CR>'
+nnoremap <silent> <expr> <leader>sd ':set lines=' . (tabpagenr("$") == 1 ? '67' : '65') . ' columns=319<CR>'
 
 
 

@@ -59,8 +59,8 @@ Set size of default frame
   (setq default-frame-alist
         '((top    . 0)
           (left   . 0)
-          (width  . 271)
-          (height . 70)))
+          (width  . 237)
+          (height . 66)))
 #+END_SRC
 
 Start maximized
@@ -91,6 +91,8 @@ Avoid Emacs hanging for a while after changing default font:
 #+BEGIN_SRC emacs-lisp
   ;; (modify-frame-parameters nil '((wait-for-wm . nil)))
 #+END_SRC
+
+*** TODO Set frame size based on home/work
 
 ** Clean-up
 #+BEGIN_SRC emacs-lisp
@@ -131,7 +133,7 @@ I think the following would be handy
               :prefix "C-c ]")
   (bind-keys  :prefix-map emacs-unimpaired-toggle-map
               :prefix-docstring "This map is used to toggle settings ala vim-unimpaired"
-              :prefix "C-c g")
+              :prefix "C-c !")
 #+END_SRC
 Note the use of /bind-keys*/ for the enable and disable maps and /bind-keys/ for the toggle map.
 This is because /bind-keys*/ will override any maps that are defined by any modes.
@@ -258,7 +260,11 @@ How does this work? What is it supposed to do?
                                  :weight 'normal)))
 #+END_SRC
 
-Increase/Decrease font size using =C-x C-+= and =C-x C--=. =C-x C-0= resets it
+Scale font size using =C-x C-+= and =C-x C--=. =C-x C-0= resets it.
+=text-scale-mode-step= controls the scaling factor. For obvious reasons, don't set it to 1 else it won't change at all
+#+BEGIN_SRC emacs-lisp
+  (setq text-scale-mode-step 1.1)
+#+END_SRC
 
 ** Tabs, Indentation and Spacing
 Use only spaces and no tabs
@@ -384,6 +390,8 @@ evil can be toggled using =C-z=
   (use-package evil
     ;; :disabled
     :init
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-C-w-in-emacs-state t)
     (evil-mode t)
 #+END_SRC
 
@@ -422,7 +430,7 @@ evil can be toggled using =C-z=
   (use-package evil-matchit)
 #+END_SRC
 
-**** Keybindings
+**** Keybinds
 Make /Escape/ quit everything
 #+BEGIN_SRC emacs-lisp
   (defun my/minibuffer-keyboard-quit ()
@@ -844,7 +852,8 @@ From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 -
 #+BEGIN_SRC emacs-lisp
   (setq org-capture-templates
         '(("w"  "Capture templates for work")
-          ("wl" "L3 related"     entry (file+headline "~/Notes/AMD/AspenHighlands.org" "L3"))
+          ("wl" "L3 related"     entry (file+headline "~/Notes/AMD/AspenHighlands.org" "L3") "* %? %(org-set-property \"CAPTURE_DATE\" \"%U\")\n")
+          ;; ("wl" "L3 related"     entry (file+headline "~/Notes/AMD/AspenHighlands.org" "L3")
           ("wf" "Formal related" entry (file "~/Notes/AMD/Formal.org"))
           ("s"  "Capture templates for snippets")
           ("se" "Emacs snippets" entry (file "~/Notes/Software/emacs.org"))
@@ -854,6 +863,32 @@ From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 -
 
 NOTE: When using several keys, keys using the same prefix key must be sequential in the list and preceded by a 2-element entry explaining the prefix key.
 [[http://orgmode.org/manual/Template-elements.html#Template-elements][Template elements]], [[http://orgmode.org/manual/Template-elements.html#Template-expansion][Template expansion]]
+
+We use this to create frames for org-capture directly from the OS as shown [[http://cestlaz.github.io/posts/using-emacs-24-capture-2/][here]].
+#+BEGIN_SRC emacs-lisp
+  (use-package noflet)
+
+  (defun my/make-capture-frame ()
+    "Create a new frame and run org-capture."
+    (interactive)
+    (make-frame '((name . "capture")))
+    (select-frame-by-name "capture")
+    (delete-other-windows)
+    (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
+            (org-capture)))
+
+  (defadvice org-capture-finalize
+      (after delete-capture-frame activate)
+    "Advise capture-finalize to close the frame"
+    (if (equal "capture" (frame-parameter nil 'name))
+      (delete-frame)))
+
+  (defadvice org-capture-destroy
+      (after delete-capture-frame activate)
+    "Advise capture-destroy to close the frame"
+    (if (equal "capture" (frame-parameter nil 'name))
+      (delete-frame)))
+#+END_SRC
 
 ***** TODO Add sensible expansion templates
 
@@ -908,34 +943,42 @@ Delete the result block using =C-c C-v k= where =C-c C-v= is the /org-babel-key-
 
 *** TODO Diminish org-indent-mode
 
-** noflet
-We use this to create frames for org-capture directly from the OS as shown [[http://cestlaz.github.io/posts/using-emacs-24-capture-2/][here]].
-#+BEGIN_SRC emacs-lisp
-  (use-package noflet)
-
-  (defun my/make-capture-frame ()
-    "Create a new frame and run org-capture."
-    (interactive)
-    (make-frame '((name . "capture")))
-    (select-frame-by-name "capture")
-    (delete-other-windows)
-    (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
-            (org-capture)))
-#+END_SRC
-
 ** projectile
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :diminish projectile-mode
     :init
-    (setq-default projectile-keymap-prefix (kbd "C-x p"))
     (setq projectile-enable-caching t)
     (setq projectile-completion-system 'helm)
     :config
     (add-to-list 'projectile-other-file-alist '("cc" "h")) ; .cc -> .h
     (add-to-list 'projectile-other-file-alist '("h" "cc")) ; .h -> .cc
-    (projectile-global-mode))
+    (projectile-global-mode)
 #+END_SRC
+
+*** Keybinds
+:PROPERTIES:
+:header-args: :tangle no
+:END:
+
+Unbind the default prefix. Explained [[https://github.com/bbatsov/projectile/issues/991#issuecomment-248026667][here.]]
+#+BEGIN_SRC emacs-lisp
+  (define-key projectile-mode-map projectile-keymap-prefix nil)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  :bind (("C-x p" . projectile-keymap-prefix)
+         :map       projectile-command-map)
+#+END_SRC
+
+*** use-package END
+#+BEGIN_SRC emacs-lisp
+  )
+#+END_SRC
+
+*** TODO Set .x.v as other file for .x
+This requires including $STEM/build/lv/ch/rtl in .projectile and ignoring .x
+Might need to re-index every time a model is built?
 
 ** TODO SLIME
 ** undo-tree
@@ -1071,6 +1114,17 @@ Use brighter colors
 #+END_SRC
 
 *** TODO Find Better colors for leuven theme
+
+** verilog-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package verilog-mode
+    :load-path "bundle/verilog-mode"
+    :mode (("\\.v\\'"    . verilog-mode)
+           ("\\.svh?\\'" . verilog-mode)
+           ("\\.x\\'"    . verilog-mode))
+    :config
+    (font-lock-mode 1))
+#+END_SRC
 
 ** monokai-theme
 #+BEGIN_SRC emacs-lisp

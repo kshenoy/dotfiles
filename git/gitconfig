@@ -4,7 +4,6 @@
 
 [core]
   editor = gvim --nofork
-  excludesfile = /home/ks/.gitignore_global
   fileMode = false
 
 [color]

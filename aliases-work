@@ -50,29 +50,7 @@ gvim_func_work() {
 
   gvim_func -geometry 318x67+1911+0 ${_server:+--servername $_server} "$@"
 }
-alias v="gvim_func -geometry 273x63+0+0"
-
-
-unset -f emacs_func_work
-emacs_func_work() {
-  # This is a hack to weed out the arguments. The last argument is more likely to be a file than any of the other ones
-  local _file=$(eval echo $(echo '$'"$#"))
-  if [[ ( -f $_file ) && ( -n $REPO_PATH ) ]]; then
-    local _server=$(echo ${REPO_PATH} | tr '/' '_')
-    local _scratch_dir=$(dirname $(readlink -f $REPO_PATH/sim))
-    if [[ $(readlink -f $_file 2> /dev/null) =~ ^$_scratch_dir ]]; then
-      _server="${_server}_SCRATCH"
-    elif [[ ! $(readlink -f $_file) =~ ^$REPO_PATH ]]; then
-      _server=""
-    fi
-  fi
-
-  #echo "[$(tput setaf 2)Server: $(tput sgr0)'$(tput setaf 4)${_server}$(tput sgr0)']"
-  #echo "emacs_func ${_server:+--socket-name=$_server} $@"
-  emacs_func "${_server:+--socket-name=$_server}" "$@"
-}
-alias e=emacs
-alias ed="~/bin/emacs_daemon"
+alias v="gvim_func -geometry 319x67+0+0"
 alias vlog="v -p *ChkL3.log *Seq.log dsp_ch.txt sim.out -c 'set autoread'"
 
 

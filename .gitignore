@@ -3,7 +3,6 @@ bash/history
 compiz/
 emacs.d/ac-comphist.dat
 emacs.d/bookmarks
-emacs.d/bundle/
 emacs.d/config.el*
 emacs.d/elpa/
 emacs.d/games/
@@ -13,6 +12,7 @@ emacs.d/projectile-bookmarks.eld
 emacs.d/projectile.cache
 emacs.d/recentf
 emacs.d/semanticdb/
+emacs.d/session*
 emacs.d/tmp/
 fonts/
 unity/

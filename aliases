@@ -220,6 +220,8 @@ fi
 alias edbg="emacs --debug-init"
 unset -f e
 e() { ec "$@" & }
+# To kill the daemon:
+alias edk="emacsclient -ne '(save-buffers-kill-emacs)'"
 
 
 #===============
