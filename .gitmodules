@@ -1,0 +1,3 @@
+[submodule "emacs.d/bundle/verilog-mode"]
+	path = emacs.d/bundle/verilog-mode
+	url = https://github.com/veripool/verilog-mode
