@@ -54,6 +54,17 @@ alias v="gvim_func -geometry 319x67+0+0"
 alias vlog="v -p *ChkL3.log *Seq.log dsp_ch.txt sim.out -c 'set autoread'"
 
 
+unset -f emacs_func_work
+emacs_func_work() {
+  local _server=""
+  if [[ -n $REPO_PATH ]]; then
+    _server="${REPO_PATH//\//_}"
+  fi
+  emacs_func ${_server:+--socket-name=${_server}} "$@" &
+}
+alias e="emacs_func_work"
+
+
 # Project Aliases
 # alias as_bsub="lsf_bsub -Is -R 'rusage[mem=2000]' -q high -P aspen-ver"
 #alias amdfind='find $REPO_PATH -path "$REPO_PATH/simenv/build" -prune -or -path "$REPO_PATH/.ccache" -prune -or -path "$REPO_PATH/.autoio_cache" -prune -or -path "$REPO_PATH/release_gate_run" -prune -or -print'
@@ -145,7 +156,7 @@ pfu() {
 
   if [[ $ret != 0 ]]; then return; fi
 
-  ~/bin/gentags --create
+  ~kshenoy/bin/gentags --create
   sosa
   [[ -f ~/.fzf.bash ]] && . ~/.fzf.bash
 }
@@ -184,30 +195,16 @@ dyn_vars() {
   export sim=${REPO_PATH+$REPO_PATH/}'sim'
   export r=${REPO_PATH+$REPO_PATH/}'ch/rtl'
   export v=${REPO_PATH+$REPO_PATH/}'ch/verif'
+  export tb=${REPO_PATH+$REPO_PATH/}'ch/tb'
   export txn=${REPO_PATH+$REPO_PATH/}'ch/verif/txn'
   export rl3=${REPO_PATH+$REPO_PATH/}'ch/rtl/l3'
   export vl3=${REPO_PATH+$REPO_PATH/}'ch/verif/chk_l3'
   export vl23=${REPO_PATH+$REPO_PATH/}'ch/verif/chk_l2l3'
   export vlk=${REPO_PATH+$REPO_PATH/}'ch/verif/chk_lock'
   export vcov=${REPO_PATH+$REPO_PATH/}'ch/verif/coverage'
-  export test=${REPO_PATH+$REPO_PATH/}'ch/tc/tb_ch'
 }
 dyn_vars
 
-# Hash of locations and their aliases. Used in prompt pwd display to show shorthand instead of whole path
-# ${!dir_alias[@]} gives a list of keys
-# ${dir_alias[@]}  gives a list of values
-# if [[ ${dir_alias[$as]} ]]; then echo "Found"; else echo "Not Found"; fi
-# declare -A dir_alias=(
-#   ['$HOME']='~'
-#   ['$ch0ks/wa']='~WA0'
-#   ['$ch0']='~CH0'
-#   ['$ch1ks/wa']='~WA1'
-#   ['$ch1']='~CH1'
-#   ['$scr0']='~Scratch0'
-#   ['$scr1']='~Scratch1'
-#   ['$scr2']='~Scratch2'
-# )
 
 #=======================================================================================================================
 # Functions
@@ -219,7 +216,15 @@ benv() {
   local env_tmux=$TMUX
   local env_tmux_pane=$TMUX_PANE
 
-  (( $# > 0 )) && command cd "$1"
+  local _workarea=$PWD
+  if (( $# > 0 )); then
+    _workarea=$1
+  fi
+
+  # Start emacs daemon if one isn't present
+  [[ -n "${_workarea}" ]] && ~kshenoy/bin/emacs_daemon -s ${_workarea} &> /dev/null &
+
+  command cd "${_workarea}"
   sbi && bootenv
   local ret=$?
 
@@ -229,6 +234,7 @@ benv() {
 
   if [[ $ret != 0 ]]; then return; fi
 
+  # Source aliases etc.
   sosa; sosf
   [[ -f ~/.fzf.bash ]] && . ~/.fzf.bash
 
@@ -293,6 +299,9 @@ mkwa() {
   local _proj=""
   local _branch=""
   local _cl=""
+  local _fg_red=$(tput setaf 1)
+  local _fg_green=$(tput setaf 2)
+  local _reset=$(tput sgr0)
 
   if [[ "${_temp}" =~ @ ]]; then
     local _cl=" -changelist ${_temp#*@}"
@@ -323,7 +332,7 @@ mkwa() {
       ;;&
     *)
       if [[ -z "${_proj}" ]]; then
-        echo "ERROR: Project not specified"
+        echo "${_fg_red}ERROR${_reset}: Project not specified"
         return 1
       fi
       ;;
@@ -346,13 +355,17 @@ mkwa() {
     return 1
   fi
 
+  # Start an emacs daemon
+  echo "${_fg_green}[Starting emacs daemon...]${_reset}"
+  ~kshenoy/bin/emacs_daemon -s &> /dev/null &
+
   # Source aliases...
-  echo "$(tput setaf 2)[Sourcing aliases...]$(tput sgr0)"
+  echo "${_fg_green}[Sourcing aliases...]${_reset}"
   [[ -f ~/.dotfiles/aliases ]] && . ~/.dotfiles/aliases
 
   # Create tags
-  echo "$(tput setaf 2)[Generating Tags...]$(tput sgr0)"
-  ~/bin/gentags --create
+  echo "${_fg_green}[Generating tags...]${_reset}"
+  ~kshenoy/bin/gentags --create
 }
 
 
@@ -400,8 +413,8 @@ pfrem() {
   echo "  command rm -rf $_scratch_dir"
   rm_rf_silent $_scratch_dir
 
-  # Kill emacs daemon
-  #~kshenoy/bin/emacs_daemon -k $(echo $_workarea | tr '/' '_')
+  # Kill emacs daemon. Use explicit path to avoid kill any other daemons
+  ~kshenoy/bin/emacs_daemon -k ${_workarea//\//_}
 }
 
 unset -f wtff

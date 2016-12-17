@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+
+function _print_help_() {
+  echo "Usage:"
+  echo "  `basename $0` [OPTIONS]"
+  echo
+  echo "Options:"
+  echo "  -h             Print this help"
+  echo "  -s [SERVER]    Start the daemon. If SERVER is not specfied, it's derived from $REPO_PATH"
+  echo "  -k [SERVER]    Kill the daemon. If SERVER is not specfied, it's derived from $REPO_PATH"
+  echo "  -K             Kill all daemons"
+  echo "  -r [SERVER]    Restart the daemon. If SERVER is not specfied, it's derived from $REPO_PATH"
+  echo "  -l, --list     List all running daemons"
+}
+
+# Defaults
+_emacs_path="/home/kshenoy/bin/emacs_path"
+# By default, on a *nix-like platform, the sockets are located in a directory called /tmp/emacs1234 where
+# /tmp is the value of the environment variable TMPDIR (defaulting to /tmp) and 1234 is the user ID
+_socket_path="${TMPDIR:-/tmp}/emacs$(id -u)"
+
+# Colors for echo!
+_fg_red=$(tput setaf 1)
+_fg_green=$(tput setaf 2)
+_reset=$(tput sgr0)
+
+# Loop over all the options first to see if help needs to be dumped
+# This allows us to ignore any other option
+for _i in "$@"; do
+  if [[ $1 =~ ^-h$ ]] || [[ $1 =~ ^--help$ ]]; then
+    _print_help_
+    exit 0
+  fi
+done
+
+# while  getopts ":s:k:"
+while (( $# > 0 )); do
+  _socket="server"
+  case "$1" in
+    -s)
+      if [[ -n "$2" ]] && [[ "$2" != -* ]]; then
+        _socket="$2"
+        shift
+      elif [[ -n "${REPO_PATH}" ]]; then
+        _socket="${REPO_PATH//\//_}"
+      fi
+
+      echo "${_fg_green}Creating emacs daemon${_reset}: ${_socket}"
+      if [[ ! -S ${_socket_path}/${_socket} ]]; then
+        ${_emacs_path}/bin/emacs --daemon${_socket:+=${_socket}} 1> /dev/null
+      fi
+      ;;
+
+    -k)
+      if [[ -n "$2" ]] && [[ "$2" != -* ]]; then
+        _socket="$2"
+        shift
+      elif [[ -n "${REPO_PATH}" ]]; then
+        _socket="${REPO_PATH//\//_}"
+      else
+        # This is the default name used by emacs to create a socket when one is not provided
+        _socket="server"
+      fi
+
+      echo "${_fg_green}Killing emacs daemon${_reset}: ${_socket}${_reset}"
+      if [[ -S ${_socket_path}/${_socket} ]]; then
+        ${_emacs_path}/bin/emacsclient -ne ${_socket:+--socket-name=${_socket}} --eval '(kill-emacs)'
+      fi
+      ;;
+
+    -K)
+      while read; do
+        $0 -k $REPLY
+      done < <($0 -l | command tail -n +2)
+      # `tail -n +2` will dump out all lines starting from line no. 2
+      ;;
+
+    -r)
+      if [[ -n "$2" ]] && [[ "$2" != -* ]]; then
+        _socket="$2"
+        shift
+      fi
+      $0 -k ${_socket}
+      $0 -s ${_socket}
+      ;;
+
+    --list|-l)
+      echo "${_fg_green}Currently running daemons:${_reset}"
+      command ls -1 ${_socket_path}
+      ;;
+
+    *)
+      echo "ERROR: Invalid option: ${1}" >&2; echo
+      print_help
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+# Clean-up
+unset _socket _emacs_path _socket_path _fg_red _fg_green _reset
+
+exit 0

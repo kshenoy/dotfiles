@@ -8,12 +8,14 @@ root = ssh://kshenoy@atlhen-vdi0653//home/kshenoy/Dropbox
 #          can be given more than once.
 #mountpoint = /mnt/cifs/amd/Dropbox/Softwares/Linux
 
+
 # Paths to synchronize
 #path = current
 #path = common
 #path = .netscape/bookmarks.html
 path = Config
 path = Documents/Notes
+
 
 # Some regexps specifying names and paths to ignore
 #ignore = Path stats    ## ignores <root>/stats
@@ -22,22 +24,26 @@ path = Documents/Notes
 #ignore = Name *stats   ## ignores all files/directories that end with "stats"
 #ignore = Name stats*   ## ignores all files/directories that begin with "stats"
 #ignore = Name *.tmp    ## ignores all files with the extension .tmp
-ignore = Name {.git*}
 ignore = Name *.tags
 ignore = Name tags
 ignore = Name .nfs*
 ignore = Name *.tmp
 ignore = Name .netrwhist
 #ignore = Name *history
-ignore = Path Config/dotfiles/emacs.d/auto-save-list
-ignore = Path Config/dotfiles/emacs.d/elpa
-ignore = Path Config/dotfiles/emacs.d/tmp
-ignore = Path Config/dotfiles/vim/bundle
-ignore = Path Config/dotfiles/vim/tmp
-ignore = Path Config/dotfiles/compiz
-ignore = Path Config/dotfiles/scripts/ti
-ignore = Path Config/dotfiles/unity
-ignore = Path Config/Fonts/PragmataPro
+
+# Ignores the exact path and everything below it
+ignore = BelowPath .git
+ignore = BelowPath Config/dotfiles/emacs.d/auto-save-list
+ignore = BelowPath Config/dotfiles/emacs.d/elpa
+ignore = BelowPath Config/dotfiles/emacs.d/server
+ignore = BelowPath Config/dotfiles/emacs.d/tmp
+ignore = BelowPath Config/dotfiles/vim/bundle
+ignore = BelowPath Config/dotfiles/vim/tmp
+ignore = BelowPath Config/dotfiles/compiz
+ignore = BelowPath Config/dotfiles/scripts/ti
+ignore = BelowPath Config/dotfiles/unity
+ignore = BelowPath Config/Fonts/PragmataPro
+
 
 #          When set to true, this flag causes the user interface to skip
 #          asking for confirmations on non-conflicting changes. (More

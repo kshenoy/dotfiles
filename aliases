@@ -211,17 +211,17 @@ alias govg='$VISUAL ~/.vim/gvimrc'
 alias govm='$VISUAL ~/.vim/plugin/mappings.vim'
 alias govv='$VISUAL ~/.vim/vimrc'
 
+alias edbg="emacs --debug-init"
+alias ed="~/bin/emacs_daemon"
 if [[ $(hostname) =~ loki ]]; then
-  alias ec='XLIB_SKIP_ARGB_VISUALS=1 emacsclient --alternate-editor="emacs" --create-frame --quiet'
+  alias ec='/usr/bin/env XLIB_SKIP_ARGB_VISUALS=1 emacsclient --alternate-editor="emacs" --create-frame --quiet'
   alias emacs='/usr/bin/env XLIB_SKIP_ARGB_VISUALS=1 emacs'
 else
   alias ec='emacsclient --alternate-editor="emacs" --create-frame --quiet'
 fi
-alias edbg="emacs --debug-init"
-unset -f e
-e() { ec "$@" & }
-# To kill the daemon:
-alias edk="emacsclient -ne '(save-buffers-kill-emacs)'"
+unset -f emacs_func
+emacs_func() { ec "$@" & }
+alias e="emacs_func"
 
 
 #===============

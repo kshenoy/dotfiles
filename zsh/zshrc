@@ -153,7 +153,7 @@ setopt EXTENDED_GLOB
 #===============================================================================
 # 256 colors for console
 #
-if [[ -e /usr/share/terminfo/x/xterm-256color ]]; then
+if [[ -f /usr/share/terminfo/x/xterm-256color ]]; then
   export TERM='screen-256color'
 else
   export TERM='xterm-color'

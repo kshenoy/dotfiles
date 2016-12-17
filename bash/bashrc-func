@@ -151,8 +151,8 @@ function @ {
       _cmd+=("$i")
     fi
   done
-  echo "${_cmd[@]}"
-  echo
+  # echo "${_cmd[@]}"
+  # echo
   eval "${_cmd[@]}"
 }
 
