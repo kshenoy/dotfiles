@@ -108,7 +108,7 @@ HOSTNAME="$(hostname)"
 # Keeps history forever. Requires PROMPT_COMMAND='history -a; history -r'
 # Moving this to PROMPT_COMMAND to keep the HISTFILE current when sessions span multiple days
 # HISTFILE="${HOME}/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
-mkdir -p $(dirname ${HISTFILE})
+# mkdir -p $(dirname ${HISTFILE})
 
 ## TERMINAL
 # Set terminal to mimic titeInhibit = true

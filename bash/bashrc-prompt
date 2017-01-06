@@ -316,6 +316,7 @@ _setprompt_sjlmod_() {
   # Putting this here to keep the HISTFILE current when sessions span multiple days
   # FIXME: Find a better way to do this i.e. do it once a day instead of everytime the prompt is refreshed
   HISTFILE="${HOME}/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
+  [[ -d $(dirname ${HISTFILE}) ]] || mkdir -p $(dirname ${HISTFILE})
   # Write to the history file immediately instead of waiting till the end of the session
   history -a
 }
