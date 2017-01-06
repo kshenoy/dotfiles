@@ -2,7 +2,7 @@
 
 _dropbox=/home/ks/Dropbox
 
-mkdir -p ~/.config ~/.local/share ~/.ssh ~/.unison ~/bin
+mkdir -p ~/.config{,/git} ~/.local/share ~/.ssh ~/.unison ~/bin
 
 ln -svTf "$_dropbox"/Documents/Notes         ~/Notes
 ln -svTf "$_dropbox"/Config/dotfiles         ~/.dotfiles
@@ -25,7 +25,7 @@ ln -svTf ~/.dotfiles/vim                     ~/.config/nvim
 ln -svTf ~/.dotfiles/vim                     ~/.vim
 ln -svTf ~/.dotfiles/xinitrc                 ~/.xinitrc
 ln -svTf ~/.dotfiles/Xresources              ~/.Xresources
-ln -svTf ~/.dotfiles/fzf.bash                ~/.fzf.bash
+ln -svTf ~/.dotfiles/fzf/fzf.bash            ~/.fzf.bash
 
 ln -svTf ~/.dotfiles/scripts/vim_merge       ~/bin/vim_merge
 ln -svTf ~/.dotfiles/scripts/wim             ~/bin/vim

@@ -363,6 +363,9 @@ mkwa() {
   echo "${_fg_green}[Sourcing aliases...]${_reset}"
   [[ -f ~/.dotfiles/aliases ]] && . ~/.dotfiles/aliases
 
+  # Set project root for emacs-projectile
+  cp $as0ks/projectile $STEM/.projectile
+
   # Create tags
   echo "${_fg_green}[Generating tags...]${_reset}"
   ~kshenoy/bin/gentags --create

@@ -7,6 +7,9 @@
 ;; You may delete these explanatory comments.
 (package-initialize)
 
+;; (custom-set-variables '(debug-on-error t))
+
+
 (setq my-init-config-org     (expand-file-name "config.org" user-emacs-directory)
       my-init-config-el      (expand-file-name "config.el"  user-emacs-directory)
       my-init-config-el-pass (concat my-init-config-el ".pass")

@@ -30,9 +30,9 @@ ignore = Name .nfs*
 ignore = Name *.tmp
 ignore = Name .netrwhist
 #ignore = Name *history
+ignore = Name .git
 
 # Ignores the exact path and everything below it
-ignore = BelowPath .git
 ignore = BelowPath Config/dotfiles/emacs.d/auto-save-list
 ignore = BelowPath Config/dotfiles/emacs.d/elpa
 ignore = BelowPath Config/dotfiles/emacs.d/server
@@ -43,6 +43,7 @@ ignore = BelowPath Config/dotfiles/compiz
 ignore = BelowPath Config/dotfiles/scripts/ti
 ignore = BelowPath Config/dotfiles/unity
 ignore = BelowPath Config/Fonts/PragmataPro
+ignore = BelowPath Documents/Notes/Personal
 
 
 #          When set to true, this flag causes the user interface to skip
