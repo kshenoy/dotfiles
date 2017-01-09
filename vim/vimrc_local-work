@@ -9,7 +9,7 @@ function! s:SetLocalSettings(filename)
       if (l:p4path =~ 'ch/rtl')
         setlocal textwidth=80
         let &colorcolumn=(&tw+1)
-      elseif (l:p4path =~ 'ch/verif/(chk_)?l3')
+      elseif (l:p4path =~ '\vch/verif/(chk_)?l3')
         setlocal textwidth=100
         let &colorcolumn=(&tw+1)
       endif

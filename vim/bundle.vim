@@ -48,12 +48,14 @@ Plug  'tpope/vim-surround'
 Plug  'AndrewRadev/switch.vim',           {'on': 'Switch'}
 Plug  'WeiChungWu/vim-SystemVerilog',     {'for': 'systemverilog'}
 Plug  'dhruvasagar/vim-table-mode',       {'on': ['TableModeToggle', 'TableModeEnable']}
-Plug  'wellle/targets.vim'
+" Plug  'wellle/targets.vim'
 Plug  'kana/vim-textobj-user'
 Plug  'glts/vim-textobj-comment',         {'on': '<Plug>(textobj-comment'}
 Plug  'kana/vim-textobj-function',        {'on': '<Plug>(textobj-function'}
 Plug  'kana/vim-textobj-indent',          {'on': '<Plug>(textobj-indent'}
 Plug  'kana/vim-textobj-line',            {'on': '<Plug>(textobj-line'}
+Plug  'saihoooooooo/vim-textobj-space',   {'on': '<Plug>(textobj-space'}
+Plug  'rhysd/vim-textobj-word-column',    {'on': '<Plug>(textobj-wordcolumn'}
 Plug  'kshenoy/TWiki-Syntax',             {'for': 'twiki'}
 Plug  'SirVer/ultisnips',                 PlugCond(has('python'))
 Plug  'tpope/vim-unimpaired'
@@ -464,21 +466,26 @@ nnoremap coB :TableModeToggle<CR>
 
 
 " vim-textobj-* --------------------------------------------------------------------------------------------------  {{{1
-let g:textobj_comment_no_default_key_mappings  = 1
-let g:textobj_function_no_default_key_mappings = 1
-let g:textobj_indent_no_default_key_mappings   = 1
-let g:textobj_line_no_default_key_mappings     = 1
+let g:textobj_comment_no_default_key_mappings    = 1
+let g:textobj_function_no_default_key_mappings   = 1
+let g:textobj_indent_no_default_key_mappings     = 1
+let g:textobj_line_no_default_key_mappings       = 1
+let g:textobj_space_no_default_key_mappings      = 1
+let g:textobj_wordcolumn_no_default_key_mappings = 1
 
 for s:mode in ['x', 'o']
   for s:motion in ['i', 'a']
-    execute s:mode . 'map ' . s:motion . '_ <Plug>(textobj-line-'        . s:motion          . ')'
-    execute s:mode . 'map ' . s:motion . 'c <Plug>(textobj-comment-'     . s:motion          . ')'
-    execute s:mode . 'map ' . s:motion . 'f <Plug>(textobj-function-'    . s:motion          . ')'
-    execute s:mode . 'map ' . s:motion . 'F <Plug>(textobj-function-'    . toupper(s:motion) . ')'
-    execute s:mode . 'map ' . s:motion . 'i <Plug>(textobj-indent-same-' . s:motion          . ')'
-    execute s:mode . 'map ' . s:motion . 'I <Plug>(textobj-indent-'      . s:motion          . ')'
+    execute s:mode . 'map ' . s:motion . 'c       <Plug>(textobj-comment-'      . s:motion          . ')'
+    execute s:mode . 'map ' . s:motion . 'f       <Plug>(textobj-function-'     . s:motion          . ')'
+    execute s:mode . 'map ' . s:motion . 'F       <Plug>(textobj-function-'     . toupper(s:motion) . ')'
+    execute s:mode . 'map ' . s:motion . 'i       <Plug>(textobj-indent-same-'  . s:motion          . ')'
+    execute s:mode . 'map ' . s:motion . 'I       <Plug>(textobj-indent-'       . s:motion          . ')'
+    execute s:mode . 'map ' . s:motion . '_       <Plug>(textobj-line-'         . s:motion          . ')'
+    execute s:mode . 'map ' . s:motion . '<Space> <Plug>(textobj-space-'        . s:motion          . ')'
+    execute s:mode . 'map ' . s:motion . 'v       <Plug>(textobj-wordcolumn-w-' . s:motion          . ')'
+    execute s:mode . 'map ' . s:motion . 'V       <Plug>(textobj-wordcolumn-W-' . s:motion          . ')'
   endfor
-  execute s:mode . 'map ' . s:motion . 'C <Plug>(textobj-comment-big-a)'
+  execute s:mode . 'map ' . 'a' . 'C <Plug>(textobj-comment-big-a)'
 endfor
 
 
