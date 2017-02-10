@@ -48,9 +48,9 @@ gvim_func_work() {
     #echo "[$(tput setaf 2)Server: $(tput sgr0)'$(tput setaf 4)${_server}$(tput sgr0)']"
   fi
 
-  gvim_func -geometry 318x67+1911+0 ${_server:+--servername $_server} "$@"
+  gvim_func -geometry 319x70+1911+0 ${_server:+--servername $_server} "$@"
 }
-alias v="gvim_func -geometry 319x67+0+0"
+alias v="gvim_func -geometry 319x70+0+0"
 alias vlog="v -p *ChkL3.log *Seq.log dsp_ch.txt sim.out -c 'set autoread'"
 
 
@@ -93,14 +93,14 @@ alias trapbug='P4DIFF= s_trapbug -bug'
 
 # Misc
 alias rr='~/bin/rerun'
-alias rrb='rr --norun -b'
-alias rrc='rr --norun -c'
-alias rrcb='rr --norun -bc'
+alias rrb='rr --norun --build'
+alias rrc='rr --norun --clean'
+alias rrcb='rr --norun --clean --build'
 alias bca='build -clean_all'
-alias rrbr='rr -b'
-alias rrcr='rr -c'
-alias rrdbg=$'rr -a \'-avf "--/ChkL3.Debug/"\' --fsdb --dsp'
-alias rrdbg_ras='rr -y $v/debug/ras/amdmsg_config.yaml --fsdb'
+alias rrrbr='rr --recompile-all --build'
+alias rrbr='rr --build'
+alias rrcr='rr --clean'
+alias rrdbg=$'rr --add \'-avf "--/ChkL3.Debug/"\' --fsdb --dsp'
 
 alias rg='release_gate'
 alias rgd='release_gate -donate'
@@ -166,8 +166,8 @@ pfu() {
 # Locations                                                                                                         {{{1
 #============
 # Declaring these as environment variables instead of regular ones allows access from within vim
-unset -f make_wa
-make_wa() {
+unset -f make_wa_vars
+make_wa_vars() {
   local _proj _ch _wa _scr
   for _proj in as ah br; do
     local _proj_ucase=$(tr 'a-z' 'A-Z' <<< ${_proj})
@@ -177,7 +177,7 @@ make_wa() {
       eval "export ${_proj}${_ch}='/proj/ch_func_dev${_ch}/${_proj_ucase}'"
       eval "export ${_proj}${_ch}ks='/proj/ch_func_dev${_ch}/${_proj_ucase}/kshenoy'"
       for _wa in {1..5}; do
-        eval "export ${_proj}${_ch}${_wa}='/proj/ch_func_dev${_ch}/${_proj_ucase}/kshenoy/${_proj}${_wa}'"
+        eval "export ${_proj}${_ch}${_wa}='/proj/ch_func_dev${_ch}/${_proj_ucase}/kshenoy/${_proj}${_ch}${_wa}'"
       done
     done
 
@@ -186,22 +186,23 @@ make_wa() {
     done
   done
 }
-make_wa
+make_wa_vars
 
 # Dynamic variables (Recomputed everytime path changes via preprompt or equivalent)
 # If $REPO_PATH is set, expand ${...} to $REPO_PATH/ (append trailing slash)
 # This allows us to use $rtl etc as an absolute path when $REPO_PATH is set and when bootenv isn't done, as a relative path
 dyn_vars() {
-  export sim=${REPO_PATH+$REPO_PATH/}'sim'
-  export r=${REPO_PATH+$REPO_PATH/}'ch/rtl'
-  export v=${REPO_PATH+$REPO_PATH/}'ch/verif'
-  export tb=${REPO_PATH+$REPO_PATH/}'ch/tb'
-  export txn=${REPO_PATH+$REPO_PATH/}'ch/verif/txn'
-  export rl3=${REPO_PATH+$REPO_PATH/}'ch/rtl/l3'
-  export vl3=${REPO_PATH+$REPO_PATH/}'ch/verif/chk_l3'
-  export vl23=${REPO_PATH+$REPO_PATH/}'ch/verif/chk_l2l3'
-  export vlk=${REPO_PATH+$REPO_PATH/}'ch/verif/chk_lock'
-  export vcov=${REPO_PATH+$REPO_PATH/}'ch/verif/coverage'
+  export ch="${REPO_PATH+$REPO_PATH/}ch"
+  export v="${ch}/verif"
+  export r="${ch}/rtl"
+  export tb="${ch}/tb"
+  export txn="${v}/txn"
+  export cl3="${v}/chk_l3"
+  export cl23="${v}/chk_l2l3"
+  export clk="${v}/chk_lock"
+  export vcov="${v}/coverage"
+  export avf="${REPO_PATH+$REPO_PATH/}import/avf"
+  export sim="${REPO_PATH+$REPO_PATH/}sim"
 }
 dyn_vars
 
@@ -222,7 +223,7 @@ benv() {
   fi
 
   # Start emacs daemon if one isn't present
-  [[ -n "${_workarea}" ]] && ~kshenoy/bin/emacs_daemon -s ${_workarea} &> /dev/null &
+  [[ -n "${_workarea}" ]] && ~kshenoy/bin/emacs_daemon -s ${workarea//\//_} &> /dev/null &
 
   command cd "${_workarea}"
   sbi && bootenv
@@ -238,7 +239,9 @@ benv() {
   sosa; sosf
   [[ -f ~/.fzf.bash ]] && . ~/.fzf.bash
 
-  (( $# > 0 )) && command cd ~-
+  if (( $# > 0 )); then
+    command cd ~-
+  fi
 }
 
 unset -f trapbug_rm
@@ -364,11 +367,29 @@ mkwa() {
   [[ -f ~/.dotfiles/aliases ]] && . ~/.dotfiles/aliases
 
   # Set project root for emacs-projectile
-  cp $as0ks/projectile $STEM/.projectile
+  command cp $as0ks/projectile $STEM/.projectile
 
   # Create tags
   echo "${_fg_green}[Generating tags...]${_reset}"
   ~kshenoy/bin/gentags --create
+}
+
+
+unset -f wa_list
+wa_list() {
+  local _proj _ch _wa _path
+  for _ch in {0..1}; do
+    for _proj in as ah br; do
+      local _proj_ucase=$(tr 'a-z' 'A-Z' <<< ${_proj})
+      for _wa in {1..5}; do
+        _path="/proj/ch_func_dev${_ch}/${_proj_ucase}/kshenoy/${_proj}${_ch}${_wa}"
+        if [[ "$(ls -A ${_path})" ]]; then
+          echo ${_path}:
+          ls ${_path} | sed 's/^/  /'
+        fi
+      done
+    done
+  done
 }
 
 
@@ -381,9 +402,8 @@ dotty() {
 
 unset -f but
 but() {
-  model=${1%_unittest}_unittest
+  model=unittest_${1#unittest_}
 
-  \cp $asks/amdmsg_config.yaml .
   echo build -model $model
   build -model $model
   if (( $? != 0 )); then WhyTheFail; return 1; fi
