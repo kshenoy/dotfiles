@@ -31,6 +31,9 @@ ignore = Name *.tmp
 ignore = Name .netrwhist
 #ignore = Name *history
 ignore = Name .git
+# Files created by FreeFileSync
+ignore = Name sync.ffs_lock
+ignore = Name sync.ffs_db
 
 # Ignores the exact path and everything below it
 ignore = BelowPath Config/dotfiles/emacs.d/auto-save-list
@@ -44,6 +47,7 @@ ignore = BelowPath Config/dotfiles/scripts/ti
 ignore = BelowPath Config/dotfiles/unity
 ignore = BelowPath Config/Fonts/PragmataPro
 ignore = BelowPath Documents/Notes/Personal
+ignore = BelowPath Documents/Notes/TI
 
 
 #          When set to true, this flag causes the user interface to skip

@@ -52,14 +52,16 @@ my %opts = (
 
 # Since this is a wrapper, after processing the extra options I have to invoke the non-wrapper version to pass vim its
 # base options.
-my $root_exec;
-foreach my $i (`bash -c "type -a \$(basename $0)"`) {
-  if ($i !~ $0) {
-    $root_exec = (split(/\s+/, $i))[-1];
-    last;
+my $root_exec = dirname($0)  . "/vim_path/" . basename($0);
+unless (-f $root_exec) {
+  foreach my $i (`bash -c "type -a \$(basename $0)"`) {
+    if ($i !~ $0) {
+      $root_exec = (split(/\s+/, $i))[-1];
+      last;
+    }
   }
 }
-# print Dumper $0,$root_exec;
+# print Dumper $0, $root_exec;
 
 GetOptions(
   \%opts,

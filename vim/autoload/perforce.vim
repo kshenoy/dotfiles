@@ -61,16 +61,30 @@ function! s:SetupMergeLayout(...)                                               
 
   " Main merging tab
   exec "b " . l:merge
+  setlocal noreadonly modifiable
+  let b:bufname="MERGE"
   wincmd s
   wincmd t
   exec "b " . l:base
+  let b:bufname="ORIGINAL"
   wincmd v
   exec "b " . l:remote
+  let b:bufname="THEIRS"
   wincmd v
   exec "b " . l:local
-  set readonly
+  let b:bufname="YOURS"
+  setlocal readonly
   windo diffthis
   let t:guitablabel='Main'
+
+  " Merge - Remote v/s Merge v/s Local
+  exec "tabe " . l:remote
+  wincmd v
+  exec "b " . l:merge
+  wincmd v
+  exec "b " . l:local
+  windo diffthis
+  let t:guitablabel = l:remote_str . ' v/s ' . l:merge_str . ' v/s ' . l:local_str
 
   " Diff - Base vs Remote
   exec "tabe " . l:base
@@ -83,7 +97,6 @@ function! s:SetupMergeLayout(...)                                               
   exec "tabe " . l:base
   wincmd v
   exec "b " . l:local
-  set readonly
   windo diffthis
   let t:guitablabel = l:base_str . ' v/s ' . l:local_str
 
@@ -91,7 +104,6 @@ function! s:SetupMergeLayout(...)                                               
   exec "tabe " . l:remote
   wincmd v
   exec "b " . l:local
-  set readonly
   windo diffthis
   let t:guitablabel = l:remote_str . ' v/s ' . l:local_str
 
@@ -106,7 +118,6 @@ function! s:SetupMergeLayout(...)                                               
   exec "tabe " . l:local
   wincmd v
   exec "b " . l:merge
-  set readonly
   windo diffthis
   let t:guitablabel = l:local_str . ' v/s Merge'
 

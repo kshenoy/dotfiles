@@ -19,11 +19,15 @@
 "
   " Set Font
   if has('unix')
-    set guifont=MesloLGLDZ\ Nerd\ Font\ 8
+    set guifont=
+    set guifont+=Hack\ 8
+    set guifont+=MesloLGLDZ\ Nerd\ Font\ 8
     set guifont+=Monospace\ 8
-    set linespace=0
+    set linespace=3
   elseif has('win32')
-    set guifont=Consolas:h9:cANSI
+    set guifont=
+    set guifont+=Hack:h9:cANSI:qDRAFT
+    set guifont+=Consolas:h9:cANSI
     set linespace=3
   endif
 

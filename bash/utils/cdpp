@@ -13,6 +13,9 @@ super_cd() {
   if (( $#==0 )); then
     _dir=${REPO_PATH-${HOME/%\//}}
   else
+    until [[ $1 != "--" ]]; do
+      shift;
+    done
     _dir=${1/%\//}
   fi
 
@@ -42,8 +45,15 @@ super_cd() {
       ;;
 
     *\*\**)
-      # echo find ${1%%\*\**} -type d -path *${1##\*\*}
-      _dir=$(find ${1%%\*\**} -type d -path *${1##\*\*} | head -n 1)
+      local _src=${1%%\*\**}; _src=${_src:-.}
+      local _dst=${1##*\*\*}
+      # echo find ${_src} -type d -path *${_dst}
+      _dir=$(find ${_src} -type d -path *${_dst} | head -n 1)
+      if [[ -z ${_dir} ]]; then
+        # find was unable to find a matching directory
+        echo "ERROR: Unable to find ${_dst#/} under ${_src}"
+        return 1
+      fi
       ;;&  # This will cause it to get evaluated against *) as well
 
     ,*)

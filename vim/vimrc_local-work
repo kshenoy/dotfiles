@@ -8,17 +8,16 @@ function! s:SetLocalSettings(filename)
       " Current file is under a REPO
       if (l:p4path =~ 'ch/rtl')
         setlocal textwidth=80
-        let &colorcolumn=(&tw+1)
       elseif (l:p4path =~ '\vch/verif/(chk_)?l3')
         setlocal textwidth=100
-        let &colorcolumn=(&tw+1)
       endif
-      let b:OrigamiFoldAtCol=(&tw - 3)
+      let &l:colorcolumn=(&l:textwidth+1)
+      let b:OrigamiFoldAtCol=(&l:textwidth - 3)
     endif
   endif
 endfunction
 
 augroup AMD
   autocmd!
-  autocmd BufRead * call s:SetLocalSettings(expand('<afile>'))
+  autocmd BufRead * echo "File: ".expand('<afile>:p')|call s:SetLocalSettings(expand('<afile>:p'))
 augroup END

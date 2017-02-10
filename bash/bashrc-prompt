@@ -390,7 +390,7 @@ _get_compact_pwd_() {                                                           
         cpwd=$(sed -e "s:^/proj/ch_func_gen_scratch\([0-9]\)/${_proj_full}/:~${_proj}\1_Scratch/:" <<< $cpwd)
       elif [[ "$cpwd" =~ ^/proj/ch_func_dev ]]; then
         cpwd=$(sed -e "s:^/proj/ch_func_dev\([0-9]\)/\(${_proj}\|${_proj_full}\)/:~${_proj}\1/:" <<< $cpwd)
-        cpwd=$(sed -e "s:^\(~${_proj}[0-9]\)/${_me}/${_proj_lcase}:\1:" <<< $cpwd)
+        cpwd=$(sed -e "s:^\(~${_proj}[0-9]\)/${_me}/${_proj_lcase}[0-9]:\1:" <<< $cpwd)
       fi
     done
   fi

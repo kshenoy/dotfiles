@@ -7,7 +7,7 @@
 ;; You may delete these explanatory comments.
 (package-initialize)
 
-;; (custom-set-variables '(debug-on-error t))
+(custom-set-variables '(debug-on-error t))
 
 
 (setq my-init-config-org     (expand-file-name "config.org" user-emacs-directory)

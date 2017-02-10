@@ -74,7 +74,10 @@ popd()  { command popd  $@ > /dev/null ; }
 
 
 # Function to create new dir(s) and enter it (last directory if multiple arguments are given)                       {{{1
-mcd() { mkdir -p $1 && cd $1; }
+mcd() {
+  command mkdir -p "$@" || return
+  cd -- "${@: -1}"
+}
 
 
 # Function to summarise the number of jobs running in LSF queue                                                     {{{1

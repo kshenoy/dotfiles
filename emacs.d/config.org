@@ -12,14 +12,15 @@
 #+BEGIN_SRC emacs-lisp
   (when (< emacs-major-version 24)
     ;; For important compatibility libraries like cl-lib
-    (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+    (add-to-list 'package-archives
+                 '("gnu" . "http://elpa.gnu.org/packages/")))
 
   (when (>= emacs-major-version 24)
     (when (>= emacs-minor-version 4)
       (setq load-prefer-newer t))
     (require 'package)
     (add-to-list 'package-archives
-                 '("melpa" . "http://melpa.milkbox.net/packages/")
+                 '("melpa" . "https://melpa.milkbox.net/packages/")
                  '("org"   . "http://orgmode.org/elpa/")))
 
   (package-initialize)
@@ -166,7 +167,7 @@ By default =C-x == is bound to /what-cursor-position/ but evil maps both =ga= an
     (interactive)
     (revert-buffer :ignore-auto :noconfirm))
 
-  (bind-key* "<F5>" 'my/revert-buffer-no-confirm)
+  (bind-key* "<f5>" 'my/revert-buffer-no-confirm)
 #+END_SRC
 
 *** Enable/Disable/Toggle ala vim-unimpaired
@@ -175,7 +176,7 @@ By default =C-x == is bound to /what-cursor-position/ but evil maps both =ga= an
 :END:
 I think the following would be handy
   =[= - Enable setting
-  =!= - Toggle setting
+  =~= - Toggle setting
   =]= - Disable setting
 
 #+BEGIN_SRC emacs-lisp
@@ -187,11 +188,11 @@ I think the following would be handy
               :prefix "C-c ]")
   (bind-keys* :prefix-map emacs-unimpaired-toggle-map
               :prefix-docstring "This map is used to toggle settings ala vim-unimpaired"
-              :prefix "C-c !")
+              :prefix "C-c ~")
 #+END_SRC
 Note the use of /bind-keys*/ for the enable and disable maps and /bind-keys/ for the toggle map.
 This is because /bind-keys*/ will override any maps that are defined by any modes.
-Since =C-c [=, =C-c != and  =C-c ]= are all defined by org-mode, I want to override those definitions and hence put mine in the /override-global-mode/
+Since =C-c [=, =C-c ~= and  =C-c ]= are all defined by org-mode, I want to override those definitions and hence put mine in the /override-global-mode/
 On the other hand, since =C-c a-z= are reserved for the user, there's no need override anything and hence a simple /bind-keys/ will suffice.
 
 Note that since /bind-keys*/ puts everything in the /override-global-mode/ map, it essentially ignores any =:map= that is passed to it.
@@ -295,21 +296,36 @@ However, the downside to this is that if I have multiple such 'when' sections (l
   (add-hook 'after-make-frame-functions
             (lambda (frame)
               (select-frame frame)
-              ;; (when (eq system-type 'gnu/linux)
-              ;;   (when (my/font-exist-p "MesloLGMDZ Nerd Font")
-              ;;     (setq my-variable-pitch-font "MesloLGMDZ Nerd Font-10"
-              ;;           my-monospaced-font     "MesloLGMDZ Nerd Font-10"))
+              (when (eq system-type 'gnu/linux)
 
-              ;;   (when (my/font-exist-p "DejaVu Sans")      (setq my-variable-pitch-font "DejaVu Sans-10"))
-              ;;   (when (my/font-exist-p "DejaVu Sans Mono") (setq my-monospaced-font     "DejaVu Sans Mono-10")))
+                (when (my/font-exist-p "DejaVu Sans Mono")
+                  (setq my-variable-pitch-font "DejaVu Sans Mono-11"
+                        my-monospaced-font     "DejaVu Sans Mono-11"))
 
-              (when (eq system-type 'windows-nt)
-                (when (my/font-exist-p "Consolas")
-                  (setq my-variable-pitch-font "Consolas-10"
-                        my-monospaced-font     "Consolas-10"))
-                  (set-face-attribute 'default        nil :font my-variable-pitch-font)
-                  (set-face-attribute 'fixed-pitch    nil :font my-monospaced-font)
-                  (set-face-attribute 'variable-pitch nil :font my-variable-pitch-font))))
+                (when (my/font-exist-p "Hack")
+                  (setq my-variable-pitch-font "Hack-10"
+                        my-monospaced-font     "Hack-10"))
+
+                (set-face-attribute 'default        nil :font my-variable-pitch-font)
+                (set-face-attribute 'fixed-pitch    nil :font my-monospaced-font)
+                (set-face-attribute 'variable-pitch nil :font my-variable-pitch-font))))
+  ;;   (when (my/font-exist-p "MesloLGMDZ Nerd Font")
+  ;;     (setq my-variable-pitch-font "MesloLGMDZ Nerd Font-10"
+  ;;           my-monospaced-font     "MesloLGMDZ Nerd Font-10"))
+
+  ;;   (when (my/font-exist-p "DejaVu Sans")      (setq my-variable-pitch-font "DejaVu Sans-10"))
+  ;;   (when (my/font-exist-p "DejaVu Sans Mono") (setq my-monospaced-font     "DejaVu Sans Mono-10")))
+
+  (when (eq system-type 'windows-nt)
+    (when (my/font-exist-p "Consolas")
+      (setq my-variable-pitch-font "Consolas-10"
+            my-monospaced-font     "Consolas-10"))
+    (when (my/font-exist-p "Hack")
+      (setq my-variable-pitch-font "Hack-10"
+            my-monospaced-font     "Hack-10"))
+    (set-face-attribute 'default        nil :font my-variable-pitch-font)
+    (set-face-attribute 'fixed-pitch    nil :font my-monospaced-font)
+    (set-face-attribute 'variable-pitch nil :font my-variable-pitch-font))
 #+END_SRC
 
 Fall back to DejaVu Sans when the font lacks support for some glyphs. Taken from [[https://github.com/joodie/emacs-literal-config/blob/c66e30ce961b140dd3e84116f4d45cbc19d0d944/emacs.org#font][github:joodie]]
@@ -327,6 +343,7 @@ Scale font size using =C-x C-+= and =C-x C--=. =C-x C-0= resets it.
 =text-scale-mode-step= controls the scaling factor. For obvious reasons, don't set it to 1 else it won't change at all
 #+BEGIN_SRC emacs-lisp
   (setq text-scale-mode-step 1.1)
+  (setq line-spacing 2)
 #+END_SRC
 
 ** Tabs, Indentation and Spacing
@@ -374,6 +391,14 @@ Use =C-c s SPC= to delete trailing whitespace manually
 #+BEGIN_SRC emacs-lisp
   (bind-keys :map my-s-bindings-map
              ("SPC" . delete-trailing-whitespace))
+#+END_SRC
+
+*** Toggle wrap
+:PROPERTIES:
+:CUSTOM_ID: h:37f6c771-5673-4416-97dc-4a0f85c9d502
+:END:
+#+BEGIN_SRC emacs-lisp
+  (bind-key "w" 'toggle-truncate-lines emacs-unimpaired-toggle-map)
 #+END_SRC
 
 ** Highlight current line
@@ -513,7 +538,7 @@ evil can be toggled using =C-z=
   (use-package evil
     ;; :disabled
     :init
-    (setq evil-want-C-u-scroll t)
+    ;; (setq evil-want-C-u-scroll t)
     (setq evil-want-C-w-in-emacs-state t)
     (evil-mode t)
 #+END_SRC
@@ -845,8 +870,10 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
 :PROPERTIES:
 :CUSTOM_ID: h:080c3337-de87-4d2e-890a-1e047392f89a
 :END:
+
 #+BEGIN_SRC emacs-lisp
   (use-package org
+   :pin org
 #+END_SRC
 
 *** :init
@@ -877,6 +904,67 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
   (setq org-imenu-depth 10)
 #+END_SRC
 
+**** Org-agenda custom commands
+:PROPERTIES:
+:CUSTOM_ID: h:777edf92-ed17-4eab-a79a-3a6d1a3acbbf
+:END:
+Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html
+#+BEGIN_SRC emacs-lisp
+  (defun my/org-skip-subtree-if-habit ()
+    "Skip an agenda entry if it has a STYLE property equal to \"habit\"."
+    (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+      (if (string= (org-entry-get nil "STYLE") "habit")
+          subtree-end
+        nil)))
+
+  (defun my/org-skip-subtree-if-priority (priority)
+    "Skip an agenda subtree if it has a priority of PRIORITY.
+
+  PRIORITY may be one of the characters ?A, ?B, or ?C."
+    (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+          (pri-value (* 1000 (- org-lowest-priority priority)))
+          (pri-current (org-get-priority (thing-at-point 'line t))))
+      (if (= pri-value pri-current)
+          subtree-end
+        nil)))
+
+  (setq org-agenda-custom-commands
+        '(("d" "Daily agenda and all TODOs"
+           ((tags "PRIORITY=\"A\""
+                  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                   (org-agenda-overriding-header "High-priority unfinished tasks:")))
+            (agenda "" ((org-agenda-span 3)))
+            (alltodo ""
+                     ((org-agenda-skip-function '(or (my/org-skip-subtree-if-habit)
+                                                     (my/org-skip-subtree-if-priority ?A)
+                                                     (org-agenda-skip-if nil '(scheduled deadline))))
+                      (org-agenda-overriding-header "ALL normal priority tasks:"))))
+           ((org-agenda-compact-blocks t)))))
+#+END_SRC
+
+**** Org Tag List
+:PROPERTIES:
+:CUSTOM_ID: h:4ec8545f-1a7f-422b-8444-b3669a990e3b
+:END:
+#+BEGIN_SRC emacs-lisp
+  (setq org-tag-alist '((:startgrouptag) ("Work")
+                        (:grouptags)     ("Project") ("Module") ("Feature") ("Tools")
+                        (:endgrouptag)
+                        (:startgrouptag) ("Project")
+                        (:grouptags)     ("AS") ("AH") ("BR") ("ZN")
+                        (:endgrouptag)
+                        (:startgrouptag) ("Module")
+                        (:grouptags)     ("L2") ("L2L3") ("L3") ("XI") ("MCA")
+                        (:endgrouptag)
+                        (:startgrouptag) ("Feature")
+                        (:grouptags)     ("BusLock") ("DebugBus") ("L3F") ("MeshGating") ("QoS") ("RangeLock")
+                                         ("RAS") ("TraceCapture")
+                        (:endgrouptag)
+                        (:startgrouptag) ("Tools")
+                        (:grouptags)     ("Formal")
+                        (:endgrouptag)))
+#+END_SRC
+
 **** TODO Show the emphasis markers on point
 :PROPERTIES:
 :CUSTOM_ID: h:20e0e38b-c292-4d90-be0c-4c6163358e56
@@ -897,7 +985,7 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
   (add-hook 'post-command-hook 'org-show-emphasis-markers-at-point nil t)
 #+END_SRC
 
-**** Org babel source blocks
+**** org-babel, source blocks
 :PROPERTIES:
 :CUSTOM_ID: h:5346da4e-8084-4ec9-89d8-ead64f2381d3
 :END:
@@ -930,7 +1018,7 @@ Ask for confirmation before evaluating? NO!
     (not (or (string= lang "emacs-lisp"))))
 
   ;; (setq org-confirm-babel-evaluate 'my/org-babel-evaluate-silent)
-  (setq org-confirm-babel-evaluate nil)
+  ;; (setq org-confirm-babel-evaluate nil)
 #+END_SRC
 
 **** Clean View
@@ -964,6 +1052,16 @@ Custom keywords
   (eval-after-load 'org-indent '(diminish org-indent-mode))
 #+END_SRC
 
+**** Make org-mode play nicely with Google Chrome
+:PROPERTIES:
+:CUSTOM_ID: h:3f70b37d-ea2d-4c42-b8cd-5b82834ce1f1
+:END:
+From [[http://stackoverflow.com/a/6309985/734153][StackOverflow]]
+#+BEGIN_SRC emacs-lisp
+  (setq browse-url-browser-function 'browse-url-generic
+        browse-url-generic-program  "google-chrome")
+#+END_SRC
+
 **** Templates
 :PROPERTIES:
 :CUSTOM_ID: h:7c276593-3413-45f2-a8b6-8c8cc9550bca
@@ -987,10 +1085,10 @@ Variable pitch for non-code text taken from [[http://www.xiangji.me/2015/07/13/a
     (set-face-attribute 'org-code  nil :inherit 'fixed-pitch)
     (set-face-attribute 'org-block nil :inherit 'fixed-pitch))
 
-  (add-hook 'org-mode-hook      'my/set-buffer-variable-pitch)
-  (add-hook 'eww-mode-hook      'my/set-buffer-variable-pitch)
-  (add-hook 'markdown-mode-hook 'my/set-buffer-variable-pitch)
-  (add-hook 'Info-mode-hook     'my/set-buffer-variable-pitch)
+  ;; (add-hook 'org-mode-hook      'my/set-buffer-variable-pitch)
+  ;; (add-hook 'eww-mode-hook      'my/set-buffer-variable-pitch)
+  ;; (add-hook 'markdown-mode-hook 'my/set-buffer-variable-pitch)
+  ;; (add-hook 'Info-mode-hook     'my/set-buffer-variable-pitch)
 #+END_SRC
 
 NOTE: =org-block-background= has been removed in Org 8.3.1 and from 9.0.0,
@@ -1060,6 +1158,7 @@ A good way to find more characters is to use =M-x insert-char=
 :END:
 #+BEGIN_SRC emacs-lisp
   (use-package org-wunderlist
+    :disabled
     :init (setq org-wunderlist-file (concat org-directory "Personal/Wunderlist.org")
                 org-wunderlist-dir  (concat user-emacs-directory "tmp/org-wunderlist/")))
 #+END_SRC
@@ -1190,7 +1289,8 @@ Automatically add ids to saved org-mode headlines
 :END:
 Syntax highlighting when exporting to HTML? Yes, please!
 #+BEGIN_SRC emacs-lisp
-  (use-package htmlize)
+  (use-package htmlize
+    :disabled)
 #+END_SRC
 
 *** Keybinds
@@ -1359,7 +1459,7 @@ Similar to vim's easy-motion plugin
 :END:
 Replaces avy
 
-** TODO FIXME auto-complete
+** TODO auto-complete
 :PROPERTIES:
 :CUSTOM_ID: h:d49ac609-f845-47a7-a404-2dbdfc80b944
 :END:
@@ -1474,6 +1574,42 @@ Use brighter colors
            ("\\.x\\'"    . verilog-mode))
     :config
     (font-lock-mode 1))
+#+END_SRC
+
+** vimish-fold
+:PROPERTIES:
+:CUSTOM_ID: h:ba80b90d-9d21-49a7-8581-e389855954db
+:END:
+#+BEGIN_SRC emacs-lisp
+  (use-package vimish-fold
+    :disabled
+#+END_SRC
+
+*** :config
+:PROPERTIES:
+:CUSTOM_ID: h:387234a6-d37b-4005-9f36-3f6f82ecd626
+:END:
+#+BEGIN_SRC emacs-lisp
+  :config
+  (vimish-fold-global-mode 1)
+#+END_SRC
+
+**** evil-vimish-mode
+:PROPERTIES:
+:CUSTOM_ID: h:4f6c517b-426d-45be-a2be-fd0991b5c629
+:END:
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-vimish-fold
+    :config
+    (evil-vimish-fold-mode 1))
+#+END_SRC
+
+*** END
+:PROPERTIES:
+:CUSTOM_ID: h:09e1ddb0-83a0-40d1-a09a-52f8cc7bf1e8
+:END:
+#+BEGIN_SRC emacs-lisp
+  )
 #+END_SRC
 
 ** monokai-theme

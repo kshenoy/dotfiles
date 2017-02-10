@@ -29,11 +29,6 @@ snip.rv = complete( t[1], opts )
 endsnippet
 
 
-snippet Inc "C++ includes" b
-#include <iostream>
-endsnippet
-
-
 snippet ns "namespace ..."
 namespace${1/.+/ /m}${1:`!p snip.rv = snip.basename or "name"`} {
   ${VISUAL}${0}
@@ -72,40 +67,31 @@ class ${1:`!p snip.rv = snip.basename or "name"`} {
 endsnippet
 
 
-
 #===========================================================================
-# STL
+# Shared Ptrs
 #
-snippet be "$1.begin(), $1.end()"
-${1:v}${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}begin(); $1${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}end()
+snippet 'bsp' "boost::shared_ptr" w
+::boost::shared_ptr< $1 > $0
 endsnippet
 
-
-snippet 'vec(tor)?' "::std::vector" r
-::std::vector<${1:char}> ${0};
+snippet 'bms' "boost::make_shared" w
+::boost::make_shared< $1 >($0)
 endsnippet
 
-
-
-#===========================================================================
-# Misc
-#
-snippet forbe "Iterate over STL container"
-${1:::std::vector<int>}::const_iterator it, it_last;
-for (${3:it} = ${2:v}.begin(), ${4:it_last}=$2.end(); $3 != $4; ${5:++}$3) {
-  ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
-}
+snippet 'ssp' "std::shared_ptr" w
+::std::shared_ptr< $1 > $0
 endsnippet
 
+snippet 'sms' "std::make_shared" w
+::std::make_shared< $1 >($0)
+endsnippet
 
-snippet readfile "readfile"
-std::vector<char> v;
-if (FILE *${2:fp} = fopen(${1:"filename"}, "r")) {
-  char buf[1024];
-  while (size_t len = fread(buf, 1, sizeof(buf), $2))
-    v.insert(v.end(), buf, buf + len);
-  fclose($2);
-}$0
+snippet 'sup' "std::unique_ptr" w
+::std::unique_ptr< $1 > $0
+endsnippet
+
+snippet 'smu' "std::make_unique" w
+::std::make_unique< $1 >($0)
 endsnippet
 
 

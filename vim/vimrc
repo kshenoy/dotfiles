@@ -263,7 +263,7 @@ if DISABLE_FROM == 16 | finish | endif
 "set foldcolumn=3                                                               " Width of column used to indicate folds
 set foldtext=my#FoldText()
 set foldmethod=marker
-"set foldmarker={{{,}}                                                     " Markers used when 'foldmethod' is "marker"}
+"set foldmarker={{{,}}}                                                    " Markers used when 'foldmethod' is "marker"}
 "set foldmarker=>_>,<_<                                                     " Markers used when 'foldmethod' is "marker"
 set foldnestmax=2                                      " Maximum fold depth for when 'foldmethod is "indent" or "syntax"
 

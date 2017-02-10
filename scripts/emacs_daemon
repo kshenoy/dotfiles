@@ -6,10 +6,10 @@ function _print_help_() {
   echo
   echo "Options:"
   echo "  -h             Print this help"
-  echo "  -s [SERVER]    Start the daemon. If SERVER is not specfied, it's derived from $REPO_PATH"
-  echo "  -k [SERVER]    Kill the daemon. If SERVER is not specfied, it's derived from $REPO_PATH"
+  echo "  -s [SERVER]    Start the daemon. If SERVER is not specfied, it's derived from \$REPO_PATH"
+  echo "  -k [SERVER]    Kill the daemon. If SERVER is not specfied, it's derived from \$REPO_PATH"
   echo "  -K             Kill all daemons"
-  echo "  -r [SERVER]    Restart the daemon. If SERVER is not specfied, it's derived from $REPO_PATH"
+  echo "  -r [SERVER]    Restart the daemon. If SERVER is not specfied, it's derived from \$REPO_PATH"
   echo "  -l, --list     List all running daemons"
 }
 

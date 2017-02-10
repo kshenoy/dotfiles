@@ -82,6 +82,11 @@ function! statusline#Update(winnr)                                              
   let l:stat .= s:Color(l:active, 'STLFilename', '%f ')
   let l:stat .= s:Color(l:active, 'STLMarker', l:active ? '« ' : '» ')
 
+  let l:bufname = getbufvar(l:bufnr, "bufname", "")
+  if (l:bufname != "")
+    let l:stat .= '[' . l:bufname . '] '
+  endif
+
   " Status: Modified, Read Only, Paste, Spell etc.
   let l:stat .= s:Color(l:active, 'STLStatus', '%{&modified ? "+" : ""}')
   let l:stat .= s:Color(l:active, 'STLStatus', '%{&readonly ? "" : ""}')
