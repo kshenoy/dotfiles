@@ -12,16 +12,15 @@
 #+BEGIN_SRC emacs-lisp
   (when (< emacs-major-version 24)
     ;; For important compatibility libraries like cl-lib
-    (add-to-list 'package-archives
-                 '("gnu" . "http://elpa.gnu.org/packages/")))
+    (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+
+  (add-to-list 'package-archives '("melpa" . "https://melpa.milkbox.net/packages/") t)
+  (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/") t)
 
   (when (>= emacs-major-version 24)
     (when (>= emacs-minor-version 4)
       (setq load-prefer-newer t))
-    (require 'package)
-    (add-to-list 'package-archives
-                 '("melpa" . "https://melpa.milkbox.net/packages/")
-                 '("org"   . "http://orgmode.org/elpa/")))
+    (require 'package))
 
   (package-initialize)
 #+END_SRC
@@ -873,6 +872,7 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
 
 #+BEGIN_SRC emacs-lisp
   (use-package org
+   :ensure org-plus-contrib
    :pin org
 #+END_SRC
 
@@ -1139,18 +1139,27 @@ A good way to find more characters is to use =M-x insert-char=
     :ensure nil
     :init
     (setq org-agenda-files
-          (delq nil
-                (mapcar (lambda (x)
-                          (let ((y (concat org-directory x)))
-                            (and (file-exists-p y) y)))
-                        '("Software/" "Personal/" "AMD/"))))
-    ;; (setq org-agenda-files (quote ("~/Notes/Software/" "~/Notes/Personal/")))
+          (mapcar (lambda (x)
+                    (let ((y (concat org-directory x)))
+                      (and (file-exists-p y) y)))
+                  '("organizer.org" "Software/" "Personal/")))
+
     (setq org-agenda-tags-column            -120) ; Monitors are wide, might as well use it :/
     (setq org-agenda-skip-scheduled-if-done t)    ; Why isn't this default?
     (setq org-agenda-skip-deadline-if-done  t))
 #+END_SRC
 
 [[#h:7c86a221-7ef3-4222-900f-042b36e59e04][Keybinds]]
+
+**** org-refile
+By default org-refile only shows the 1st level headings from the current file.
+This will make it show two levels of headings from all agenda files
+#+BEGIN_SRC emacs-lisp
+  (setq org-refile-targets '((org-agenda-files . (:maxlevel . 2))))
+#+END_SRC
+
+***** TODO Set org-refile targets based on current file
+Why would I want to refile something work-related under Softwares etc.
 
 **** org-wunderlist
 :PROPERTIES:
@@ -1182,17 +1191,35 @@ Autocomplete sources for org mode
 :PROPERTIES:
 :CUSTOM_ID: h:b24cb628-f225-4d2e-97a0-2d72ed5e3c88
 :END:
+
+Show hierarchical headlines when refiling instead of flattening it out
+Show all the hierarchical headlines instead of having to step down them
+#+BEGIN_SRC emacs-lisp
+  (setq org-refile-use-outline-path t)
+  (setq org-outline-path-complete-in-steps nil)
+#+END_SRC
+
 From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 - Capture 1]] and [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][Using Emacs 24 - Capture 2]]
 #+BEGIN_SRC emacs-lisp
   (setq org-capture-templates
-        '(("w"  "Capture templates for work")
-          ("wl" "L3 related"     entry (file+headline "~/Notes/AMD/AspenHighlands.org" "L3") "* %? %(org-set-property \"CAPTURE_DATE\" \"%U\")\n")
-          ;; ("wl" "L3 related"     entry (file+headline "~/Notes/AMD/AspenHighlands.org" "L3")
-          ("wf" "Formal related" entry (file "~/Notes/AMD/Formal.org"))
-          ("s"  "Capture templates for snippets")
-          ("se" "Emacs snippets" entry (file "~/Notes/Software/emacs.org"))
-          ("ss" "Shell snippets" entry (file "~/Notes/Software/shell.org"))
-          ("sv" "Vim snippets"   entry (file "~/Notes/Software/vim.org"))))
+        '(("T" "TODO" entry
+           (file+headline org-default-notes-file "Inbox")
+           "* TODO %^{Task}%(org-set-property \"CAPTURED\" \"%U\")\n\n%?"
+           :jump-to-captured t)
+
+          ("s"  "Snippets of code")
+
+          ("se" "Emacs" entry
+           (file (concat org-directory "Software/emacs.org"))
+           :jump-to-captured t)
+
+          ("ss" "Shell" entry
+           (file (concat org-directory "Software/shell.org"))
+           :jump-to-captured t)
+
+          ("sv" "Vim" entry
+           (file (concat org-directory "Software/vim.org"))
+           :jump-to-captured t)))
 #+END_SRC
 
 NOTE: When using several keys, keys using the same prefix key must be sequential in the list and preceded by a 2-element entry explaining the prefix key.
@@ -1224,63 +1251,60 @@ We use this to create frames for org-capture directly from the OS as shown [[htt
       (delete-frame)))
 #+END_SRC
 
-***** TODO Add sensible expansion templates
-:PROPERTIES:
-:CUSTOM_ID: h:f26bbd99-9072-4a62-93a9-b5286ecd12bc
-:END:
-
+***** TODO Split org-capture-templates and move work related stuff to a separate file
 **** org-id
 :PROPERTIES:
 :CUSTOM_ID: h:8a9fa520-31a7-49fb-a85c-18ea5d215b7a
 :END:
 Copied from [[https://writequit.org/articles/emacs-org-mode-generate-ids.html][here]].
-#+BEGIN_SRC emacs-lisp
-  (require 'org-id)
-  (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
+#+BEGIN_SRC emacs-lisp :tangle no
+  (use-package org-id)
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (defun my/org-custom-id-get (&optional pom create prefix)
-    "Get the CUSTOM_ID property of the entry at point-or-marker POM.
-     If POM is nil, refer to the entry at point. If the entry does
-     not have an CUSTOM_ID, the function returns nil. However, when
-     CREATE is non nil, create a CUSTOM_ID if none is present
-     already. PREFIX will be passed through to `org-id-new'. In any
-     case, the CUSTOM_ID of the entry is returned."
-    (interactive)
-    (org-with-point-at pom
-      (let ((id (org-entry-get nil "CUSTOM_ID")))
-        (cond
-         ((and id (stringp id) (string-match "\\S-" id))
-          id)
-         (create
-          (setq id (org-id-new (concat prefix "h")))
-          (org-entry-put pom "CUSTOM_ID" id)
-          (org-id-add-location id (buffer-file-name (buffer-base-buffer)))
-          id)))))
+#+BEGIN_SRC emacs-lisp :tangle no
+    :init
+    (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
 
-  (defun my/org-add-ids-to-headlines-in-file ()
-    "Add CUSTOM_ID properties to all headlines in the current
-     file which do not already have one. Only adds ids if the
-     `auto-id' option is set to `t' in the file somewhere. ie,
-     ,#+OPTIONS: auto-id:t"
-    (interactive)
-    (save-excursion
-      (widen)
-      (goto-char (point-min))
-      (when (re-search-forward "^#\\+OPTIONS:.*auto-id:t" (point-max) t)
-        (org-map-entries (lambda () (my/org-custom-id-get (point) 'create))))))
-#+END_SRC
+    :config
+    (defun my/org-custom-id-get (&optional pom create prefix)
+      "Get the CUSTOM_ID property of the entry at point-or-marker POM.
+       If POM is nil, refer to the entry at point. If the entry does
+       not have an CUSTOM_ID, the function returns nil. However, when
+       CREATE is non nil, create a CUSTOM_ID if none is present
+       already. PREFIX will be passed through to `org-id-new'. In any
+       case, the CUSTOM_ID of the entry is returned."
+      (interactive)
+      (org-with-point-at pom
+        (let ((id (org-entry-get nil "CUSTOM_ID")))
+          (cond
+           ((and id (stringp id) (string-match "\\S-" id))
+            id)
+           (create
+            (setq id (org-id-new (concat prefix "h")))
+            (org-entry-put pom "CUSTOM_ID" id)
+            (org-id-add-location id (buffer-file-name (buffer-base-buffer)))
+            id)))))
 
-Automatically add ids to saved org-mode headlines
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (add-hook 'before-save-hook
-                        (lambda ()
-                          (when (and (eq major-mode 'org-mode)
-                                     (eq buffer-read-only nil))
-                            (my/org-add-ids-to-headlines-in-file))))))
+    (defun my/org-add-ids-to-headlines-in-file ()
+      "Add CUSTOM_ID properties to all headlines in the current
+       file which do not already have one. Only adds ids if the
+       `auto-id' option is set to `t' in the file somewhere. ie,
+       ,#+OPTIONS: auto-id:t"
+      (interactive)
+      (save-excursion
+        (widen)
+        (goto-char (point-min))
+        (when (re-search-forward "^#\\+OPTIONS:.*auto-id:t" (point-max) t)
+          (org-map-entries (lambda () (my/org-custom-id-get (point) 'create))))))
+
+    ;; Automatically add ids to saved org-mode headlines
+    (add-hook 'org-mode-hook
+              (lambda ()
+                (add-hook 'before-save-hook
+                          (lambda ()
+                            (when (and (eq major-mode 'org-mode)
+                                       (eq buffer-read-only nil))
+                              (my/org-add-ids-to-headlines-in-file)))))))
 #+END_SRC
 
 **** htmlize
