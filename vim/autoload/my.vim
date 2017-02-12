@@ -849,8 +849,8 @@ endfunction
 " Temporary functions only
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! my#_RemoveAllErrInBut_(num)                                                                             " {{{1
-  silent! execute '%g/L3ErrPkt/ s/\v,? \[(0x)?[^' . a:num . ']\]\=[^,}]+//g'
-  silent! execute '%g/L3ErrPkt/ s/\vErrIn\w*\=\zs\{\[' . a:num . '\]\=([^}]+)\}/\1/g'
+  " Delete everything but the entry we're interested in just the ErrIn field
+  silent! execute '%g/L3ErrPkt/ .s/\v(ErrIn\w*)@<=\=\{[^}]{-}(\[' . a:num . '\]\s*\=\s*[^,]+)[^}]{-}\}/\2/g'
 endfunction
 "nnoremap K :<C-U>call my#TestFunc(v:count, v:count1)<CR>
 
