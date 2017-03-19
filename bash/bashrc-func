@@ -15,10 +15,19 @@ _src_dir=$(dirname ${BASH_SOURCE[0]})
 # Use like so:  sleep 10; alert
 unset -f alert
 alert() {
+  # Pick up display message if provided as argument. If not show the last command that was run
+  local _msg=${1:-$(fc -nl -1 | sed -e 's/^\s*[0-9]\+\s*//' -e 's/[;&|]\+\s*alert$//')}
+  # Add TMUX information if available
+  if [[ -n $TMUX ]]; then
+    _msg="$(tmux display-message -p "[#S:#I.#P]") ${_msg}"
+  else
+    _msg="[$$] ${_msg}"
+  fi
+
+  # Indicate normal completion or error
   local _icon=$( (($? == 0)) && echo terminal || echo error)
-  local _msg=$(fc -nl -1 | sed -e 's/^\s*[0-9]\+\s*//' -e 's/[;&|]\s*alert$//')
-  _msg="$([[ -n "$TMUX" ]] && tmux display-message -p "[tmux #S:#I.#P] ")$_msg"
-  notify-send --urgency=low -i ${_icon} ${_msg}
+
+  notify-send --urgency=low -i ${_icon} "${_msg}"
 }
 
 
@@ -99,41 +108,45 @@ uc() { echo $@ | /usr/bin/tr "[a-z]" "[A-Z]"; }
 # Simple calc                                                                                                       {{{1
 unset -f =
 =() {
-  local _input=${1:-$(</dev/stdin)}
+  local _input=${@:-$(</dev/stdin)}
   local _output=$(echo "$_input" | irb -m --noverbose | command sed 's/"//g')
+  # echo $_input
+  # echo $_output
 
   # Infer type to format output
   if [[ $_input =~ 'to_s(16)' ]]; then
-    echo $_output | tr '[a-f]' '[A-F]' | command sed -e 's/^/0x/'
+    _output=$(echo $_output | tr '[a-f]' '[A-F]' | command sed -e 's/^/0x/')
   elif [[ $_input =~ 'to_s(2)' ]]; then
-    echo $_output | command sed -e 's/^/0b/'
+    _output=$($_output | command sed -e 's/^/0b/')
   elif [[ ! $_input =~ 'to_s' ]]; then
     # If there's no output formatting, try to match output base to that of input
+    local _base
     if [[ $_input =~ 0x ]]; then
-      = "($_output).to_s(16)"
+      _base=16
     elif [[ $_input =~ 0b ]]; then
-      = "($_output).to_s(2)"
-    else
-      echo $_output
+      _base=2
     fi
+    _output=$(= "($_output).to_s(${_base})")
   fi
+
+  echo $_output
 }
 
 unset -f =b
 =b() {
-  local _input=${1:-$(</dev/stdin)}
+  local _input=${@:-$(</dev/stdin)}
   = "($_input).to_s(2)"
 }
 
 unset -f =d
 =d() {
-  local _input=${1:-$(</dev/stdin)}
+  local _input=${@:-$(</dev/stdin)}
   = "($_input).to_s(10)"
 }
 
 unset -f =h
 =h() {
-  local _input=${1:-$(</dev/stdin)}
+  local _input=${@:-$(</dev/stdin)}
   = "($_input).to_s(16)"
 }
 

@@ -19,5 +19,6 @@ endfunction
 
 augroup AMD
   autocmd!
-  autocmd BufRead * echo "File: ".expand('<afile>:p')|call s:SetLocalSettings(expand('<afile>:p'))
+  autocmd BufNewFile,BufRead *.txl set filetype=ruby
+  autocmd BufRead * call s:SetLocalSettings(expand('<afile>:p'))
 augroup END

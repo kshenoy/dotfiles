@@ -154,6 +154,11 @@ bind '"\e`": "!:0"'
 # bind '"\e4": "!:4 \n"'
 # bind '"\e5": "!:5 \n"'
 
+set -o vi
+bind '"\ee": emacs-editing-mode'
+set -o emacs
+bind '"\ee": vi-editing-mode'
+
 
 #=======================================================================================================================
 # EXTERNAL CUSTOMISATIONS

@@ -4,8 +4,8 @@
 
 """ S
 nnoremap <silent> <leader>so :so $MYVIMRC<BAR>so $MYGVIMRC<CR>
-nnoremap <leader>sr :reg<CR>
-nnoremap <leader>sm :marks<CR>
+nnoremap <silent> <leader>sr :reg<CR>
+nnoremap <silent> <leader>sm :marks<CR>
 " Set size
 nnoremap <silent> <expr> <leader>sd ':set lines=' . (tabpagenr("$") == 1 ? '70' : '68') . ' columns=319<CR>'
 
@@ -155,10 +155,10 @@ nnoremap <silent>  <C-\> :call my#CscopeMap('l', 1)<CR>
 nnoremap <silent> g<C-\> :call my#CscopeMap('l', 0)<CR>
 
 """ Move by visual lines
-noremap <expr> j (v:count == 0 ? 'gj' : 'j')
-noremap <expr> k (v:count == 0 ? 'gk' : 'k')
-noremap gj j
-noremap gk k
+noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
+noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
+noremap <silent> gj j
+noremap <silent> gk k
 
 nnoremap gm :call cursor(0, virtcol('$')/2)<CR>
 
@@ -166,10 +166,10 @@ nnoremap gm :call cursor(0, virtcol('$')/2)<CR>
 "imap <C-Right> <C-O>W
 
 """ View/scrolling
-nnoremap zh    3zh
-nnoremap zl    3zl
-nnoremap <C-E> 3<C-E>
-nnoremap <C-Y> 3<C-Y>
+nnoremap <silent> zh    3zh
+nnoremap <silent> zl    3zl
+nnoremap <silent> <C-E> 3<C-E>
+nnoremap <silent> <C-Y> 3<C-Y>
 
 " Toggle the cursor line to be fixed in the middle of the screen
 nnoremap <silent> <leader>zz :let &scrolloff=999-&scrolloff<CR>
@@ -179,8 +179,12 @@ nnoremap <expr> <CR> foldlevel('.') ? 'za' : '<CR>'
 """ Cycle between absolute/relative numbering
 noremap <silent> <F2> :call my#CycleNumbering()<CR>
 
-" Visually select the text that was last edited/pasted
+""" Visually select the text that was last edited/pasted
 nnoremap gV `[v`]
+
+""" Jump to beginning/end lines of the paragraph instead of to a blank line between paragraphs
+map g{ <Plug>(ParJumpBackward)
+map g} <Plug>(ParJumpForward)
 
 
 

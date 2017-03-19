@@ -378,7 +378,7 @@ _get_compact_pwd_() {                                                           
   #   /proj/ch_func_dev{1:0}/ASPEN_HIGHLANDS -> ~AH{1:0}
   # Contract more if it's my directory
   local cpwd=${PWD}
-  if [[(-n "$HOME") && ("$cpwd" =~ ^"$HOME")]]; then
+  if [[ -n "$HOME" ]] && [[ "$cpwd" =~ ^"$HOME" ]]; then
     cpwd=${cpwd/#$HOME/\~};
   else
     local _proj

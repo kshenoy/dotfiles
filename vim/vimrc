@@ -361,6 +361,8 @@ endif
 "
 if DISABLE_FROM == 24 | finish | endif
 
+set isfname+={,}                                          " This will allow vim to understand env vars with curly braces
+
 
 "
 " 25. MULTI-BYTE CHARACTERS                                                                                         {{{1

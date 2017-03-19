@@ -142,7 +142,7 @@ _p4_command_() {
             ;;
     esac
 
-    if [[ "$cur" == //depot/* && -z "$P4_DISABLE_DEPOT_COMPLETION" ]]; then
+    if [[ "$cur" == //depot/* ]] && [[ -z "$P4_DISABLE_DEPOT_COMPLETION" ]]; then
         completions=$(_get_depot_completion_ $cur)
     fi
 

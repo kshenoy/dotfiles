@@ -32,7 +32,7 @@ __fzf_select__() {                                                              
 
 __fzf_select_work__() {
   local _arg=${1:-'.'}
-  if [[ (-n "$REPO_PATH") && ($_arg =~ $REPO_PATH) ]]; then
+  if [[ -n "$REPO_PATH" ]] && [[ $_arg =~ $REPO_PATH ]]; then
     local cmd="find -L ${_arg} -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune \
                       -o -type d \\( -name build -o -name .ccache -o -name dfx -o -name emu -o -name _env -o \
                                      -name env_squash -o -name fp -o -name import -o -name libs -o -name powerPro -o \

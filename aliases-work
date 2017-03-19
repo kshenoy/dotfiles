@@ -18,9 +18,9 @@ fi
 unalias P
 unset -f P
 P() {
-  if [[ (-f ${1}) && ("${1}" =~ sim\.out) ]]; then
+  if [[ -f ${1} ]] && [[ "${1}" == "sim.out" ]]; then
     if [[ $PAGER =~ vim ]]; then
-      eval "$PAGER -c '/error:\|Backtrace:' -c 'norm zt' $@"
+      eval "$PAGER -c 'silent! /error:\|Backtrace:' -c 'norm zt' $@"
     elif [[ $PAGER =~ less ]]; then
       eval "$PAGER -p error: $@"
     fi
@@ -37,7 +37,7 @@ unset -f vim_func_work
 gvim_func_work() {
   # This is a hack to weed out the arguments. The last argument is more likely to be a file than any of the other ones
   local _file=$(eval echo $(echo '$'"$#"))
-  if [[ ( -f $_file ) && ( -n $REPO_PATH ) ]]; then
+  if [[ -f $_file ]] && [[ -n $REPO_PATH ]]; then
     local _server=${REPO_PATH}
     local _scratch_dir=$(dirname $(readlink -f $REPO_PATH/sim))
     if [[ $(readlink -f $_file 2> /dev/null) =~ ^$_scratch_dir ]]; then
@@ -76,13 +76,25 @@ alias amdgrep='find $REPO_PATH -path "$REPO_PATH/simenv/build" -prune -or -path 
 alias sbi='. /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash'
 alias mkv='mkverdi -nolsf $(grep -Po "\-model\s*\S+" sim.out) -rc ~/novas.rc -guiConf ~/novas.conf -tkName "verdi_$(tmux display-message -p "#S#I")"'
 alias findFirstError='findFirstError --tkName "verdi_$(tmux display-message -p "#S#I")"'
-alias cid='cat $REPO_PATH/configuration_id'
+alias cid='cat ${REPO_PATH+$REPO_PATH/}configuration_id'
 alias cidn='cid | grep -Po "(?<=@)\d+$"'
 alias bj='lsf_bjobs -w'
 alias bjj='lsf_bjobs -w | command grep "JOBID\|$$"'
 alias bk='lsf_bkill'
 alias bq='lsf_bqueues'
-alias bjg='bj | grep $$:'
+
+unset -f bjg
+bjg() {
+  bj | grep "${1:-$$:}"
+}
+unset -f bjg_spin
+bjg_spin() {
+  local _lsf_jobid=$(bjg ${1:-$$} | cut -d' ' -f1) || return $?
+  while [[ $(bjg ${1:-$$}) ]]; do
+    sleep 60;
+  done
+  alert "Completed LSF Job: ${_lsf_jobid}"
+}
 
 alias wtf='WhyTheFail'
 alias lmn='ljd -nomail -l'
@@ -193,13 +205,15 @@ make_wa_vars
 # This allows us to use $rtl etc as an absolute path when $REPO_PATH is set and when bootenv isn't done, as a relative path
 dyn_vars() {
   export ch="${REPO_PATH+$REPO_PATH/}ch"
-  export v="${ch}/verif"
+  export reg="${REPO_PATH+$REPO_PATH/}meta/registers"
   export r="${ch}/rtl"
   export tb="${ch}/tb"
-  export txn="${v}/txn"
-  export cl3="${v}/chk_l3"
+  export tc="${ch}/tc"
+  export v="${ch}/verif"
   export cl23="${v}/chk_l2l3"
+  export cl3="${v}/chk_l3"
   export clk="${v}/chk_lock"
+  export txn="${v}/txn"
   export vcov="${v}/coverage"
   export avf="${REPO_PATH+$REPO_PATH/}import/avf"
   export sim="${REPO_PATH+$REPO_PATH/}sim"
@@ -258,17 +272,20 @@ psig() {
 
 unset -f rgsig
 rgsig() {
-  for i in $(grep -P FAIL release_gate_tmp/release_gate.log | colm -1); do
-    echo -e "\n$i";
+  for i in $(grep FAIL ${REPO_PATH+$REPO_PATH/}release_gate_tmp/release_gate.log | colm -1); do
+    local _sim=${i##*release_gate_tmp/}
+    _sim=${_sim%%/*}
+    echo -e "\n${_sim}";
     psig $i;
   done
 }
 
 unset -f rgww
 rgww() {
-  if [[ -z $REPO_PATH ]]; then return; fi
-  for i in `g FAIL $REPO_PATH/release_gate_tmp/release_gate.log | colm -1`; do
-    echo -e "\n$i";
+  for i in `g FAIL ${REPO_PATH+$REPO_PATH/}release_gate_tmp/release_gate.log | colm -1`; do
+    local _sim=${i##*release_gate_tmp/}
+    _sim=${_sim%%/*}
+    echo -e "\n${_sim}";
     pww $i;
   done
 }
@@ -381,9 +398,9 @@ wa_list() {
   for _ch in {0..1}; do
     for _proj in as ah br; do
       local _proj_ucase=$(tr 'a-z' 'A-Z' <<< ${_proj})
-      for _wa in {1..5}; do
+      for _wa in {1..6}; do
         _path="/proj/ch_func_dev${_ch}/${_proj_ucase}/kshenoy/${_proj}${_ch}${_wa}"
-        if [[ "$(ls -A ${_path})" ]]; then
+        if [[ -d ${_path} ]] && [[ "$(ls -A ${_path})" ]]; then
           echo ${_path}:
           ls ${_path} | sed 's/^/  /'
         fi
@@ -445,4 +462,3 @@ wtff() {
   model=`basename ${1%_rg.build.log}`
   wtf -m $model
 }
-

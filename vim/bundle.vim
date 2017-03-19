@@ -43,7 +43,7 @@ Plug  'kshenoy/vim-signature'
 " Plug  'justinmk/vim-sneak'
 Plug  'kshenoy/vim-sol'
 "Plug 'sjl/splice.vim',                   {'on': 'SpliceInit'}
-"Plug 'kana/vim-submode'
+Plug 'kana/vim-submode'
 Plug  'tpope/vim-surround'
 Plug  'AndrewRadev/switch.vim',           {'on': 'Switch'}
 Plug  'WeiChungWu/vim-SystemVerilog',     {'for': 'systemverilog'}
@@ -62,6 +62,7 @@ Plug  'tpope/vim-unimpaired'
 Plug  'tpope/vim-vinegar',                {'on': '<Plug>VinegarUp'}
 Plug  'chaoren/vim-wordmotion'
 " Plug  'Valloric/YouCompleteMe',           {'do': './install.py --clang-completer'}
+Plug  'kshenoy/vim-parjumper'
 
 call plug#end()
 
@@ -264,8 +265,16 @@ nnoremap coC :QToggle<CR>
 
 
 " vim-mark -------------------------------------------------------------------------------------------------------  {{{1
-nmap <silent> <C-A-N> <Plug>MarkSearchAnyNext
-nmap <silent> <C-A-P> <Plug>MarkSearchAnyPrev
+map  <unique>          <leader>m             <Plug>my(Mark)
+nmap <unique> <silent> <Plug>my(Mark)m       <Plug>MarkSet
+xmap <unique> <silent> <Plug>my(Mark)m       <Plug>MarkSet
+nmap <unique> <silent> <Plug>my(Mark)x       <Plug>MarkRegex
+xmap <unique> <silent> <Plug>my(Mark)x       <Plug>MarkRegex
+nmap <unique> <silent> <Plug>my(Mark)n       <Plug>MarkClear
+nmap <unique> <silent> <Plug>my(Mark)<C-N>   <Plug>MarkSearchNext
+nmap <unique> <silent> <Plug>my(Mark)<C-P>   <Plug>MarkSearchPrev
+nmap <unique> <silent> <Plug>my(Mark)<C-A-N> <Plug>MarkSearchAnyNext
+nmap <unique> <silent> <Plug>my(Mark)<C-A-P> <Plug>MarkSearchAnyPrev
 
 
 " vim-markdown ---------------------------------------------------------------------------------------------------  {{{1
@@ -398,6 +407,15 @@ if exists('*submode#')
   "call submode#map       ( 'WinCycle' , 'n', '', '<C-W>'       , '<C-W><C-W>'   )
   "call submode#map       ( 'WinCycle' , 'n', '', 'w'           , '<C-W>w'       )
   "call submode#map       ( 'WinCycle' , 'n', '', 'W'           , '<C-W>W'       )
+
+  call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-N>',   '<Leader>m<C-N>')
+  call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-P>',   '<Leader>m<C-P>')
+  call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-A-N>', '<Leader>m<C-A-N>')
+  call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-A-P>', '<Leader>m<C-A-P>')
+  call submode#map       ('mark.vim', 'n', '', '<C-N>',            '<Leader>m<C-N>')
+  call submode#map       ('mark.vim', 'n', '', '<C-P>',            '<Leader>m<C-P>')
+  call submode#map       ('mark.vim', 'n', '', '<C-A-N>',          '<Leader>m<C-A-N>')
+  call submode#map       ('mark.vim', 'n', '', '<C-A-P>',          '<Leader>m<C-A-P>')
 
   " Custom Maps
   "nnoremap <Plug>IncLines :<C-U>let &lines += 1<CR>

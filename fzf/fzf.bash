@@ -6,7 +6,7 @@ fi
 
 # Man path
 # --------
-if [[ ! "$MANPATH" == *$FZF_PATH/man* && -d "$FZF_PATH/man" ]]; then
+if [[ ! "$MANPATH" == *$FZF_PATH/man* ]] && [[ -d "$FZF_PATH/man" ]]; then
   export MANPATH="$MANPATH:$FZF_PATH/man"
 fi
 

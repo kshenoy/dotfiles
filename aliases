@@ -193,7 +193,7 @@ alias k9='kill -9'
 unset -f gvim_func
 gvim_func() {
   # If tmux is being used, check that DISPLAY is set correctly
-  if [[ (-n "$TMUX") && ($DISPLAY != "$(tmux show-env | grep DISPLAY | cut -d '=' -f2)") ]]; then
+  if [[ -n "$TMUX" ]] && [[ $DISPLAY != "$(tmux show-env | grep DISPLAY | cut -d '=' -f2)" ]]; then
     tmux_pp update-env >& /dev/null
   fi
   gvim "$@" 2> /dev/null
@@ -269,15 +269,6 @@ alias sosa='. ~/.dotfiles/aliases && echo Sourced aliases'
 #=======
 # Misc
 #
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-#alias alert='notify-send --urgency=low -i "$( (( $? == 0 )) && echo terminal || echo error)" "$(fc -nl -1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-unset -f alert
-alert() {
-  local _icon=$( (($? == 0)) && echo terminal || echo error)
-  local _msg=$(fc -nl -1 | sed -e 's/^\s*[0-9]\+\s*//' -e 's/[;&|]\s*alert$//')
-  notify-send --urgency=low -i ${_icon} ${_msg}
-}
 alias j='jobs'
 alias archdate='date +%Y-%m-%d'
 alias so=source

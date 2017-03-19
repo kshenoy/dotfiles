@@ -1,8 +1,9 @@
 " This vimrc is used only when vim is being used as a pager
-" The aim is to make vim behave like less as much as possible
+" The aim is to make vim behave like less without losing much
 set nocompatible
 
 set readonly
+set noswapfile
 
 syntax on
 set cursorline
@@ -15,3 +16,12 @@ highlight Search cterm=reverse ctermfg=NONE ctermbg=NONE
 nnoremap <silent> q :qall!<CR>
 nnoremap <silent> n nzz
 nnoremap <silent> N Nzz
+
+""" Move by visual lines
+noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
+noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
+noremap <silent> gj j
+noremap <silent> gk k
+
+""" Copy the file name to unix visual select buffer
+nnoremap <expr> y<C-G> ':let @' . (has('win_32') ? '+' : '*') . '="' . expand("%:p") . '"<CR>'

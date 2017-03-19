@@ -7,6 +7,7 @@ emacs.d/config.el*
 emacs.d/elpa/
 emacs.d/games/
 emacs.d/org-wunderlist/
+emacs.d/network-security.data
 emacs.d/private.el
 emacs.d/projectile-bookmarks.eld
 emacs.d/projectile.cache
@@ -15,6 +16,7 @@ emacs.d/semanticdb/
 emacs.d/server/
 emacs.d/session*
 emacs.d/tmp/
+emacs.d/*unison*
 fonts/
 unity/
 vim/autoload/plug*

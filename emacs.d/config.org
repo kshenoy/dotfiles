@@ -4,18 +4,18 @@
 * Init
 :PROPERTIES:
 :CUSTOM_ID: h:b13bc7d4-281f-44b7-95c5-aca12b96d689
+:header-args: :tangle yes
 :END:
 ** Archives
 :PROPERTIES:
 :CUSTOM_ID: h:45fea474-997a-4cc3-ad1e-17064f71b695
 :END:
-#+BEGIN_SRC emacs-lisp
-  (when (< emacs-major-version 24)
-    ;; For important compatibility libraries like cl-lib
-    (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
 
-  (add-to-list 'package-archives '("melpa" . "https://melpa.milkbox.net/packages/") t)
-  (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/") t)
+/package-archives/ uses HTTP access to GNU by default. Replacing it with the https version instead
+#+BEGIN_SRC emacs-lisp
+  (setq         package-archives '(("repo-gnu"   . "https://elpa.gnu.org/packages/")))
+  (add-to-list 'package-archives  '("repo-melpa" . "https://melpa.milkbox.net/packages/") t)
+  (add-to-list 'package-archives  '("repo-org"   . "http://orgmode.org/elpa/") t)
 
   (when (>= emacs-major-version 24)
     (when (>= emacs-minor-version 4)
@@ -59,6 +59,7 @@ Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/
 * Visual
 :PROPERTIES:
 :CUSTOM_ID: h:0613d4ad-1d3e-4425-a6b4-ee238042a64f
+:header-args: :tangle yes
 :END:
 #+BEGIN_SRC emacs-lisp
   ;; Disable anoying beep
@@ -150,6 +151,7 @@ Emacs.toolBar: off
 * General
 :PROPERTIES:
 :CUSTOM_ID: h:e872ba61-2943-4b5f-976a-9045a10107d6
+:header-args: :tangle yes
 :END:
 ** Keybinds
 :PROPERTIES:
@@ -517,19 +519,18 @@ Mode-specific scratch buffers?
 * Packages
 :PROPERTIES:
 :CUSTOM_ID: h:7cf6a220-380c-4b32-8833-18f97bd60476
+:header-args: :tangle yes
 :END:
 ** TODO hydra
 :PROPERTIES:
 :CUSTOM_ID: h:19d345f5-c20b-4b41-a302-a5e635739a27
 :END:
-Seems like modular bindings. Very useful for
-- Window movement etc.
-
-More ideas in https::/github.com/kana/vim-submode
+Ideas in https::/github.com/kana/vim-submode
 
 ** evil
 :PROPERTIES:
 :CUSTOM_ID: h:2e3e3bcf-8e0c-4f3e-9d2d-2a5914cabb05
+:header-args: :tangle yes
 :END:
 evil can be toggled using =C-z=
 
@@ -539,6 +540,8 @@ evil can be toggled using =C-z=
     :init
     ;; (setq evil-want-C-u-scroll t)
     (setq evil-want-C-w-in-emacs-state t)
+    (setq evil-want-Y-yank-to-eol t)
+
     (evil-mode t)
 #+END_SRC
 
@@ -762,7 +765,7 @@ We redefine /helm-command-prefix/ here
   :bind* (("M-x"   . helm-M-x)
           ("C-h a" . helm-apropos))
 
-  :bind (("C-c h" . helm-command-prefix)
+  :bind (("C-c j" . helm-command-prefix)
          :map       helm-command-map
          ("b"     . helm-buffers-list)
          ("f"     . helm-find-files)    ; Find files in the current directory
@@ -791,7 +794,7 @@ Other useful default keybinds:
 )
 #+END_SRC
 
-** linum-relative
+** TODO linum-relative
 :PROPERTIES:
 :CUSTOM_ID: h:c7842971-98ae-483c-b02a-63c054609dfc
 :END:
@@ -852,7 +855,7 @@ Shouldn't it inherit from 'linum?
   ;; (add-hook 'linum-before-numbering-hook #'my-linum-gapless-setup-margin-overlays)
 #+END_SRC
 
-** macrostep
+** TODO macrostep
 :PROPERTIES:
 :CUSTOM_ID: h:f0ffd993-5f5b-40cc-8b4f-b99e8c8769c4
 :END:
@@ -868,12 +871,17 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
 ** org
 :PROPERTIES:
 :CUSTOM_ID: h:080c3337-de87-4d2e-890a-1e047392f89a
+:header-args: :tangle yes
 :END:
 
+This solution is by [[https://www.reddit.com/r/emacs/comments/5sx7j0/how_do_i_get_usepackage_to_ignore_the_bundled/ddixpr9/][/u/Wolfer1ne on reddit]].
+Passing an argument to =:ensure= (other than t or nil) allows us to use a different package than the one named in use-package
+Also, using =:pin= allows us to prefer which package-archive we'd like to use to download the package from.
+I don't remember why we need to specifically grab =org-plus-contrib= from the org repository instead of from one of the other ones.
 #+BEGIN_SRC emacs-lisp
   (use-package org
-   :ensure org-plus-contrib
-   :pin org
+    :ensure org-plus-contrib
+    :pin repo-org
 #+END_SRC
 
 *** :init
@@ -904,67 +912,6 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
   (setq org-imenu-depth 10)
 #+END_SRC
 
-**** Org-agenda custom commands
-:PROPERTIES:
-:CUSTOM_ID: h:777edf92-ed17-4eab-a79a-3a6d1a3acbbf
-:END:
-Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html
-#+BEGIN_SRC emacs-lisp
-  (defun my/org-skip-subtree-if-habit ()
-    "Skip an agenda entry if it has a STYLE property equal to \"habit\"."
-    (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-      (if (string= (org-entry-get nil "STYLE") "habit")
-          subtree-end
-        nil)))
-
-  (defun my/org-skip-subtree-if-priority (priority)
-    "Skip an agenda subtree if it has a priority of PRIORITY.
-
-  PRIORITY may be one of the characters ?A, ?B, or ?C."
-    (let ((subtree-end (save-excursion (org-end-of-subtree t)))
-          (pri-value (* 1000 (- org-lowest-priority priority)))
-          (pri-current (org-get-priority (thing-at-point 'line t))))
-      (if (= pri-value pri-current)
-          subtree-end
-        nil)))
-
-  (setq org-agenda-custom-commands
-        '(("d" "Daily agenda and all TODOs"
-           ((tags "PRIORITY=\"A\""
-                  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                   (org-agenda-overriding-header "High-priority unfinished tasks:")))
-            (agenda "" ((org-agenda-span 3)))
-            (alltodo ""
-                     ((org-agenda-skip-function '(or (my/org-skip-subtree-if-habit)
-                                                     (my/org-skip-subtree-if-priority ?A)
-                                                     (org-agenda-skip-if nil '(scheduled deadline))))
-                      (org-agenda-overriding-header "ALL normal priority tasks:"))))
-           ((org-agenda-compact-blocks t)))))
-#+END_SRC
-
-**** Org Tag List
-:PROPERTIES:
-:CUSTOM_ID: h:4ec8545f-1a7f-422b-8444-b3669a990e3b
-:END:
-#+BEGIN_SRC emacs-lisp
-  (setq org-tag-alist '((:startgrouptag) ("Work")
-                        (:grouptags)     ("Project") ("Module") ("Feature") ("Tools")
-                        (:endgrouptag)
-                        (:startgrouptag) ("Project")
-                        (:grouptags)     ("AS") ("AH") ("BR") ("ZN")
-                        (:endgrouptag)
-                        (:startgrouptag) ("Module")
-                        (:grouptags)     ("L2") ("L2L3") ("L3") ("XI") ("MCA")
-                        (:endgrouptag)
-                        (:startgrouptag) ("Feature")
-                        (:grouptags)     ("BusLock") ("DebugBus") ("L3F") ("MeshGating") ("QoS") ("RangeLock")
-                                         ("RAS") ("TraceCapture")
-                        (:endgrouptag)
-                        (:startgrouptag) ("Tools")
-                        (:grouptags)     ("Formal")
-                        (:endgrouptag)))
-#+END_SRC
-
 **** TODO Show the emphasis markers on point
 :PROPERTIES:
 :CUSTOM_ID: h:20e0e38b-c292-4d90-be0c-4c6163358e56
@@ -985,7 +932,7 @@ Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mod
   (add-hook 'post-command-hook 'org-show-emphasis-markers-at-point nil t)
 #+END_SRC
 
-**** org-babel, source blocks
+**** org-babel source blocks
 :PROPERTIES:
 :CUSTOM_ID: h:5346da4e-8084-4ec9-89d8-ead64f2381d3
 :END:
@@ -1031,16 +978,41 @@ Ask for confirmation before evaluating? NO!
   (setq org-odd-level-only nil)
 
   ;; …▼•
-  ;; (setq org-ellipsis " ▼" )              ; Use a fancy arrow to indicate a fold instead of '...'
+  ;; (setq org-ellipsis "▼") ; Use a fancy arrow to indicate a fold instead of '...'
 #+END_SRC
 
 **** ToDo States
 :PROPERTIES:
 :CUSTOM_ID: h:bb9269f6-f4dc-427b-aed2-071192813695
 :END:
+
+Add logging when task state changes
+#+BEGIN_SRC emacs-lisp
+  (setq org-log-done nil)
+  (setq org-log-into-drawer t)  ; Save state changes into LOGBOOK drawer instead of in the body
+#+END_SRC
+
 Custom keywords
 #+BEGIN_SRC emacs-lisp
-  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCEL(c)")))
+  (setq org-todo-keywords '((sequence "TODO(t!)" "WAITING(w@/!)" "|" "DONE(d!)" "CANCEL(c@)")))
+  ;; (setq org-todo-keyword-faces
+  ;;       (quote (("TODO" :foreground "red" :weight bold)
+  ;;               ("WAITING" :foreground "orange" :weight bold)
+  ;;               ("DONE" :foreground "forest green" bold)
+  ;;               ("CANCEL" :foreground "forest green" bold))))
+#+END_SRC
+=!= - Log timestamp
+=@= - Log timestamp and note
+Refer [[http://orgmode.org/manual/Tracking-TODO-state-changes.html][Tracking-TODO-state-changes]] for details
+
+Change from any todo state to any other state using =C-c C-t KEY=
+#+BEGIN_SRC emacs-lisp
+  (setq org-use-fast-todo-selection t)
+#+END_SRC
+
+This frees up S-left and S-right which I can then use to cycles through the todo states but skip setting timestamps and entering notes which is very convenient when all I want to do is fix up the status of an entry.
+#+BEGIN_SRC emacs-lisp
+  (setq org-treat-S-cursor-todo-selection-as-state-change nil)
 #+END_SRC
 
 *** :config
@@ -1114,6 +1086,16 @@ This is a counter-part to =org-insert-link=. From [[http://emacs.stackexchange.c
           (insert description))))
 #+END_SRC
 
+**** Add to org-modules
+:PROPERTIES:
+:CUSTOM_ID: h:f410f30f-9d3a-4af4-a7f5-3440370f5871
+:END:
+#+BEGIN_SRC emacs-lisp
+  ;; (add-to-list 'org-modules 'org-id)
+  ;; (eval-after-load 'org
+  ;;   '(org-load-modules-maybe t))
+#+END_SRC
+
 **** org-bullets
 :PROPERTIES:
 :CUSTOM_ID: h:224d116a-434c-4dc1-b773-5bf948d70523
@@ -1139,26 +1121,99 @@ A good way to find more characters is to use =M-x insert-char=
     :ensure nil
     :init
     (setq org-agenda-files
-          (mapcar (lambda (x)
-                    (let ((y (concat org-directory x)))
-                      (and (file-exists-p y) y)))
-                  '("organizer.org" "Software/" "Personal/")))
+          (seq-filter 'file-exists-p
+                      (mapcar (lambda (x)
+                                (concat org-directory x))
+                              '("organizer.org" "Software/" "Personal/"))))
 
     (setq org-agenda-tags-column            -120) ; Monitors are wide, might as well use it :/
     (setq org-agenda-skip-scheduled-if-done t)    ; Why isn't this default?
-    (setq org-agenda-skip-deadline-if-done  t))
+    (setq org-agenda-skip-deadline-if-done  t)
 #+END_SRC
 
 [[#h:7c86a221-7ef3-4222-900f-042b36e59e04][Keybinds]]
 
-**** org-refile
-By default org-refile only shows the 1st level headings from the current file.
-This will make it show two levels of headings from all agenda files
+***** TODO Fix setting org-agenda-files
+:PROPERTIES:
+:CUSTOM_ID: h:be354b60-5a0e-4e5c-9f54-b37d5e491c74
+:END:
+The lambda will insert a nil if the file/directory doesn't exist.
+This will cause whatever reads =org-agenda-files= to blow up because it expects
+
+***** org-agenda custom commands
+:PROPERTIES:
+:CUSTOM_ID: h:777edf92-ed17-4eab-a79a-3a6d1a3acbbf
+:END:
+Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html
 #+BEGIN_SRC emacs-lisp
-  (setq org-refile-targets '((org-agenda-files . (:maxlevel . 2))))
+  (defun my/org-skip-subtree-if-habit ()
+    "Skip an agenda entry if it has a STYLE property equal to \"habit\"."
+    (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+      (if (string= (org-entry-get nil "STYLE") "habit")
+          subtree-end
+        nil)))
+
+  (defun my/org-skip-subtree-if-priority (priority)
+    "Skip an agenda subtree if it has a priority of PRIORITY.
+
+  PRIORITY may be one of the characters ?A, ?B, or ?C."
+    (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+          (pri-value (* 1000 (- org-lowest-priority priority)))
+          (pri-current (org-get-priority (thing-at-point 'line t))))
+      (if (= pri-value pri-current)
+          subtree-end
+        nil)))
+
+  (setq org-agenda-custom-commands
+        '(("d" "Daily agenda and all TODOs"
+           ((tags "PRIORITY=\"A\""
+                  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                   (org-agenda-overriding-header "High-priority unfinished tasks:")))
+            (agenda "" ((org-agenda-span 3)))
+            (alltodo ""
+                     ((org-agenda-skip-function '(or (my/org-skip-subtree-if-habit)
+                                                     (my/org-skip-subtree-if-priority ?A)
+                                                     (org-agenda-skip-if nil '(scheduled deadline))))
+                      (org-agenda-overriding-header "ALL normal priority tasks:"))))
+           ((org-agenda-compact-blocks t)))))
+
+  ;; (org-add-agenda-custom-command
+  ;;  '("w" "Work agenda"
+  ;;    ((tags "PRIORITY=\"A\""
+  ;;           ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+  ;;            (org-agenda-overriding-header "High-priority unfinished tasks:")))
+  ;;     (agenda "" ((org-agenda-span 3)))
+  ;;     (alltodo ""
+  ;;              ((org-agenda-skip-function '(or (my/org-skip-subtree-if-habit)
+  ;;                                              (my/org-skip-subtree-if-priority ?A)
+  ;;                                              (org-agenda-skip-if nil '(scheduled deadline))))
+  ;;               (org-agenda-overriding-header "ALL normal priority tasks:"))))
+  ;;    ((org-agenda-compact-blocks t))))
+#+END_SRC
+
+***** org-agenda END
+:PROPERTIES:
+:CUSTOM_ID: h:499db1cd-fb0e-4a31-8951-efe3e13711f9
+:END:
+#+BEGIN_SRC emacs-lisp
+  )
+#+END_SRC
+
+**** org-refile
+:PROPERTIES:
+:CUSTOM_ID: h:0f3890d6-47fb-41f8-a0b9-49b1041c1c49
+:END:
+Show upto 9 levels of headings from the current file and two levels of headings from all agenda files
+#+BEGIN_SRC emacs-lisp
+  (setq org-refile-targets
+        '((nil . (:maxlevel . 9))
+          (org-agenda-files . (:maxlevel . 2))))
 #+END_SRC
 
 ***** TODO Set org-refile targets based on current file
+:PROPERTIES:
+:CUSTOM_ID: h:a8682cea-8519-48aa-9384-415e52db3645
+:END:
 Why would I want to refile something work-related under Softwares etc.
 
 **** org-wunderlist
@@ -1252,59 +1307,92 @@ We use this to create frames for org-capture directly from the OS as shown [[htt
 #+END_SRC
 
 ***** TODO Split org-capture-templates and move work related stuff to a separate file
+:PROPERTIES:
+:CUSTOM_ID: h:d753c037-d265-47f6-bd8e-f3cbe0067fb0
+:END:
 **** org-id
 :PROPERTIES:
 :CUSTOM_ID: h:8a9fa520-31a7-49fb-a85c-18ea5d215b7a
 :END:
-Copied from [[https://writequit.org/articles/emacs-org-mode-generate-ids.html][here]].
-#+BEGIN_SRC emacs-lisp :tangle no
-  (use-package org-id)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp
+  (use-package org-id
+    :ensure org-plus-contrib
     :init
     (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
 
     :config
-    (defun my/org-custom-id-get (&optional pom create prefix)
-      "Get the CUSTOM_ID property of the entry at point-or-marker POM.
-       If POM is nil, refer to the entry at point. If the entry does
-       not have an CUSTOM_ID, the function returns nil. However, when
-       CREATE is non nil, create a CUSTOM_ID if none is present
-       already. PREFIX will be passed through to `org-id-new'. In any
-       case, the CUSTOM_ID of the entry is returned."
-      (interactive)
-      (org-with-point-at pom
-        (let ((id (org-entry-get nil "CUSTOM_ID")))
-          (cond
-           ((and id (stringp id) (string-match "\\S-" id))
-            id)
-           (create
-            (setq id (org-id-new (concat prefix "h")))
-            (org-entry-put pom "CUSTOM_ID" id)
-            (org-id-add-location id (buffer-file-name (buffer-base-buffer)))
-            id)))))
+#+END_SRC
 
-    (defun my/org-add-ids-to-headlines-in-file ()
-      "Add CUSTOM_ID properties to all headlines in the current
-       file which do not already have one. Only adds ids if the
-       `auto-id' option is set to `t' in the file somewhere. ie,
-       ,#+OPTIONS: auto-id:t"
-      (interactive)
-      (save-excursion
-        (widen)
-        (goto-char (point-min))
-        (when (re-search-forward "^#\\+OPTIONS:.*auto-id:t" (point-max) t)
-          (org-map-entries (lambda () (my/org-custom-id-get (point) 'create))))))
 
-    ;; Automatically add ids to saved org-mode headlines
-    (add-hook 'org-mode-hook
-              (lambda ()
-                (add-hook 'before-save-hook
-                          (lambda ()
-                            (when (and (eq major-mode 'org-mode)
-                                       (eq buffer-read-only nil))
-                              (my/org-add-ids-to-headlines-in-file)))))))
+***** Completion while inserting link
+:PROPERTIES:
+:CUSTOM_ID: h:40efe8c7-eb48-45c0-a291-96500e19f703
+:END:
+To use completion, insert link using =C-c C-l= and select =id:= as type and completion should trigger
+More details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
+#+BEGIN_SRC emacs-lisp
+  (defun org-id-complete-link (&optional arg)
+    "Create an id: link using completion"
+    (concat "id:"
+            (org-id-get-with-outline-path-completion)))
+
+  (org-link-set-parameters "id"
+                           :complete 'org-id-complete-link)
+#+END_SRC
+
+***** Adding org-ids automatically
+:PROPERTIES:
+:CUSTOM_ID: h:dc330b26-b3ec-43bd-b8a2-c012c98899a7
+:END:
+Copied from [[https://writequit.org/articles/emacs-org-mode-generate-ids.html][here]]. This is now redundant as the completion while inserting a link automatically creates an =ID= Property.
+#+BEGIN_SRC emacs-lisp :tangle no
+  (defun my/org-custom-id-get (&optional pom create prefix)
+    "Get the CUSTOM_ID property of the entry at point-or-marker POM.
+     If POM is nil, refer to the entry at point. If the entry does
+     not have an CUSTOM_ID, the function returns nil. However, when
+     CREATE is non nil, create a CUSTOM_ID if none is present
+     already. PREFIX will be passed through to `org-id-new'. In any
+     case, the CUSTOM_ID of the entry is returned."
+    (interactive)
+    (org-with-point-at pom
+      (let ((id (org-entry-get nil "ID")))
+        (cond
+         ((and id (stringp id) (string-match "\\S-" id))
+          id)
+         (create
+          (setq id (org-id-new (concat prefix "h")))
+          (org-entry-put pom "ID" id)
+          (org-id-add-location id (buffer-file-name (buffer-base-buffer)))
+          id)))))
+
+  (defun my/org-add-ids-to-headlines-in-file ()
+    "Add CUSTOM_ID properties to all headlines in the current
+     file which do not already have one. Only adds ids if the
+     `auto-id' option is set to `t' in the file somewhere. ie,
+     ,#+OPTIONS: auto-id:t"
+    (interactive)
+    (save-excursion
+      (widen)
+      (goto-char (point-min))
+      (when (re-search-forward "^#\\+OPTIONS:.*auto-id:t" (point-max) t)
+        (org-map-entries (lambda () (my/org-custom-id-get (point) 'create))))))
+
+  ;; Automatically add ids to saved org-mode headlines
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook
+                        (lambda ()
+                          (when (and (eq major-mode 'org-mode)
+                                     (eq buffer-read-only nil))
+                            (my/org-add-ids-to-headlines-in-file))))))
+#+END_SRC
+
+***** END
+:PROPERTIES:
+:CUSTOM_ID: h:9aee1006-a2ca-4139-afa0-7d985bba5793
+:END:
+#+BEGIN_SRC emacs-lisp
+  )
 #+END_SRC
 
 **** htmlize
@@ -1334,9 +1422,9 @@ Custom keymap for org-mode bindings
 
 Note that these are still part of the /:config/ block
 #+BEGIN_SRC emacs-lisp
-  (bind-keys :map helm-command-map
-             ("o" . helm-org-in-buffer-headings)
-             ("h" . helm-info-org))
+  ;; (bind-keys :map helm-command-map
+  ;;            ("o" . helm-org-in-buffer-headings)
+  ;;            ("h" . helm-info-org))
 #+end_src
 
 Delete the result block using =C-c C-v k= where =C-c C-v= is the /org-babel-key-prefix/
@@ -1432,7 +1520,6 @@ Default binding is =C-x u=
 :END:
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
-    :disabled
     :diminish yas-minor-mode
     :init (yas-global-mode t))
 #+END_SRC
@@ -1483,7 +1570,7 @@ Similar to vim's easy-motion plugin
 :END:
 Replaces avy
 
-** TODO auto-complete
+** auto-complete
 :PROPERTIES:
 :CUSTOM_ID: h:d49ac609-f845-47a7-a404-2dbdfc80b944
 :END:
@@ -1555,7 +1642,8 @@ http://emacs.stackexchange.com/a/21173/9690
 :END:
 When a color is specified as a hex code or with its name, set the background of the face to the value of the color itself
 #+BEGIN_SRC emacs-lisp
-  (use-package rainbow-mode)
+  (use-package rainbow-mode
+    :defer t)
 #+END_SRC
 
 Provides command =rainbow-mode= to toggle this
@@ -1586,6 +1674,16 @@ Use brighter colors
 :CUSTOM_ID: h:8a9e4f3c-6c59-459a-aa7e-206e8d0b1e82
 :END:
 
+** aggressive-indent
+:PROPERTIES:
+:CUSTOM_ID: h:9a3422fa-1468-4181-9b35-deb725189f1c
+:END:
+#+BEGIN_SRC emacs-lisp
+  (use-package aggressive-indent
+    :config
+    (global-aggressive-indent-mode t))
+#+END_SRC
+
 ** verilog-mode
 :PROPERTIES:
 :CUSTOM_ID: h:c291889f-581d-4f79-997c-34b92411a11f
@@ -1600,7 +1698,7 @@ Use brighter colors
     (font-lock-mode 1))
 #+END_SRC
 
-** vimish-fold
+** TODO vimish-fold
 :PROPERTIES:
 :CUSTOM_ID: h:ba80b90d-9d21-49a7-8581-e389855954db
 :END:
@@ -1636,7 +1734,7 @@ Use brighter colors
   )
 #+END_SRC
 
-** monokai-theme
+** TODO monokai-theme
 :PROPERTIES:
 :CUSTOM_ID: h:d0f68afa-4eb8-4d92-b734-28f545165342
 :END:
@@ -1653,7 +1751,7 @@ Use brighter colors
     (load-theme 'monokai t))
 #+END_SRC
 
-** solarized-theme
+** TODO solarized-theme
 :PROPERTIES:
 :CUSTOM_ID: h:f78dde22-b0a4-41d8-81bd-ac2f0438f379
 :END:
@@ -1706,9 +1804,27 @@ Use brighter colors
 
 Load theme first and then override the colors
 
+* ProgLangEmacs
+:PROPERTIES:
+:header-args: :tangle yes
+:CUSTOM_ID: h:17f4cf1c-f131-4609-8ab6-777100bc262a
+:END:
+** sml-mode
+:PROPERTIES:
+:CUSTOM_ID: h:40f3215d-0bf0-4e42-bf18-9b943cbef969
+:END:
+#+BEGIN_SRC emacs-lisp
+  (use-package sml-mode
+    :config
+    (use-package ob-sml)
+    (add-to-list 'org-structure-template-alist
+                 '("sml" "#+BEGIN_SRC sml\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>")))
+#+END_SRC
+
 * After
 :PROPERTIES:
 :CUSTOM_ID: h:da43a0c0-246b-4bb4-b64b-643cb405482f
+:header-args: :tangle yes
 :END:
 ** Private config
 :PROPERTIES:
@@ -1733,9 +1849,11 @@ Set the background of the line number column to match that of the modeline
 :CUSTOM_ID: h:22f01c76-e2de-4a52-83e2-958de541430e
 :END:
 ** DONE Add CUSTOM_ID property to all headings
-CLOSED: [2017-01-05 Thu 19:21]
 :PROPERTIES:
 :CUSTOM_ID: h:93a4e44c-9ef9-41cc-b82e-4f5d407efde7
+:END:
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2017-01-05 Thu 19:21]
 :END:
 CUSTOM_ID value is the full hierarchical path to the section heading eg. =org*org-capture=
 [[https://writequit.org/articles/emacs-org-mode-generate-ids.html][Autogenerating CUSTOM_IDs]]

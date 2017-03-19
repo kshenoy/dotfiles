@@ -191,7 +191,7 @@ function! my#SynTrace()                                                         
   endfor
   "echo l:out
   return l:out
-endfunc
+endfunction
 command! -nargs=0 SynTrace call my#SynTrace()
 
 
@@ -754,7 +754,7 @@ function! my#SetupMergeLayout()                                                 
 endfunction
 
 
-function! my#SetDiffFileType()                                                                                  " {{{1
+function! my#SetDiffFileType()                                                                                    " {{{1
   let l:filetype=''
   windo if (l:filetype == '')|let l:filetype=&filetype|endif
   windo let &filetype=l:filetype
