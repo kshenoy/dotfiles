@@ -109,6 +109,9 @@ group=false
 #          extttnumerids.
 owner=false
 
+#          keep copies of conflicting files
+copyonconflict=true
+
 #          Including the preference -prefer root causes Unison always to
 #          resolve conflicts in favor of root, rather than asking for
 #          guidance from the user. (The syntax of root is the same as for

@@ -74,8 +74,8 @@ alias amdgrep='find $REPO_PATH -path "$REPO_PATH/simenv/build" -prune -or -path 
 
 # Building and Compiling
 alias sbi='. /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash'
-alias mkv='mkverdi -nolsf $(grep -Po "\-model\s*\S+" sim.out) -rc ~/novas.rc -guiConf ~/novas.conf -tkName "verdi_$(tmux display-message -p "#S#I")"'
-alias findFirstError='findFirstError --tkName "verdi_$(tmux display-message -p "#S#I")"'
+alias mkv='mkverdi -nolsf $(grep -Po "\-model\s*\S+" sim.out) -rc ~/novas.rc -guiConf ~/novas.conf -tkName "verdi_$(tmux display-message -p "#S:#I.#P")"'
+alias findFirstError='findFirstError --tkName "verdi_$(tmux display-message -p "#S:#I.#P")"'
 alias cid='cat ${REPO_PATH+$REPO_PATH/}configuration_id'
 alias cidn='cid | grep -Po "(?<=@)\d+$"'
 alias bj='lsf_bjobs -w'
@@ -156,15 +156,15 @@ pfop() {
 }
 pfu() {
   # Save ENV variables
-  local env_tmux=$TMUX
-  local env_tmux_pane=$TMUX_PANE
+  local _env_tmux=$TMUX
+  local _env_tmux_pane=$TMUX_PANE
 
   pf update_env "$@"
   local ret=$?
 
   # Restore ENV variables
-  export TMUX=$env_tmux
-  export TMUX_PANE=$env_tmux_pane
+  export TMUX=$_env_tmux
+  export TMUX_PANE=$_env_tmux_pane
 
   if [[ $ret != 0 ]]; then return; fi
 
@@ -228,24 +228,21 @@ dyn_vars
 unset -f benv
 benv() {
   # Save ENV variables
-  local env_tmux=$TMUX
-  local env_tmux_pane=$TMUX_PANE
-
-  local _workarea=$PWD
-  if (( $# > 0 )); then
-    _workarea=$1
-  fi
+  local _env_tmux=$TMUX
+  local _env_tmux_pane=$TMUX_PANE
+  local _old_pwd=$PWD
+  local _workarea=${1:-$PWD}
 
   # Start emacs daemon if one isn't present
-  [[ -n "${_workarea}" ]] && ~kshenoy/bin/emacs_daemon -s ${workarea//\//_} &> /dev/null &
+  # [[ -n "${_workarea}" ]] && ~kshenoy/bin/emacs_daemon -s ${workarea//\//_} &> /dev/null &
 
-  command cd "${_workarea}"
+  command pushd "${_workarea}" > /dev/null
   sbi && bootenv
   local ret=$?
 
   # Restore ENV variables
-  export TMUX=$env_tmux
-  export TMUX_PANE=$env_tmux_pane
+  export TMUX=$_env_tmux
+  export TMUX_PANE=$_env_tmux_pane
 
   if [[ $ret != 0 ]]; then return; fi
 
@@ -253,9 +250,7 @@ benv() {
   sosa; sosf
   [[ -f ~/.fzf.bash ]] && . ~/.fzf.bash
 
-  if (( $# > 0 )); then
-    command cd ~-
-  fi
+  command popd > /dev/null
 }
 
 unset -f trapbug_rm

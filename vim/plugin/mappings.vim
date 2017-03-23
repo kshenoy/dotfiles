@@ -86,7 +86,7 @@ noremap <silent> [M :call my#MethodJump('[M')<CR>
 nnoremap Y y$
 
 """ Split line (sister to [J]oin lines)
-nnoremap S i<CR><ESC>:call my#Preserve('-1s/\s\+$//')<CR>
+nnoremap <M-j> i<CR><ESC>:call my#Preserve('-2s/\s\+$//')<CR>
 
 """ Break undo-sequence before deleting till start of line
 inoremap <C-U> <C-G>u<C-U>

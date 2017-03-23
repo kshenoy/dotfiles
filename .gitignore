@@ -1,7 +1,7 @@
 *.bak
 bash/history
 compiz/
-emacs.d/ac-comphist.dat
+emacs.d/ac-comphist*
 emacs.d/bookmarks
 emacs.d/config.el*
 emacs.d/elpa/
