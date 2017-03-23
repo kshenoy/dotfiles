@@ -1,15 +1,11 @@
 #+TITLE: Emacs Configuration
-#+OPTIONS: auto-id:t
+#+PROPERTY: header-args :results value silent
 
 * Init
 :PROPERTIES:
-:CUSTOM_ID: h:b13bc7d4-281f-44b7-95c5-aca12b96d689
 :header-args: :tangle yes
 :END:
 ** Archives
-:PROPERTIES:
-:CUSTOM_ID: h:45fea474-997a-4cc3-ad1e-17064f71b695
-:END:
 
 /package-archives/ uses HTTP access to GNU by default. Replacing it with the https version instead
 #+BEGIN_SRC emacs-lisp
@@ -26,9 +22,6 @@
 #+END_SRC
 
 ** use-package
-:PROPERTIES:
-:CUSTOM_ID: h:8f834fca-3a0e-4755-8a18-6afe69aad21f
-:END:
 [[https://www.youtube.com/watch?v%3D2TSKxxYEbII][use-package video tutorial]]
 
 Install and load use-package
@@ -50,15 +43,11 @@ Install and load use-package
 #+END_SRC
 
 ** TODO Check if there's a way to keep all the config in this file itself with init.el being empty
-:PROPERTIES:
-:CUSTOM_ID: h:f1c5cc2f-e694-40d9-bd2b-a0430076c314
-:END:
 Sacha Chua seems to have something like that. Her init.el is simply a link.
 Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/shaving_time_on_emacs_startup_from_org_literate/][reddit thread]].
 
 * Visual
 :PROPERTIES:
-:CUSTOM_ID: h:0613d4ad-1d3e-4425-a6b4-ee238042a64f
 :header-args: :tangle yes
 :END:
 #+BEGIN_SRC emacs-lisp
@@ -73,9 +62,6 @@ Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/
 #+END_SRC
 
 ** Frame related
-:PROPERTIES:
-:CUSTOM_ID: h:b9951130-defe-46b5-bca5-35f01fb85dab
-:END:
 Set size of default frame
 #+BEGIN_SRC emacs-lisp
   (setq default-frame-alist
@@ -115,14 +101,8 @@ Avoid Emacs hanging for a while after changing default font:
 #+END_SRC
 
 *** TODO Set frame size based on home/work
-:PROPERTIES:
-:CUSTOM_ID: h:6a732008-4dfc-4eae-9e60-16cc633372c3
-:END:
 
 ** Clean-up
-:PROPERTIES:
-:CUSTOM_ID: h:907fe3c0-0aac-4a06-a423-5c6dad15abf1
-:END:
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-startup-message t)
   (setq initial-scratch-message "")
@@ -140,9 +120,6 @@ Emacs.toolBar: off
 #+END_EXAMPLE
 
 ** Mode line
-:PROPERTIES:
-:CUSTOM_ID: h:a74142e4-3cd0-4feb-8003-5273b4a10ea0
-:END:
 #+BEGIN_SRC emacs-lisp
   ;; Show column number in bottom bar
   (setq column-number-mode t)
@@ -150,13 +127,9 @@ Emacs.toolBar: off
 
 * General
 :PROPERTIES:
-:CUSTOM_ID: h:e872ba61-2943-4b5f-976a-9045a10107d6
 :header-args: :tangle yes
 :END:
 ** Keybinds
-:PROPERTIES:
-:CUSTOM_ID: h:d4e6fc2c-28e1-47f7-860a-42ed5ea2bfcf
-:END:
 By default =C-x == is bound to /what-cursor-position/ but evil maps both =ga= and =g8= to that as well so might as well use it to show something useful.
 #+BEGIN_SRC emacs-lisp
   (bind-key* "C-x =" 'describe-char)
@@ -172,9 +145,6 @@ By default =C-x == is bound to /what-cursor-position/ but evil maps both =ga= an
 #+END_SRC
 
 *** Enable/Disable/Toggle ala vim-unimpaired
-:PROPERTIES:
-:CUSTOM_ID: h:3c4b0674-d521-454a-8039-064ef4edbfac
-:END:
 I think the following would be handy
   =[= - Enable setting
   =~= - Toggle setting
@@ -200,9 +170,6 @@ Note that since /bind-keys*/ puts everything in the /override-global-mode/ map, 
 Thus, once the prefixes and maps are defined, we have to use /bind-keys/ only to create new keybinds inside them.
 
 *** Substitution map
-:PROPERTIES:
-:CUSTOM_ID: h:8fc683f0-bf77-4084-bacf-d8f952746ff6
-:END:
 #+BEGIN_SRC emacs-lisp
   (bind-keys :prefix-map my-s-bindings-map
              :prefix-docstring "This map is used to group together all substitution related bindings"
@@ -210,18 +177,12 @@ Thus, once the prefixes and maps are defined, we have to use /bind-keys/ only to
 #+END_SRC
 
 ** Custom file
-:PROPERTIES:
-:CUSTOM_ID: h:4fa309b1-b455-4e51-bfc4-7296a6342f1f
-:END:
 #+BEGIN_SRC emacs-lisp
   (setq custom-file (concat user-emacs-directory "custom.el"))
   (load custom-file)
 #+END_SRC
 
 ** Backup
-:PROPERTIES:
-:CUSTOM_ID: h:31607b99-cc66-4be1-94dd-f0f8bfcf85ea
-:END:
 #+BEGIN_SRC emacs-lisp
   (defvar backup-directory (concat user-emacs-directory "/tmp/backups"))
   (if (not (file-exists-p backup-directory)) (make-directory backup-directory t))
@@ -235,23 +196,15 @@ Thus, once the prefixes and maps are defined, we have to use /bind-keys/ only to
   (setq kept-new-versions         9)  ; newest versions to keep when a new numbered backup is made (default: 2)
 #+END_SRC
 
-** TODO Autosave
-:PROPERTIES:
-:CUSTOM_ID: h:eac166b3-83d2-4bca-ac9f-a02a6f047ce3
-:END:
-Freezes the window while autosaving. Bloody annoying!
-
+** Autosave
 #+BEGIN_SRC emacs-lisp
   (defvar autosave-directory (concat user-emacs-directory "/tmp/autosaves"))
   (if (not (file-exists-p autosave-directory)) (make-directory autosave-directory t))
   (setq auto-save-file-name-transforms `(("." ,autosave-directory t)))
-  (setq auto-save-default nil)  ; auto-save every buffer that visits a file
+  (setq auto-save-default t)  ; auto-save every buffer that visits a file
 #+END_SRC
 
 ** History
-:PROPERTIES:
-:CUSTOM_ID: h:2ab3fa7b-04b1-455e-941c-44d2bfc626f4
-:END:
 Delete identical history entries
 #+BEGIN_SRC emacs-lisp
 (setq history-delete-duplicates t)
@@ -268,9 +221,6 @@ Save mini-buffer history
 #+END_SRC
 
 ** UTF-8 Please
-:PROPERTIES:
-:CUSTOM_ID: h:d02fcd1a-910b-46bd-a093-ec0ed7e913b0
-:END:
 #+BEGIN_SRC emacs-lisp
   (setq locale-coding-system   'utf-8)
   (set-terminal-coding-system  'utf-8)
@@ -282,7 +232,7 @@ Save mini-buffer history
 
 ** TODO Fonts
 :PROPERTIES:
-:CUSTOM_ID: h:5cd588d9-dc03-4b39-8f35-478a5e6277bd
+:ID:       bd542328-7d1d-4806-936d-a50673beada6
 :END:
 The reason for adding the hook is that if I try to create a daemon, it errors out with
     /error: Window system is not in use or not initialized/
@@ -348,9 +298,6 @@ Scale font size using =C-x C-+= and =C-x C--=. =C-x C-0= resets it.
 #+END_SRC
 
 ** Tabs, Indentation and Spacing
-:PROPERTIES:
-:CUSTOM_ID: h:cc854adc-4c20-417f-85ab-b2b127ec6249
-:END:
 Use only spaces and no tabs
 #+BEGIN_SRC emacs-lisp
   (setq-default indent-tabs-mode nil)
@@ -362,9 +309,6 @@ Use only spaces and no tabs
 Since these are buffer-local variables, I have to use =setq-default=
 
 *** Enable/Disable/Toggle Trailing whitespace
-:PROPERTIES:
-:CUSTOM_ID: h:c0d2d6d9-e1f8-4002-bc1c-46260bceb4f9
-:END:
 #+BEGIN_SRC emacs-lisp
   (defun my/toggle-trailing-whitespace ()
     "Toggle trailing whitespace"
@@ -380,9 +324,6 @@ Since these are buffer-local variables, I have to use =setq-default=
 #+END_SRC
 
 *** Delete trailing whitespace
-:PROPERTIES:
-:CUSTOM_ID: h:ed4ca61d-ea45-4530-beaa-3a24d25b32e7
-:END:
 From [[https://www.emacswiki.org/emacs/DeletingWhitespace#toc3][emacswiki:]]
 #+BEGIN_SRC emacs-lisp
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
@@ -395,43 +336,28 @@ Use =C-c s SPC= to delete trailing whitespace manually
 #+END_SRC
 
 *** Toggle wrap
-:PROPERTIES:
-:CUSTOM_ID: h:37f6c771-5673-4416-97dc-4a0f85c9d502
-:END:
 #+BEGIN_SRC emacs-lisp
   (bind-key "w" 'toggle-truncate-lines emacs-unimpaired-toggle-map)
 #+END_SRC
 
 ** Highlight current line
-:PROPERTIES:
-:CUSTOM_ID: h:b8f6f0e9-5fc6-4294-8fc3-190b339b05d3
-:END:
 #+BEGIN_SRC emacs-lisp
   ;; (global-hl-line-mode 1)
   (bind-key "c" 'global-hl-line-mode emacs-unimpaired-toggle-map)
 #+END_SRC
 
 *** TODO FIXME
-:PROPERTIES:
-:CUSTOM_ID: h:b1e7fad4-20fe-47a3-9470-5bae1601f36f
-:END:
 #+BEGIN_SRC emacs-lisp
   (bind-key "c" (global-hl-line-mode 1)  emacs-unimpaired-enable-map)
   (bind-key "c" (global-hl-line-mode -1) emacs-unimpaired-disable-map)
 #+END_SRC
 
 ** Simpler y/n answers
-:PROPERTIES:
-:CUSTOM_ID: h:893a0773-f84f-4f5c-a6ad-66d4451923dd
-:END:
 #+BEGIN_SRC emacs-lisp
   (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
 ** Matching Parens
-:PROPERTIES:
-:CUSTOM_ID: h:172408f5-623b-4e63-a8c6-83a53860e31d
-:END:
 #+BEGIN_SRC emacs-lisp
   (show-paren-mode 1)
   (setq show-paren-delay 0)
@@ -439,9 +365,6 @@ Use =C-c s SPC= to delete trailing whitespace manually
 #+END_SRC
 
 ** Misc
-:PROPERTIES:
-:CUSTOM_ID: h:4b0bd578-b9df-4e64-8a04-6804726250bf
-:END:
 #+BEGIN_SRC emacs-lisp
   ;; Count 1 space after a period as the end of a sentence, instead of 2
   (setq sentence-end-double-space nil)
@@ -460,9 +383,6 @@ Use =C-c s SPC= to delete trailing whitespace manually
 #+END_SRC
 
 ** Winner mode
-:PROPERTIES:
-:CUSTOM_ID: h:6ad960fe-38f3-46cf-9982-73d35b6b9518
-:END:
 Undo and Redo changes in window configuration. Use =C-c right= and =C-c left= to switch between different layouts.
 This is useful when I close a window by mistake to undo it and restore the window layout.
 #+BEGIN_SRC emacs-lisp
@@ -470,25 +390,19 @@ This is useful when I close a window by mistake to undo it and restore the windo
 #+END_SRC
 
 ** Theme Directories
-:PROPERTIES:
-:CUSTOM_ID: h:8696b918-4f92-48c8-a925-6b63118157ff
-:END:
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'custom-theme-load-path (concat user-emacs-directory "/themes"))
   (add-to-list 'load-path (concat user-emacs-directory "/themes"))
 #+END_SRC
 
 ** Emacs server
-:PROPERTIES:
-:CUSTOM_ID: h:3ce0afb3-b180-4ac2-b076-685cf068e201
-:END:
 - Always start the emacs-server, except when run in daemon mode
 - Already Disable prompt asking you if you want to kill a buffer with a live process attached to it.
   http://stackoverflow.com/questions/268088/how-to-remove-the-prompt-for-killing-emacsclient-buffers
 
 #+BEGIN_SRC emacs-lisp
   (use-package server
-    ;; :disabled
+    :disabled
     :config
     (unless (or (daemonp) (server-running-p))
       (server-mode 1))
@@ -502,36 +416,22 @@ This will launch emacsclient if a server is already running and launch emacs if 
 #+END_EXAMPLE
 
 ** Mouse
-:PROPERTIES:
-:CUSTOM_ID: h:b65c491f-76bd-4558-a4a6-7d88c89cea7d
-:END:
 Mouse-wheel acts on the hovered window rather than the one where the typing focus is
 #+BEGIN_SRC emacs-lisp
   (setq mouse-wheel-follow-mouse t)
 #+END_SRC
 
 ** TODO Scratch
-:PROPERTIES:
-:CUSTOM_ID: h:68b8d2ec-ece8-4f73-af3a-83f87d700023
-:END:
 Mode-specific scratch buffers?
 
 * Packages
 :PROPERTIES:
-:CUSTOM_ID: h:7cf6a220-380c-4b32-8833-18f97bd60476
 :header-args: :tangle yes
 :END:
 ** TODO hydra
-:PROPERTIES:
-:CUSTOM_ID: h:19d345f5-c20b-4b41-a302-a5e635739a27
-:END:
 Ideas in https::/github.com/kana/vim-submode
 
 ** evil
-:PROPERTIES:
-:CUSTOM_ID: h:2e3e3bcf-8e0c-4f3e-9d2d-2a5914cabb05
-:header-args: :tangle yes
-:END:
 evil can be toggled using =C-z=
 
 #+BEGIN_SRC emacs-lisp
@@ -546,17 +446,11 @@ evil can be toggled using =C-z=
 #+END_SRC
 
 *** :config
-:PROPERTIES:
-:CUSTOM_ID: h:413028be-e035-4d93-8ba3-5ef3f95063f5
-:END:
 #+BEGIN_SRC emacs-lisp
   :config
 #+END_SRC
 
 **** evil-commentary
-:PROPERTIES:
-:CUSTOM_ID: h:1655d373-867e-4bab-9348-25f58476fb32
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package evil-commentary
     :diminish evil-commentary-mode
@@ -564,44 +458,29 @@ evil can be toggled using =C-z=
 #+END_SRC
 
 **** evil-surround
-:PROPERTIES:
-:CUSTOM_ID: h:6394835f-85a8-44c9-b64f-c45e9f951f9f
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package evil-surround
     :config (global-evil-surround-mode))
 #+END_SRC
 
 **** evil-visualstar
-:PROPERTIES:
-:CUSTOM_ID: h:a7f569b2-3176-4d88-87ea-2fa743dd4994
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package evil-visualstar
     :config (global-evil-visualstar-mode))
 #+END_SRC
 
 **** evil-exchange
-:PROPERTIES:
-:CUSTOM_ID: h:45705aa6-ec0f-428e-a995-4dc6dbdb3f8e
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package evil-exchange
     :config (evil-exchange-cx-install))
 #+END_SRC
 
 **** evil-matchit
-:PROPERTIES:
-:CUSTOM_ID: h:e4b3634c-0a16-4bb9-9f50-eaa980056a4a
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package evil-matchit)
 #+END_SRC
 
 **** Keybinds
-:PROPERTIES:
-:CUSTOM_ID: h:403aae41-dacc-4418-87b6-49e005cfb94b
-:END:
 Make /Escape/ quit everything
 #+BEGIN_SRC emacs-lisp
   (defun my/minibuffer-keyboard-quit ()
@@ -631,17 +510,11 @@ Make /Escape/ quit everything
 #+END_SRC
 
 *** END
-:PROPERTIES:
-:CUSTOM_ID: h:c5616623-92e8-424d-8143-014fa328c7ef
-:END:
 #+BEGIN_SRC emacs-lisp
 )
 #+END_SRC
 
 ** flycheck
-:PROPERTIES:
-:CUSTOM_ID: h:835dd876-927b-46bb-87ad-8b9c00ab0c20
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :disabled
@@ -654,9 +527,6 @@ Make /Escape/ quit everything
 #+END_SRC
 
 ** helm
-:PROPERTIES:
-:CUSTOM_ID: h:6db31ca2-7596-47d7-bc56-874876af18f4
-:END:
 [[http://tuhdo.github.io/helm-intro.html][Introduction to Helm by reddit:/u/tuhdo]]
 
 #+BEGIN_SRC emacs-lisp
@@ -666,9 +536,6 @@ Make /Escape/ quit everything
 #+END_SRC
 
 *** :init
-:PROPERTIES:
-:CUSTOM_ID: h:563721c1-eab9-4f5d-a934-fadb291712f6
-:END:
 #+BEGIN_SRC emacs-lisp
   :init
   (require 'helm-config)
@@ -697,17 +564,11 @@ Make /Escape/ quit everything
 #+END_SRC
 
 *** :config
-:PROPERTIES:
-:CUSTOM_ID: h:f04f3450-2360-4e31-8c74-db5cd596995c
-:END:
 #+BEGIN_SRC emacs-lisp
   :config
 #+END_SRC
 
 **** Remove sub-headers line if only a single source; keep them for multiple sources
-:PROPERTIES:
-:CUSTOM_ID: h:6c52baa7-1f97-4b93-ae62-27900466a625
-:END:
 #+BEGIN_SRC emacs-lisp
   (defvar helm-source-header-default-background (face-attribute 'helm-source-header :background))
   (defvar helm-source-header-default-foreground (face-attribute 'helm-source-header :foreground))
@@ -729,9 +590,6 @@ Make /Escape/ quit everything
 #+END_SRC
 
 **** helm-descbinds
-:PROPERTIES:
-:CUSTOM_ID: h:fa26ada6-ef40-4311-92f4-df4d1877bbe0
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package helm-descbinds
     :init (helm-descbinds-mode t))
@@ -741,9 +599,6 @@ Note that helm-descbinds will replace the default /describe-bindings/.
 Thus =C-h b= can be used for it; no need to create a new binding.
 
 **** helm-projectile
-:PROPERTIES:
-:CUSTOM_ID: h:30f0f898-ea0e-4e94-b5a0-7b4fd18fe5de
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package helm-projectile
     :config
@@ -751,9 +606,6 @@ Thus =C-h b= can be used for it; no need to create a new binding.
 #+END_SRC
 
 *** Keybinds
-:PROPERTIES:
-:CUSTOM_ID: h:fa05ad14-8a2e-41f4-b94a-a78568388cdb
-:END:
 Remove the default prefix =C-x c=. Note this is still a part of :config
 #+BEGIN_SRC emacs-lisp
   (unbind-key "C-x c")
@@ -787,17 +639,11 @@ Other useful default keybinds:
 |--------------+-----------------------------+-----------------------------------------------------------|
 
 *** use-package END
-:PROPERTIES:
-:CUSTOM_ID: h:30ee671c-23b4-4b78-9622-45cc06c097ab
-:END:
 #+BEGIN_SRC emacs-lisp
 )
 #+END_SRC
 
 ** TODO linum-relative
-:PROPERTIES:
-:CUSTOM_ID: h:c7842971-98ae-483c-b02a-63c054609dfc
-:END:
 Relative line-numbers ala vim
 #+BEGIN_SRC emacs-lisp
   (use-package linum-relative
@@ -809,15 +655,9 @@ Relative line-numbers ala vim
 #+END_SRC
 
 *** TODO Figure out why it's necessary to explicitly specify :background for 'linum-relative-current-face
-:PROPERTIES:
-:CUSTOM_ID: h:d6a080d6-2990-4be0-9924-8f496f701cb4
-:END:
 Shouldn't it inherit from 'linum?
 
 *** TODO Fix ugly gaps in linum-face when lines wrap. [[http://emacs.stackexchange.com/a/897/9690][StackExchange Discussion]]
-:PROPERTIES:
-:CUSTOM_ID: h:36ed6e58-dff9-4f78-83c9-38f56b7e1b64
-:END:
 #+BEGIN_SRC emacs-lisp
   (defvar my-linum-gapless-margin-display
     `((margin left-margin) ,(propertize "     " 'face 'linum))
@@ -856,9 +696,6 @@ Shouldn't it inherit from 'linum?
 #+END_SRC
 
 ** TODO macrostep
-:PROPERTIES:
-:CUSTOM_ID: h:f0ffd993-5f5b-40cc-8b4f-b99e8c8769c4
-:END:
 Expand a macro and enter macrostep-mode by pressing /C-c m e/.
 Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
 
@@ -869,25 +706,18 @@ Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
 #+END_SRC
 
 ** org
-:PROPERTIES:
-:CUSTOM_ID: h:080c3337-de87-4d2e-890a-1e047392f89a
-:header-args: :tangle yes
-:END:
-
 This solution is by [[https://www.reddit.com/r/emacs/comments/5sx7j0/how_do_i_get_usepackage_to_ignore_the_bundled/ddixpr9/][/u/Wolfer1ne on reddit]].
-Passing an argument to =:ensure= (other than t or nil) allows us to use a different package than the one named in use-package
-Also, using =:pin= allows us to prefer which package-archive we'd like to use to download the package from.
-I don't remember why we need to specifically grab =org-plus-contrib= from the org repository instead of from one of the other ones.
 #+BEGIN_SRC emacs-lisp
   (use-package org
     :ensure org-plus-contrib
     :pin repo-org
 #+END_SRC
 
+Passing an argument to =:ensure= (other than t or nil) allows us to use a different package than the one named in use-package
+Also, using =:pin= allows us to prefer which package-archive we'd like to use to download the package from.
+I don't remember why we need to specifically grab =org-plus-contrib= from the org repository instead of from one of the other ones.
+
 *** :init
-:PROPERTIES:
-:CUSTOM_ID: h:ca544f41-e5df-4476-99fd-fa8da996bf74
-:END:
 #+BEGIN_SRC emacs-lisp
   :init
   (setq org-indent-mode t)
@@ -912,30 +742,7 @@ I don't remember why we need to specifically grab =org-plus-contrib= from the or
   (setq org-imenu-depth 10)
 #+END_SRC
 
-**** TODO Show the emphasis markers on point
-:PROPERTIES:
-:CUSTOM_ID: h:20e0e38b-c292-4d90-be0c-4c6163358e56
-:END:
-#+BEGIN_SRC emacs-lisp
-  (defun org-show-emphasis-markers-at-point ()
-    (save-match-data
-      (if (and (org-in-regexp org-emph-re 2)
-           (>= (point) (match-beginning 3))
-           (<= (point) (match-end 4))
-           (member (match-string 3) (mapcar 'car org-emphasis-alist)))
-      (with-silent-modifications
-        (remove-text-properties
-         (match-beginning 3) (match-beginning 5)
-         '(invisible org-link)))
-        (apply 'font-lock-flush (list (match-beginning 3) (match-beginning 5))))))
-
-  (add-hook 'post-command-hook 'org-show-emphasis-markers-at-point nil t)
-#+END_SRC
-
 **** org-babel source blocks
-:PROPERTIES:
-:CUSTOM_ID: h:5346da4e-8084-4ec9-89d8-ead64f2381d3
-:END:
 Enable syntax highlighting within the source blocks and keep the editing popup window within the same window.
 Also, strip leading and trailing empty lines if any.
 /org-src-preserve-indentation/ will not add an extra level of indentation to the source code
@@ -959,19 +766,22 @@ Languages which can be evaluated in Org-mode buffers.
 #+end_src
 
 Ask for confirmation before evaluating? NO!
-#+begin_src emacs-lisp
+On second thought it's better not to do this because of the security implications.
+A safer way to go about it is by enabling it on a file-by-file basis using the following modeline
+#+BEGIN_EXAMPLE
+  -*- org-confirm-babel-evaluate: nil -*-
+#+END_EXAMPLE
+
+#+BEGIN_SRC emacs-lisp :tangle no
   (defun my/org-babel-evaluate-silent (lang body)
     "Do not ask for confirmation to evaluate these languages."
     (not (or (string= lang "emacs-lisp"))))
 
-  ;; (setq org-confirm-babel-evaluate 'my/org-babel-evaluate-silent)
+  (setq org-confirm-babel-evaluate 'my/org-babel-evaluate-silent)
   ;; (setq org-confirm-babel-evaluate nil)
 #+END_SRC
 
 **** Clean View
-:PROPERTIES:
-:CUSTOM_ID: h:d9426993-d7f5-4ebe-90aa-e562fcad3167
-:END:
 #+BEGIN_SRC emacs-lisp
   (setq org-startup-indented t)
   (setq org-hide-leading-stars t)
@@ -981,15 +791,55 @@ Ask for confirmation before evaluating? NO!
   ;; (setq org-ellipsis "▼") ; Use a fancy arrow to indicate a fold instead of '...'
 #+END_SRC
 
-**** ToDo States
-:PROPERTIES:
-:CUSTOM_ID: h:bb9269f6-f4dc-427b-aed2-071192813695
+***** TODO Hide the < and > around targets
+:LOGBOOK:
+- State "TODO"       from              [2017-03-19 Sun 15:00]
 :END:
+From [[http://emacs.stackexchange.com/a/19239/9690][Emacs StackExchange]]
+At the moment, it hides not just the angle braces but also the text between them.
+#+BEGIN_SRC emacs-lisp :tangle no
+  (defcustom org-hidden-links-additional-re "<<[<]?[[:alnum:]]+>>[>]?"
+    "Regular expression that matches strings where the invisible-property is set to org-link."
+    :type '(choice (const :tag "Off" nil) regexp)
+    :group 'org-link)
+  (make-variable-buffer-local 'org-hidden-links-additional-re)
 
+  (defun org-activate-hidden-links-additional (limit)
+    "Put invisible-property org-link on strings matching `org-hide-links-additional-re'."
+    (if org-hidden-links-additional-re
+        (re-search-forward org-hidden-links-additional-re limit t)
+      (goto-char limit)
+      nil))
+
+  (add-hook 'org-font-lock-set-keywords-hook (lambda ()
+                           (add-to-list 'org-font-lock-extra-keywords
+                                '(org-activate-hidden-links-additional
+                                  (0 '(face org-target invisible org-link))))))
+#+END_SRC
+
+***** TODO Show the emphasis and target markers on point
+#+BEGIN_SRC emacs-lisp :tangle no
+  (defun org-show-emphasis-markers-at-point ()
+    (save-match-data
+      (if (and (org-in-regexp org-emph-re 2)
+           (>= (point) (match-beginning 3))
+           (<= (point) (match-end 4))
+           (member (match-string 3) (mapcar 'car org-emphasis-alist)))
+      (with-silent-modifications
+        (remove-text-properties
+         (match-beginning 3) (match-beginning 5)
+         '(invisible org-link)))
+        (apply 'font-lock-flush (list (match-beginning 3) (match-beginning 5))))))
+
+  (add-hook 'post-command-hook 'org-show-emphasis-markers-at-point nil t)
+#+END_SRC
+
+**** ToDo States
 Add logging when task state changes
 #+BEGIN_SRC emacs-lisp
   (setq org-log-done nil)
   (setq org-log-into-drawer t)  ; Save state changes into LOGBOOK drawer instead of in the body
+  (setq org-treat-insert-todo-heading-as-state-change t)
 #+END_SRC
 
 Custom keywords
@@ -1016,18 +866,12 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 #+END_SRC
 
 *** :config
-:PROPERTIES:
-:CUSTOM_ID: h:f751a0b0-a912-4ce8-b641-9e64cf7ad26f
-:END:
 #+BEGIN_SRC emacs-lisp
   :config
   (eval-after-load 'org-indent '(diminish org-indent-mode))
 #+END_SRC
 
 **** Make org-mode play nicely with Google Chrome
-:PROPERTIES:
-:CUSTOM_ID: h:3f70b37d-ea2d-4c42-b8cd-5b82834ce1f1
-:END:
 From [[http://stackoverflow.com/a/6309985/734153][StackOverflow]]
 #+BEGIN_SRC emacs-lisp
   (setq browse-url-browser-function 'browse-url-generic
@@ -1035,18 +879,12 @@ From [[http://stackoverflow.com/a/6309985/734153][StackOverflow]]
 #+END_SRC
 
 **** Templates
-:PROPERTIES:
-:CUSTOM_ID: h:7c276593-3413-45f2-a8b6-8c8cc9550bca
-:END:
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'org-structure-template-alist
                '("sl" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
 #+END_SRC
 
 **** Fonts
-:PROPERTIES:
-:CUSTOM_ID: h:74b40aa3-6f7e-4e97-a627-a90faea5ad6d
-:END:
 Variable pitch for non-code text taken from [[http://www.xiangji.me/2015/07/13/a-few-of-my-org-mode-customizations][here]].
 #+BEGIN_SRC emacs-lisp
   (defun my/set-buffer-variable-pitch ()
@@ -1066,13 +904,10 @@ Variable pitch for non-code text taken from [[http://www.xiangji.me/2015/07/13/a
 NOTE: =org-block-background= has been removed in Org 8.3.1 and from 9.0.0,
 has been completely deprecated and it inherits from =org-block=
 
-General configuration [[*Fonts][here]]
+General configuration [[id:bd542328-7d1d-4806-936d-a50673beada6][here]]
 
 **** Delete links
-:PROPERTIES:
-:CUSTOM_ID: h:4b19a5e4-f147-48f8-807d-637e76258c1d
-:END:
-This is a counter-part to =org-insert-link=. From [[http://emacs.stackexchange.com/a/10714/9690][here]].
+This is the counterpart to =org-insert-link=. From [[http://emacs.stackexchange.com/a/10714/9690][here]].
 #+BEGIN_SRC emacs-lisp
   (defun my/org-replace-link-with-description ()
     "Replace an org link with its description. If a description doesn't exist, replace with its address"
@@ -1086,10 +921,57 @@ This is a counter-part to =org-insert-link=. From [[http://emacs.stackexchange.c
           (insert description))))
 #+END_SRC
 
+**** Complete multiple org tags
+Aaron Bieber: [[https://blog.aaronbieber.com/2016/03/05/playing-tag-in-org-mode.html][Playing Tag in Org-mode]]
+
+Once the first tag is set (using helm), we don't get completion support after that.
+This is because, the entire tag string is treated as a single value and Helm tries to complete based only on the full value.
+#+BEGIN_SRC emacs-lisp
+  (defun my/org-swap-tags (tags)
+    "Replace any tags on the current headline with TAGS.
+
+  The assumption is that TAGS will be a string conforming to Org Mode's
+  tag format specifications, or nil to remove all tags."
+    (let ((old-tags (org-get-tags-string))
+          (tags (if tags
+                    (concat " " tags)
+                  "")))
+      (save-excursion
+        (beginning-of-line)
+        (re-search-forward
+         (concat "[ \t]*" (regexp-quote old-tags) "[ \t]*$")
+         (line-end-position) t)
+        (replace-match tags)
+        (org-set-tags t))))
+
+  (defun my/org-set-tags (tag)
+    "Add TAG if it is not in the list of tags, remove it otherwise.
+
+  TAG is chosen interactively from the global tags completion table."
+    (interactive
+     (list (let ((org-last-tags-completion-table
+                  (if (derived-mode-p 'org-mode)
+                      (org-uniquify
+                       (delq nil (append (org-get-buffer-tags)
+                                         (org-global-tags-completion-table))))
+                    (org-global-tags-completion-table))))
+             (org-icompleting-read
+              "Tag: " 'org-tags-completion-function nil nil nil
+              'org-tags-history))))
+    (let* ((cur-list (org-get-tags))
+           (new-tags (mapconcat 'identity
+                                (if (member tag cur-list)
+                                    (delete tag cur-list)
+                                  (append cur-list (list tag)))
+                                ":"))
+           (new (if (> (length new-tags) 1) (concat " :" new-tags ":")
+                  nil)))
+      (my/org-swap-tags new)))
+
+  (bind-key* "C-c C-q" 'my/org-set-tags)
+#+END_SRC
+
 **** Add to org-modules
-:PROPERTIES:
-:CUSTOM_ID: h:f410f30f-9d3a-4af4-a7f5-3440370f5871
-:END:
 #+BEGIN_SRC emacs-lisp
   ;; (add-to-list 'org-modules 'org-id)
   ;; (eval-after-load 'org
@@ -1097,9 +979,6 @@ This is a counter-part to =org-insert-link=. From [[http://emacs.stackexchange.c
 #+END_SRC
 
 **** org-bullets
-:PROPERTIES:
-:CUSTOM_ID: h:224d116a-434c-4dc1-b773-5bf948d70523
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
     ;; :disable
@@ -1113,9 +992,6 @@ This is a counter-part to =org-insert-link=. From [[http://emacs.stackexchange.c
 A good way to find more characters is to use =M-x insert-char=
 
 **** org-agenda
-:PROPERTIES:
-:CUSTOM_ID: h:9439ba5b-3a6a-43a1-9476-c9a2adae50fd
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package org-agenda
     :ensure nil
@@ -1134,16 +1010,10 @@ A good way to find more characters is to use =M-x insert-char=
 [[#h:7c86a221-7ef3-4222-900f-042b36e59e04][Keybinds]]
 
 ***** TODO Fix setting org-agenda-files
-:PROPERTIES:
-:CUSTOM_ID: h:be354b60-5a0e-4e5c-9f54-b37d5e491c74
-:END:
 The lambda will insert a nil if the file/directory doesn't exist.
 This will cause whatever reads =org-agenda-files= to blow up because it expects
 
 ***** org-agenda custom commands
-:PROPERTIES:
-:CUSTOM_ID: h:777edf92-ed17-4eab-a79a-3a6d1a3acbbf
-:END:
 Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html
 #+BEGIN_SRC emacs-lisp
   (defun my/org-skip-subtree-if-habit ()
@@ -1192,17 +1062,11 @@ Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mod
 #+END_SRC
 
 ***** org-agenda END
-:PROPERTIES:
-:CUSTOM_ID: h:499db1cd-fb0e-4a31-8951-efe3e13711f9
-:END:
 #+BEGIN_SRC emacs-lisp
   )
 #+END_SRC
 
 **** org-refile
-:PROPERTIES:
-:CUSTOM_ID: h:0f3890d6-47fb-41f8-a0b9-49b1041c1c49
-:END:
 Show upto 9 levels of headings from the current file and two levels of headings from all agenda files
 #+BEGIN_SRC emacs-lisp
   (setq org-refile-targets
@@ -1211,15 +1075,9 @@ Show upto 9 levels of headings from the current file and two levels of headings 
 #+END_SRC
 
 ***** TODO Set org-refile targets based on current file
-:PROPERTIES:
-:CUSTOM_ID: h:a8682cea-8519-48aa-9384-415e52db3645
-:END:
 Why would I want to refile something work-related under Softwares etc.
 
 **** org-wunderlist
-:PROPERTIES:
-:CUSTOM_ID: h:202b2abd-5930-4e3c-af09-dea245e2da28
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package org-wunderlist
     :disabled
@@ -1230,9 +1088,6 @@ Why would I want to refile something work-related under Softwares etc.
 Client-ID and Token stored in private.el
 
 **** org-ac
-:PROPERTIES:
-:CUSTOM_ID: h:310f0fc4-224e-4c70-bdde-c65a695a6b25
-:END:
 Autocomplete sources for org mode
 
 #+BEGIN_SRC emacs-lisp
@@ -1243,9 +1098,6 @@ Autocomplete sources for org mode
 #+END_SRC
 
 **** org-capture
-:PROPERTIES:
-:CUSTOM_ID: h:b24cb628-f225-4d2e-97a0-2d72ed5e3c88
-:END:
 
 Show hierarchical headlines when refiling instead of flattening it out
 Show all the hierarchical headlines instead of having to step down them
@@ -1307,13 +1159,8 @@ We use this to create frames for org-capture directly from the OS as shown [[htt
 #+END_SRC
 
 ***** TODO Split org-capture-templates and move work related stuff to a separate file
-:PROPERTIES:
-:CUSTOM_ID: h:d753c037-d265-47f6-bd8e-f3cbe0067fb0
-:END:
 **** org-id
-:PROPERTIES:
-:CUSTOM_ID: h:8a9fa520-31a7-49fb-a85c-18ea5d215b7a
-:END:
+I grab the /org-plus-contrib/ version of org-id to match org
 #+BEGIN_SRC emacs-lisp
   (use-package org-id
     :ensure org-plus-contrib
@@ -1323,10 +1170,19 @@ We use this to create frames for org-capture directly from the OS as shown [[htt
     :config
 #+END_SRC
 
+***** TODO Use org-id globally across all files
+:LOGBOOK:
+- State "TODO"       from              [2017-03-18 Sat 19:50]
+:END:
+Example on [[http://stackoverflow.com/a/27158715/734153][Emacs StackExchange]]
+#+BEGIN_SRC emacs-lisp
+  (setq org-id-track-globally t)
+  (setq org-id-extra-files '("~/.emacs.d/config.org"))
+#+END_SRC
 
 ***** Completion while inserting link
 :PROPERTIES:
-:CUSTOM_ID: h:40efe8c7-eb48-45c0-a291-96500e19f703
+:ID:       be086bdd-ffcf-4f4e-beb2-a948191895eb
 :END:
 To use completion, insert link using =C-c C-l= and select =id:= as type and completion should trigger
 More details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
@@ -1340,65 +1196,12 @@ More details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchan
                            :complete 'org-id-complete-link)
 #+END_SRC
 
-***** Adding org-ids automatically
-:PROPERTIES:
-:CUSTOM_ID: h:dc330b26-b3ec-43bd-b8a2-c012c98899a7
-:END:
-Copied from [[https://writequit.org/articles/emacs-org-mode-generate-ids.html][here]]. This is now redundant as the completion while inserting a link automatically creates an =ID= Property.
-#+BEGIN_SRC emacs-lisp :tangle no
-  (defun my/org-custom-id-get (&optional pom create prefix)
-    "Get the CUSTOM_ID property of the entry at point-or-marker POM.
-     If POM is nil, refer to the entry at point. If the entry does
-     not have an CUSTOM_ID, the function returns nil. However, when
-     CREATE is non nil, create a CUSTOM_ID if none is present
-     already. PREFIX will be passed through to `org-id-new'. In any
-     case, the CUSTOM_ID of the entry is returned."
-    (interactive)
-    (org-with-point-at pom
-      (let ((id (org-entry-get nil "ID")))
-        (cond
-         ((and id (stringp id) (string-match "\\S-" id))
-          id)
-         (create
-          (setq id (org-id-new (concat prefix "h")))
-          (org-entry-put pom "ID" id)
-          (org-id-add-location id (buffer-file-name (buffer-base-buffer)))
-          id)))))
-
-  (defun my/org-add-ids-to-headlines-in-file ()
-    "Add CUSTOM_ID properties to all headlines in the current
-     file which do not already have one. Only adds ids if the
-     `auto-id' option is set to `t' in the file somewhere. ie,
-     ,#+OPTIONS: auto-id:t"
-    (interactive)
-    (save-excursion
-      (widen)
-      (goto-char (point-min))
-      (when (re-search-forward "^#\\+OPTIONS:.*auto-id:t" (point-max) t)
-        (org-map-entries (lambda () (my/org-custom-id-get (point) 'create))))))
-
-  ;; Automatically add ids to saved org-mode headlines
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (add-hook 'before-save-hook
-                        (lambda ()
-                          (when (and (eq major-mode 'org-mode)
-                                     (eq buffer-read-only nil))
-                            (my/org-add-ids-to-headlines-in-file))))))
-#+END_SRC
-
 ***** END
-:PROPERTIES:
-:CUSTOM_ID: h:9aee1006-a2ca-4139-afa0-7d985bba5793
-:END:
 #+BEGIN_SRC emacs-lisp
   )
 #+END_SRC
 
 **** htmlize
-:PROPERTIES:
-:CUSTOM_ID: h:405b1fd9-9626-4ede-9a40-fc6751824215
-:END:
 Syntax highlighting when exporting to HTML? Yes, please!
 #+BEGIN_SRC emacs-lisp
   (use-package htmlize
@@ -1406,9 +1209,6 @@ Syntax highlighting when exporting to HTML? Yes, please!
 #+END_SRC
 
 *** Keybinds
-:PROPERTIES:
-:CUSTOM_ID: h:7c86a221-7ef3-4222-900f-042b36e59e04
-:END:
 
 Custom keymap for org-mode bindings
 #+BEGIN_SRC emacs-lisp
@@ -1435,22 +1235,13 @@ Delete the result block using =C-c C-v k= where =C-c C-v= is the /org-babel-key-
 #+end_src
 
 *** use-package END
-:PROPERTIES:
-:CUSTOM_ID: h:999d1b03-8721-4788-9a3f-5d491fe14d1b
-:END:
 #+BEGIN_SRC emacs-lisp
 )
 #+END_SRC
 
 *** TODO Diminish org-indent-mode
-:PROPERTIES:
-:CUSTOM_ID: h:3196d20c-4df7-4216-b723-bbe34846310c
-:END:
 
 ** projectile
-:PROPERTIES:
-:CUSTOM_ID: h:dc7b9f0f-01eb-466d-a0b2-381de4cfad33
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :diminish projectile-mode
@@ -1466,7 +1257,6 @@ Delete the result block using =C-c C-v k= where =C-c C-v= is the /org-babel-key-
 *** Keybinds
 :PROPERTIES:
 :header-args: :tangle no
-:CUSTOM_ID: h:069023a5-d864-4c6f-88ec-4ac2920a8c24
 :END:
 
 Unbind the default prefix. Explained [[https://github.com/bbatsov/projectile/issues/991#issuecomment-248026667][here.]]
@@ -1480,28 +1270,16 @@ Unbind the default prefix. Explained [[https://github.com/bbatsov/projectile/iss
 #+END_SRC
 
 *** use-package END
-:PROPERTIES:
-:CUSTOM_ID: h:16947e3b-9ac4-49e5-8acf-f4a66e9ea72b
-:END:
 #+BEGIN_SRC emacs-lisp
   )
 #+END_SRC
 
 *** TODO Set .x.v as other file for .x
-:PROPERTIES:
-:CUSTOM_ID: h:43711a5f-6ae9-4556-b82f-c4e28e7e4437
-:END:
 This requires including $STEM/build/lv/ch/rtl in .projectile and ignoring .x
 Might need to re-index every time a model is built?
 
 ** TODO SLIME
-:PROPERTIES:
-:CUSTOM_ID: h:a39d7830-f2ca-4e68-912e-d5b0b4d7a00f
-:END:
 ** undo-tree
-:PROPERTIES:
-:CUSTOM_ID: h:778dabd6-a00e-4128-bbd0-075bfa99acb6
-:END:
 This lets us visually walk through the changes we've made, undo back to a certain point (or redo), and go down different branches.
 Default binding is =C-x u=
 #+BEGIN_SRC emacs-lisp
@@ -1515,9 +1293,6 @@ Default binding is =C-x u=
 #+END_SRC
 
 ** yasnippet
-:PROPERTIES:
-:CUSTOM_ID: h:7ab0398e-ac05-4e77-baa9-6b9f5965779b
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :diminish yas-minor-mode
@@ -1525,9 +1300,6 @@ Default binding is =C-x u=
 #+END_SRC
 
 ** which-key
-:PROPERTIES:
-:CUSTOM_ID: h:089bdfc4-998f-47c1-aa9d-8ace956067ba
-:END:
 Shows which keys can be pressed next. Eg. if you press =C-x= and wait a few seconds, a window pops up with all the key bindings following the currently entered incomplete command.
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
@@ -1536,9 +1308,6 @@ Shows which keys can be pressed next. Eg. if you press =C-x= and wait a few seco
 #+END_SRC
 
 ** ace-window
-:PROPERTIES:
-:CUSTOM_ID: h:6598a046-2a58-4018-9e8a-5e6ccdfca8bf
-:END:
 When more than 2 windows are open, show a number to jump in each window to jump directly to.
 Similar to Tmux's =<prefix> C-g=
 #+BEGIN_SRC emacs-lisp
@@ -1554,9 +1323,6 @@ Similar to Tmux's =<prefix> C-g=
 Note that we're rebinding =C-x o=
 
 ** avy
-:PROPERTIES:
-:CUSTOM_ID: h:3047e81a-de30-44a1-9d00-08124ddaa60a
-:END:
 Similar to vim's easy-motion plugin
 #+BEGIN_SRC emacs-lisp
   (use-package avy
@@ -1565,15 +1331,9 @@ Similar to vim's easy-motion plugin
 #+END_SRC
 
 ** TODO evil-snipe
-:PROPERTIES:
-:CUSTOM_ID: h:fa2a6cb1-77a9-4cd0-b77f-aa5ce3e47c33
-:END:
 Replaces avy
 
 ** auto-complete
-:PROPERTIES:
-:CUSTOM_ID: h:d49ac609-f845-47a7-a404-2dbdfc80b944
-:END:
 Completion doesn't work if evil is installed
 
 #+BEGIN_SRC emacs-lisp
@@ -1584,9 +1344,6 @@ Completion doesn't work if evil is installed
 #+END_SRC
 
 ** TODO company-mode
-:PROPERTIES:
-:CUSTOM_ID: h:412d45f5-0675-4401-bfe9-e8b64da3935a
-:END:
 Autocompletion
 Reduce delay and ensure that the popup shows up only if the last command has been an editing command.
 #+BEGIN_SRC emacs-lisp
@@ -1598,9 +1355,6 @@ Reduce delay and ensure that the popup shows up only if the last command has bee
 #+end_src
 
 *** :config
-:PROPERTIES:
-:CUSTOM_ID: h:5a874015-7a14-49de-9bbc-33b30d46b9a0
-:END:
 #+BEGIN_SRC emacs-lisp
   :config (add-hook 'after-init-hook 'global-company-mode)
 #+END_SRC
@@ -1622,24 +1376,15 @@ This will complete the selection only if I have explicitly interacted with Compa
 #+END_SRC
 
 **** TODO Completion for Org
-:PROPERTIES:
-:CUSTOM_ID: h:ec8e5f87-b26c-4f66-ac27-1053c2424ad9
-:END:
 http://orgmode.org/manual/Completion.html
 http://emacs.stackexchange.com/a/21173/9690
 
 *** END
-:PROPERTIES:
-:CUSTOM_ID: h:b47a5f34-0374-4366-bf82-d33c0b9ced0e
-:END:
 #+BEGIN_SRC emacs-lisp
 )
 #+END_SRC
 
 ** rainbow-mode
-:PROPERTIES:
-:CUSTOM_ID: h:bed217fa-07e0-4770-a3eb-851828336439
-:END:
 When a color is specified as a hex code or with its name, set the background of the face to the value of the color itself
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-mode
@@ -1649,9 +1394,6 @@ When a color is specified as a hex code or with its name, set the background of 
 Provides command =rainbow-mode= to toggle this
 
 ** rainbow-delimiters
-:PROPERTIES:
-:CUSTOM_ID: h:691336d0-e3ba-4d5b-b19f-1704c8c9e47f
-:END:
 Use brighter colors
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
@@ -1670,14 +1412,8 @@ Use brighter colors
 #+END_SRC
 
 *** TODO Find Better colors for leuven theme
-:PROPERTIES:
-:CUSTOM_ID: h:8a9e4f3c-6c59-459a-aa7e-206e8d0b1e82
-:END:
 
 ** aggressive-indent
-:PROPERTIES:
-:CUSTOM_ID: h:9a3422fa-1468-4181-9b35-deb725189f1c
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package aggressive-indent
     :config
@@ -1685,9 +1421,6 @@ Use brighter colors
 #+END_SRC
 
 ** verilog-mode
-:PROPERTIES:
-:CUSTOM_ID: h:c291889f-581d-4f79-997c-34b92411a11f
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package verilog-mode
     :load-path "bundle/verilog-mode"
@@ -1699,27 +1432,18 @@ Use brighter colors
 #+END_SRC
 
 ** TODO vimish-fold
-:PROPERTIES:
-:CUSTOM_ID: h:ba80b90d-9d21-49a7-8581-e389855954db
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package vimish-fold
     :disabled
 #+END_SRC
 
 *** :config
-:PROPERTIES:
-:CUSTOM_ID: h:387234a6-d37b-4005-9f36-3f6f82ecd626
-:END:
 #+BEGIN_SRC emacs-lisp
   :config
   (vimish-fold-global-mode 1)
 #+END_SRC
 
 **** evil-vimish-mode
-:PROPERTIES:
-:CUSTOM_ID: h:4f6c517b-426d-45be-a2be-fd0991b5c629
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package evil-vimish-fold
     :config
@@ -1727,17 +1451,11 @@ Use brighter colors
 #+END_SRC
 
 *** END
-:PROPERTIES:
-:CUSTOM_ID: h:09e1ddb0-83a0-40d1-a09a-52f8cc7bf1e8
-:END:
 #+BEGIN_SRC emacs-lisp
   )
 #+END_SRC
 
 ** TODO monokai-theme
-:PROPERTIES:
-:CUSTOM_ID: h:d0f68afa-4eb8-4d92-b734-28f545165342
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package monokai-theme
     :disabled
@@ -1752,9 +1470,6 @@ Use brighter colors
 #+END_SRC
 
 ** TODO solarized-theme
-:PROPERTIES:
-:CUSTOM_ID: h:f78dde22-b0a4-41d8-81bd-ac2f0438f379
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package solarized-theme
     :disabled
@@ -1779,9 +1494,6 @@ Use brighter colors
 #+END_SRC
 
 ** leuven-theme
-:PROPERTIES:
-:CUSTOM_ID: h:469b4ba5-b4e9-4c23-bc57-5ef1ca1219e5
-:END:
 [[https://github.com/fniessen/emacs-leuven-theme][Github Link]]
 #+BEGIN_SRC emacs-lisp
   (use-package leuven-theme
@@ -1807,37 +1519,120 @@ Load theme first and then override the colors
 * ProgLangEmacs
 :PROPERTIES:
 :header-args: :tangle yes
-:CUSTOM_ID: h:17f4cf1c-f131-4609-8ab6-777100bc262a
 :END:
 ** sml-mode
-:PROPERTIES:
-:CUSTOM_ID: h:40f3215d-0bf0-4e42-bf18-9b943cbef969
-:END:
 #+BEGIN_SRC emacs-lisp
   (use-package sml-mode
+    :if (eq system-type 'gnu/linux)
     :config
-    (use-package ob-sml)
     (add-to-list 'org-structure-template-alist
-                 '("sml" "#+BEGIN_SRC sml\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>")))
+                 '("sml" "#+BEGIN_SRC sml\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
+#+END_SRC
+
+*** TODO Restart the SML REPL
+:LOGBOOK:
+- State "TODO"       from "TODO"       [2017-03-19 Sun 11:23]
+:END:
+#+BEGIN_SRC emacs-lisp :tangle no
+  (defun my/restart-sml-repl ()
+    "Restarts the SML REPL"
+    (interactive)
+    (progn
+      (when (get-buffer-process (current-buffer))
+        (goto-char (point-max)) ; First go to the end of the buffer
+        (comint-delchar-or-maybe-eof 1); Then kill the REPL (C-d)
+        (sleep-for 0.1)) ; This is needed for some reason
+      (sml-run "sml" nil)))
+
+  (bind-key* "C-c C-s" 'my/restart-sml-repl)
+#+END_SRC
+
+*** Restart SML REPL and load the correct file
+By /u/kaushalmodi on [[https://www.reddit.com/r/ProgLangEmacs/comments/4x698w/one_command_to_kill_sml_restart_it_guess_and_load/][reddit]]
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/restart-sml-and-run ()
+    "Restarts the SML REPL and tries to load the correct .sml file.
+
+  The sml file loaded is the one at the top of the list returned by
+  `buffer-list'.
+
+  If this command is executed while in an sml buffer, the point is returned back
+  to that buffer after restarting the REPL and loading that file."
+    (interactive)
+    (let* ((in-sml-buf (derived-mode-p 'sml-mode))
+           (repl-buf (get-buffer "*sml*"))
+           (sml-file (if in-sml-buf
+                         (buffer-file-name)
+                       (catch 'break
+                         (dolist (buf (buffer-list))
+                           (let ((file (buffer-file-name buf)))
+                             (when (and (stringp file)
+                                        (string-match-p ".*\\.sml\\'" file))
+                               ;; Return the first .sml file name from the list
+                               ;; and end the loop.
+                               (throw 'break file)))))))
+           (msg "Restarted SML"))
+      (when repl-buf
+        (when in-sml-buf
+          ;; If the REPL buffer already exists and you are not in it, switch
+          ;; to it.
+          (switch-to-buffer-other-window repl-buf))
+        ;; If the REPL has a live process, kill it
+        (when (get-buffer-process (current-buffer))
+          (goto-char (point-max)) ; First go to the EOB
+          (comint-delchar-or-maybe-eof 1) ; Then kill the REPL (C-d)
+          (sleep-for 0.1))) ; Somehow this is needed between kill and respawn
+      (if sml-file
+          (setq msg (concat msg (format " and now loading `%s'"
+                                        (file-name-nondirectory sml-file))))
+        ;; If no sml file was found in the buffer list
+        (setq sml-file ""))
+      (setq msg (concat msg "."))
+      (message msg)
+      ;; Then start a new process
+      (sml-run "sml" sml-file) ; C-c C-s + typing "use foo.sml" in REPL
+      ;; Switch back to the sml buffer if you executed this command from there
+      (when in-sml-buf
+        (switch-to-buffer-other-window (get-file-buffer sml-file)))))
+
+  (bind-key "C-c <C-return>" #'my/restart-sml-and-run inferior-sml-mode-map)
+  (bind-key "C-c <C-return>" #'my/restart-sml-and-run sml-mode-map)
+#+END_SRC
+
+*** ob-sml
+#+BEGIN_SRC emacs-lisp
+  (use-package ob-sml
+    :config
+    (add-to-list 'org-babel-load-languages '(sml . t))
+    (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
+#+END_SRC
+
+**** TODO Launch sml-repl if not running when evaluating a code-block
+:LOGBOOK:
+- State "TODO"       from "TODO"       [2017-03-19 Sun 11:23]
+:END:
+
+**** END
+#+BEGIN_SRC emacs-lisp
+  )
+#+END_SRC
+
+*** END
+#+BEGIN_SRC emacs-lisp
+  )
 #+END_SRC
 
 * After
 :PROPERTIES:
-:CUSTOM_ID: h:da43a0c0-246b-4bb4-b64b-643cb405482f
 :header-args: :tangle yes
 :END:
 ** Private config
-:PROPERTIES:
-:CUSTOM_ID: h:4bb131e7-7688-4fd7-8d15-e2f267006d37
-:END:
 #+BEGIN_SRC emacs-lisp
   (load (concat user-emacs-directory "private.el") t)
 #+END_SRC
 
 ** TODO After theme
-:PROPERTIES:
-:CUSTOM_ID: h:fec112a6-4b7b-4d6f-8e0c-96109e23c176
-:END:
 Set the background of the line number column to match that of the modeline
 #+BEGIN_SRC emacs-lisp
   ;; (set-face-attribute 'linum nil :font my-monospaced-font :background (face-attribute 'mode-line :background nil t) :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant 'normal :weight 'normal)
@@ -1845,13 +1640,7 @@ Set the background of the line number column to match that of the modeline
 #+END_SRC
 
 * ToDo Items
-:PROPERTIES:
-:CUSTOM_ID: h:22f01c76-e2de-4a52-83e2-958de541430e
-:END:
 ** DONE Add CUSTOM_ID property to all headings
-:PROPERTIES:
-:CUSTOM_ID: h:93a4e44c-9ef9-41cc-b82e-4f5d407efde7
-:END:
 :LOGBOOK:
 - State "DONE"       from "TODO"       [2017-01-05 Thu 19:21]
 :END:
