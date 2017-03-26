@@ -1,4 +1,6 @@
 *.bak
+*conflicted*
+*unison.tmp
 bash/history
 compiz/
 emacs.d/ac-comphist*

@@ -206,19 +206,19 @@ gvim_diff() {
   # DESCRIPTON: Opening up vimdiff takes some observable amount of time. This function opens it only if required.
 
   # If there are no differences, print that files are identical and return
-  command diff -qs $@ && return
+  command diff -qs "$@" && return
 
   # At this point, diff can have non-zero error code because of actual differences or because it couldn't find the file.
   # To eliminate the 2nd case, check to see if all files are present. If not, return.
   # If any files are missing, the previous diff command will output the error.
-  for i in $@; do
-    if [[ ! -f $i ]]; then
+  for i in "$@"; do
+    if [[ ! -f "$i" ]]; then
       return
     fi
   done
 
   # Run vimdiff only if there are differences and all files are present
-  gvim_func -df $@
+  gvim_func -df "$@"
 }
 alias vd=gvim_diff
 

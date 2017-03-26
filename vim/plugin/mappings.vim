@@ -97,6 +97,10 @@ nnoremap ZQ :qall!<CR>
 """ Make the repeat operator accept a count (repeat.vim does this too)
 " nnoremap . :<C-U>execute 'normal! ' . repeat('.', v:count1)<CR>
 
+""" Swap * and g* as I don't do a lot of whole word searches
+nnoremap <silent> *  g*
+nnoremap <silent> g* *
+
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -296,11 +300,11 @@ cnoremap %s/ %s/\v
 cnoremap .s/ .s/\v
 xnoremap :s/ :s/\%V\v
 
-""" Search with visual selection
-vnoremap *  <ESC>/\<<C-R>=escape( @*, '$*[]\/' )<CR>\>
-vnoremap g* <ESC>/<C-R>=escape( @*, '$*[]\/' )<CR>
-vnoremap #  <ESC>?\<<C-R>=escape( @*, '$*[]\/' )<CR>\>
-vnoremap g# <ESC>?<C-R>=escape( @*, '$*[]\/' )<CR>
+""" Search with visual selection (* doesn't do whole-word searches - to match what I do in normal mode)
+vnoremap *  <ESC>/<C-R>=escape( @*, '$*[]\/' )<CR><CR>
+vnoremap g* <ESC>/\<<C-R>=escape( @*, '$*[]\/' )<CR>\><CR>
+vnoremap #  <ESC>?<C-R>=escape( @*, '$*[]\/' )<CR><CR>
+vnoremap g# <ESC>?\<<C-R>=escape( @*, '$*[]\/' )<CR>\><CR>
 
 """ Start substitute with visual selection
 " This escape function is meant for use with normal substitution
@@ -309,10 +313,10 @@ vnoremap & <ESC>:%s/<C-R>=escape( @*, '$*[]\\|\/' )<CR>/
 "vnoremap & <ESC>:%s/\v<C-R>=escape( @*, '$%^*=+<>()[]{}&/' )<CR>/
 
 """ Set search pattern without moving the cursor
-nnoremap <silent> <leader>*  :let @/='\<'.escape(expand('<cword>'),'$*[]/').'\>'<CR>
-nnoremap <silent> <leader>g* :let @/=escape(expand('<cword>'),'$*[]/')<CR>
-vnoremap <silent> <leader>*  :<C-U>let @/='\<'.escape(@*,'$*[]/').'\>'<CR>
-vnoremap <silent> <leader>g* :<C-U>let @/=escape(@*,'$*[]/')<CR>
+nnoremap <silent> <leader>*  :let @/=escape(expand('<cword>'),'$*[]/')<CR>
+nnoremap <silent> <leader>g* :let @/='\<'.escape(expand('<cword>'),'$*[]/').'\>'<CR>
+vnoremap <silent> <leader>*  :<C-U>let @/=escape(@*,'$*[]/')<CR>
+vnoremap <silent> <leader>g* :<C-U>let @/='\<'.escape(@*,'$*[]/').'\>'<CR>
 
 """ Find and show results in a LocationList (Buffer-specific)
 nnoremap <silent> <leader>/ :call my#FindAndList('local', 'normal')<CR>

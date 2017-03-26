@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: ::std::make_shared
+# key: sms
+# --
+::std::make_shared< $1 >($0)

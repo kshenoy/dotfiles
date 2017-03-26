@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: namespace
+# key: ns
+# --
+namespace ${1:Namespace} {
+  $0
+} // END namespace $1

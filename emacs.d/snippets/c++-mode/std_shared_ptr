@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: std::shared_ptr
+# key: ssp
+# --
+::std::shared_ptr< $1 > $0

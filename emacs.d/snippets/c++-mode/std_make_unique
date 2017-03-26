@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: ::std::make_unique
+# key: smu
+# --
+::std::make_unique< $1 >($0)

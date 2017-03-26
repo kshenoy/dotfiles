@@ -204,8 +204,8 @@ make_wa_vars
 # If $REPO_PATH is set, expand ${...} to $REPO_PATH/ (append trailing slash)
 # This allows us to use $rtl etc as an absolute path when $REPO_PATH is set and when bootenv isn't done, as a relative path
 dyn_vars() {
-  export ch="${REPO_PATH+$REPO_PATH/}ch"
-  export reg="${REPO_PATH+$REPO_PATH/}meta/registers"
+  export ch="${ANCHOR_ch-${REPO_PATH+$REPO_PATH/}ch}"
+  export reg="${ANCHOR_local_rdl-${REPO_PATH+$REPO_PATH/}meta/registers}"
   export r="${ch}/rtl"
   export tb="${ch}/tb"
   export tc="${ch}/tc"

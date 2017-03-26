@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: ::boost::make_shared
+# key: bms
+# --
+::boost::make_shared< $1 >($0)

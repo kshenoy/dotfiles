@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: boost::shared_ptr
+# key: bsp
+# --
+::boost::shared_ptr< $1 > $0

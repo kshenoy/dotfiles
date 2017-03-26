@@ -6,12 +6,11 @@
 :header-args: :tangle yes
 :END:
 ** Archives
-
 /package-archives/ uses HTTP access to GNU by default. Replacing it with the https version instead
 #+BEGIN_SRC emacs-lisp
-  (setq         package-archives '(("repo-gnu"   . "https://elpa.gnu.org/packages/")))
-  (add-to-list 'package-archives  '("repo-melpa" . "https://melpa.milkbox.net/packages/") t)
-  (add-to-list 'package-archives  '("repo-org"   . "http://orgmode.org/elpa/") t)
+  (setq package-archives '(("repo-gnu"   . "https://elpa.gnu.org/packages/")
+                           ("repo-melpa" . "https://melpa.milkbox.net/packages/")
+                           ("repo-org"   . "http://orgmode.org/elpa/")))
 
   (when (>= emacs-major-version 24)
     (when (>= emacs-minor-version 4)
@@ -161,11 +160,8 @@ I think the following would be handy
               :prefix-docstring "This map is used to toggle settings ala vim-unimpaired"
               :prefix "C-c ~")
 #+END_SRC
-Note the use of /bind-keys*/ for the enable and disable maps and /bind-keys/ for the toggle map.
-This is because /bind-keys*/ will override any maps that are defined by any modes.
+Note the use of /bind-keys*/. This is because /bind-keys*/ will override any maps that are defined by any modes.
 Since =C-c [=, =C-c ~= and  =C-c ]= are all defined by org-mode, I want to override those definitions and hence put mine in the /override-global-mode/
-On the other hand, since =C-c a-z= are reserved for the user, there's no need override anything and hence a simple /bind-keys/ will suffice.
-
 Note that since /bind-keys*/ puts everything in the /override-global-mode/ map, it essentially ignores any =:map= that is passed to it.
 Thus, once the prefixes and maps are defined, we have to use /bind-keys/ only to create new keybinds inside them.
 
@@ -240,43 +236,31 @@ This is because we try to set a face-attribute before a frame is created which i
 
 However, the downside to this is that if I have multiple such 'when' sections (like in private.el) we can't dictate the order in which they're applied.
 #+BEGIN_SRC emacs-lisp
-  (defun my/font-exist-p (font)
-    " Check if font exists"
-    (if (null (x-list-fonts font)) nil t))
+  (defun my/set-font-exists (font size)
+    " Check if font exists and set if it does"
+    (let ((font (concat font "-" (if (numberp size)
+                                     (number-to-string size)
+                                   size))))
+      (when (x-list-fonts font)
+        (setq my-variable-pitch-font font
+              my-fixed-pitch-font    font))))
 
   (add-hook 'after-make-frame-functions
             (lambda (frame)
               (select-frame frame)
               (when (eq system-type 'gnu/linux)
+                (my/set-font-exists "DejaVu Sans Mono" "11"))
+              (when (eq system-type 'windows-nt)
+                (my/set-font-exists "Consolas" "10"))
+              (my/set-font-exists "Hack" "10")
+              (set-face-attribute 'default        nil :font my-variable-pitch-font)
+              (set-face-attribute 'fixed-pitch    nil :font my-fixed-pitch-font)
+              (set-face-attribute 'variable-pitch nil :font my-variable-pitch-font)))
 
-                (when (my/font-exist-p "DejaVu Sans Mono")
-                  (setq my-variable-pitch-font "DejaVu Sans Mono-11"
-                        my-monospaced-font     "DejaVu Sans Mono-11"))
-
-                (when (my/font-exist-p "Hack")
-                  (setq my-variable-pitch-font "Hack-10"
-                        my-monospaced-font     "Hack-10"))
-
-                (set-face-attribute 'default        nil :font my-variable-pitch-font)
-                (set-face-attribute 'fixed-pitch    nil :font my-monospaced-font)
-                (set-face-attribute 'variable-pitch nil :font my-variable-pitch-font))))
-  ;;   (when (my/font-exist-p "MesloLGMDZ Nerd Font")
-  ;;     (setq my-variable-pitch-font "MesloLGMDZ Nerd Font-10"
-  ;;           my-monospaced-font     "MesloLGMDZ Nerd Font-10"))
-
-  ;;   (when (my/font-exist-p "DejaVu Sans")      (setq my-variable-pitch-font "DejaVu Sans-10"))
-  ;;   (when (my/font-exist-p "DejaVu Sans Mono") (setq my-monospaced-font     "DejaVu Sans Mono-10")))
-
-  (when (eq system-type 'windows-nt)
-    (when (my/font-exist-p "Consolas")
-      (setq my-variable-pitch-font "Consolas-10"
-            my-monospaced-font     "Consolas-10"))
-    (when (my/font-exist-p "Hack")
-      (setq my-variable-pitch-font "Hack-10"
-            my-monospaced-font     "Hack-10"))
-    (set-face-attribute 'default        nil :font my-variable-pitch-font)
-    (set-face-attribute 'fixed-pitch    nil :font my-monospaced-font)
-    (set-face-attribute 'variable-pitch nil :font my-variable-pitch-font))
+  ;; (my/set-font-exists "Hack" "10")
+  ;; (set-face-attribute 'default        nil :font my-variable-pitch-font)
+  ;; (set-face-attribute 'fixed-pitch    nil :font my-fixed-pitch-font)
+  ;; (set-face-attribute 'variable-pitch nil :font my-variable-pitch-font))
 #+END_SRC
 
 Fall back to DejaVu Sans when the font lacks support for some glyphs. Taken from [[https://github.com/joodie/emacs-literal-config/blob/c66e30ce961b140dd3e84116f4d45cbc19d0d944/emacs.org#font][github:joodie]]
@@ -380,6 +364,9 @@ Use =C-c s SPC= to delete trailing whitespace manually
   ;; Jump to the help window when it's opened.
   ;; Press q to close it and restore the view to the previous buffer
   (setq help-window-select t)
+
+  ;; Confirm before quitting - sometimes I fat-finger and press both C-x C-c instead of just C-c
+  (setq confirm-kill-emacs 'y-or-n-p)
 #+END_SRC
 
 ** Winner mode
@@ -428,8 +415,37 @@ Mode-specific scratch buffers?
 :PROPERTIES:
 :header-args: :tangle yes
 :END:
-** TODO hydra
-Ideas in https::/github.com/kana/vim-submode
+** ace-window
+When more than 2 windows are open, show a home-row character to in each window to jump directly to.
+Similar to Tmux's =<prefix> C-g=
+#+BEGIN_SRC emacs-lisp
+  (use-package ace-window
+    :init
+    (setq aw-background t)
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j? ?k? ?l))
+    :config
+    (set-face-attribute 'aw-leading-char-face nil :foreground "red" :height 2.5)
+    :bind ("C-x o" . ace-window))
+#+END_SRC
+
+Note that we're rebinding =C-x o=
+
+** aggressive-indent
+#+BEGIN_SRC emacs-lisp
+  (use-package aggressive-indent
+    :config
+    (global-aggressive-indent-mode t))
+#+END_SRC
+
+** auto-complete
+Completion doesn't work if evil is installed
+
+#+BEGIN_SRC emacs-lisp
+  (use-package auto-complete
+    :init
+    (progn (ac-config-default)
+           (global-auto-complete-mode t)))
+#+END_SRC
 
 ** evil
 evil can be toggled using =C-z=
@@ -486,7 +502,7 @@ Make /Escape/ quit everything
   (defun my/minibuffer-keyboard-quit ()
     "Abort recursive edit.
           In Delete Selection mode, if the mark is active, just deactivate it;
-          then it takes a second \\[keyboard-quit] to abort the minibuffer."
+          then it takes a second ESC to abort the minibuffer."
     (interactive)
     (if (and delete-selection-mode transient-mark-mode mark-active)
         (setq deactivate-mark  t)
@@ -512,6 +528,14 @@ Make /Escape/ quit everything
 *** END
 #+BEGIN_SRC emacs-lisp
 )
+#+END_SRC
+
+** avy
+Similar to vim's easy-motion plugin
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :bind (:map evil-normal-state-map
+                ("g s" . avy-goto-char)))
 #+END_SRC
 
 ** flycheck
@@ -643,68 +667,6 @@ Other useful default keybinds:
 )
 #+END_SRC
 
-** TODO linum-relative
-Relative line-numbers ala vim
-#+BEGIN_SRC emacs-lisp
-  (use-package linum-relative
-    :disabled
-    :diminish linum-relative-mode
-    :init
-    (setq linum-relative-current-symbol "")
-    (linum-relative-global-mode t))
-#+END_SRC
-
-*** TODO Figure out why it's necessary to explicitly specify :background for 'linum-relative-current-face
-Shouldn't it inherit from 'linum?
-
-*** TODO Fix ugly gaps in linum-face when lines wrap. [[http://emacs.stackexchange.com/a/897/9690][StackExchange Discussion]]
-#+BEGIN_SRC emacs-lisp
-  (defvar my-linum-gapless-margin-display
-    `((margin left-margin) ,(propertize "     " 'face 'linum))
-    "String used on the margin.")
-
-  (defvar-local my-linum-gapless-margin-overlays nil
-    "List of overlays in current buffer.")
-
-  (defun my-linum-gapless-make-overlay-at (p)
-    "Create a margin overlay at position P."
-    (push (make-overlay p (1+ p)) my-linum-gapless-margin-overlays)
-    (overlay-put
-     (car my-linum-gapless-margin-overlays) 'before-string
-     (propertize " "  'display my-linum-gapless-margin-display)))
-
-  (defun my-linum-gapless-setup-margin-overlays ()
-    "Put overlays on each line which is visually wrapped."
-    (interactive)
-    (let ((ww (- (window-width)
-                 (if (= 0 (or (cdr fringe-mode) 1)) 1 0)))
-          ov)
-      (mapc #'delete-overlay my-linum-gapless-margin-overlays)
-      (save-excursion
-        (goto-char (point-min))
-        (while (null (eobp))
-          ;; On each logical line
-          (forward-line 1)
-          (save-excursion
-            (forward-char -1)
-            ;; Check if it has multiple visual lines.
-            (while (>= (current-column) ww)
-              (my-linum-gapless-make-overlay-at (point))
-              (forward-char (- ww))))))))
-
-  ;; (add-hook 'linum-before-numbering-hook #'my-linum-gapless-setup-margin-overlays)
-#+END_SRC
-
-** TODO macrostep
-Expand a macro and enter macrostep-mode by pressing /C-c m e/.
-Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
-
-#+BEGIN_SRC emacs-lisp
-  (use-package macrostep
-    :disabled
-    :bind ("C-c m e" . macrostep-expand))
-#+END_SRC
-
 ** org
 This solution is by [[https://www.reddit.com/r/emacs/comments/5sx7j0/how_do_i_get_usepackage_to_ignore_the_bundled/ddixpr9/][/u/Wolfer1ne on reddit]].
 #+BEGIN_SRC emacs-lisp
@@ -762,7 +724,7 @@ Languages which can be evaluated in Org-mode buffers.
                                          (ruby       . t)
                                          (perl       . t)
                                          (sh         . t)
-                                         (dot        . t))))
+                                         (C          . t))))
 #+end_src
 
 Ask for confirmation before evaluating? NO!
@@ -922,7 +884,7 @@ This is the counterpart to =org-insert-link=. From [[http://emacs.stackexchange.
 #+END_SRC
 
 **** Complete multiple org tags
-Aaron Bieber: [[https://blog.aaronbieber.com/2016/03/05/playing-tag-in-org-mode.html][Playing Tag in Org-mode]]
+From [[https://blog.aaronbieber.com/2016/03/05/playing-tag-in-org-mode.html][Aaron Bieber's blog]]
 
 Once the first tag is set (using helm), we don't get completion support after that.
 This is because, the entire tag string is treated as a single value and Helm tries to complete based only on the full value.
@@ -998,8 +960,7 @@ A good way to find more characters is to use =M-x insert-char=
     :init
     (setq org-agenda-files
           (seq-filter 'file-exists-p
-                      (mapcar (lambda (x)
-                                (concat org-directory x))
+                      (mapcar (lambda (x) (concat org-directory x))
                               '("organizer.org" "Software/" "Personal/"))))
 
     (setq org-agenda-tags-column            -120) ; Monitors are wide, might as well use it :/
@@ -1007,7 +968,7 @@ A good way to find more characters is to use =M-x insert-char=
     (setq org-agenda-skip-deadline-if-done  t)
 #+END_SRC
 
-[[#h:7c86a221-7ef3-4222-900f-042b36e59e04][Keybinds]]
+Keybinds for org [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][located here]]
 
 ***** TODO Fix setting org-agenda-files
 The lambda will insert a nil if the file/directory doesn't exist.
@@ -1067,15 +1028,42 @@ Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mod
 #+END_SRC
 
 **** org-refile
+By [[https://www.reddit.com/r/emacs/comments/4366f9/how_do_orgrefiletargets_work/czg008y/][/u/awalker4 on reddit]].
 Show upto 9 levels of headings from the current file and two levels of headings from all agenda files
 #+BEGIN_SRC emacs-lisp
   (setq org-refile-targets
-        '((nil . (:maxlevel . 9))
+        '((nil . (:maxlevel . 5))
           (org-agenda-files . (:maxlevel . 2))))
 #+END_SRC
 
+Each element of the list generates a set of possible targets.
+/nil/ indicates that all the headings in the current buffer will be considered.
+
 ***** TODO Set org-refile targets based on current file
 Why would I want to refile something work-related under Softwares etc.
+A way to do it is by writing a function that sets /org-refile-targets/ in a let binding making it local.
+eg. implementation by abo-abo: [[https://github.com/abo-abo/worf/blob/master/worf.el][worf-refile-other]]
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (load-library "find-lisp")
+
+  (defun my/org-refile-targets ()
+  "Refile the current heading to another heading.
+  The other heading can be in the current file or in a file that resides
+  anywhere below the directory the current file resides in.
+
+  The intent is to move to a similar file. If I'm in work-related file,
+  I almost never have to refile something to a personal file."
+  (interactive "p")
+  (let* (org-refile-targets
+         (seq-filter (lambda (x) (string-match-p
+                                  (directory-file-name (buffer-file-name)) x))
+                     (find-lisp-find-files org-directory org-agenda-file-regexp))))
+
+  (org-refile))
+
+  (bind-key* "C-c C-w" 'my/org-refile-targets)
+#+END_SRC
 
 **** org-wunderlist
 #+BEGIN_SRC emacs-lisp
@@ -1209,14 +1197,17 @@ Syntax highlighting when exporting to HTML? Yes, please!
 #+END_SRC
 
 *** Keybinds
+:PROPERTIES:
+:ID:       ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7
+:END:
 
 Custom keymap for org-mode bindings
 #+BEGIN_SRC emacs-lisp
-  (bind-keys  :prefix-map my-org-bindings-map
-              :prefix-docstring "This map is used to group together all org-mode settings"
-              :prefix "C-c o"
-              ("a" . org-agenda)
-              ("c" . org-capture))
+  (bind-keys :prefix-map my-org-bindings-map
+             :prefix-docstring "This map is used to group together all org-mode settings"
+             :prefix "C-c o"
+             ("a" . org-agenda)
+             ("c" . org-capture))
   ;; :bind (("c" . calendar))
 #+END_SRC
 
@@ -1229,9 +1220,9 @@ Note that these are still part of the /:config/ block
 
 Delete the result block using =C-c C-v k= where =C-c C-v= is the /org-babel-key-prefix/
 #+begin_src emacs-lisp
-  :bind (:map     org-babel-map
-         ("k"   . org-babel-remove-result)
-         ("C-k" . org-babel-remove-result))
+  :bind (:map org-babel-map
+              ("k"   . org-babel-remove-result)
+              ("C-k" . org-babel-remove-result))
 #+end_src
 
 *** use-package END
@@ -1278,7 +1269,35 @@ Unbind the default prefix. Explained [[https://github.com/bbatsov/projectile/iss
 This requires including $STEM/build/lv/ch/rtl in .projectile and ignoring .x
 Might need to re-index every time a model is built?
 
-** TODO SLIME
+** rainbow-delimiters
+Use brighter colors
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :config
+    (progn
+      (set-face-attribute 'rainbow-delimiters-depth-1-face nil :foreground "dark orange")
+      (set-face-attribute 'rainbow-delimiters-depth-2-face nil :foreground "deep pink")
+      (set-face-attribute 'rainbow-delimiters-depth-3-face nil :foreground "chartreuse")
+      (set-face-attribute 'rainbow-delimiters-depth-4-face nil :foreground "deep sky blue")
+      (set-face-attribute 'rainbow-delimiters-depth-5-face nil :foreground "yellow")
+      (set-face-attribute 'rainbow-delimiters-depth-6-face nil :foreground "orchid")
+      (set-face-attribute 'rainbow-delimiters-depth-7-face nil :foreground "spring green")
+      (set-face-attribute 'rainbow-delimiters-depth-8-face nil :foreground "sienna1"))
+
+    :bind (:map emacs-unimpaired-toggle-map ("r" . rainbow-delimiters-mode)))
+#+END_SRC
+
+*** TODO Find Better colors for leuven theme
+
+** rainbow-mode
+When a color is specified as a hex code or with its name, set the background of the face to the value of the color itself
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-mode
+    :defer t)
+#+END_SRC
+
+Provides command =rainbow-mode= to toggle this
+
 ** undo-tree
 This lets us visually walk through the changes we've made, undo back to a certain point (or redo), and go down different branches.
 Default binding is =C-x u=
@@ -1292,11 +1311,34 @@ Default binding is =C-x u=
       (setq undo-tree-visualizer-diff t))
 #+END_SRC
 
+** verilog-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package verilog-mode
+    :load-path "bundle/verilog-mode"
+    :mode (("\\.v\\'"    . verilog-mode)
+           ("\\.svh?\\'" . verilog-mode)
+           ("\\.x\\'"    . verilog-mode))
+    :config
+    (font-lock-mode 1))
+#+END_SRC
+
 ** yasnippet
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :diminish yas-minor-mode
-    :init (yas-global-mode t))
+
+    :init
+    ;; (setq-default yas-snippet-dirs (list (concat user-emacs-directory "snippets")))
+    (setq yas-wrap-around-region t)  ; Automatically insert selected text at $0, if any
+    (yas-global-mode t)
+
+    :config
+    (bind-keys :map yas-minor-mode-map
+               ("C-c & n"   . yas-new-snippet)
+               ("C-c & s"   . yas-insert-snippet)
+               ("C-c & v"   . yas-visit-snippet-file)
+               ("C-c & r"   . yas-reload-all)
+               ("C-c & C-r" . yas-reload-all)))
 #+END_SRC
 
 ** which-key
@@ -1307,41 +1349,97 @@ Shows which keys can be pressed next. Eg. if you press =C-x= and wait a few seco
     :config  (which-key-mode))
 #+END_SRC
 
-** ace-window
-When more than 2 windows are open, show a number to jump in each window to jump directly to.
-Similar to Tmux's =<prefix> C-g=
+** leuven-theme
+[[https://github.com/fniessen/emacs-leuven-theme][Github Link]]
 #+BEGIN_SRC emacs-lisp
-  (use-package ace-window
-    :init
-    (setq aw-background t)
-    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j? ?k? ?l))
+  (use-package leuven-theme
+    ;; :disabled
     :config
-    (set-face-attribute 'aw-leading-char-face nil :foreground "red" :height 2.5)
-    :bind ("C-x o" . ace-window))
+    (load-theme 'leuven t)
+
+    (setq evil-normal-state-cursor   '("#008000" box)
+          evil-visual-state-cursor   '("#006FE0" box)
+          evil-insert-state-cursor   '("#0000FF" bar)
+          evil-replace-state-cursor  '("#D0372D" bar)
+          evil-operator-state-cursor '("#D0372D" hollow)
+          evil-emacs-state-cursor    '("white"   box))
+
+    (set-face-attribute 'org-agenda-date         nil :height 1.4)
+    (set-face-attribute 'org-agenda-date-today   nil :height 1.4)
+    (set-face-attribute 'org-agenda-date-weekend nil :height 1.4)
+    (set-face-attribute 'trailing-whitespace     nil :background "#DDDDFF"))
 #+END_SRC
 
-Note that we're rebinding =C-x o=
+Load theme first and then override the colors
 
-** avy
-Similar to vim's easy-motion plugin
+** TODO hydra
+Ideas in https::/github.com/kana/vim-submode
+
+** TODO linum-relative
+Relative line-numbers ala vim
 #+BEGIN_SRC emacs-lisp
-  (use-package avy
-    :bind (:map evil-normal-state-map
-                ("g s" . avy-goto-char)))
+  (use-package linum-relative
+    :disabled
+    :diminish linum-relative-mode
+    :init
+    (setq linum-relative-current-symbol "")
+    (linum-relative-global-mode t))
 #+END_SRC
 
+*** TODO Figure out why it's necessary to explicitly specify :background for 'linum-relative-current-face
+Shouldn't it inherit from 'linum?
+
+*** TODO Fix ugly gaps in linum-face when lines wrap. [[http://emacs.stackexchange.com/a/897/9690][StackExchange Discussion]]
+#+BEGIN_SRC emacs-lisp
+  (defvar my-linum-gapless-margin-display
+    `((margin left-margin) ,(propertize "     " 'face 'linum))
+    "String used on the margin.")
+
+  (defvar-local my-linum-gapless-margin-overlays nil
+    "List of overlays in current buffer.")
+
+  (defun my-linum-gapless-make-overlay-at (p)
+    "Create a margin overlay at position P."
+    (push (make-overlay p (1+ p)) my-linum-gapless-margin-overlays)
+    (overlay-put
+     (car my-linum-gapless-margin-overlays) 'before-string
+     (propertize " "  'display my-linum-gapless-margin-display)))
+
+  (defun my-linum-gapless-setup-margin-overlays ()
+    "Put overlays on each line which is visually wrapped."
+    (interactive)
+    (let ((ww (- (window-width)
+                 (if (= 0 (or (cdr fringe-mode) 1)) 1 0)))
+          ov)
+      (mapc #'delete-overlay my-linum-gapless-margin-overlays)
+      (save-excursion
+        (goto-char (point-min))
+        (while (null (eobp))
+          ;; On each logical line
+          (forward-line 1)
+          (save-excursion
+            (forward-char -1)
+            ;; Check if it has multiple visual lines.
+            (while (>= (current-column) ww)
+              (my-linum-gapless-make-overlay-at (point))
+              (forward-char (- ww))))))))
+
+  ;; (add-hook 'linum-before-numbering-hook #'my-linum-gapless-setup-margin-overlays)
+#+END_SRC
+
+** TODO macrostep
+Expand a macro and enter macrostep-mode by pressing /C-c m e/.
+Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
+
+#+BEGIN_SRC emacs-lisp
+  (use-package macrostep
+    :disabled
+    :bind ("C-c m e" . macrostep-expand))
+#+END_SRC
+
+** TODO SLIME
 ** TODO evil-snipe
 Replaces avy
-
-** auto-complete
-Completion doesn't work if evil is installed
-
-#+BEGIN_SRC emacs-lisp
-  (use-package auto-complete
-    :init
-    (progn (ac-config-default)
-           (global-auto-complete-mode t)))
-#+END_SRC
 
 ** TODO company-mode
 Autocompletion
@@ -1382,53 +1480,6 @@ http://emacs.stackexchange.com/a/21173/9690
 *** END
 #+BEGIN_SRC emacs-lisp
 )
-#+END_SRC
-
-** rainbow-mode
-When a color is specified as a hex code or with its name, set the background of the face to the value of the color itself
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-mode
-    :defer t)
-#+END_SRC
-
-Provides command =rainbow-mode= to toggle this
-
-** rainbow-delimiters
-Use brighter colors
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-delimiters
-    :config
-    (progn
-      (set-face-attribute 'rainbow-delimiters-depth-1-face nil :foreground "dark orange")
-      (set-face-attribute 'rainbow-delimiters-depth-2-face nil :foreground "deep pink")
-      (set-face-attribute 'rainbow-delimiters-depth-3-face nil :foreground "chartreuse")
-      (set-face-attribute 'rainbow-delimiters-depth-4-face nil :foreground "deep sky blue")
-      (set-face-attribute 'rainbow-delimiters-depth-5-face nil :foreground "yellow")
-      (set-face-attribute 'rainbow-delimiters-depth-6-face nil :foreground "orchid")
-      (set-face-attribute 'rainbow-delimiters-depth-7-face nil :foreground "spring green")
-      (set-face-attribute 'rainbow-delimiters-depth-8-face nil :foreground "sienna1"))
-
-    :bind (:map emacs-unimpaired-toggle-map ("r" . rainbow-delimiters-mode)))
-#+END_SRC
-
-*** TODO Find Better colors for leuven theme
-
-** aggressive-indent
-#+BEGIN_SRC emacs-lisp
-  (use-package aggressive-indent
-    :config
-    (global-aggressive-indent-mode t))
-#+END_SRC
-
-** verilog-mode
-#+BEGIN_SRC emacs-lisp
-  (use-package verilog-mode
-    :load-path "bundle/verilog-mode"
-    :mode (("\\.v\\'"    . verilog-mode)
-           ("\\.svh?\\'" . verilog-mode)
-           ("\\.x\\'"    . verilog-mode))
-    :config
-    (font-lock-mode 1))
 #+END_SRC
 
 ** TODO vimish-fold
@@ -1493,29 +1544,6 @@ Use brighter colors
     (load-theme 'solarized-light t))
 #+END_SRC
 
-** leuven-theme
-[[https://github.com/fniessen/emacs-leuven-theme][Github Link]]
-#+BEGIN_SRC emacs-lisp
-  (use-package leuven-theme
-    ;; :disabled
-    :config
-    (load-theme 'leuven t)
-
-    (setq evil-normal-state-cursor   '("#008000" box)
-          evil-visual-state-cursor   '("#006FE0" box)
-          evil-insert-state-cursor   '("#0000FF" bar)
-          evil-replace-state-cursor  '("#D0372D" bar)
-          evil-operator-state-cursor '("#D0372D" hollow)
-          evil-emacs-state-cursor    '("white"   box))
-
-    (set-face-attribute 'org-agenda-date         nil :height 1.4)
-    (set-face-attribute 'org-agenda-date-today   nil :height 1.4)
-    (set-face-attribute 'org-agenda-date-weekend nil :height 1.4)
-    (set-face-attribute 'trailing-whitespace     nil :background "#DDDDFF"))
-#+END_SRC
-
-Load theme first and then override the colors
-
 * ProgLangEmacs
 :PROPERTIES:
 :header-args: :tangle yes
@@ -1548,8 +1576,6 @@ Load theme first and then override the colors
 #+END_SRC
 
 *** Restart SML REPL and load the correct file
-By /u/kaushalmodi on [[https://www.reddit.com/r/ProgLangEmacs/comments/4x698w/one_command_to_kill_sml_restart_it_guess_and_load/][reddit]]
-
 #+BEGIN_SRC emacs-lisp
   (defun my/restart-sml-and-run ()
     "Restarts the SML REPL and tries to load the correct .sml file.
