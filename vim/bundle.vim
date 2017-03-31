@@ -161,13 +161,14 @@ endif
 "  \ ]
 "\ }
 
+" <C-N>, <C-P> and <C-O> to match Helm's defaults
 let g:ctrlp_prompt_mappings = {
-  \ 'PrtSelectMove("j")': ['<C-J>'],
-  \ 'PrtSelectMove("k")': ['<C-K>'],
-  \ 'PrtHistory(-1)':     ['<C-N>', '<Down>'],
-  \ 'PrtHistory(1)':      ['<C-P>', '<Up>'],
-  \ 'ToggleType(1)':      ['<C-F>', '<C-L>'],
-  \ 'ToggleType(-1)':     ['<C-B>', '<C-H>'],
+  \ 'PrtSelectMove("j")': ['<C-N>'],
+  \ 'PrtSelectMove("k")': ['<C-P>'],
+  \ 'PrtHistory(-1)':     ['<Down>'],
+  \ 'PrtHistory(1)':      ['<Up>'],
+  \ 'ToggleType(1)':      ['<C-O>', '<C-L>'],
+  \ 'ToggleType(-1)':     ['<C-H>'],
   \ 'PrtCurLeft()':       ['<Left>'],
   \ 'PrtCurRight()':      ['<Right>'],
   \ }
