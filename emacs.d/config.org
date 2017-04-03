@@ -921,8 +921,7 @@ This is because, the entire tag string is treated as a single value and Helm tri
      (list (let ((org-last-tags-completion-table
                   (if (derived-mode-p 'org-mode)
                       (org-uniquify
-                       (delq nil (append (org-get-buffer-tags)
-                                         (org-global-tags-completion-table))))
+                       (delq nil (org-get-buffer-tags)))
                     (org-global-tags-completion-table))))
              (org-icompleting-read
               "Tag: " 'org-tags-completion-function nil nil nil
@@ -1142,34 +1141,34 @@ From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 -
            "* TODO %^{Task}\n\n%?"
            :jump-to-captured t)
 
-          ("d"  "Spanish Drill")
+          ("s"  "Spanish")
 
-          ("dd" "Item" entry
+          ("ss" "Item" entry
            (file+headline (concat org-directory "Personal/Spanish.org") "Misc")
-           "\n* %?%(setq my-spanish-capture (read-from-minibuffer \"Spanish: \")) :drill:%(org-set-property \"ADDED\" \"%U\")%(org-set-property \"DRILL_CARD_TYPE\" \"hide1_firstmore\")\n\nSpanish: [%(message my-spanish-capture)]\nEnglish: [%^{English}]"
+           "\n* %?%(setq my-spanish-capture (read-string \"Spanish: \")) :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"hide1_firstmore\")\n\nSpanish: [%(message my-spanish-capture)]\nEnglish: [%^{English}]"
            :jump-to-captured t :empty-lines 1)
 
-          ("dn" "Noun" entry
+          ("sn" "Noun" entry
            (file+headline (concat org-directory "Personal/Spanish.org") "Nouns")
-           "\n* %?[%(setq my-spanish-capture (read-from-minibuffer \"Spanish: \"))] :drill:noun:%(org-set-property \"ADDED\" \"%U\")%(org-set-property \"DRILL_CARD_TYPE\" \"twosided\")\n\nTranslate this noun.\n\n** Spanish\n/%(message my-spanish-capture)/\n\n** English\n%^{English}"
+           "\n* %?[%(setq my-spanish-capture (read-string \"Spanish: \"))] :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"twosided\")\n\nTranslate this noun.\n\n** Spanish\n/%(message my-spanish-capture)/\n\n** English\n%^{English}"
            :jump-to-captured t :empty-lines 1)
 
-          ("dv" "Verb" entry
+          ("sv" "Verb" entry
            (file+headline (concat org-directory "Personal/Spanish.org") "Verbs")
-           "\n* %(setq my-spanish-capture (read-from-minibuffer \"Spanish: \")) :drill:verb:%(org-set-property \"ADDED\" \"%U\")%(org-set-property \"DRILL_CARD_TYPE\" \"hide1cloze\")%(org-set-property \"VERB_INFINITIVE\" (concat \"\\\"\" my-spanish-capture \"\\\"\"))%(org-set-property \"VERB_TRANSLATION\" (concat \"\\\"to \" (setq my-english-capture (read-from-minibuffer \"English: to \")) \"\\\"\"))%(org-set-property \"VERB_INFINITIVE_HINT\" (concat \"\\\"\" (substring my-spanish-capture 0 1) \"...\\\"\"))\n\nSpanish: [%(message my-spanish-capture)]\nEnglish: [to %(message my-english-capture)]\n\n** Notes\n** Examples\n** Simple Present Tense :drill:verb:%(org-set-property \"DRILL_CARD_TYPE\" \"conjugate\")%(org-set-property \"VERB_TENSE\" \"\\\"simple present\\\"\")\n\n| yo            | %?  |\n| tú            |   |\n| él/usted      |   |\n| nosotros      |   |\n| vosotros      |   |\n| ellos/ustedes |   |"
+           "\n* %(setq my-spanish-capture (read-string \"Spanish: \")) :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"hide1cloze\")%(org-set-property \"VERB_INFINITIVE\" (concat \"\\\"\" my-spanish-capture \"\\\"\"))%(org-set-property \"VERB_TRANSLATION\" (concat \"\\\"to \" (setq my-english-capture (read-from-minibuffer \"English: to \")) \"\\\"\"))%(org-set-property \"VERB_INFINITIVE_HINT\" (concat \"\\\"\" (substring my-spanish-capture 0 1) \"...\\\"\"))\n\nSpanish: [%(message my-spanish-capture)]\nEnglish: [to %(message my-english-capture)]\n\n** Notes\n** Examples\n** Simple Present Tense :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"conjugate\")%(org-set-property \"VERB_TENSE\" \"\\\"simple present\\\"\")\n\n| yo               | %?  |\n| tú               |   |\n| él/ella/Ud.      |   |\n| nosotros         |   |\n| vosotros         |   |\n| ellos/ellas/Uds. |   |"
            :jump-to-captured t :empty-lines 1)
 
-          ("s"  "Snippets of code")
+          ("c"  "Code snippets")
 
-          ("se" "Emacs" entry
+          ("ce" "Emacs" entry
            (file (concat org-directory "Software/emacs.org"))
            :jump-to-captured t)
 
-          ("ss" "Shell" entry
+          ("cs" "Shell" entry
            (file (concat org-directory "Software/shell.org"))
            :jump-to-captured t)
 
-          ("sv" "Vim" entry
+          ("cv" "Vim" entry
            (file (concat org-directory "Software/vim.org"))
            :jump-to-captured t)))
 #+END_SRC
@@ -1256,6 +1255,7 @@ More details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchan
     :config
     (add-to-list 'org-modules 'org-drill)
     (setq org-drill-add-random-noise-to-intervals-p t)
+    (setq org-drill-hide-item-headings-p t)
 
     (use-package org-drill-table
       :load-path "bundle/org-drill-table"))

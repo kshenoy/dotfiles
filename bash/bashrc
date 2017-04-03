@@ -113,7 +113,8 @@ HOSTNAME="$(hostname)"
 ## TERMINAL
 # Set terminal to mimic titeInhibit = true
 MANPAGER=less
-export PAGER='~/bin/vim --config NONE -u ~/.vim/vimrc_pager'
+# export PAGER='~/bin/vim --config NONE -u ~/.vim/vimrc_pager'
+PAGER=less
 EDITOR=vim
 VISUAL=gvim
 
