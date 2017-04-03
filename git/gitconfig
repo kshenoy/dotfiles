@@ -1,19 +1,38 @@
 [user]
-  name = Kartik Shenoy
+  name  = Kartik Shenoy
   email = theresmorethanoneway@gmail.com
 
 [core]
-  editor = gvim --nofork
+  editor   = gvim --nofork
   fileMode = false
 
 [color]
-  ui = auto
+  ui     = auto
+  branch = auto
+  diff   = auto
+  status = auto
+
+[color "branch"]
+  current = green
+  remote  = red
+
+[color "diff"]
+  meta = yellow
+  frag = magenta
+  old = red bold
+  new = green
+  plain = white
+
+[color "status"]
+  added = yellow
+  changed = green
+  untracked = cyan
 
 [push]
   default = matching
 
 [diff]
-  tool = gvim
+  tool = meld
 [difftool]
   prompt = false
 [difftool "gvim"]
@@ -32,5 +51,18 @@
   helper = cache --timeout=3600
 
 [alias]
-  lg   = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit
-  sync = !git stash && git pull && git stash pop
+  alias = "!git config -l | grep alias | cut -c 7-"
+  d  = diff
+  dw = diff --word-diff
+  dt = difftool
+  mt = mergetool
+  cl = clone
+  ci = commit
+  co = checkout
+  br = branch
+  br-rm-remote = !"f() { branch=${1-$(git branch-name)}; git push origin :$branch; }; f"
+  br-rm-local  = !"f() { branch=${1-$(git branch-name)}; git branch -D $branch; }; f"
+  br-rm-all    = !"f() { branch=${1-$(git branch-name)}; git push origin :$branch; git branch -D $branch; }; f"
+  lg = log --color --graph --pretty=format:' %C(yellow)%h %C(bold blue)<%an>%C(reset) %s %C(green)(%cr)%C(reset)%C(red)%d%C(reset)' --abbrev-commit
+  ls = log --oneline --decorate
+  sync = "!git stash && git pull && git stash pop"

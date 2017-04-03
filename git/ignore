@@ -1,4 +1,5 @@
 # Created by https://www.gitignore.io/api/c,c++,dropbox,emacs,vim,tags
+/CHECKIN
 
 ### C ###
 # Object files
