@@ -19,6 +19,7 @@ endfunction
 
 augroup AMD
   autocmd!
-  autocmd BufNewFile,BufRead *.txl set filetype=ruby
+  autocmd BufNewFile,BufRead *.txl set filetype=ruby.txl
+  autocmd BufNewFile,BufRead *.rdl set filetype=ruby.rdl
   autocmd BufRead * call s:SetLocalSettings(expand('<afile>:p'))
 augroup END

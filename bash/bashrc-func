@@ -241,6 +241,12 @@ unix2dos() {
 }
 
 
+# spin - Spin till input predicate succeeds
+# unset -f spin
+# spin() {
+#   eval "until $@; do sleep 5; done"
+# }
+
 # Automatically add completion for all aliases to commands having completion functions                              {{{1
 # Call this at the end
 alias_completion() {

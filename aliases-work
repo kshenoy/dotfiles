@@ -48,19 +48,21 @@ gvim_func_work() {
     #echo "[$(tput setaf 2)Server: $(tput sgr0)'$(tput setaf 4)${_server}$(tput sgr0)']"
   fi
 
-  gvim_func -geometry 319x70+1911+0 ${_server:+--servername $_server} "$@"
+  gvim_func -geometry 273x66+1911+0 ${_server:+--servername $_server} "$@"
 }
-alias v="gvim_func -geometry 319x70+0+0"
+alias v="gvim_func -geometry 273x66+0+0"
 alias vlog="v -p *ChkL3.log *Seq.log dsp_ch.txt sim.out -c 'set autoread'"
+alias v="gvim_func -geometry 273x66+0+0"
 
 
 unset -f emacs_func_work
 emacs_func_work() {
-  local _server=""
+  local _socket="server"
   if [[ -n $REPO_PATH ]]; then
-    _server="${REPO_PATH//\//_}"
+    _socket="${REPO_PATH//\//_}"
   fi
-  emacs_func ${_server:+--socket-name=${_server}} "$@" &
+  # echo emacs_func ${_socket+--socket-name=$_socket} "$@"
+  emacs_func ${_socket+--socket-name=$_socket} "$@" &
 }
 alias e="emacs_func_work"
 
@@ -74,10 +76,9 @@ alias amdgrep='find $REPO_PATH -path "$REPO_PATH/simenv/build" -prune -or -path 
 
 # Building and Compiling
 alias sbi='. /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash'
-alias mkv='mkverdi -nolsf $(grep -Po "\-model\s*\S+" sim.out) -rc ~/novas.rc -guiConf ~/novas.conf -tkName "verdi_$(tmux display-message -p "#S:#I.#P")"'
+alias mkv='mkverdi -nolsf $(grep -Po "\-model\s*\S+" sim.out) -rc ~/novas.rc -guiConf ~/novas.conf -tkName "verdi_$(tmux display-message -p "#S:#I.#P")" &'
 alias findFirstError='findFirstError --tkName "verdi_$(tmux display-message -p "#S:#I.#P")"'
 alias cid='cat ${REPO_PATH+$REPO_PATH/}configuration_id'
-alias cidn='cid | grep -Po "(?<=@)\d+$"'
 alias bj='lsf_bjobs -w'
 alias bjj='lsf_bjobs -w | command grep "JOBID\|$$"'
 alias bk='lsf_bkill'
@@ -86,14 +87,6 @@ alias bq='lsf_bqueues'
 unset -f bjg
 bjg() {
   bj | grep "${1:-$$:}"
-}
-unset -f bjg_spin
-bjg_spin() {
-  local _lsf_jobid=$(bjg ${1:-$$} | cut -d' ' -f1) || return $?
-  while [[ $(bjg ${1:-$$}) ]]; do
-    sleep 60;
-  done
-  alert "Completed LSF Job: ${_lsf_jobid}"
 }
 
 alias wtf='WhyTheFail'
@@ -188,7 +181,7 @@ make_wa_vars() {
     for _ch in {0..1}; do
       eval "export ${_proj}${_ch}='/proj/ch_func_dev${_ch}/${_proj_ucase}'"
       eval "export ${_proj}${_ch}ks='/proj/ch_func_dev${_ch}/${_proj_ucase}/kshenoy'"
-      for _wa in {1..5}; do
+      for _wa in {1..6}; do
         eval "export ${_proj}${_ch}${_wa}='/proj/ch_func_dev${_ch}/${_proj_ucase}/kshenoy/${_proj}${_ch}${_wa}'"
       done
     done
@@ -341,6 +334,9 @@ mkwa() {
       ;;&
     br)
       _proj="breckenridge"
+      ;;&
+    vh)
+      _proj="valhalla"
       ;;&
     zn)
       _proj="zen"

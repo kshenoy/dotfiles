@@ -233,13 +233,17 @@ alias govv='$VISUAL ~/.vim/vimrc'
 alias edbg="emacs --debug-init"
 alias ed="~/bin/emacs_daemon"
 if [[ $(hostname) =~ loki ]]; then
-  alias ec='/usr/bin/env XLIB_SKIP_ARGB_VISUALS=1 emacsclient --alternate-editor="emacs" --create-frame --quiet'
   alias emacs='/usr/bin/env XLIB_SKIP_ARGB_VISUALS=1 emacs'
+  unset -f emacs_func
+  emacs_func() {
+    /usr/bin/env XLIB_SKIP_ARGB_VISUALS=1 emacsclient --alternate-editor="emacs" --create-frame --quiet "$@" &
+  }
 else
-  alias ec='emacsclient --alternate-editor="emacs" --create-frame --quiet'
+  unset -f emacs_func
+  emacs_func() {
+    emacsclient --alternate-editor="emacs" --create-frame --quiet "$@" &
+  }
 fi
-unset -f emacs_func
-emacs_func() { ec "$@" & }
 alias e="emacs_func"
 
 

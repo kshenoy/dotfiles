@@ -20,7 +20,7 @@
   " Set Font
   if has('unix')
     set guifont=
-    set guifont+=Hack\ 8
+    set guifont+=Hack\ 9
     set guifont+=MesloLGLDZ\ Nerd\ Font\ 8
     set guifont+=Monospace\ 8
     set linespace=3

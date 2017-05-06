@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: include headers
-# key: inc
-# --
-#include "${1:`(file-name-base (buffer-file-name))`.h}"
-$0

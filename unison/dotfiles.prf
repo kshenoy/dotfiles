@@ -35,9 +35,13 @@ ignore = Name .git
 ignore = Name sync.ffs_lock
 ignore = Name sync.ffs_db
 
+# Files used  by emacs
+ignore = Regex .*/emacs.d/ac-comphist.*
+
 # Ignores the exact path and everything below it
 ignore = BelowPath Config/dotfiles/emacs.d/auto-save-list
 ignore = BelowPath Config/dotfiles/emacs.d/elpa
+ignore = BelowPath Config/dotfiles/emacs.d/bundle
 ignore = BelowPath Config/dotfiles/emacs.d/server
 ignore = BelowPath Config/dotfiles/emacs.d/tmp
 ignore = BelowPath Config/dotfiles/vim/bundle

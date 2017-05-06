@@ -21,7 +21,7 @@ endglobal
 #
 snippet inc "#include <>" b
 #include <$1`!p
-opts = ['cassert', 'cstdio', 'cstdlib', 'cstring', 'fstream', 'iostream', 'sstream']
+opts = ['cassert', 'cstdio', 'cstdlib', 'cstring', 'fstream', 'iostream', 'sstream', 'string', 'array']
 if snip.basename:
   opts.insert(0, snip.basename + '.h')
 snip.rv = complete( t[1], opts )
@@ -45,8 +45,14 @@ endsnippet
 #===========================================================================
 # Loops
 #
-snippet for "C++ style for..."
+snippet for "C++ style for..." b
 for (auto ${1:i} = 0; $1 < ${2:count}; ++$1) {
+  ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
+}
+endsnippet
+
+snippet forr "Ranged for loop" b
+for (auto ${1:i}: ${2:v}) {
   ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
 }
 endsnippet

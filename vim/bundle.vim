@@ -113,17 +113,11 @@ if has('unix')
     \ 'types': {
       \ 1: ['.git', 'cd %s && git ls-files --cached --exclude-standard --others'],
       \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
-      \ 3: ['P4CONFIG', "find %s -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune -o " .
-                              \ "-type d \\( -name build -o -name .ccache -o -name dfx -o -name emu -o -name _env -o " .
-                              \ "            -name env_squash -o -name fp -o -name import -o -name tools -o " .
-                              \ "            -name powerPro -o -name release_gate_tmp -o -name sdpx -o -name sim -o " .
-                              \ "            -wholename '*/libs/rtl' -o -wholename '*/ch/variants' -o " .
-                              \ "            -wholename '*/ch/verif/dft' -o -wholename '*/ch/rtl/defines/old' -o " .
-                              \ "            -wholename '*/txn/gen' -o -wholename '*/ch/verif/txn/yml' -o " .
-                              \ "            -wholename '*/ch/syn' \\) -prune -o " .
-                              \ "-type f \\( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' -o " .
-                              \ "            -iname '*.cc.o' -o -iname '*tags*' \\) -prune -o " .
-                              \ "-type f -print"
+      \ 3: ['P4CONFIG', 'cd %s && cat <(p4 have | sed "s:^.*$PWD/::" | ' .
+                                        \ 'grep -v "emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/variants\|' .
+                                        \ 'ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn") ' .
+                                   \ '<(find import/avf -type f) | ' .
+                               \ 'grep -v "\.\(so\|log\)"'
          \ ]
     \ },
     \ 'fallback': "find %s -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune -o " .

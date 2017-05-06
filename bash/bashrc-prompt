@@ -308,7 +308,7 @@ _setprompt_sjlmod_() {
   PS1+="${prc_grey}${pr_fill}${prc_orange}${pr_time}"
   PS1+="\n${prc_grey}${pr_llcorner}${pr_cmd_exit}${prc_user_symbol}${pr_user_symbol}${prc_norm} "
 
-  PS2="${prc_user_symbol}${pr_user_symbol}${prc_norm} "
+  PS2="      ${prc_user_symbol}...${prc_norm}   "
 
   # Evaluate dynamic variables only if dyn_vars is defined (Not required for prompt)
   declare -F dyn_vars &> /dev/null && dyn_vars

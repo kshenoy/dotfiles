@@ -46,14 +46,14 @@ _query_parse_args_() {                                                          
     fi
   done
 
-  local _opt_end=0
+  local _opt_end=false
   while (( $# > 0 )); do
     #echo "DEBUG: Arg:'$1'"
     case $1 in
       --?*)
         ;&
       -[[:alpha:]])
-        if [[ "$_opt_end" == "0" ]] && [[ ! $1 =~ ^-l$ ]] && [[ ! $1 =~ ^--level$ ]]; then
+        if ! $_opt_end && [[ ! $1 =~ ^-l$ ]] && [[ ! $1 =~ ^--level$ ]]; then
           _cmd_recurse+=("$1")
         fi
         ;;&
@@ -96,13 +96,13 @@ _query_parse_args_() {                                                          
 
       --)
         # Standard shell separator between options and arguments
-        if [[ "$_opt_end" == "0" ]]; then
-          _opt_end=1
+        if ! $_opt_end; then
+          _opt_end=true
         fi
         ;;
 
       -*)
-        if [[ "$_opt_end" == "0" ]]; then
+        if ! $_opt_end; then
           echo -e "ERROR: Invalid option: '$1'"
           _query_help_
           return 1;
