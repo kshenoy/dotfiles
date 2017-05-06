@@ -1,0 +1,109 @@
+#!/usr/bin/perl
+
+##=======================================================================================================================
+## Documentation                                                                                                    {{{1
+##=======================================================================================================================
+=head1 NAME
+
+ spin
+
+=head1 AUTHOR
+
+ Kartik Shenoy
+ (Based on Glenn Strunk's script try)
+
+=head1 SYNOPSIS
+
+ spin [OPTIONS]
+
+ spin --model <model>
+
+ spin -h|--help|--man
+
+=head1 DESCRIPTION
+
+ Spin till input predicate succeeds and run the command if one was provided
+
+=head1 OPTIONS
+
+ Only of the following two must be specified:
+ -p, --predicate    Condition to spin on
+ -m, --model        Spin till the specified model was built successfully
+
+ Optional Arguments:
+ -e, --execute      Command to run once the condition has been met. [Optional]
+ -i, --interval     Interval in seconds to wait before checking again. [Default=60s]
+ -n, --num-tries    Number of times to try before giving up. [Default=infinite].
+     --verbose      Verbose mode. Print values of all arguments
+
+=cut
+# }}}1
+
+use strict;
+use diagnostics;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper;
+#use Term::ANSIColor qw(:constants);
+
+
+Getopt::Long::Configure("bundling");
+#Getopt::Long::Configure("pass_through");
+$Data::Dumper::Sortkeys = 1;
+
+
+## Default values for options ==========================================================================================
+my %opts = (                                                                                                       # {{{
+  'execute'       => "",
+  'interval'      => 60,
+  'num-tries'     => -1,
+  'predicate'     => "",
+  'predicate_set' => 0,
+  'interval_set'  => 0,
+  'verbose'       => 0
+);
+my $ret=0;
+
+GetOptions(                                                                                                        # {{{
+  \%opts,
+  'execute|e=s',
+  'interval|i=i'    => sub { $opts{'interval'}      = $_[1];
+                             $opts{'interval_set'}  = 1; },
+  'model|m=s'       => sub { $opts{'predicate'}     = '[[ -f $STEM/build/' . $_[1] . '/BUILD_SUCCEEDED ]]';
+                             $opts{'predicate_set'} = 1;
+                             $opts{'interval'}      = 60 if (!$opts{'interval_set'});
+                       },
+  'num-tries|n=i',
+  'predicate|p=s'   => sub { pod2usage(
+                               -message => "ERROR: Multiple uses of predicate/build detected."
+                               -verbose => 0,
+                               -exitval => 1
+                             ) if $opts{predicate_set};
+                             $opts{'predicate'}     = $_[1];
+                             $opts{'predicate_set'} = 1;
+                       },
+  'help|h|?'        => sub { pod2usage( -verbose => 1, -exitval => 0 ); },
+  'man'             => sub { pod2usage( -verbose => 2, -exitval => 0 ); },
+  'verbose!',
+) or pod2usage(-verbose => 1);
+
+print "INFO: Ignoring extra arguments '@ARGV'\n" if ($#ARGV >= 0);
+
+## Dump the input arguments
+print Dumper(\%opts) if $opts{'verbose'};
+
+my $i=0;
+do {
+  $ret = system($opts{'predicate'});
+  if ($? == 0) {
+    exec $opts{'execute'} if ($opts{'execute'} ne "");
+    exit 0;
+  }
+
+  # print "FAILED: $i\n";
+  $i++;
+  sleep $opts{'interval'};
+} while ($i != $opts{'num-tries'});  # Intentionally using != so that we can run infinitely when num-tries = -1
+
+pod2usage(-verbose => 0, -exitval => 1, -message => "ERROR: Hit limit on number of tries");
+exit 1;

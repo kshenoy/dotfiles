@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: range-based for
+# key: forr
+# --
+for (auto& i: ${1:v}) {
+  $0
+}
