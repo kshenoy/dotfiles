@@ -62,7 +62,7 @@ emacs_func_work() {
     _socket="${REPO_PATH//\//_}"
   fi
   # echo emacs_func ${_socket+--socket-name=$_socket} "$@"
-  emacs_func ${_socket+--socket-name=$_socket} "$@" &
+  emacs_func ${_socket+--socket-name=$_socket} "$@"
 }
 alias e="emacs_func_work"
 
@@ -118,7 +118,7 @@ alias bus3='bucket -n 3'
 alias busw='watch -n15 "bucket -n 1"'
 alias toclippy="sed -e 's/$//' | tee ~/clippy.txt"
 
-alias xt='xterm -geometry 273x60+1920+21 &'
+alias xt='xterm -geometry 273x60+1919+21 &'
 alias xtr='resize -s 60 273'
 # alias xtr='wmctrl -i -r $(printf "0x0%x" $(xdotool getactivewindow)) -b add,maximized_vert; wmctrl -i -r $(printf "0x0%x" $(xdotool getactivewindow)) -e 0,1920,25,1915,1144'
 alias tmxvnc='tmux new-window -d -n "XVNC" "x11vnc"'
@@ -301,9 +301,18 @@ tel() {
 
 unset -f mkwa
 mkwa() {
-  # Eg. mkwa proj_name[/branch_name][@changelist_num]
+  _mkwa_help() {
+    echo 'SYNTAX:'
+    echo '  mkwa PROJ[/BRANCH=PROJ_trunk][@CHANGELIST=latest]'
+    echo '  mkwa tb_env'
+  }
 
-  local _temp=${1}
+  if [[ -f "$1" ]]; then
+    local _temp=$(sed 's/p4_mkwa\s\+-configuration_id\s\+//' "$1")
+  else
+    local _temp=${1}
+  fi
+
   local _proj=""
   local _branch=""
   local _cl=""
@@ -343,7 +352,7 @@ mkwa() {
       ;;&
     *)
       if [[ -z "${_proj}" ]]; then
-        echo "${_fg_red}ERROR${_reset}: Project not specified"
+        echo -e "${_fg_red}ERROR${_reset}: Project not specified\n"; _help
         return 1
       fi
       ;;
@@ -367,8 +376,8 @@ mkwa() {
   fi
 
   # Start an emacs daemon
-  echo "${_fg_green}[Starting emacs daemon...]${_reset}"
-  ~kshenoy/bin/emacs_daemon -s &> /dev/null &
+  # echo "${_fg_green}[Starting emacs daemon...]${_reset}"
+  # ~kshenoy/bin/emacs_daemon -s &> /dev/null &
 
   # Source aliases...
   echo "${_fg_green}[Sourcing aliases...]${_reset}"
