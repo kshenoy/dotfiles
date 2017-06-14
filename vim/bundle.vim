@@ -2,67 +2,79 @@
 " PLUGINS
 "
 
-if (empty(glob(expand(g:dotvim).'/autoload/plug.vim')))
-  silent execute "!curl -fLo ".expand(g:dotvim)."/autoload/plug.vim --create-dirs "
-  \ "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
-  autocmd VimEnter * PlugInstall|PlugUpgrade
+" Automatically install plugins
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  augroup Plug
+    autocmd!
+    autocmd VimEnter * PlugUpgrade --sync|PlugInstall --sync
+  augroup END
 endif
 
 call plug#begin(expand(g:dotvim . '/bundle/'))
 
-function! PlugCond(cond, ...)
+function! s:PlugCond(cond, ...)
   let opts = get(a:000, 0, {})
   return a:cond ? opts : extend(opts, { 'on': [], 'for': [] })
 endfunction
 
-Plug  'tpope/vim-abolish'
-Plug  'PeterRincker/vim-argumentative'
-" Plug  'vim-scripts/AutoComplPop'
-Plug  'chriskempson/base16-vim'
-Plug  'tpope/vim-commentary',             {'on': '<Plug>Commentary'}
-Plug  'ctrlpvim/ctrlp.vim'
-Plug  'tacahiroy/ctrlp-funky'
-Plug  'FelikZ/ctrlp-py-matcher',          PlugCond(has('python'))
-Plug  'Raimondi/delimitMate'
-"Plug 'vim-scripts/DrawIt'
-Plug  'junegunn/vim-easy-align',          {'on': ['EasyAlign', '<Plug>(EasyAlign)']}
-Plug  'tpope/vim-endwise'
-Plug  'tommcdo/vim-exchange',             {'on': '<Plug>(Exchange'}
-Plug  'derekwyatt/vim-fswitch'
-Plug  'sjl/gundo.vim',                    {'on': 'GundoToggle'}
-"Plug 'nathanaelkane/vim-indent-guides',  {'on': ['IndentGuidesToggle', 'IndentGuidesEnable']}
-"Plug 'Yggdroot/indentLine',              PlugCond(has('conceal'), {'on': 'IndentLinesToggle'})
-Plug  'Valloric/ListToggle',              {'on': ['LToggle', 'QToggle']}
-Plug  'Yggdroot/vim-mark'
-Plug  'matchit.zip'
-" Plug  'lifepillar/vim-mucomplete'
-Plug  'kshenoy/vim-origami'
-Plug  'tpope/vim-repeat'
-Plug  'kshenoy/vim-signature'
-" Plug  'maxboisvert/vim-simple-complete'
-" Plug  'justinmk/vim-sneak'
-Plug  'kshenoy/vim-sol'
-"Plug 'sjl/splice.vim',                   {'on': 'SpliceInit'}
-Plug 'kana/vim-submode'
-Plug  'tpope/vim-surround'
-Plug  'AndrewRadev/switch.vim',           {'on': 'Switch'}
-Plug  'WeiChungWu/vim-SystemVerilog',     {'for': 'systemverilog'}
-Plug  'dhruvasagar/vim-table-mode',       {'on': ['TableModeToggle', 'TableModeEnable']}
-" Plug  'wellle/targets.vim'
-Plug  'kana/vim-textobj-user'
-Plug  'glts/vim-textobj-comment',         {'on': '<Plug>(textobj-comment'}
-Plug  'kana/vim-textobj-function',        {'on': '<Plug>(textobj-function'}
-Plug  'kana/vim-textobj-indent',          {'on': '<Plug>(textobj-indent'}
-Plug  'kana/vim-textobj-line',            {'on': '<Plug>(textobj-line'}
-Plug  'saihoooooooo/vim-textobj-space',   {'on': '<Plug>(textobj-space'}
-Plug  'rhysd/vim-textobj-word-column',    {'on': '<Plug>(textobj-wordcolumn'}
-Plug  'kshenoy/TWiki-Syntax',             {'for': 'twiki'}
-Plug  'SirVer/ultisnips',                 PlugCond(has('python'))
-Plug  'tpope/vim-unimpaired'
-Plug  'tpope/vim-vinegar',                {'on': '<Plug>VinegarUp'}
-Plug  'chaoren/vim-wordmotion'
-" Plug  'Valloric/YouCompleteMe',           {'do': './install.py --clang-completer'}
-Plug  'kshenoy/vim-parjumper'
+call plug#('ctrlpvim/ctrlp.vim')
+call plug#('tacahiroy/ctrlp-funky')
+call plug#('FelikZ/ctrlp-py-matcher',          s:PlugCond(has('python')||has('python3')))
+
+" Motion/TextObjects ---------------------------------------------------------------------------------------------------
+call plug#('PeterRincker/vim-argumentative')
+call plug#('matchit.zip')
+" call plug#('justinmk/vim-sneak')
+" call plug#('wellle/targets.vim')
+call plug#('kshenoy/vim-parjumper',            {'on': '<Plug>(ParJump'})
+call plug#('rhysd/vim-textobj-word-column',    {'on': '<Plug>(textobj-wordcolumn'})
+call plug#('chaoren/vim-wordmotion')
+call plug#('kana/vim-textobj-user')
+call plug#('glts/vim-textobj-comment',         {'on': '<Plug>(textobj-comment'})
+call plug#('kana/vim-textobj-function',        {'on': '<Plug>(textobj-function'})
+call plug#('kana/vim-textobj-indent',          {'on': '<Plug>(textobj-indent'})
+call plug#('kana/vim-textobj-line',            {'on': '<Plug>(textobj-line'})
+call plug#('saihoooooooo/vim-textobj-space',   {'on': '<Plug>(textobj-space'})
+
+" Completion/Text insertion --------------------------------------------------------------------------------------------
+" call plug#('vim-scripts/AutoComplPop')
+call plug#('Raimondi/delimitMate')
+call plug#('tpope/vim-endwise')
+call plug#('tpope/vim-commentary',             {'on': '<Plug>Commentary'})
+"call plug#('vim-scripts/DrawIt')
+call plug#('junegunn/vim-easy-align',          {'on': ['EasyAlign', '<Plug>(EasyAlign)']})
+call plug#('tommcdo/vim-exchange',             {'on': '<Plug>(Exchange'})
+call plug#('derekwyatt/vim-fswitch')
+call plug#('lifepillar/vim-mucomplete')
+call plug#('kshenoy/vim-origami')
+call plug#('dhruvasagar/vim-table-mode',       {'on': ['TableModeToggle', 'TableModeEnable']})
+call plug#('SirVer/ultisnips',                 s:PlugCond(has('python')||has('python3')))
+
+" Misc -----------------------------------------------------------------------------------------------------------------
+call plug#('tpope/vim-abolish')
+" call plug#('skywind3000/asyncrun.vim')
+" call plug#('tpope/vim-dispatch')
+call plug#('sjl/gundo.vim',                    {'on': 'GundoToggle'})
+" call plug#('nathanaelkane/vim-indent-guides',  {'on': ['IndentGuidesToggle', 'IndentGuidesEnable']})
+" call plug#('Yggdroot/indentLine',              PlugCond(has('conceal'), {'on': 'IndentLinesToggle'}))
+call plug#('Valloric/ListToggle',              {'on': ['LToggle', 'QToggle']})
+call plug#('Yggdroot/vim-mark')
+call plug#('tpope/vim-repeat')
+call plug#('kshenoy/vim-signature')
+call plug#('kana/vim-submode')
+call plug#('tpope/vim-surround')
+call plug#('AndrewRadev/switch.vim',           {'on': 'Switch'})
+call plug#('WeiChungWu/vim-SystemVerilog',     {'for': 'systemverilog'})
+call plug#('kshenoy/TWiki-Syntax',             {'for': 'twiki'})
+call plug#('tpope/vim-unimpaired')
+call plug#('tpope/vim-vinegar',                {'on': '<Plug>VinegarUp'})
+
+" Colorshemes ----------------------------------------------------------------------------------------------------------
+" call plug#('chriskempson/base16-vim')
+call plug#('kshenoy/vim-sol')
+call plug#('rakr/vim-one')
 
 call plug#end()
 
@@ -113,11 +125,13 @@ if has('unix')
     \ 'types': {
       \ 1: ['.git', 'cd %s && git ls-files --cached --exclude-standard --others'],
       \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
-      \ 3: ['P4CONFIG', 'cd %s && cat <(p4 have | sed "s:^.*$PWD/::" | ' .
-                                        \ 'grep -v "emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/variants\|' .
-                                        \ 'ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn") ' .
-                                   \ '<(find import/avf -type f) | ' .
-                               \ 'grep -v "\.\(so\|log\)"'
+      \ 3: ['P4CONFIG', 'cd %s && cat <(p4 have | ' .
+                                     \ 'grep -v "^\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/variants\|' .
+                                     \ 'ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)") ' .
+                                   \ '<(find import/avf -type f 2> /dev/null) ' .
+                                   \ '<(p4 opened | grep add | sed "s/#.*//" | command xargs -I{} -n1 p4 where {} | ' .
+                                     \   'cut -d" " -f3) | ' .
+                               \ 'grep -v "\.\(so\|log\)" | sed "s:^.*$PWD/::"'
          \ ]
     \ },
     \ 'fallback': "find %s -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune -o " .
@@ -359,14 +373,12 @@ let g:submode_keep_leaving_key    = 1
 
 if exists('*submode#')
   call submode#enter_with( 'WinResize', 'n', '', '<C-W><'      , '<C-W><'       )
-  call submode#enter_with( 'WinResize', 'n', '', '<C-W>>'      , '<C-W>>'       )
   call submode#map       ( 'WinResize', 'n', '', '<'           , '<C-W><'       )
-  call submode#map       ( 'WinResize', 'n', '', '='           , '<C-W>='       )
+  call submode#enter_with( 'WinResize', 'n', '', '<C-W>>'      , '<C-W>>'       )
   call submode#map       ( 'WinResize', 'n', '', '>'           , '<C-W>>'       )
   call submode#enter_with( 'WinResize', 'n', '', '<C-W>+'      , '<C-W>+'       )
-  call submode#enter_with( 'WinResize', 'n', '', '<C-W>-'      , '<C-W>-'       )
   call submode#map       ( 'WinResize', 'n', '', '+'           , '<C-W>+'       )
-  call submode#map       ( 'WinResize', 'n', '', '='           , '<C-W>='       )
+  call submode#enter_with( 'WinResize', 'n', '', '<C-W>-'      , '<C-W>-'       )
   call submode#map       ( 'WinResize', 'n', '', '-'           , '<C-W>-'       )
   "call submode#enter_with( 'WinMove'  , 'n', '', '<C-W>h'      , '<C-W>h'       )
   "call submode#enter_with( 'WinMove'  , 'n', '', '<C-W>j'      , '<C-W>j'       )
@@ -404,12 +416,12 @@ if exists('*submode#')
   "call submode#map       ( 'WinCycle' , 'n', '', 'W'           , '<C-W>W'       )
 
   call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-N>',   '<Leader>m<C-N>')
-  call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-P>',   '<Leader>m<C-P>')
-  call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-A-N>', '<Leader>m<C-A-N>')
-  call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-A-P>', '<Leader>m<C-A-P>')
   call submode#map       ('mark.vim', 'n', '', '<C-N>',            '<Leader>m<C-N>')
+  call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-P>',   '<Leader>m<C-P>')
   call submode#map       ('mark.vim', 'n', '', '<C-P>',            '<Leader>m<C-P>')
+  call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-A-N>', '<Leader>m<C-A-N>')
   call submode#map       ('mark.vim', 'n', '', '<C-A-N>',          '<Leader>m<C-A-N>')
+  call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-A-P>', '<Leader>m<C-A-P>')
   call submode#map       ('mark.vim', 'n', '', '<C-A-P>',          '<Leader>m<C-A-P>')
 
   " Custom Maps
@@ -512,6 +524,7 @@ let g:UltiSnipsEditSplit = "vertical"
 execute 'let g:UltiSnipsSnippetDirectories=["' . g:dotvim . '/UltiSnips"]'
 " execute 'let g:UltiSnipsSnippetsDir="' . g:dotvim . '/UltiSnips"'
 let g:UltiSnipsEnableSnipMate=0
+let g:UltiSnipsExpandTrigger='<S-Tab>'
 
 
 " vim-vinegar ----------------------------------------------------------------------------------------------------  {{{1
