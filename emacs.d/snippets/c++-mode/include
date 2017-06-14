@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: #include <...>
+# key: inc
+# --
+#include <${1:$$(yas-choose-value '("cassert" "cstdio" "cstdlib" "cstring" "iostream" "istream" "ostream" "sstream" "array" "vector" "map"))}>
