@@ -7,8 +7,9 @@ extends c
 # We want to overwrite everything in parent ft.
 priority -48
 
-#===========================================================================
-# Global functions
+
+#=======================================================================================================================
+# Global functions                                                                                                  {{{1
 #
 global !p
 from UltiSnips_globals import *
@@ -16,8 +17,8 @@ endglobal
 
 
 
-#===========================================================================
-# Headers/Namespaces
+#=======================================================================================================================
+# Headers                                                                                                           {{{1
 #
 snippet inc "#include <>" b
 #include <$1`!p
@@ -29,10 +30,18 @@ snip.rv = complete( t[1], opts )
 endsnippet
 
 
+
+#=======================================================================================================================
+# Namespaces                                                                                                        {{{1
+#
 snippet ns "namespace ..."
 namespace${1/.+/ /m}${1:`!p snip.rv = snip.basename or "name"`} {
+
   ${VISUAL}${0}
-} // END namespace${1/.+/ /m}$1
+
+} // END `!p
+snip.rv = "anonymous " if (len(t[1]) == 0) else ""
+`namespace${1/.+/ /m}$1
 endsnippet
 
 
@@ -42,8 +51,8 @@ endsnippet
 
 
 
-#===========================================================================
-# Loops
+#=======================================================================================================================
+# Loops                                                                                                             {{{1
 #
 snippet for "C++ style for..." b
 for (auto ${1:i} = 0; $1 < ${2:count}; ++$1) {
@@ -59,11 +68,29 @@ endsnippet
 
 
 
-#===========================================================================
-# Classes
+#=======================================================================================================================
+# Using/typedefs                                                                                                    {{{1
 #
-snippet 'cl(ass)?' "class" r
-class ${1:`!p snip.rv = snip.basename or "name"`} {
+snippet 'us(ing)?' "using typedef ..." rb
+using ${1} = ${0}
+endsnippet
+
+
+
+#=======================================================================================================================
+# Templates                                                                                                         {{{1
+#
+snippet temp "template <typename T>" b
+template <typename ${1:T}>
+endsnippet
+
+
+
+#=======================================================================================================================
+# Classes                                                                                                           {{{1
+#
+snippet 'cl(ass)?' "class" rw
+class ${1:`!p snip.rv = "c" + snip.basename.title().replace('_', '') or "name"`} {
   public:
     ${1/(\w+).*/$1/}( ${2:arguments} );
     virtual ~${1/(\w+).*/$1/}(){}
@@ -73,31 +100,39 @@ class ${1:`!p snip.rv = snip.basename or "name"`} {
 endsnippet
 
 
-#===========================================================================
-# Shared Ptrs
+#=======================================================================================================================
+# Pointers                                                                                                          {{{1
 #
-snippet 'bsp' "boost::shared_ptr" w
-::boost::shared_ptr< $1 > $0
+snippet bsp "boost::shared_ptr" w
+boost::shared_ptr< $1 > $0
 endsnippet
 
-snippet 'bms' "boost::make_shared" w
-::boost::make_shared< $1 >($0)
+snippet bms "boost::make_shared" w
+boost::make_shared< $1 >($0)
 endsnippet
 
-snippet 'ssp' "std::shared_ptr" w
-::std::shared_ptr< $1 > $0
+snippet ssp "std::shared_ptr" w
+std::shared_ptr< $1 > $0
 endsnippet
 
-snippet 'sms' "std::make_shared" w
-::std::make_shared< $1 >($0)
+snippet sms "std::make_shared" w
+std::make_shared< $1 >($0)
 endsnippet
 
-snippet 'sup' "std::unique_ptr" w
-::std::unique_ptr< $1 > $0
+snippet sup "std::unique_ptr" w
+std::unique_ptr< $1 > $0
 endsnippet
 
-snippet 'smu' "std::make_unique" w
-::std::make_unique< $1 >($0)
+snippet smu "std::make_unique" w
+std::make_unique< $1 >($0)
+endsnippet
+
+
+#=======================================================================================================================
+# STL                                                                                                               {{{1
+#
+snippet be "<STL>.begin(), <STL>.end()" w
+${1:v}${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}begin()${2:,} $1${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}end()
 endsnippet
 
 

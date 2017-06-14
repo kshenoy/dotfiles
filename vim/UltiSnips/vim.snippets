@@ -37,7 +37,7 @@ endsnippet
 
 
 snippet fu "function" b
-function! `!v substitute(substitute((expand('%:p') =~ "autoload" ? expand('%:p:r') : ""), '^.*autoload/', '', ''), '/', '#', '') . '#'`${1:funcName} (${2})
+function! `!v substitute(substitute((expand('%:p') =~ "autoload" ? expand('%:p:r') : ""), '^.*autoload/', '', ''), '/', '#', '') . '#'`${1:funcName}(${2})
   " Description:
 
   $0
