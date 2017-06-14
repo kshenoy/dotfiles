@@ -9,7 +9,7 @@
  '(debug-on-error t)
  '(package-selected-packages
    (quote
-    (org-drill-table org-id aggressive-indent ob-sml projectile noflet org-ac helm-projectile yasnippet which-key use-package try swiper sml-mode rainbow-delimiters org-wunderlist org-bullets leuven-theme htmlize helm-descbinds geiser flycheck evil-visualstar evil-surround evil-numbers evil-matchit evil-leader evil-exchange evil-commentary company ace-window)))
+    (rainbow-mode org-drill-table org-id aggressive-indent ob-sml projectile noflet org-ac helm-projectile yasnippet which-key use-package try swiper sml-mode rainbow-delimiters org-wunderlist org-bullets leuven-theme htmlize helm-descbinds geiser flycheck evil-visualstar evil-surround evil-numbers evil-matchit evil-leader evil-exchange evil-commentary company ace-window)))
  '(safe-local-variable-values (quote ((org-confirm-babel-evaluate)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
