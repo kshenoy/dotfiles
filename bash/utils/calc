@@ -1,0 +1,207 @@
+#!/usr/bin/env bash
+
+# Simple calc
+unset -f =
+=() {                                                                                                             # {{{1
+  local _input="${@:-$(</dev/stdin)}"
+  # echo $_input
+
+  # if [[ $_input =~ [:xdigit:]+\[[:digit:]+:[:digit:]+\] ]]; then
+  #   _input=${_input#.*[}
+  #   echo $_input
+  #   return
+  # fi
+  # = "($_input >> $_lsb) & ($_msb - $_lsb)"
+
+  # If there's no explicit output formatting, try to infer from the input
+  if [[ ! $_input =~ to_s ]]; then
+    if [[ $_input =~ 0x ]] || [[ $_input =~ [a-fA-F] ]]; then
+      local _base=16
+    elif [[ $_input =~ 0b ]]; then
+      local _base=2
+    fi
+    _input="(${_input}).to_s(${_base})"
+  fi
+
+  local _result=$(echo "$_input" | irb -m --noverbose | command sed 's/"//g')
+
+  # Pretty-print formatted output
+  if [[ $_input =~ 'to_s(16)' ]]; then
+    _result="0x${_result}"
+  elif [[ $_input =~ 'to_s(2)' ]]; then
+    _result="0b${_result}"
+  fi
+
+  echo $_result
+}
+
+unset -f =base
+=base() (                                                                                                         # {{{1
+  _help () { #{{{
+    echo 'SYNTAX:'
+    echo '  =base NUM TO [FROM=10]'
+    echo '  echo NUM | =base TO [FROM=10]'
+    echo '  =base TO [FROM=10] <<< "NUM"'
+  } # }}}
+
+  if (( $# >= 3 )); then
+    local _num=$1
+    shift
+  elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
+    # From pipe or from redirection respectively
+    local _num=$(</dev/stdin)
+  elif (( $# <= 1 )); then
+    echo -e "ERROR: Insufficient arguments. At least two required\n"; _help
+    return 1
+  else
+    local _num=$1
+    shift
+  fi
+
+  local _ibase=${2:-10}
+  local _obase=$1
+
+  case $_ibase in
+    2)
+      _num=${_num#0[bB]}
+      ;;
+    16)
+      _num=$(tr '[a-f]' '[A-F]' <<< "${_num#0[xX]}")
+      ;;
+  esac
+
+  local _result=$(echo "obase=${_obase}; ibase=${_ibase}; $_num" | bc)
+  case $_obase in
+    2)
+      _result="0b${_result}"
+      ;;
+    16)
+      _result="0x${_result}"
+      ;;
+  esac
+
+  echo $_result
+)
+
+unset -f =bin
+=bin() (                                                                                                          # {{{1
+  _help () { # {{{
+    echo 'SYNTAX:'
+    echo '  =bin NUM [FROM=10]'
+    echo '  echo NUM | =bin [FROM=10]'
+    echo '  =bin [FROM=10] <<< "NUM"'
+  } # }}}
+
+  if (( $# >= 2 )); then
+    local _num=$1
+    shift
+  elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
+    # From pipe or from redirection respectively
+    local _num=$(</dev/stdin)
+  elif (( $# == 0 )); then
+    echo -e "ERROR: Insufficient arguments. At least one required\n"; _help
+    return 1
+  else
+    local _num=$1
+    shift
+  fi
+
+  local _ibase=${1:-10}
+  local _obase=2
+  =base $_num $_obase $_ibase
+)
+
+unset -f =dec
+=dec() (                                                                                                          # {{{1
+  _help () { # {{{
+    echo 'SYNTAX:'
+    echo '  =dec NUM [FROM=10]'
+    echo '  echo NUM | =dec [FROM=16]'
+    echo '  =dec [FROM=10] <<< "NUM"'
+  } # }}}
+
+  if (( $# >= 2 )); then
+    local _num=$1
+    shift
+  elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
+    # From pipe or from redirection respectively
+    local _num=$(</dev/stdin)
+  elif (( $# == 0 )); then
+    echo -e "ERROR: Insufficient arguments. At least one required\n"; _help
+    return 1
+  else
+    local _num=$1
+    shift
+  fi
+
+  local _ibase=${1:-16}
+  local _obase=10
+  =base $_num $_obase $_ibase
+)
+
+unset -f =hex
+=hex() (                                                                                                          # {{{1
+  _help () { # {{{
+    echo 'SYNTAX:'
+    echo '  =hex NUM [FROM=10]'
+    echo '  echo NUM | =hex [FROM=10]'
+    echo '  =hex [FROM=10] <<< "NUM"'
+  } # }}}
+
+  if (( $# >= 2 )); then
+    local _num=$1
+    shift
+  elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
+    # From pipe or from redirection respectively
+    local _num=$(</dev/stdin)
+  elif (( $# == 0 )); then
+    echo -e "ERROR: Insufficient arguments. At least one required\n"; _help
+    return 1
+  else
+    local _num=$1
+    shift
+  fi
+
+  local _ibase=${1:-10}
+  local _obase=16
+  =base $_num $_obase $_ibase
+)
+
+# BitSlice
+unset -f =slice
+=slice() (                                                                                                        # {{{1
+  _help() { # {{{
+    echo 'SYNTAX:'
+    echo '  =bitslice NUM MSB LSB'
+    echo '  =bitslice NUM BIT'
+    echo '  echo NUM | =bitslice MSB LSB'
+    echo '  =bitslice MSB LSB <<< "NUM"'
+    echo
+    echo "NOTE: MSB >= LSB"
+  } # }}}
+
+  if (( $# >= 3 )); then
+    local _num=$1
+    shift
+  elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
+    # From pipe or from redirection respectively
+    local _num=$(</dev/stdin)
+  elif (( $# < 1 )); then
+    echo -e "ERROR: Insufficient arguments. At least one more required\n"; _help
+    return 1
+  else
+    local _num=$1
+    shift
+  fi
+
+  local _msb=$1
+  local _lsb=${2:-$_msb}
+
+  if (( $_lsb > $_msb )); then
+    echo -e "ERROR: MSB must be greater than or equal to LSB when slicing\n"; _help
+    return 1
+  fi
+
+  # echo "in=$_num, msb=$_msb, lsb=$_lsb"
+  = "($_num >> $_lsb) & ((1 << ($_msb - $_lsb + 1)) - 1)"
+)
