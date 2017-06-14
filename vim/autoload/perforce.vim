@@ -1,32 +1,42 @@
-function! perforce#Checkout()                                                                                     " {{{1
+function! perforce#Checkout(filename)                                                                             " {{{1
   " Description: Confirm with the user, then checkout a file from perforce.
 
   " Check that we're not in a regression work-area (not fool-proof)
-  if ($STEM =~ 'regr_build\|regrplatform')
+  if (  ($STEM == "")
+   \ || ($STEM =~ 'regr_build\|regrplatform')
+   \ )
     setlocal nomodifiable
-    return 0
+    return
   endif
 
-  let l:p4path = substitute(split(system("p4 files " . expand('%:p')), '\s\+')[0], '#\d\+$', '', '')
+  " Filter out if we get any errors while running p4 files eg. opening a file from p4v
+  let l:p4path = substitute(system("p4 files " . a:filename), '#.*$', '', '')
+
   if (  ( l:p4path =~ '^//depot' )
   \  && ( confirm("Checkout from Perforce?", "&Yes\n&No", 1) == 1 )
   \  )
     call system("p4 edit " . l:p4path . " > /dev/null")
     if (v:shell_error == 0)
       setlocal noreadonly
-      return 1
+      return
     endif
   endif
-
-  return 0
 endfunction
 
 
 function! perforce#MergeInit()                                                                                    " {{{1
   " Description: Sets up merge layout and creates keybindings
   call s:SetupMergeLayout('Original', 'Theirs', 'Yours', 'Merge')
-  call s:CreateMaps()
+  call s:CreateMergeMaps()
 endfunction
+" }}}1
+
+
+let s:conflict_ORIGINAL='^>>>> ORIGINAL'
+let s:conflict_THEIRS='^==== THEIRS'
+let s:conflict_YOURS='^==== YOURS'
+let s:conflict_END='^<<<<'
+let s:conflict_ANY=s:conflict_ORIGINAL . '\|' . s:conflict_THEIRS . '\|' . s:conflict_YOURS . '\|' . s:conflict_END
 
 
 function! s:SetupMergeLayout(...)                                                                                 " {{{1
@@ -39,11 +49,14 @@ function! s:SetupMergeLayout(...)                                               
   "              Tab 5: Diff of Remote v/s Merge
   "              Tab 6: Diff of Local  v/s Merge
   "
-  "              Git     v/s  Perforce
-  "              Base     |   Original
-  "              Remote   |   Theirs
-  "              Local    |   Yours
-  "              Merge    |   Merge
+  "              +--------+----------+
+  "              | Git    | Perforce |
+  "              +--------+----------+
+  "              | Base   | Original |
+  "              | Remote | Theirs   |
+  "              | Local  | Yours    |
+  "              | Merge  | Merge    |
+  "              +--------+----------+
 
   " Arguments: All arguments are optional and the only thing they're used for is to name the tabs
   let l:base_str   = get(a:000, 0, 'Base')
@@ -62,17 +75,17 @@ function! s:SetupMergeLayout(...)                                               
   " Main merging tab
   exec "b " . l:merge
   setlocal noreadonly modifiable
-  let b:bufname="MERGE"
+  let b:bufname=toupper(l:merge_str)
   wincmd s
   wincmd t
   exec "b " . l:base
-  let b:bufname="ORIGINAL"
+  let b:bufname=toupper(l:base_str)
   wincmd v
   exec "b " . l:remote
-  let b:bufname="THEIRS"
+  let b:bufname=toupper(l:remote_str)
   wincmd v
   exec "b " . l:local
-  let b:bufname="YOURS"
+  let b:bufname=toupper(l:local_str)
   setlocal readonly
   windo diffthis
   let t:guitablabel='Main'
@@ -131,67 +144,186 @@ function! s:ConflictMotion(fwd, ...)                                            
   " Description: Jump to the next/previous conflict marker.
   "              The optional argument can be used to specify any additional flags
   let l:flags = 'W' . (a:fwd ? '' : 'b') . get(a:000, 0, '')
-  return search('\M^\(>>>> ORIGINAL\|==== THEIRS\|==== YOURS\|<<<<\)', l:flags)
+  return search('\M'.s:conflict_ANY, l:flags)
 endfunction
 
 
 function! s:ConflictInnerMotion(ai, ...)                                                                          " {{{1
-  let l:block = get(a:000, 0, '')
-  let l:start_pat = '\M^\(>>>> ORIGINAL\|==== THEIRS\|==== YOURS\|<<<<\)'
-  let l:end_pat   = '\M^\(==== THEIRS\|==== YOURS\|<<<<\)'
+  " Save cursor position in case we're unable to act
+  let l:curpos = getcurpos()
+  let l:block  = get(a:000, 0, '')
 
+  let l:first_line = search('\M' . s:conflict_ORIGINAL, 'bWcn')
+  let l:last_line  = search('\M' . s:conflict_END, 'Wcn')
+
+  let l:start_pat  = '\M'
+  let l:end_pat    = '\M'
   if (l:block ==# 'ORIGINAL')
-    let l:start_pat = '\M^>>>> ORIGINAL'
-    let l:end_pat   = '\M^\(==== THEIRS\|==== YOURS\|<<<<\)'
+    let l:start_pat .= s:conflict_ORIGINAL
+    let l:end_pat   .= s:conflict_THEIRS
   elseif (l:block ==# 'THEIRS')
-    let l:start_pat = '\M^==== THEIRS'
-    let l:end_pat   = '\M^\(==== YOURS\|<<<<\)'
+    let l:start_pat .= s:conflict_THEIRS
+    let l:end_pat   .= s:conflict_YOURS
   elseif (l:block ==# 'YOURS')
-    let l:start_pat = '\M^==== YOURS'
-    let l:end_pat   = '\M^<<<<'
+    let l:start_pat .= s:conflict_YOURS
+    let l:end_pat   .= s:conflict_END
+  else
+    let l:start_pat .= s:conflict_ORIGINAL . '\|' . s:conflict_THEIRS . '\|' . s:conflict_YOURS
+    let l:end_pat   .= s:conflict_THEIRS   . '\|' . s:conflict_YOURS  . '\|' . s:conflict_END
   endif
 
-  " Find starting line of any block
-  if (getline('.') =~ '\M^<<<<')
+  " Move one line up if on the last line of conflict block
+  if (getline('.') =~ '\M' . s:conflict_END)
     -
   endif
-  if (search(l:start_pat, 'bWc') != 0)
-    let l:start = line('.')
-  elseif (search(l:start_pat, 'W') != 0)
-    let l:start = line('.')
-  else
-    echo "DEBUG: No start in sight"
+
+  " Find starting line of block. First search forwards, then backwards
+  let l:start = search(l:start_pat, 'bWc', l:first_line)
+  if (l:start == 0)
+    let l:start = search(l:start_pat, 'Wc', l:last_line)
+  endif
+  if (l:start == 0)
+    echoe "Unable to find the start of the conflict block. Are you in one?"
     return
   endif
+
+  " Find ending line of block. First search forwards, then backwards
+  let l:end = search(l:end_pat, 'Wn', l:last_line)
+  if (l:end == 0)
+    let l:end = search(l:end_pat, 'bWn', l:first_line)
+  endif
+  if (l:end == 0)
+    echoe "Unable to find the end of the conflict block. Are you in one?"
+    return
+  endif
+
+  if (l:start >= l:end)
+    echoe "Conflict block bounds are not sensible. Something's messed up! Start=" . l:start . ", End=" . l:end
+    call setpos('.', l:curpos)
+    return
+  elseif (  (l:end == l:start + 1)
+       \ && (a:ai ==# 'i')
+       \ )
+    echoe "Nothing to select. Conflict block seems to be empty"
+    call setpos('.', l:curpos)
+    return
+  endif
+
+  " If on the 'YOURS' block, keep the final '<<<<' (by not decrementing l:end)
   if (a:ai ==# 'i')
     +
     let l:start += 1
+    let l:end -= 1
+  elseif (getline('.') !~ '\M' . s:conflict_YOURS)
+    let l:end -= 1
   endif
 
-  " Find ending line of any block
-  let l:end = search(l:end_pat, 'Wn')
-  if (l:end == 0)
-    echo "DEBUG: No end in sight"
-    return
-  endif
-  let l:end -= 1
-
-  if (l:start > l:end)
-    echoe "Shit's fucked up!"
-  else
-    execute 'normal! V' . (l:end - l:start) . 'j'
-  endif
+  execute 'normal! V' . (l:end > l:start + 1 ? (l:end - l:start) . 'j' : '')
 endfunction
 
-function! s:CreateMaps()                                                                                          " {{{1
-  noremap  ]C :call <SID>ConflictMotion(0)<CR>
-  noremap  [C :call <SID>ConflictMotion(1)<CR>
-  xnoremap iC :call <SID>ConflictInnerMotion('i')<CR>
-  xnoremap aC :call <SID>ConflictInnerMotion('a')<CR>
-  onoremap iC :call <SID>ConflictInnerMotion('i')<CR>
-  onoremap aC :call <SID>ConflictInnerMotion('a')<CR>
 
-  nmap dgo d:call <SID>ConflictInnerMotion('a', 'THEIRS')<CR>d:call   <SID>ConflictInnerMotion('a','YOURS')<CR>dd[Cdd
-  nmap dgt d:call <SID>ConflictInnerMotion('a', 'ORIGINAL')<CR>d:call <SID>ConflictInnerMotion('a','YOURS')<CR>dd[Cdd
-  nmap dgy d:call <SID>ConflictInnerMotion('a', 'ORIGINAL')<CR>d:call <SID>ConflictInnerMotion('a','THEIRS')<CR>dd]Cdd
+function! s:DiffGet(block)                                                                                        " {{{1
+  " Save cursor position in case we're unable to act
+  let l:curpos  = getcurpos()
+  let l:curline = line('.')
+
+  let l:original_line = search('\M' . s:conflict_ORIGINAL, 'bWc')
+  let l:end_line      = search('\M' . s:conflict_END, 'Wcn')
+  if (  (l:original_line > l:curline)
+   \ || (l:end_line      < l:curline)
+   \ )
+    " Ensure that the cursor was within the conflict block
+    call setpos('.', l:curpos)
+    return
+  endif
+
+  let l:theirs_line = search('\M' . s:conflict_THEIRS, 'Wcn')
+  let l:yours_line  = search('\M' . s:conflict_YOURS, 'Wcn')
+  if (  (l:original_line == 0)
+   \ || (l:theirs_line   == 0)
+   \ || (l:yours_line    == 0)
+   \ || (l:end_line      == 0)
+   \ )
+    call setpos('.', l:curpos)
+    return
+  endif
+
+  if (a:block ==# 'ORIGINAL')
+    let l:before_start_line = l:original_line
+    let l:before_stop_line  = l:original_line
+    let l:after_start_line  = l:theirs_line
+    let l:after_stop_line   = l:end_line
+  elseif (a:block ==# 'THEIRS')
+    let l:before_start_line = l:original_line
+    let l:before_stop_line  = l:theirs_line
+    let l:after_start_line  = l:yours_line
+    let l:after_stop_line   = l:end_line
+  elseif (a:block ==# 'YOURS')
+    let l:before_start_line = l:original_line
+    let l:before_stop_line  = l:yours_line
+    let l:after_start_line  = l:end_line
+    let l:after_stop_line   = l:end_line
+  else
+    call setpos('.', l:curpos)
+    return
+  endif
+
+  if (  (l:before_stop_line < l:before_start_line)
+   \ || (l:after_stop_line  < l:after_start_line)
+   \ )
+    call setpos('.', l:curpos)
+    return
+  endif
+
+  " Adjust 'after' based on the number of lines deleted during 'before'
+  let l:after_start_line -= (l:before_stop_line - l:before_start_line + 1)
+  let l:after_stop_line  -= (l:before_stop_line - l:before_start_line + 1)
+
+  execute l:before_start_line . "," . l:before_stop_line . "g/./d"
+  execute l:after_start_line  . "," . l:after_stop_line  . "g/./d"
+endfunction
+
+
+function! s:DiffGetOriginal()                                                                                     " {{{1
+  normal! _d:call <SID>ConflictInnerMotion('a', 'THEIRS')
+  normal! _d:call <SID>ConflictInnerMotion('a', 'YOURS')
+  " Move up to '>>>> ORIGINAL' and delete it
+  call s:ConflictMotion(0)
+  delete _
+endfunction
+
+function! s:DiffGetTheirs()                                                                                       " {{{1
+  normal! _d:call <SID>ConflictInnerMotion('a', 'ORIGINAL')
+  " Delete '==== THEIRS'
+  delete _
+  normal! _d:call <SID>ConflictInnerMotion('a', 'YOURS')
+endfunction
+
+function! s:DiffGetYours()                                                                                        " {{{1
+  normal! _d:call <SID>ConflictInnerMotion('a', 'ORIGINAL')
+  normal! _d:call <SID>ConflictInnerMotion('a', 'THEIRS')
+  " Delete '==== YOURS'
+  delete _
+  " Move down to '<<<<' and delete it
+  call s:ConflictMotion(1)
+  delete _
+endfunction
+
+
+function! s:CreateMergeMaps()                                                                                     " {{{1
+  noremap <silent> [C :call <SID>ConflictMotion(0)<CR>
+  noremap <silent> ]C :call <SID>ConflictMotion(1)<CR>
+
+  for l:ai in ['i', 'a']
+    for l:map in ['o', 'x']
+      execute l:map."noremap <silent> ".l:ai         . "C :call <SID>ConflictInnerMotion('".l:ai."')<CR>"
+      execute l:map."noremap <silent> ".toupper(l:ai)."OC :call <SID>ConflictInnerMotion('".l:ai."', 'ORIGINAL')<CR>"
+      execute l:map."noremap <silent> ".toupper(l:ai)."TC :call <SID>ConflictInnerMotion('".l:ai."', 'THEIRS')<CR>"
+      execute l:map."noremap <silent> ".toupper(l:ai)."YC :call <SID>ConflictInnerMotion('".l:ai."', 'YOURS')<CR>"
+    endfor
+  endfor
+
+  nmap <silent> dgo :silent call <SID>DiffGetOriginal()<CR>
+  nmap <silent> dgt :silent call <SID>DiffGetTheirs()<CR>
+  nmap <silent> dgy :silent call <SID>DiffGetYours()<CR>
 endfunction
