@@ -358,33 +358,6 @@ function! my#CursorBlind()                                                      
 endfunction
 
 
-function! s:NextTextObject(motion, dir)                                                                           " {{{1
-  " Description: Motion for "next/last object".
-  "              eg. "din(" would go to the next "()" pair and delete its contents.
-  let c = nr2char(getchar())
-
-  if c ==# "b"
-    let c = "("
-  elseif c ==# "B"
-    let c = "{"
-  elseif c ==# "d"
-    let c = "["
-  endif
-
-  execute "normal! " . a:dir . c . "v" . a:motion . c
-endfunction
-
-"onoremap an :<C-U>call <SID>NextTextObject('a', 'f')<CR>
-"xnoremap an :<C-U>call <SID>NextTextObject('a', 'f')<CR>
-"onoremap in :<C-U>call <SID>NextTextObject('i', 'f')<CR>
-"xnoremap in :<C-U>call <SID>NextTextObject('i', 'f')<CR>
-"
-"onoremap ap :<C-U>call <SID>NextTextObject('a', 'F')<CR>
-"xnoremap ap :<C-U>call <SID>NextTextObject('a', 'F')<CR>
-"onoremap ip :<C-U>call <SID>NextTextObject('i', 'F')<CR>
-"xnoremap ip :<C-U>call <SID>NextTextObject('i', 'F')<CR>
-
-
 function! my#BuffersList()                                                                                        " {{{1
   " Description: Returns a list of open buffers
   let res = []
@@ -589,7 +562,8 @@ function! my#CscopeMap(view, exec, ...)                                         
   " Description: One function to execute cscope commands instead of a ton of mappings
   " Arguments:
   "   view (char) : How to display results (l: Location list, s: Horizontal split, v: Vertical split)
-  "   exec (bool) : Whether to (1) obtain search term from user or (0) use <cword> or <cfile> appropriately
+  "   exec (bool) : Whether to (0) use <cword> or <cfile> appropriately or
+  "                            (1) obtain search term from user
   "   a:1         : Text to search for. If nothing is specified when exec=0, user has to input on the command line
   "
   " Find type is determined by a getchar() call. Both bare-chars and control-chars (s / <C-S>) etc. are supported
@@ -635,7 +609,7 @@ function! my#CscopeMap(view, exec, ...)                                         
   let l:type = (l:type ==# 'y' ? 's' : l:type )
   let cmd .= 'cscope find ' . l:type
 
-  if (a:exec == 0)
+  if a:exec
     call feedkeys( ':' . cmd . ' ')
     return
   endif
@@ -665,93 +639,6 @@ command! -range -nargs=0 Overline        call my#CombineSelection(<line1>, <line
 command! -range -nargs=0 Underline       call my#CombineSelection(<line1>, <line2>, '0332')
 command! -range -nargs=0 DoubleUnderline call my#CombineSelection(<line1>, <line2>, '0333')
 command! -range -nargs=0 Strikethrough   call my#CombineSelection(<line1>, <line2>, '0336')
-
-
-function! my#SetupMergeLayout()                                                                                   " {{{1
-  " Description: Setup layout for merges
-  "              Tab 1: Main window with all 4 panes (Clockwise from top-left)
-  "                - Base (Original), Remote (Theirs), Local (Yours) and Merge
-  "              Tab 2: Diff of Base v/s Remote
-  "              Tab 3: Diff of Base v/s Local
-  "              Tab 4: Diff of Remote v/s Local
-  "              Tab 5: Diff of Remote v/s Merge
-  "              Tab 6: Diff of Local  v/s Merge
-  "
-  "              Git     v/s  Perforce
-  "              Base     |   Original
-  "              Remote   |   Theirs
-  "              Local    |   Yours
-  "              Merge    |   Merge
-
-  " Arguments: All arguments are optional and the only thing they're used for is to name the tabs
-  let l:base_str   = get(a:000, 0, 'Base')
-  let l:remote_str = get(a:000, 1, 'Remote')
-  let l:local_str  = get(a:000, 2, 'Local')
-  let l:merge_str  = get(a:000, 3, 'Merge')
-
-  let l:base   = argv(0)
-  let l:remote = argv(1)
-  let l:local  = argv(2)
-  let l:merge  = argv(3)
-
-  " Init
-  tabonly|wincmd o
-
-  " Main merging tab
-  exec "b " . l:merge
-  wincmd s
-  wincmd t
-  exec "b " . l:base
-  wincmd v
-  exec "b " . l:remote
-  wincmd v
-  exec "b " . l:local
-  set readonly
-  windo diffthis
-  let t:guitablabel='Main'
-
-  " Diff - Base vs Remote
-  exec "tabe " . l:base
-  wincmd v
-  exec "b " . l:remote
-  windo diffthis
-  let t:guitablabel = l:base_str . ' v/s ' . l:remote_str
-
-  " Diff - Base vs Local
-  exec "tabe " . l:base
-  wincmd v
-  exec "b " . l:local
-  set readonly
-  windo diffthis
-  let t:guitablabel = l:base_str . ' v/s ' . l:local_str
-
-  " Diff - Remote vs Local
-  exec "tabe " . l:remote
-  wincmd v
-  exec "b " . l:local
-  set readonly
-  windo diffthis
-  let t:guitablabel = l:remote_str . ' v/s ' . l:local_str
-
-  " Diff - Remote vs Merge
-  exec "tabe " . l:remote
-  wincmd v
-  exec "b " . l:merge
-  windo diffthis
-  let t:guitablabel = l:remote_str . ' v/s Merge'
-
-  " Diff - Local vs Merge
-  exec "tabe " . l:local
-  wincmd v
-  exec "b " . l:merge
-  set readonly
-  windo diffthis
-  let t:guitablabel = l:local_str . ' v/s Merge'
-
-  set columns=400
-  tabdo wincmd =
-  tabfirst
-endfunction
 
 
 function! my#SetDiffFileType()                                                                                    " {{{1
@@ -843,6 +730,100 @@ function! my#WindowToggleZoom ()                                                
   endif
 endfunction
 " }}}1
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" VERSION CONTROL                                                                                                 " {{{1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! my#VcsSetupMergeLayout()                                                                                " {{{2
+  " Description: Setup layout for merges
+  "              Tab 1: Main window with all 4 panes (Clockwise from top-left)
+  "                - Base (Original), Remote (Theirs), Local (Yours) and Merge
+  "              Tab 2: Diff of Base v/s Remote
+  "              Tab 3: Diff of Base v/s Local
+  "              Tab 4: Diff of Remote v/s Local
+  "              Tab 5: Diff of Remote v/s Merge
+  "              Tab 6: Diff of Local  v/s Merge
+  "
+  "              Git     v/s  Perforce
+  "              Base     |   Original
+  "              Remote   |   Theirs
+  "              Local    |   Yours
+  "              Merge    |   Merge
+
+  " Arguments: All arguments are optional and the only thing they're used for is to name the tabs
+  let l:base_str   = get(a:000, 0, 'Base')
+  let l:remote_str = get(a:000, 1, 'Remote')
+  let l:local_str  = get(a:000, 2, 'Local')
+  let l:merge_str  = get(a:000, 3, 'Merge')
+
+  let l:base   = argv(0)
+  let l:remote = argv(1)
+  let l:local  = argv(2)
+  let l:merge  = argv(3)
+
+  " Init
+  tabonly|wincmd o
+
+  " Main merging tab
+  exec "b " . l:merge
+  wincmd s
+  wincmd t
+  exec "b " . l:base
+  wincmd v
+  exec "b " . l:remote
+  wincmd v
+  exec "b " . l:local
+  set readonly
+  windo diffthis
+  let t:guitablabel='Main'
+
+  " Diff - Base vs Remote
+  exec "tabe " . l:base
+  wincmd v
+  exec "b " . l:remote
+  windo diffthis
+  let t:guitablabel = l:base_str . ' v/s ' . l:remote_str
+
+  " Diff - Base vs Local
+  exec "tabe " . l:base
+  wincmd v
+  exec "b " . l:local
+  set readonly
+  windo diffthis
+  let t:guitablabel = l:base_str . ' v/s ' . l:local_str
+
+  " Diff - Remote vs Local
+  exec "tabe " . l:remote
+  wincmd v
+  exec "b " . l:local
+  set readonly
+  windo diffthis
+  let t:guitablabel = l:remote_str . ' v/s ' . l:local_str
+
+  " Diff - Remote vs Merge
+  exec "tabe " . l:remote
+  wincmd v
+  exec "b " . l:merge
+  windo diffthis
+  let t:guitablabel = l:remote_str . ' v/s Merge'
+
+  " Diff - Local vs Merge
+  exec "tabe " . l:local
+  wincmd v
+  exec "b " . l:merge
+  set readonly
+  windo diffthis
+  let t:guitablabel = l:local_str . ' v/s Merge'
+
+  set columns=400
+  tabdo wincmd =
+  tabfirst
+endfunction
+
+
+" }}}2
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

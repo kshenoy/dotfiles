@@ -47,5 +47,8 @@
 
   set background=light
   colorscheme solarized
-  "set background=dark
-  "colorscheme base16-ocean
+  " colorscheme sol
+
+  " set background=dark
+  " colorscheme base16-ocean
+  " colorscheme one

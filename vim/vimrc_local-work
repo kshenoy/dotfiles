@@ -2,24 +2,20 @@
 " LOCAL SETTINGS
 "
 function! s:SetLocalSettings(filename)
-  if ($STEM != "")
-    let l:p4path = substitute(split(system("p4 files " . a:filename), '\s\+')[0], '#\d\+$', '', '')
-    if (l:p4path =~ '^//depot')
-      " Current file is under a REPO
-      if (l:p4path =~ 'ch/rtl')
-        setlocal textwidth=80
-      elseif (l:p4path =~ '\vch/verif/(chk_)?l3')
-        setlocal textwidth=100
-      endif
-      let &l:colorcolumn=(&l:textwidth+1)
-      let b:OrigamiFoldAtCol=(&l:textwidth - 3)
-    endif
+  if (a:filename =~ 'ch/rtl')
+    setlocal textwidth=80
+    setlocal softtabstop=3
+    setlocal shiftwidth=3
+  elseif (a:filename =~ '\vch/verif/(chk_|arch_)?l3')
+    setlocal textwidth=100
   endif
+  let &l:colorcolumn=(&l:textwidth+1)
+  let b:OrigamiFoldAtCol=(&l:textwidth - 3)
 endfunction
 
 augroup AMD
   autocmd!
-  autocmd BufNewFile,BufRead *.txl set filetype=ruby.txl
-  autocmd BufNewFile,BufRead *.rdl set filetype=ruby.rdl
+  autocmd BufNewFile,BufRead *.txl,*.rdl execute "set filetype=ruby.".expand('<afile>:e')
   autocmd BufRead * call s:SetLocalSettings(expand('<afile>:p'))
+  autocmd BufRead *_if.h let b:fswitchfnames='/_if$//'
 augroup END

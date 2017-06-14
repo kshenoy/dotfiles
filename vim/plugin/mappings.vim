@@ -1,6 +1,6 @@
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Leader commands                                                                                                   {{{1
-"""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" LEADER COMMANDS                                                                                                   {{{1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 """ S
 nnoremap <silent> <leader>so :so $MYVIMRC<BAR>so $MYGVIMRC<CR>
@@ -11,9 +11,9 @@ nnoremap <silent> <expr> <leader>sd ':set lines=' . (tabpagenr("$") == 1 ? '66' 
 
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " GOTO commands                                                                                                     {{{1
-"""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 execute 'nnoremap <silent> govv :e ' . g:dotvim . '/vimrc<CR>'
 execute 'nnoremap <silent> govg :e ' . g:dotvim . '/gvimrc<CR>'
@@ -36,13 +36,16 @@ noremap <F1> :vert bo h index<CR>
 
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Re-mapping for convenience                                                                                        {{{1
-""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" RE-MAPPING FOR CONVENIENCE                                                                                        {{{1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 """ Netrw
 "nnoremap - :Ex<CR>
 "autocmd FileType netrw nnoremap qq :Rex<CR>
+
+""" Remap <CR> to accept the selected entry from the popup menu - Messes up endwise
+" inoremap <expr> <silent> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
 """ Remap w to behave as 'w' should in all cases (:h cw). Use ce to do what 'cw' used to
 onoremap <silent> <expr> w (v:count > 1 ? ":normal! " . v:count . "w<CR>" : ":normal! w<CR>")
@@ -53,7 +56,7 @@ command! W w !sudo tee % > /dev/null
 
 """ Show full file path while opening file
 cabbrev %% <C-R>=fnameescape( expand( '%:p' ))<CR>
-nnoremap <leader>s% :source <C-R>=fnameescape( expand( '%:p' ))<CR><CR>
+nnoremap <leader>s% :silent! source <C-R>=fnameescape( expand( '%:p' ))<CR><CR>
 cabbrev <expr> E (( getcmdtype() == ':' && getcmdpos() <= 2 ) ? 'e <C-R>=fnameescape( expand( "%:p:h" ))."/"<CR><C-R>=my#EatChar("\\s")<CR>' : 'E' )
 
 """ Display full path and filename
@@ -104,8 +107,8 @@ nnoremap <silent> g* *
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Indentation and styling                                                                                           {{{1
-"""""""""""""""""""""""""""
+" INDENTATION AND STYLING                                                                                           {{{1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 """ Tab
 """ Preserve visual block after indenting
@@ -138,9 +141,9 @@ nnoremap <silent> <expr> cok ':set colorcolumn=' . (&colorcolumn=='0' ? '+1' : 0
 
 
 
-"
-" Navigation                                                                                                        {{{1
-"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" NAVIGATION                                                                                                        {{{1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " % jumps from if-else-end while g% reverse jumps
 nmap <A-%> g%
@@ -155,8 +158,8 @@ nmap <A-%> g%
 "   'f'   file:     open the filename under cursor
 "   'i'   includes: find files that include the filename under cursor
 "   'd'   called:   find functions that function under cursor calls
-nnoremap <silent>  <C-\> :call my#CscopeMap('l', 1)<CR>
-nnoremap <silent> g<C-\> :call my#CscopeMap('l', 0)<CR>
+nnoremap <silent>  <C-\> :call my#CscopeMap('l', 0)<CR>
+nnoremap <silent> g<C-\> :call my#CscopeMap('l', 1)<CR>
 
 """ Move by visual lines
 noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
@@ -192,9 +195,9 @@ map g} <Plug>(ParJumpForward)
 
 
 
-"
-" Buffers, Windows, Tabs                                                                                            {{{1
-"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" BUFFERS, WINDOWS, TABS                                                                                            {{{1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 """ Buffers
 "nnoremap gb :<C-U>exec (v:count ? 'b '.v:count : 'bn')<cr>
@@ -259,9 +262,9 @@ autocmd CmdwinEnter * noremap <buffer> <S-CR> <CR>q:
 cnoremap <C-W> <C-R>=my#CmdIsk(1)<CR><C-W><C-R>=my#CmdIsk(0)<CR>
 
 
-"
-" Search and replace                                                                                                {{{1
-"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" SEARCH AND REPLACE                                                                                                {{{1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " |--------+------------+-----------------------------------------------------------------------------------------|
 " | Mode   | Map        | Description                                                                             |
 " |--------+------------+-----------------------------------------------------------------------------------------|
@@ -352,20 +355,17 @@ nnoremap cg* g*<C-O>cgn
 
 
 
-"
-" Misc                                                                                                              {{{1
-"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" MISC                                                                                                              {{{1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-""" Show help on the word below cursor (Note: :h has be remapped to 'vert bo h')
+""" Show help on the word below cursor (Note: :h has been remapped to 'vert bo h')
 nnoremap <silent> <S-F1> :h <C-R><C-W><CR>
 imap     <S-F1> <C-\><C-O><S-F1>
 
 """ Ctrl+S functionality for save
 nnoremap <silent> <C-S> :execute ':silent :wall!'<CR>
 imap     <silent> <C-S> <C-\><C-O><C-S>
-
-""" Fullscreen
-nnoremap <silent> <F11> :if &go=~#'m'<Bar>set go-=m<Bar>else<Bar>set go+=m<Bar>endif<CR>
 
 """ Copy-paste to system register
 nnoremap <silent> <A-y> "+y
@@ -381,3 +381,6 @@ nnoremap <F12> :call my#UpdateTags()<CR>
 
 """ Execute selection as vimscript
 vnoremap g: <Esc>:@*<CR>
+
+""" Run peforce diff on current file
+nnoremap <leader>vd :!p4 diff %<CR>

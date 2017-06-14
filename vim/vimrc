@@ -119,6 +119,9 @@ if DISABLE_FROM == 5 | finish | endif
 syntax on                                                                                   " Enable syntax highlighting
 set synmaxcol=1000                                                       " Don't syntax highlight lines longer than this
 set hlsearch                                                                 " Search highlighting : Enabled by default.
+if has('termguicolors')
+  set termguicolors
+endif
 "set cursorcolumn                                                                     " Highlight the line of the cursor
 "set cursorline                                                                     " Highlight the column of the cursor
 if exists('+colorcolumn')
@@ -160,14 +163,19 @@ if DISABLE_FROM == 8 | finish | endif
 set esckeys                                                                    " Allow use of cursor keys in insert mode
 
 " Setup default highlight groups for the cursors
-set gcr=n:block-NormalCursor/lCursor
-set gcr+=v:block-VisualCursor/lCursor
-set gcr+=c:ver25-CommandCursor/lCursor
-set gcr+=ve:ver35-VisualCursor/lCursor
-set gcr+=o:hor20-CommandCursor/lCursor
-set gcr+=i-ci:ver25-InsertCursor/lCursor
-set gcr+=r-cr:hor20-ReplaceCursor/lCursor
-set gcr+=sm:block-InsertCursor-blinkwait175-blinkoff150-blinkon175
+for i in ['Normal', 'Visual', 'Command', 'Insert', 'Replace']
+  if !hlexists(i.'Cursor')
+    execute 'highlight link ' . i . 'Cursor Cursor'
+  endif
+endfor
+set guicursor=n:block-NormalCursor/lCursor
+set guicursor+=v:block-VisualCursor/lCursor
+set guicursor+=c:ver25-CommandCursor/lCursor
+set guicursor+=ve:ver35-VisualCursor/lCursor
+set guicursor+=o:hor20-CommandCursor/lCursor
+set guicursor+=i-ci:ver25-InsertCursor/lCursor
+set guicursor+=r-cr:hor20-ReplaceCursor/lCursor
+set guicursor+=sm:block-InsertCursor-blinkwait175-blinkoff150-blinkon175
 
 set title                                                      " Set title of VIM window to <filename> (<filepath>) type
 set titlestring=%t%(\ %M%)%(\ (%{expand(\"%:~:.:h\")})%)%(\ %a%)
@@ -234,7 +242,10 @@ set backspace=indent,eol,start        " Allow backspace to erase previously ente
 set formatoptions+=j                                                        " Remove a comment leader when joining lines
 set formatoptions+=n                                                                          " Recognize numbered lists
 set complete=.,w,b,u,t,kspell   " Scan current buffer, open windows, other unloaded buffers, tags but not included files
-set completeopt=menu,menuone,noinsert                                                           " Insert mode completion
+set completeopt=menu                                                                " Use popup menu to show completions
+set completeopt+=menuone                                                       " Show popup menu even for a single match
+set completeopt+=noinsert                                                        " Do not insert any text until selected
+set completeopt+=noselect                                                               " Do not select a match on popup
 set pumheight=20
 set omnifunc=syntaxcomplete#Complete                             " Function for filetype-specific Insert mode completion
 set showmatch                                                                                     " Show matching braces
@@ -422,7 +433,7 @@ if has('autocmd')
   " Perforce related
   augroup Perforce
     autocmd!
-    autocmd FileChangedRO * call perforce#Checkout()
+    autocmd FileChangedRO * call perforce#Checkout(expand('<afile>:p'))
   augroup END
 
   " Diff related

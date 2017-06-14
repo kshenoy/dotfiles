@@ -81,6 +81,8 @@ function! s:UpdateUserColors()                                                  
     return
   endif
 
+  " Approximations of the colors I want: Insert - Blue, Replace - Red, Visual - Orange, etc.
+  " Colorscheme specific colors, if any, will be set from .vim/after/colors/<colorscheme>.vim
   silent execute 'highlight InsertCursor  guibg=DodgerBlue3 guifg=' . l:norm_bg
   silent execute 'highlight ReplaceCursor guibg=Red3        guifg=' . l:norm_bg
   silent execute 'highlight VisualCursor  guibg=Orange3     guifg=' . l:norm_bg
@@ -94,7 +96,7 @@ call s:ReadBase16Config()
 if has('autocmd')
   augroup Color
     autocmd!
-    autocmd FocusGained * call s:ReadBase16Config()
+    " autocmd FocusGained * call s:ReadBase16Config()
     autocmd Colorscheme * call s:After()
   augroup END
 endif
