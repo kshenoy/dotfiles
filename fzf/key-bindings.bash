@@ -1,16 +1,22 @@
 __fzf_select__() {                                                                                                # {{{1
   local _arg=${1:-'.'}
-  local _cmd="${FZF_CTRL_T_COMMAND:-"command find -L ${_arg} \\( -path '*/\\.*' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
-    -o -type f -print \
-    -o -type d -print \
-    -o -type l -print 2> /dev/null | sed -e '1d' -e 's:$_arg/::' "}"
 
-  # The while loop is required to print them all out in one line
-  # eval "$_cmd | fzf -m $FZF_CTRL_T_OPTS" | while read -r item; do
-  #   printf '%q ' "$item"
-  # done
-  # echo
-  local _out=($(eval "$_cmd | fzf -m $FZF_CTRL_T_OPTS --expect=alt-v,alt-e,alt-c"))
+  local _worked=false
+  # if [[ -n "$STEM" ]] && [[ $_arg =~ $STEM ]]; then
+  #   # local _cmd="command find -L $STEM -type l -print -o -type d -print 2> /dev/null | sed -e '1d' -e 's:$STEM/::'"
+  #   local _cmd="p4 have | sed 's:^.*$STEM/::'"
+  #   local _out=($(eval "$_cmd | fzf -m $FZF_CTRL_T_OPTS --expect=alt-v,alt-e,alt-c"))
+  # fi
+
+  if [[ ! _worked ]]; then
+    local _cmd="${FZF_CTRL_T_COMMAND:-"command find -L ${_arg} \
+      \\( -path '*/\\.*' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
+      -o -type f -print \
+      -o -type d -print \
+      -o -type l -print 2> /dev/null | sed -e '1d' -e 's:$_arg/::' "}"
+    local _out=($(eval "$_cmd | fzf -m $FZF_CTRL_T_OPTS --expect=alt-v,alt-e,alt-c"))
+  fi
+
   local _key=$(head -n1 <<< "$_out")
 
   case ${_key} in
@@ -30,41 +36,46 @@ __fzf_select__() {                                                              
   paste -s -d' ' <<< ${_out[@]}
 }
 
-__fzf_select_work__() {
+__fzf_select_work__() {                                                                                           # {{{1
   local _arg=${1:-'.'}
-  if [[ -n "$REPO_PATH" ]] && [[ $_arg =~ $REPO_PATH ]]; then
-    local cmd="find -L ${_arg} -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune \
-                      -o -type d \\( -name build -o -name .ccache -o -name dfx -o -name emu -o -name _env -o \
-                                     -name env_squash -o -name fp -o -name import -o -name libs -o -name powerPro -o \
-                                     -name release_gate_tmp -o -name sdpx -o -name sim -o -name tools -o \
-                                     -wholename '*/ch/syn' -o -wholename '*/ch/rtl/defines/old' -o \
-                                     -wholename '*/ch/variants' -o -wholename '*/ch/verif/dft' -o \
-                                     -wholename '*/txn/gen' -o -wholename '*/ch/verif/txn/yml' \\) -prune \
-                      -o -type f \\( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' -o \
-                                     -iname '*.cc.o' -o -iname '*tags*' \\) -prune \
-                      -o -type f -print -o -type d -print -o -type l -print 2> /dev/null | sed -e '1d' -e 's:$_arg/::' "
-  else
-    local cmd="${FZF_CTRL_T_COMMAND:-"command find -L . \\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -prune \
-      -o -type f -print \
-      -o -type d -print \
-      -o -type l -print "}"
+  if [[ -n "$STEM" ]] && [[ $_arg =~ $STEM ]]; then
+    # local _cmd="command find -L $STEM -type l -print -o -type d -print 2> /dev/null | sed -e '1d' -e 's:$STEM/::'"
+    local _cmd="cat <(p4 have | sed 's:^.*$STEM/::' | \
+                      grep -v 'emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/variants\|ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn') \
+                    <(find import/avf -type f) \
+                | grep -v '\.\(so\|log\)'"
+
+    # local _out=($(eval "$_cmd | fzf -m $FZF_CTRL_T_OPTS --expect=alt-v,alt-e,alt-c"))
   fi
-  eval "$cmd 2> /dev/null | sed 1d | cut -b3- | fzf -m $FZF_CTRL_T_OPTS" | while read -r item; do
-    printf '%q ' "$item"
-  done
+  # if [[ -n "$REPO_PATH" ]] && [[ $_arg =~ $REPO_PATH ]]; then
+  #   local _cmd="find -L ${STEM} -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune \
+  #                     -o -type d \\( -name build -o -name .ccache -o -name dfx -o -name emu -o -name _env -o \
+  #                                    -name env_squash -o -name fp -o -name import -o -name libs -o -name powerPro -o \
+  #                                    -name release_gate_tmp -o -name sdpx -o -name sim -o -name tools -o \
+  #                                    -wholename '*/ch/syn' -o -wholename '*/ch/rtl/defines/old' -o \
+  #                                    -wholename '*/ch/variants' -o -wholename '*/ch/verif/dft' -o \
+  #                                    -wholename '*/txn/gen' -o -wholename '*/ch/verif/txn/yml' \\) -prune \
+  #                     -o -type f \\( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' -o \
+  #                                    -iname '*.cc.o' -o -iname '*tags*' \\) -prune \
+  #                     -o -type f -print -o -type d -print -o -type l -print 2> /dev/null | sed -e '1d' -e 's:$STEM/::' "
+  # fi
+  eval "$_cmd 2> /dev/null"
+  # eval "$_cmd 2> /dev/null | sed 1d | cut -b3- | fzf -m $FZF_CTRL_T_OPTS" | while read -r item; do
+  #   printf '%q ' "$item"
+  # done
   echo
 }
 # }}}1
 
 [[ ! $- =~ i ]] && return
 
-__fzf_use_tmux__() {
+__fzf_use_tmux__() {                                                                                              # {{{1
   [[ -n "$TMUX_PANE" ]] && [[ "${FZF_TMUX:-1}" != 0 ]] && [[ ${LINES:-40} -gt 15 ]]
 }
 
-
 [[ $BASH_VERSINFO -gt 3 ]] && __use_bind_x=1 || __use_bind_x=0
 __fzf_use_tmux__ && __use_tmux=1 || __use_tmux=0
+# }}}1
 
 
 __fzf_cmd__() {                                                                                                   # {{{1

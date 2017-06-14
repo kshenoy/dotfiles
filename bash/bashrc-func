@@ -1,4 +1,4 @@
-#!/bin/bash -f
+#!/usr/bin/env bash
 # Description: Functions for BASH
 
 #typeset -A lsfjobs
@@ -6,6 +6,16 @@
 # BASH_SOURCE is an array variable whose members are the source filenames
 # http://stackoverflow.com/a/12694189/734153
 _src_dir=$(dirname ${BASH_SOURCE[0]})
+
+# Misc utils                                                                                                        {{{1
+[[ -f $_src_dir/utils/base16_color     ]] && . $_src_dir/utils/base16_color
+[[ -f $_src_dir/utils/calc             ]] && . $_src_dir/utils/calc
+[[ -f $_src_dir/utils/cdpp             ]] && . $_src_dir/utils/cdpp
+[[ -f $_src_dir/utils/colm             ]] && . $_src_dir/utils/colm
+[[ -f $_src_dir/utils/jumper           ]] && . $_src_dir/utils/jumper
+[[ -f $_src_dir/utils/query            ]] && . $_src_dir/utils/query
+[[ -f $_src_dir/utils/rationalize_dots ]] && . $_src_dir/utils/rationalize_dots
+
 
 # TMUX                                                                                                              {{{1
 [[ -f $_src_dir/../tmux/tmux_scripts ]] && . $_src_dir/../tmux/tmux_scripts
@@ -58,15 +68,6 @@ duh() {
 }
 
 
-# Misc utils                                                                                                        {{{1
-[[ -f $_src_dir/utils/base16_color     ]] && . $_src_dir/utils/base16_color
-[[ -f $_src_dir/utils/cdpp             ]] && . $_src_dir/utils/cdpp
-[[ -f $_src_dir/utils/colm             ]] && . $_src_dir/utils/colm
-[[ -f $_src_dir/utils/jumper           ]] && . $_src_dir/utils/jumper
-[[ -f $_src_dir/utils/query            ]] && . $_src_dir/utils/query
-[[ -f $_src_dir/utils/rationalize_dots ]] && . $_src_dir/utils/rationalize_dots
-
-
 # Silent push and popd. Use dirs -v for vertical dirstack                                                           {{{1
 pushd() { command pushd $@ > /dev/null ; }
 popd()  { command popd  $@ > /dev/null ; }
@@ -101,54 +102,8 @@ mcd() {
 
 
 # Case conversion                                                                                                   {{{1
-lc() { echo $@ | /usr/bin/tr "[A-Z]" "[a-z]"; }
-uc() { echo $@ | /usr/bin/tr "[a-z]" "[A-Z]"; }
-
-
-# Simple calc                                                                                                       {{{1
-unset -f =
-=() {
-  local _input=${@:-$(</dev/stdin)}
-  local _output=$(echo "$_input" | irb -m --noverbose | command sed 's/"//g')
-  # echo $_input
-  # echo $_output
-
-  # Infer type to format output
-  if [[ $_input =~ 'to_s(16)' ]]; then
-    _output=$(echo $_output | tr '[a-f]' '[A-F]' | command sed -e 's/^/0x/')
-  elif [[ $_input =~ 'to_s(2)' ]]; then
-    _output=$($_output | command sed -e 's/^/0b/')
-  elif [[ ! $_input =~ 'to_s' ]]; then
-    # If there's no output formatting, try to match output base to that of input
-    local _base
-    if [[ $_input =~ 0x ]]; then
-      _base=16
-    elif [[ $_input =~ 0b ]]; then
-      _base=2
-    fi
-    _output=$(= "($_output).to_s(${_base})")
-  fi
-
-  echo $_output
-}
-
-unset -f =b
-=b() {
-  local _input=${@:-$(</dev/stdin)}
-  = "($_input).to_s(2)"
-}
-
-unset -f =d
-=d() {
-  local _input=${@:-$(</dev/stdin)}
-  = "($_input).to_s(10)"
-}
-
-unset -f =h
-=h() {
-  local _input=${@:-$(</dev/stdin)}
-  = "($_input).to_s(16)"
-}
+lc() { echo $@ | tr "[A-Z]" "[a-z]"; }
+uc() { echo $@ | tr "[a-z]" "[A-Z]"; }
 
 
 # @: Simpler/faster alternative to globstar                                                                         {{{1
