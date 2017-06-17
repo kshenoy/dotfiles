@@ -148,19 +148,22 @@ alias gv='g -v'
 
 # If Ag/Pt/Ack exists, use it!!
 if hash ag 2> /dev/null; then
-  alias a='ag'
-  alias ach='ag -G "\.(c|cc|cpp|C|CC)$"'
-  alias ach='ag -G "\.h$"'
+  alias G='ag'
+  alias Gtc='ag -G "\.(c|cc|cpp|C|CC|h|hh|hpp|tpp)$"'
+  alias Gtch='ag -G "\.(h|hh|hpp|tpp)$"'
+  alias Gtcc='ag -G "\.(c|cc|cpp|C|CC)$"'
+  alias Gtsv='ag -G "\.(sv|svh)$"'
+  alias Gtv='ag -G "\.(v|x)$"'
 elif hash pt 2> /dev/null; then
-  alias a='pt'
+  alias G='pt'
 elif hash ack 2> /dev/null; then
-  alias a='ack --color'
-  alias ac='a --type=cpp'
-  alias acc='a --type=cpp --nohh'
-  alias ach='a --type=hh'
+  alias G='ack --color'
+  alias Gtc='a --type=cpp'
+  alias Gtcc='a --type=cpp --nohh'
+  alias Gtch='a --type=hh'
 fi
-alias ai='a -i'
-alias av='a -v'
+alias Gi='G -i'
+alias Gv='G -v'
 
 alias C=cat
 alias P=$PAGER

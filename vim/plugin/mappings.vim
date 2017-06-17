@@ -383,4 +383,4 @@ nnoremap <F12> :call my#UpdateTags()<CR>
 vnoremap g: <Esc>:@*<CR>
 
 """ Run peforce diff on current file
-nnoremap <leader>vd :!p4 diff %<CR>
+nnoremap <leader>pd :!p4 diff %<CR>

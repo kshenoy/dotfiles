@@ -406,8 +406,6 @@ let g:netrw_liststyle=3
 command! -bar -nargs=0 IncFontSize :let &guifont = substitute(&guifont, '\d\+', '\=submatch(0)+1', 'g')
 command! -bar -nargs=0 DecFontSize :let &guifont = substitute(&guifont, '\d\+', '\=submatch(0)-1', 'g')
 
-" command! -bar -nargs=0 P4DIFF execute "!p4 diff " . expand('%:p') . " &"
-
 """ Autocommands                                                                                                    {{{2
 if has('autocmd')
   " File and view saving related
@@ -443,7 +441,14 @@ if has('autocmd')
     autocmd VimEnter * if &diff|call my#SetDiffFileType()|endif
   augroup END
 endif
-" }}}2 }}}1
+" }}}2
+
+TODO_CLEANUP
+
+""" Custom Keyword Highlighting
+syn match myTodo '\(TODO\|FIXME\|BOZO\)\(_\w\+\)\?'
+hi def link myTodo Todo
+" }}}1
 
 """ Local vimrc
 let s:user = substitute(g:dotvim, '\v/home/(\w+)/.*', '\1', '')

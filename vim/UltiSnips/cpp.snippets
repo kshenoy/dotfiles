@@ -21,12 +21,14 @@ endglobal
 # Headers                                                                                                           {{{1
 #
 snippet inc "#include <>" b
-#include <$1`!p
-opts = ['algorithm', 'cassert', 'array', 'cstdio', 'cstdlib', 'cstring', 'fstream', 'iostream', 'sstream', 'string']
+#include ${2/>/</}$1`!p
+opts = ['algorithm', 'cassert', 'array', 'cstdio', 'cstdlib', 'cstring', 'fstream', 'iostream', 'list', 'map',
+        'memory', 'sstream', 'string', 'unordered_map', 'vector']
+opts.sort()
 if snip.basename:
   opts.insert(0, snip.basename + '.h')
 snip.rv = complete(t[1], opts)
-`>
+`${2:>}
 endsnippet
 
 
@@ -34,7 +36,7 @@ endsnippet
 #=======================================================================================================================
 # Namespaces                                                                                                        {{{1
 #
-snippet ns "namespace ..."
+snippet ns "namespace ..." b
 namespace${1/.+/ /m}${1:`!p snip.rv = snip.basename or "name"`} {
 
   ${VISUAL}${0}
@@ -45,7 +47,7 @@ snip.rv = "anonymous " if (len(t[1]) == 0) else ""
 endsnippet
 
 
-snippet uns "using namespace ..."
+snippet uns "using namespace ..." b
 using namespace ${1:std};
 endsnippet
 
@@ -69,19 +71,19 @@ endsnippet
 
 
 #=======================================================================================================================
-# Using/typedefs                                                                                                    {{{1
-#
-snippet 'us(ing)?' "using typedef ..." rb
-using ${1} = ${0}
-endsnippet
-
-
-
-#=======================================================================================================================
-# Templates                                                                                                         {{{1
+# Using/typedefs/templates                                                                                          {{{1
 #
 snippet tp "template <typename T>" b
 template <typename ${1:T}>
+endsnippet
+
+snippet tpus "template using" b
+template <typename ${1:T}>
+using $2 = $0
+endsnippet
+
+snippet 'us(ing)?' "using (typedef) ..." rb
+using ${1} = ${0}
 endsnippet
 
 
@@ -129,33 +131,45 @@ endsnippet
 
 
 #=======================================================================================================================
+# Casting                                                                                                           {{{1
+#
+snippet sca "static_cast<T>()" w
+static_cast<${1:T}>(${0:${VISUAL}})
+endsnippet
+
+
+#=======================================================================================================================
 # STL                                                                                                               {{{1
 #
 snippet be "<STL>.begin(), <STL>.end()" w
 ${1:${VISUAL:v}}${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}begin(), $1${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}end()
 endsnippet
 
-snippet forbe "Iterate over STL container"
-for (${1:::std::vector<int>}::const_iterator ${3:it}=${2:v}.begin(), ${4:it_last}=$2.end(); 
+snippet forbe "Iterate over STL container" b
+for (${1:::std::vector<int>}::const_iterator ${3:it}=${2:v}.begin(), ${4:it_last}=$2.end();
      $3 != $4; ++$3) {
   ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
 }
 endsnippet
 
 snippet map "std::map" w
-std::map<${1:key}, ${2:value}> ${3:myMap};
+std::map<${1:key}, ${2:value}>$0
 endsnippet
 
 snippet umap "std::unordered_map" w
-std::unordered_map<${1:key}, ${2:value}> ${3:myMap};
+std::unordered_map<${1:key}, ${2:value}>$0
 endsnippet
 
-snippet list "std::list"
-std::list<${1:value}> ${2:myList};
+snippet list "std::list" w
+std::list<${1:${VISUAL:T}}>$0
 endsnippet
 
-snippet vector "std::vector"
-std::vector<${1:value}> ${2:myVec};
+snippet 'vec(tor)?' "std::vector" rw
+std::vector<${1:${VISUAL:T}}>$0
+endsnippet
+
+snippet 'arr(ay)?' "std::array" rw
+std::array<${1:${VISUAL:T}}, ${2:N}>$0
 endsnippet
 
 

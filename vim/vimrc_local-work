@@ -6,7 +6,7 @@ function! s:SetLocalSettings(filename)
     setlocal textwidth=80
     setlocal softtabstop=3
     setlocal shiftwidth=3
-  elseif (a:filename =~ '\vch/verif/(chk_|arch_)?l3')
+  elseif (a:filename =~ '\vch/verif/(chk_)?l3')
     setlocal textwidth=100
   endif
   let &l:colorcolumn=(&l:textwidth+1)
@@ -16,6 +16,6 @@ endfunction
 augroup AMD
   autocmd!
   autocmd BufNewFile,BufRead *.txl,*.rdl execute "set filetype=ruby.".expand('<afile>:e')
-  autocmd BufRead * call s:SetLocalSettings(expand('<afile>:p'))
-  autocmd BufRead *_if.h let b:fswitchfnames='/_if$//'
+  autocmd BufNewFile,BufRead * call s:SetLocalSettings(expand('<afile>:p'))
+  autocmd BufNewFile,BufRead *_if.h let b:fswitchfnames='/_if$//'
 augroup END

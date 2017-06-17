@@ -51,6 +51,7 @@ call plug#('lifepillar/vim-mucomplete')
 call plug#('kshenoy/vim-origami')
 call plug#('dhruvasagar/vim-table-mode',       {'on': ['TableModeToggle', 'TableModeEnable']})
 call plug#('SirVer/ultisnips',                 s:PlugCond(has('python')||has('python3')))
+call plug#('triglav/vim-visual-increment')
 
 " Misc -----------------------------------------------------------------------------------------------------------------
 call plug#('tpope/vim-abolish')

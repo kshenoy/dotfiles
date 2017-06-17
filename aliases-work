@@ -175,19 +175,18 @@ unset -f make_wa_vars
 make_wa_vars() {
   local _proj _ch _wa _scr
   for _proj in as ah br; do
-    local _proj_ucase=$(tr 'a-z' 'A-Z' <<< ${_proj})
-    local _proj_ucase_full=$(sed -e 's/as/ASPEN/i' -e 's/ah/ASPEN_HIGHLANDS/i' -e 's/br/BRECKENRIDGE/i' <<< ${_proj_ucase})
+    local _proj_full=$(sed -e 's/as/ASPEN/i' -e 's/ah/ASPEN_HIGHLANDS/i' -e 's/br/BRECKENRIDGE/i' <<< $_proj)
 
     for _ch in {0..1}; do
-      eval "export ${_proj}${_ch}='/proj/ch_func_dev${_ch}/${_proj_ucase}'"
-      eval "export ${_proj}${_ch}ks='/proj/ch_func_dev${_ch}/${_proj_ucase}/kshenoy'"
+      eval "export ${_proj}${_ch}='/proj/ch_func_dev${_ch}/${_proj_full}'"
+      eval "export ${_proj}${_ch}ks='/proj/ch_func_dev${_ch}/${_proj_full}/kshenoy'"
       for _wa in {1..6}; do
-        eval "export ${_proj}${_ch}${_wa}='/proj/ch_func_dev${_ch}/${_proj_ucase}/kshenoy/${_proj}${_ch}${_wa}'"
+        eval "export ${_proj}${_ch}${_wa}='/proj/ch_func_dev${_ch}/${_proj_full}/kshenoy/${_proj}${_ch}${_wa}'"
       done
     done
 
     for _scr in {0..2}; do
-      eval "export ${_proj}s${_scr}='/proj/ch_func_gen_scratch${_scr}/${_proj_ucase_full}'"
+      eval "export ${_proj}s${_scr}='/proj/ch_func_gen_scratch${_scr}/${_proj_full}'"
     done
   done
 }
