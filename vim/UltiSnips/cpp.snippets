@@ -22,8 +22,8 @@ endglobal
 #
 snippet inc "#include <>" b
 #include ${2/>/</}$1`!p
-opts = ['algorithm', 'cassert', 'array', 'cstdio', 'cstdlib', 'cstring', 'fstream', 'iostream', 'list', 'map',
-        'memory', 'sstream', 'string', 'unordered_map', 'vector']
+opts = ['algorithm', 'cassert', 'array', 'cstdio', 'cstdlib', 'cstring', 'fstream', 'iostream', 'list', 'map', 'memory',
+        'sstream', 'string', 'unordered_map', 'vector']
 opts.sort()
 if snip.basename:
   opts.insert(0, snip.basename + '.h')
@@ -37,7 +37,7 @@ endsnippet
 # Namespaces                                                                                                        {{{1
 #
 snippet ns "namespace ..." b
-namespace${1/.+/ /m}${1:`!p snip.rv = snip.basename or "name"`} {
+namespace${1/.+/ /m}${1:nCh} {
 
   ${VISUAL}${0}
 
@@ -103,38 +103,34 @@ endsnippet
 
 
 #=======================================================================================================================
-# Pointers                                                                                                          {{{1
+# Smart Pointers                                                                                                          {{{1
 #
-snippet bsp "boost::shared_ptr" w
-boost::shared_ptr< ${1:${VISUAL}} >$0
+snippet sp "std::smart_ptr" w
+std::$1`!p snip.rv = complete(t[1], ['shared', 'unique', 'weak'])`_ptr<${2:${VISUAL}}>
 endsnippet
 
-snippet bms "boost::make_shared" w
-boost::make_shared< ${1:${VISUAL}} >($0)
+snippet spm "std::make_smart" w
+std::make_$1`!p snip.rv = complete(t[1], ['shared', 'unique', 'weak'])`<${2:${VISUAL}}>($0)
 endsnippet
 
-snippet ssp "std::shared_ptr" w
-std::shared_ptr< ${1:${VISUAL}} >$0
+snippet bp "boost::smart_ptr" w
+boost::$1`!p snip.rv = complete(t[1], ['shared', 'unique', 'weak'])`_ptr<${2:${VISUAL}}>
 endsnippet
 
-snippet sms "std::make_shared" w
-std::make_shared< ${1:${VISUAL}} >($0)
-endsnippet
-
-snippet sup "std::unique_ptr" w
-std::unique_ptr< ${1:${VISUAL}} >$0
-endsnippet
-
-snippet smu "std::make_unique" w
-std::make_unique< ${1:${VISUAL}} >($0)
+snippet bpm "boost::make_smart" w
+boost::make_$1`!p snip.rv = complete(t[1], ['shared', 'unique', 'weak'])`<${2:${VISUAL}}>($0)
 endsnippet
 
 
 #=======================================================================================================================
 # Casting                                                                                                           {{{1
 #
-snippet sca "static_cast<T>()" w
+snippet cs "static_cast<T>()" w
 static_cast<${1:T}>(${0:${VISUAL}})
+endsnippet
+
+snippet csp "static_pointer_cast<T>()" w
+boost::static_pointer_cast<${1:T}>(${0:${VISUAL}})
 endsnippet
 
 
