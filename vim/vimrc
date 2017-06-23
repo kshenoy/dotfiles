@@ -442,12 +442,6 @@ if has('autocmd')
   augroup END
 endif
 " }}}2
-
-TODO_CLEANUP
-
-""" Custom Keyword Highlighting
-syn match myTodo '\(TODO\|FIXME\|BOZO\)\(_\w\+\)\?'
-hi def link myTodo Todo
 " }}}1
 
 """ Local vimrc
