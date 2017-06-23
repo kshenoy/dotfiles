@@ -31,8 +31,8 @@ if has('autocmd')
   autocmd!
 endif
 
-if filereadable(glob(g:dotvim . '/bundle.vim'))
-  execute 'source ' . g:dotvim . '/bundle.vim'
+if filereadable(glob(g:dotvim . '/bundles.vim'))
+  execute 'source ' . g:dotvim . '/bundles.vim'
 endif
 filetype plugin indent on
 

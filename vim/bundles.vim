@@ -3,8 +3,8 @@
 "
 
 " Automatically install plugins
-if empty(glob('~/.vim/autoload/plug.vim'))
-  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+if empty(glob('~/.vim/pack/bundles/start/vim-plug/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/pack/bundles/start/vim-plug/autoload/plug.vim --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   augroup Plug
     autocmd!
@@ -12,7 +12,7 @@ if empty(glob('~/.vim/autoload/plug.vim'))
   augroup END
 endif
 
-call plug#begin(expand(g:dotvim . '/bundle/'))
+call plug#begin(expand(g:dotvim . '/pack/bundles/opt/'))
 
 function! s:PlugCond(cond, ...)
   let opts = get(a:000, 0, {})

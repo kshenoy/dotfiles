@@ -23,7 +23,7 @@ emacs.d/*unison*
 fonts/
 unity/
 vim/autoload/plug*
-vim/bundle
+vim/pack/bundles
 vim/pythonx/UltiSnips_globals.pyc
 vim/pythonx/vimsnippets.pyc
 vim/tmp

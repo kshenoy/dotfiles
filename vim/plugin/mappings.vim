@@ -19,7 +19,7 @@ execute 'nnoremap <silent> govv :e ' . g:dotvim . '/vimrc<CR>'
 execute 'nnoremap <silent> govg :e ' . g:dotvim . '/gvimrc<CR>'
 execute 'nnoremap <silent> govf :e ' . g:dotvim . '/autoload/my.vim<CR>'
 execute 'nnoremap <silent> govm :e ' . g:dotvim . '/plugin/mappings.vim<CR>'
-execute 'nnoremap <silent> govb :e ' . g:dotvim . '/bundle.vim<CR>'
+execute 'nnoremap <silent> govb :e ' . g:dotvim . '/bundles.vim<CR>'
 
 nnoremap <silent> gosa :e ~/.dotfiles/aliases<CR>
 nnoremap <silent> gosf :e ~/.dotfiles/bash/bashrc-func<CR>

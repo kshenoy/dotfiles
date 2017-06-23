@@ -228,7 +228,7 @@ alias vd=gvim_diff
 
 # alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
 alias vi='vim --config NONE'
-alias govb='$VISUAL ~/.vim/bundle.vim'
+alias govb='$VISUAL ~/.vim/bundles.vim'
 alias govf='$VISUAL ~/.vim/autoload/my.vim'
 alias govg='$VISUAL ~/.vim/gvimrc'
 alias govm='$VISUAL ~/.vim/plugin/mappings.vim'
