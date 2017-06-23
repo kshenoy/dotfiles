@@ -15,7 +15,8 @@ endfunction
 
 augroup AMD
   autocmd!
-  autocmd BufNewFile,BufRead *.txl,*.rdl execute "set filetype=ruby.".expand('<afile>:e')
-  autocmd BufNewFile,BufRead * call s:SetLocalSettings(expand('<afile>:p'))
-  autocmd BufNewFile,BufRead *_if.h let b:fswitchfnames='/_if$//'
+  autocmd BufNewFile,BufRead *.txl,*.rdl   execute "set filetype=ruby.".expand('<afile>:e')
+  autocmd BufNewFile,BufRead *             call s:SetLocalSettings(expand('<afile>:p'))
+  autocmd BufNewFile,BufRead *_if.h        let b:fswitchfnames='/_if$//'
+  autocmd BufNewFile,BufRead *_provider.cc let b:fswitchfnames='/_provider$//'
 augroup END

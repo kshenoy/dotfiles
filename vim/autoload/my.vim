@@ -192,6 +192,7 @@ function! my#SynTrace()                                                         
   "echo l:out
   return l:out
 endfunction
+" FIXME: Get the command working
 command! -nargs=0 SynTrace call my#SynTrace()
 
 

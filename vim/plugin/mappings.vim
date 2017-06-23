@@ -259,6 +259,7 @@ autocmd CmdwinEnter * noremap <buffer> <S-CR> <CR>q:
 
 
 """ To make traversing up the directory tree easier in cmd-mode
+" FIXME: Make this silent
 cnoremap <C-W> <C-R>=my#CmdIsk(1)<CR><C-W><C-R>=my#CmdIsk(0)<CR>
 
 

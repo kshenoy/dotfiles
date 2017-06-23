@@ -152,6 +152,7 @@ if hash ag 2> /dev/null; then
   alias Gtc='ag -G "\.(c|cc|cpp|C|CC|h|hh|hpp|tpp)$"'
   alias Gtch='ag -G "\.(h|hh|hpp|tpp)$"'
   alias Gtcc='ag -G "\.(c|cc|cpp|C|CC)$"'
+  alias Gtsbs='ag -G "\.sbs$"'
   alias Gtsv='ag -G "\.(sv|svh)$"'
   alias Gtv='ag -G "\.(v|x)$"'
 elif hash pt 2> /dev/null; then
