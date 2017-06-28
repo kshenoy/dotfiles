@@ -166,6 +166,16 @@ pfu() {
   [[ -f ~/.fzf.bash ]] && . ~/.fzf.bash
 }
 
+pf_find() {
+  local _scope=""
+  if [[ $1 == "." ]]; then
+    _scope="..."
+    shift;
+  fi
+
+  pf have $_scope | grep $@ | awk '{print $3}' | sed -e "s:$PWD:.:"
+}
+alias pff=pf_find
 
 #=======================================================================================================================
 # Locations                                                                                                         {{{1
@@ -419,10 +429,14 @@ dotty() {
 unset -f but
 but() {
   model=unittest_${1#unittest_}
+  shift;
 
   echo build -model $model
-  build -model $model
-  if (( $? != 0 )); then WhyTheFail; return 1; fi
+  rerun --norun --build --nowtf --model $model $@
+  if (( $? != 0 )); then
+    WhyTheFail;
+    return 1;
+  fi
 
   echo $REPO_PATH/build/${model}/${model}
   ( $REPO_PATH/build/${model}/${model} | tee ${model}.log )

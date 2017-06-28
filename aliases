@@ -149,7 +149,7 @@ alias gv='g -v'
 # If Ag/Pt/Ack exists, use it!!
 if hash ag 2> /dev/null; then
   alias G='ag'
-  alias Gtc='ag -G "\.(c|cc|cpp|C|CC|h|hh|hpp|tpp)$"'
+  alias Gtc='ag -cpp'
   alias Gtch='ag -G "\.(h|hh|hpp|tpp)$"'
   alias Gtcc='ag -G "\.(c|cc|cpp|C|CC)$"'
   alias Gtsbs='ag -G "\.sbs$"'
