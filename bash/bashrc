@@ -5,11 +5,11 @@
 # shopt -q login_shell && echo "Login shell" || echo "Not a login shell"
 # [[ $- == *i* ]] && echo "This is an interactive shell" || echo "This is a script"
 
-#=======================================================================================================================
-# SHELL CONFIGURATION
-#======================
 umask 002
 
+#=======================================================================================================================
+# SHELL CONFIGURATION                                                                                               {{{1
+#======================
 if [[ $- == *i* ]]; then
   # Shell is interactive
   # Turn off TTY "start" and "stop" commands in all interactive shells.
@@ -21,19 +21,117 @@ if [[ $- == *i* ]]; then
   stty ixany # let any character restart output, not only start character
 fi
 
-shopt -s cdspell
+# shopt : https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html
+#    -s : set
+#    -u : unset
+#    -q : check whether set/unset
+
+# If set, a command name that is the name of a directory is executed as if it were the argument to the cd command.
+shopt -u autocd
+
+# If this is set, an argument to the cd builtin command that is not a directory is assumed to be the name of a variable
+# whose value is the directory to change to.
 shopt -s cdable_vars
+
+# If set, minor errors in the spelling of a directory component in a cd command will be corrected.
+# The errors checked for are transposed characters, a missing character, and a character too many.
+# If a correction is found, the corrected path is printed, and the command proceeds.
+shopt -s cdspell
+
+# If this is set, Bash checks that a command found in the hash table exists before trying to execute it.
+# If a hashed command no longer exists, a normal path search is performed.
 shopt -s checkhash
-# Check the window size after each command and, if necessary, update the values of LINES and COLUMNS.
+
+# If set, Bash lists the status of any stopped and running jobs before exiting an interactive shell.
+# If any jobs are running, this causes the exit to be deferred until a second exit is attempted
+# without an intervening command (see Job Control). The shell always postpones exiting if any jobs are stopped.
+shopt -s checkjobs
+
+# If set, Bash checks the window size after each command and, if necessary, updates the values of LINES and COLUMNS.
 shopt -s checkwinsize
-shopt -s mailwarn
-shopt -s sourcepath
-# Force commands entered on multiple lines to be shown on a single line in history file
+
+# If set, Bash attempts to save all lines of a multiple-line command in the same history entry.
 shopt -s cmdhist
-# Append to the history file, don't overwrite it
-shopt -s histappend histreedit
-# History commands (!, !!, etc.) will print to shell for confirmation and not auto-execute
+
+# If set, Bash quotes all shell metacharacters in filenames and directory names when performing completion.
+# If not set, Bash removes metacharacters such as the dollar sign from the set of characters that will be quoted in
+# completed filenames when these metacharacters appear in shell variable references in words to be completed.
+# This means that dollar signs in variable names that expand to directories will not be quoted; however,
+# any dollar signs appearing in filenames will not be quoted, either.
+# This is active only when bash is using backslashes to quote completed filenames.
+shopt -s complete_fullquote
+
+# If set, Bash replaces directory names with the results of word expansion when performing filename completion.
+# This changes the contents of the readline editing buffer. If not set, Bash attempts to preserve what the user typed.
+# shopt -s direxpand
+
+# If set, Bash attempts spelling correction on directory names during word completion if the directory name
+# initially supplied does not exist.
+shopt -s dirspell
+
+# If set, Bash includes filenames beginning with a ‘.’ in the results of filename expansion.
+shopt -s dotglob
+
+# If set, aliases are expanded as described below under Aliases, Aliases.
+# shopt -s expand_aliases
+
+# If set, the extended pattern matching features described above (see Pattern Matching) are enabled.
+# shopt -s extglob
+
+# If set, patterns which fail to match filenames during filename expansion result in an expansion error.
+# shopt -s failglob
+
+# If set, the pattern ‘**’ used in a filename expansion context will match all files and zero or more directories and
+# subdirectories. If the pattern is followed by a ‘/’, only directories and subdirectories match.
+shopt -s globstar
+
+# If set, shell error messages are written in the standard GNU error message format.
+# shopt -s gnu_errfmt
+
+# If set, the history list is appended to the file named by the value of the HISTFILE variable when the shell exits,
+# rather than overwriting the file.
+shopt -s histappend
+
+# If set, and Readline is being used, a user is given the opportunity to re-edit a failed history substitution.
+shopt -s histreedit
+
+# If set, and Readline is being used, the results of history substitution are not immediately passed to the shell parser.
+# Instead, the resulting line is loaded into the Readline editing buffer, allowing further modification.
+# eg. commands using (!, !!, etc.) will print to shell first for confirmation and not auto-execute
 shopt -s histverify
+
+# If set, Bash will send SIGHUP to all jobs when an interactive login shell exits (see Signals).
+shopt -s huponexit
+
+# If set, and job control is not active, the shell runs the last command of a pipeline not executed in the background
+shopt -s lastpipe
+
+# If enabled, and the cmdhist option is enabled, multi-line commands are saved to the history with embedded newlines
+# rather than using semicolon separators where possible.
+shopt -s lithist
+
+# If set, and a file that Bash is checking for mail has been accessed since the last time it was checked,
+# the message "The mail in mailfile has been read" is displayed.
+shopt -s mailwarn
+
+# If set, and Readline is being used, Bash will not attempt to search the PATH for possible completions when completion
+# is attempted on an empty line.
+# shopt -s no_empty_cmd_completion
+
+# If set, Bash matches filenames in a case-insensitive fashion when performing filename expansion.
+# shopt -s nocaseglob
+
+# If set, Bash matches patterns in a case-insensitive fashion when performing matching while executing case or
+# [[ conditional commands, when performing pattern substitution word expansions,
+# or when filtering possible completions as part of programmable completion.
+# shopt -s nocasematch
+
+# If set, Bash allows filename patterns which match no files to expand to a null string, rather than themselves.
+# shopt -s nullglob
+
+# If this is set, the shift builtin prints an error message when the shift count exceeds the number of parameters.
+shopt -s shift_verbose
+
 
 set -o noclobber
 #set -o vi
@@ -43,7 +141,7 @@ set +o nounset
 
 
 #=======================================================================================================================
-# COMPLETION
+# COMPLETION                                                                                                        {{{1
 #=============
 complete -A hostname   rsh rcp telnet rlogin r ftp ping disk
 complete -A export     printenv
@@ -94,7 +192,7 @@ complete -f -o default -X '!*.gif'  kview
 
 
 #=======================================================================================================================
-# ENVIRONMENT VARIABLES
+# ENVIRONMENT VARIABLES                                                                                             {{{1
 #========================
 # History
 HISTSIZE=65535
@@ -131,7 +229,7 @@ LANG=en_US.UTF-8
 
 
 #=======================================================================================================================
-# MISC SETTINGS
+# MISC SETTINGS                                                                                                     {{{1
 #================
 
 # Make less more friendly for non-text input files, see lesspipe(1)
@@ -144,25 +242,12 @@ fi
 
 
 #=======================================================================================================================
-# Bindings
+# BINDINGS                                                                                                          {{{1
 #===========
-# Bang! Previous Command Hotkeys: Print nth argument of the previous command using Alt+1, Alt+2 ...etc
-# http://www.softpanorama.org/Scripting/Shellorama/bash_command_history_reuse.shtml#Bang_commands
-bind '"\e`": "!:0"'
-# bind '"\e1": "!:1 \n"'
-# bind '"\e2": "!:2 \n"'
-# bind '"\e3": "!:3 \n"'
-# bind '"\e4": "!:4 \n"'
-# bind '"\e5": "!:5 \n"'
-
-set -o vi
-bind '"\ee": emacs-editing-mode'
-set -o emacs
-bind '"\ee": vi-editing-mode'
 
 
 #=======================================================================================================================
-# EXTERNAL CUSTOMISATIONS
+# EXTERNAL CUSTOMISATIONS                                                                                           {{{1
 #==========================
 
 # If not running interactively, don't do anything
@@ -192,6 +277,7 @@ for i in \
   # echo "  ... done"
   fi
 done
+# }}}1
 
 
 # Base16 Color scheme for terminal
