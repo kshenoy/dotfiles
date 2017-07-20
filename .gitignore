@@ -24,8 +24,8 @@ fonts/
 unity/
 vim/autoload/plug*
 vim/pack/bundles
-vim/pythonx/UltiSnips_globals.pyc
-vim/pythonx/vimsnippets.pyc
+vim/pack/settings/start/UltiSnips/pythonx/UltiSnips_globals.pyc
+vim/pack/settings/start/UltiSnips/pythonx/vimsnippets.pyc
 vim/tmp
 wallpapers/
 zsh/history
