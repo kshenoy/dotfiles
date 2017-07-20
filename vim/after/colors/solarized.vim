@@ -22,3 +22,12 @@ highlight InsertCursor  guifg=#fdf6e3 guibg=#268bd2
 highlight ReplaceCursor guifg=#fdf6e3 guibg=#dc322f
 highlight VisualCursor  guifg=#fdf6e3 guibg=#b58900
 highlight CommandCursor guifg=#fdf6e3 guibg=#d33682
+
+" ale related settings
+let s:sign_column_bg=utils#GetHighLightInfo('SignColumn').guibg
+let s:ale_sign=utils#GetHighLightInfo('Error')
+let s:ale_sign.guibg=s:sign_column_bg
+call utils#SetHighLightInfo('ALEErrorSign', s:ale_sign)
+let s:ale_sign=utils#GetHighLightInfo('Todo')
+let s:ale_sign.guibg=s:sign_column_bg
+call utils#SetHighLightInfo('ALEWarningSign', s:ale_sign)
