@@ -55,7 +55,11 @@ onoremap <silent> <expr> W (v:count > 1 ? ":normal! " . v:count . "W<CR>" : ":no
 command! W w !sudo tee % > /dev/null
 
 """ Show full file path while opening file
-cabbrev %% <C-R>=fnameescape( expand( '%:p' ))<CR>
+cabbrev %%p <C-R>=fnameescape(expand('%:p'))<CR>
+cabbrev %%h <C-R>=fnameescape(expand('%:p:h'))<CR>
+cabbrev %%t <C-R>=fnameescape(expand('%:p:t'))<CR>
+cabbrev %%r <C-R>=fnameescape(expand('%:p:r'))<CR>
+
 nnoremap <leader>s% :silent! source <C-R>=fnameescape( expand( '%:p' ))<CR><CR>
 cabbrev <expr> E (( getcmdtype() == ':' && getcmdpos() <= 2 ) ? 'e <C-R>=fnameescape( expand( "%:p:h" ))."/"<CR><C-R>=utils#EatChar("\\s")<CR>' : 'E' )
 
