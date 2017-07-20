@@ -8,7 +8,7 @@ if empty(glob('~/.vim/pack/bundles/start/vim-plug/autoload/plug.vim'))
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   augroup Plug
     autocmd!
-    autocmd VimEnter * PlugUpgrade --sync|PlugInstall --sync
+    autocmd VimEnter * PlugInstall --sync
   augroup END
 endif
 
@@ -24,8 +24,9 @@ call plug#('tacahiroy/ctrlp-funky')
 call plug#('FelikZ/ctrlp-py-matcher',          s:PlugCond(has('python')||has('python3')))
 
 " Motion/TextObjects ---------------------------------------------------------------------------------------------------
+runtime! macros/matchit.vim
+
 call plug#('PeterRincker/vim-argumentative')
-call plug#('matchit.zip')
 " call plug#('justinmk/vim-sneak')
 " call plug#('wellle/targets.vim')
 call plug#('kshenoy/vim-parjumper',            {'on': '<Plug>(ParJump'})
@@ -55,6 +56,7 @@ call plug#('triglav/vim-visual-increment')
 
 " Misc -----------------------------------------------------------------------------------------------------------------
 call plug#('tpope/vim-abolish')
+call plug#('w0rp/ale')
 " call plug#('skywind3000/asyncrun.vim')
 " call plug#('tpope/vim-dispatch')
 call plug#('sjl/gundo.vim',                    {'on': 'GundoToggle'})
@@ -81,6 +83,21 @@ call plug#end()
 
 
 " Plugins - Settings ===================================================================================================
+" ale ------------------------------------------------------------------------------------------------------------- {{{1
+let g:ale_lint_on_enter=0
+let g:ale_sign_error='✗ '
+let g:ale_sign_style_error='✠ '
+let g:ale_sign_warning='⚠ '
+" let g:syntastic_error_symbol='✗✗'
+" let g:syntastic_style_error_symbol='✠✠'
+" let g:syntastic_warning_symbol='∆∆'
+" let g:syntastic_style_warning_symbol='≈≈'
+
+nmap <leader>cp <Plug>my(ale_previous_wrap)
+nmap <leader>cn <Plug>my(ale_next_wrap)
+nmap <leader>cd <Plug>my(ale_detail)
+
+
 " AutoComplPop ---------------------------------------------------------------------------------------------------- {{{1
 let g:acp_completeoptPreview = 0                                              " Do not show tag previews when completing
 
