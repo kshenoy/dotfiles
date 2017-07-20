@@ -57,7 +57,7 @@ command! W w !sudo tee % > /dev/null
 """ Show full file path while opening file
 cabbrev %% <C-R>=fnameescape( expand( '%:p' ))<CR>
 nnoremap <leader>s% :silent! source <C-R>=fnameescape( expand( '%:p' ))<CR><CR>
-cabbrev <expr> E (( getcmdtype() == ':' && getcmdpos() <= 2 ) ? 'e <C-R>=fnameescape( expand( "%:p:h" ))."/"<CR><C-R>=my#EatChar("\\s")<CR>' : 'E' )
+cabbrev <expr> E (( getcmdtype() == ':' && getcmdpos() <= 2 ) ? 'e <C-R>=fnameescape( expand( "%:p:h" ))."/"<CR><C-R>=utils#EatChar("\\s")<CR>' : 'E' )
 
 """ Display full path and filename
 nnoremap <C-G> 2<C-G>
@@ -75,21 +75,21 @@ cabbrev <expr> h (( getcmdtype() == ':' && getcmdpos() <= 2 ) ? 'vert bo h' : 'h
 xnoremap <expr> p v:register=='"'?'pgvy':'p'
 
 """ Jumping to next/previous start/end of Methods
-noremap <silent> ][ :call my#SectionJump('next', 'start')<CR>
-noremap <silent> ]] :call my#SectionJump('next', 'end'  )<CR>
-noremap <silent> [[ :call my#SectionJump('prev', 'start')<CR>
-noremap <silent> [] :call my#SectionJump('prev', 'end'  )<CR>
+noremap <silent> ][ :call utils#SectionJump('next', 'start')<CR>
+noremap <silent> ]] :call utils#SectionJump('next', 'end'  )<CR>
+noremap <silent> [[ :call utils#SectionJump('prev', 'start')<CR>
+noremap <silent> [] :call utils#SectionJump('prev', 'end'  )<CR>
 
-noremap <silent> ]m :call my#MethodJump(']m')<CR>
-noremap <silent> ]M :call my#MethodJump(']M')<CR>
-noremap <silent> [m :call my#MethodJump('[m')<CR>
-noremap <silent> [M :call my#MethodJump('[M')<CR>
+noremap <silent> ]m :call utils#MethodJump(']m')<CR>
+noremap <silent> ]M :call utils#MethodJump(']M')<CR>
+noremap <silent> [m :call utils#MethodJump('[m')<CR>
+noremap <silent> [M :call utils#MethodJump('[M')<CR>
 
 """ Make Y consistent with C and D
 nnoremap Y y$
 
 """ Split line (sister to [J]oin lines)
-nnoremap <M-j> i<CR><ESC>:call my#Preserve('-2s/\s\+$//')<CR>
+nnoremap <M-j> i<CR><ESC>:call utils#Preserve('-2s/\s\+$//')<CR>
 
 """ Break undo-sequence before deleting till start of line
 inoremap <C-U> <C-G>u<C-U>
@@ -116,10 +116,10 @@ vnoremap > >gv
 vnoremap < <gv
 
 """ Briefly show CursorLine and CursorColumn
-nnoremap <silent> <F5> :call my#CursorBlind()<cr>
+nnoremap <silent> <F5> :call utils#CursorBlind()<cr>
 
 """ Panic Mode (rot13)
-nnoremap <silent> <F9> :call my#Preserve('normal! ggg?G')<CR>
+nnoremap <silent> <F9> :call utils#Preserve('normal! ggg?G')<CR>
 
 """ Change font-size, line-spacing, window-size (May be set by vim-submode, hence the maparg() check)
 nnoremap <silent> >l  :<C-U>execute 'let &lines     += ' . v:count1<CR>
@@ -158,8 +158,8 @@ nmap <A-%> g%
 "   'f'   file:     open the filename under cursor
 "   'i'   includes: find files that include the filename under cursor
 "   'd'   called:   find functions that function under cursor calls
-nnoremap <silent>  <C-\> :call my#CscopeMap('l', 0)<CR>
-nnoremap <silent> g<C-\> :call my#CscopeMap('l', 1)<CR>
+nnoremap <silent>  <C-\> :call utils#CscopeMap('l', 0)<CR>
+nnoremap <silent> g<C-\> :call utils#CscopeMap('l', 1)<CR>
 
 """ Move by visual lines
 noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
@@ -184,7 +184,7 @@ nnoremap <silent> <leader>zz :let &scrolloff=999-&scrolloff<CR>
 nnoremap <expr> <CR> foldlevel('.') ? 'za' : '<CR>'
 
 """ Cycle between absolute/relative numbering
-noremap <silent> <F2> :call my#CycleNumbering()<CR>
+noremap <silent> <F2> :call utils#CycleNumbering()<CR>
 
 """ Visually select the text that was last edited/pasted
 nnoremap gV `[v`]
@@ -208,7 +208,7 @@ nnoremap <S-BS>   :bp<BAR>bd#<CR>
 
 """ Windows
 " Swap Windows
-nnoremap <silent> <C-W><C-X> :call my#WindowSwap()<CR>
+nnoremap <silent> <C-W><C-X> :call utils#WindowSwap()<CR>
 
 " Force close and re-split
 nnoremap <silent> <C-W><S-V> <C-W><C-O><C-W><C-V>
@@ -221,7 +221,7 @@ nnoremap <silent> <C-W><S-C>k <C-W><C-K><C-W>c
 nnoremap <silent> <C-W><S-C>l <C-W><C-L><C-W>c
 
 " Toggle Zoom
-nnoremap + :<C-U>call my#WindowToggleZoom()<CR>
+nnoremap + :<C-U>call utils#WindowToggleZoom()<CR>
 
 
 """ Tab operations
@@ -260,7 +260,7 @@ autocmd CmdwinEnter * noremap <buffer> <S-CR> <CR>q:
 
 """ To make traversing up the directory tree easier in cmd-mode
 " FIXME: Make this silent
-cnoremap <C-W> <C-R>=my#CmdIsk(1)<CR><C-W><C-R>=my#CmdIsk(0)<CR>
+cnoremap <C-W> <C-R>=utils#CmdIsk(1)<CR><C-W><C-R>=utils#CmdIsk(0)<CR>
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -323,12 +323,12 @@ vnoremap <silent> <leader>*  :<C-U>let @/=escape(@*,'$*[]/')<CR>
 vnoremap <silent> <leader>g* :<C-U>let @/='\<'.escape(@*,'$*[]/').'\>'<CR>
 
 """ Find and show results in a LocationList (Buffer-specific)
-nnoremap <silent> <leader>/ :call my#FindAndList('local', 'normal')<CR>
-vnoremap <silent> <leader>/ :<C-U>call my#FindAndList('local', 'visual')<CR>
+nnoremap <silent> <leader>/ :call utils#FindAndList('local', 'normal')<CR>
+vnoremap <silent> <leader>/ :<C-U>call utils#FindAndList('local', 'visual')<CR>
 
 """ Find and show results in a QuickfixList
-nnoremap <silent> <leader>g/ :call my#FindAndList('global', 'normal')<CR>
-vnoremap <silent> <leader>g/ :<C-U>call my#FindAndList('global', 'visual')<CR>
+nnoremap <silent> <leader>g/ :call utils#FindAndList('global', 'normal')<CR>
+vnoremap <silent> <leader>g/ :<C-U>call utils#FindAndList('global', 'visual')<CR>
 
 """ Grep
 command! -nargs=+ -complete=file -bar Grep silent grep! <args>|cwindow 20|redraw!
@@ -336,18 +336,18 @@ nnoremap g/ :Grep<Space>
 nnoremap K  :Grep <C-R><C-W><CR>
 
 """ Keep searches in middle of screen
-nnoremap <silent> n :call my#SearchSaveAndRestore()<CR>/<CR>zvzz
-nnoremap <silent> N :call my#SearchSaveAndRestore()<CR>?<CR>zvzz
+nnoremap <silent> n :call utils#SearchSaveAndRestore()<CR>/<CR>zvzz
+nnoremap <silent> N :call utils#SearchSaveAndRestore()<CR>?<CR>zvzz
 
 """ Jump to corresponding <Tag> (AMD)
 nmap <leader>< va><ESC>:<C-U>/<C-R>*<CR>
 
 """ Clear search string itself ( Save before clearing )
-nnoremap <silent> <C-L> :call my#SearchSaveAndRestore()<Bar>let @/=""<CR><C-L>
+nnoremap <silent> <C-L> :call utils#SearchSaveAndRestore()<Bar>let @/=""<CR><C-L>
 "nnoremap <S-F5> :set hlsearch!<CR>:set hlsearch?<cr>   " Use coh from Unimpaired
 
 """ Remove trailing whitespace
-nnoremap <silent> <leader>s<Space> :call my#Preserve('%s/\v\s+$//')<CR>
+nnoremap <silent> <leader>s<Space> :call utils#Preserve('%s/\v\s+$//')<CR>
 
 """ Replace word under the cursor. Type replacement, press <ESC>. Use . to jump to next occurence of the word and repeat
 """ Works only on recent patches, > 7xx
@@ -378,7 +378,7 @@ nnoremap <silent> <A-d> "_d
 vnoremap <silent> <A-d> "_d
 
 """ Generate ctags
-nnoremap <F12> :call my#UpdateTags()<CR>
+nnoremap <F12> :call utils#UpdateTags()<CR>
 
 """ Execute selection as vimscript
 vnoremap g: <Esc>:@*<CR>

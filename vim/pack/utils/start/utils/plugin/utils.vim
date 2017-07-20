@@ -1,6 +1,6 @@
 " Vim Functions file
 
-function! my#FoldText()                                                                                           " {{{1
+function! utils#FoldText()                                                                                        " {{{1
   " Description: Dhruv Sagar's foldtext
   let line             = getline(v:foldstart)
   let lines_count      = v:foldend - v:foldstart + 1
@@ -15,7 +15,7 @@ function! my#FoldText()                                                         
 endfunction
 
 
-function! my#CycleNumbering(...)                                                                                  " {{{1
+function! utils#CycleNumbering(...)                                                                               " {{{1
   " Description: Cycle through different numbering modes
   " Arguments:
   "   None : Cycle through numbering modes
@@ -41,7 +41,7 @@ function! my#CycleNumbering(...)                                                
 endfunction
 
 
-function! my#MapKey( rhs, mode )                                                                                  " {{{1
+function! utils#MapKey( rhs, mode )                                                                               " {{{1
   " Description: Get LHS of a mapping. Inverse of maparg().
   " Note that hasmapto() returns a binary result while MapKey() returns the value of the LHS.
   " Pass in a key sequence and the first letter of a vim mode.
@@ -74,7 +74,7 @@ function! my#MapKey( rhs, mode )                                                
 endfunction
 
 
-function! my#ReTab( tabsize, ... )                                                                                " {{{1
+function! utils#ReTab( tabsize, ... )                                                                             " {{{1
   " Description: Change indentation when tab size is changed.
   "              Primarily used to convert an indentation of eg. 4 to 2 or vice-versa
   " Arguments:
@@ -99,10 +99,10 @@ function! my#ReTab( tabsize, ... )                                              
     let &tabstop = l:old_ts
   endif
 endfunction
-command! -nargs=* ReTab call my#ReTab(<args>)
+command! -nargs=* ReTab call utils#ReTab(<args>)
 
 
-function! my#UpdateTags()                                                                                         " {{{1
+function! utils#UpdateTags()                                                                                      " {{{1
   " Description: Generate tags ( requires exuberant_ctags )
 
   if (empty($REPO_PATH))
@@ -113,7 +113,7 @@ function! my#UpdateTags()                                                       
   execute "!gentags --create -w $REPO_PATH &"
 endfunction
 
-function! my#LoadCscopeDB()                                                                                       " {{{1
+function! utils#LoadCscopeDB()                                                                                    " {{{1
   if !has('cscope')
     return
   endif
@@ -135,7 +135,7 @@ function! my#LoadCscopeDB()                                                     
 endfunction
 
 
-function! my#Preserve(command, ...)                                                                               " {{{1
+function! utils#Preserve(command, ...)                                                                            " {{{1
   " Description: Function to execute commands without modifying the original settings like cursor position, search string etc.
 
   " Find if the command should be executed in visual mode or normal mode
@@ -161,7 +161,7 @@ function! my#Preserve(command, ...)                                             
 endfunction
 
 
-function! my#SynTrace()                                                                                           " {{{1
+function! utils#SynTrace()                                                                                        " {{{1
   " Description: Show syntax highlighting groups for word under cursor
   if !exists("*synstack")
     return
@@ -173,7 +173,7 @@ function! my#SynTrace()                                                         
     return
   endif
 
-  let l:hlInfo = my#GetHighLightInfo(l:synTrace[-1])
+  let l:hlInfo = utils#GetHighLightInfo(l:synTrace[-1])
   "echo l:hlInfo.trace
 
   let l:out = "{"
@@ -193,10 +193,10 @@ function! my#SynTrace()                                                         
   return l:out
 endfunction
 " FIXME: Get the command working
-command! -nargs=0 SynTrace call my#SynTrace()
+command! -nargs=0 SynTrace call utils#SynTrace()
 
 
-function! my#FoldAllBut( foldminlines )                                                                           " {{{1
+function! utils#FoldAllBut( foldminlines )                                                                        " {{{1
   " Description: Function to open folds that have less than the specified number of lines
   " We assume that the folds are initially closed
   " If a fold exists and is closed and has lesser number of lines than specified, open it and all nested folds
@@ -208,7 +208,7 @@ function! my#FoldAllBut( foldminlines )                                         
 endfunction
 
 
-function! my#SearchSaveAndRestore(...)                                                                            " {{{1
+function! utils#SearchSaveAndRestore(...)                                                                         " {{{1
   " Description: Save and restore search strings
   if a:0 && a:1 ==# "get"
     return s:search_str
@@ -223,7 +223,7 @@ function! my#SearchSaveAndRestore(...)                                          
 endfunction
 
 
-function! my#MethodJump( arg )                                                                                    " {{{1
+function! utils#MethodJump( arg )                                                                                 " {{{1
   " Description: Small modification to ]m, [m, ]M, [M to skip over the end of class when using ]m and [m and the start
   "              of the class when using ]M and [M
   " Arguments:
@@ -243,7 +243,7 @@ function! my#MethodJump( arg )                                                  
 endfunction
 
 
-function! my#SectionJump(dir, pos)                                                                                " {{{1
+function! utils#SectionJump(dir, pos)                                                                             " {{{1
   " Description: Jump to next/previous start/end of method
   "              Assumes that the end of the function can be identified by a "}" in the first column
   " Arguments:
@@ -290,7 +290,7 @@ function! my#SectionJump(dir, pos)                                              
 endfunction
 
 
-function! my#FillTW(...)                                                                                          " {{{1
+function! utils#FillTW(...)                                                                                       " {{{1
   " Description: Insert spaces to make the current line as wide as specified by textwidth or the supplied width
   " Arguments:  If argument is supplied use the provided value instead of textwidth to fill
   let l:filler    = nr2char(getchar())
@@ -300,16 +300,16 @@ function! my#FillTW(...)                                                        
   execute "normal! i" . l:padding
   call repeat#set(":FTW " . l:textwidth . "\<CR>" . l:filler)
 endfunction
-command! -nargs=? FTW call my#FillTW(<args>)
+command! -nargs=? FTW call utils#FillTW(<args>)
 
 
-function! my#EatChar( pat )                                                                                       " {{{1
+function! utils#EatChar( pat )                                                                                    " {{{1
   let c = nr2char( getchar(0) )
   return (c =~ a:pat) ? '' : c
 endfunc
 
 
-function! my#CmdIsk( mode )                                                                                       " {{{1
+function! utils#CmdIsk( mode )                                                                                    " {{{1
   " Description: Modify the value of iskeyword by adding a dot or restoring to original value depending upon input arg
   "              Used mainly to make traversing up the directory tree easier in cmd-mode
   " Arguments:
@@ -325,7 +325,7 @@ function! my#CmdIsk( mode )                                                     
 endfunction
 
 
-function! my#MagicSave(...)                                                                                       " {{{1
+function! utils#MagicSave(...)                                                                                    " {{{1
   " Description: If directory does not exist, create while saving the file
   if a:0
     let directory = fnamemodify(a:1, ':p:h')
@@ -339,10 +339,10 @@ function! my#MagicSave(...)                                                     
   endif
   execute 'write' file
 endfunction
-command! -nargs=? WW call my#MagicSave(<q-args>)
+command! -nargs=? WW call utils#MagicSave(<q-args>)
 
 
-function! my#CursorBlind()                                                                                        " {{{1
+function! utils#CursorBlind()                                                                                     " {{{1
   " Description: Flash the cursorcolumn and cursorline till the cursor is moved
   if &cuc || &cul
     set nocursorline nocursorcolumn
@@ -353,13 +353,13 @@ function! my#CursorBlind()                                                      
     set cursorcolumn cursorline
     augroup CursorBlind
       au!
-      au CursorHold,CursorMoved * call my#CursorBlind()
+      au CursorHold,CursorMoved * call utils#CursorBlind()
     augroup END
   endif
 endfunction
 
 
-function! my#BuffersList()                                                                                        " {{{1
+function! utils#BuffersList()                                                                                     " {{{1
   " Description: Returns a list of open buffers
   let res = []
   for b in range(1, bufnr('$'))
@@ -371,7 +371,7 @@ function! my#BuffersList()                                                      
 endfunction
 
 
-function! my#FindAndList( scope, mode, ... )                                                                      " {{{1
+function! utils#FindAndList( scope, mode, ... )                                                                   " {{{1
   " Description: Find all the lines that contain the search term and display them in the location list
   " Arguments:
   "   scope (str) "local"    : Find only with the current buffer and display results in a location list
@@ -384,7 +384,7 @@ function! my#FindAndList( scope, mode, ... )                                    
   if a:mode ==? "visual"
     let prompt = escape(@*, '$*[]/')
   elseif a:mode ==? "prev"
-    let prompt = my#SearchSaveAndRestore('get')
+    let prompt = utils#SearchSaveAndRestore('get')
   endif
   let term = input( substitute(a:scope, '.*', '\L\u\0', '') . ': /', prompt)
 
@@ -402,14 +402,14 @@ function! my#FindAndList( scope, mode, ... )                                    
     syntax match qfFileName /^[^|]*|[^|]*| / transparent conceal
     setlocal nowrap
   elseif ( a:scope ==? "global" )
-    execute "noautocmd vimgrep! /" . term . "/ " . join(my#BuffersList())
+    execute "noautocmd vimgrep! /" . term . "/ " . join(utils#BuffersList())
     copen 15
     setlocal nowrap
   endif
 endfunction
 
 
-function! my#GuiTabLabel()                                                                                        " {{{1
+function! utils#GuiTabLabel()                                                                                     " {{{1
   " Description: Set up tab labels with tab number, buffer name, number of windows
   if (exists('t:guitablabel'))
     return t:guitablabel
@@ -446,7 +446,7 @@ function! my#GuiTabLabel()                                                      
 endfunction
 
 
-function! my#GuiTabToolTip()                                                                                      " {{{1
+function! utils#GuiTabToolTip()                                                                                   " {{{1
   " Description: Set up tab tooltips to show every buffer name
   let tip = ''
   let bufnrlist = tabpagebuflist(v:lnum)
@@ -480,7 +480,7 @@ function! my#GuiTabToolTip()                                                    
   return tip
 endfunction
 
-function! my#GetHighLightInfo( hl_group )                                                                         " {{{1
+function! utils#GetHighLightInfo( hl_group )                                                                      " {{{1
   " Description: Copy/modify highlight groups
   let l:hlTrace = [a:hl_group]
   redir => l:hl_info_str
@@ -509,7 +509,7 @@ function! my#GetHighLightInfo( hl_group )                                       
 endfunction
 
 
-function! my#SetHighLightInfo( hl_group, hl_info )                                                                " {{{1
+function! utils#SetHighLightInfo( hl_group, hl_info )                                                             " {{{1
   let l:hl_cmd = 'highlight ' . a:hl_group . ' '
   for l:attr in keys(a:hl_info)
     if (l:attr ==? 'trace')
@@ -522,7 +522,7 @@ function! my#SetHighLightInfo( hl_group, hl_info )                              
 endfunction
 
 
-function! my#WindowSwap()                                                                                         " {{{1
+function! utils#WindowSwap()                                                                                      " {{{1
   " Description: Swap windows. Works similar to tommcdo's vim-exchange plugin but with windows
   "              When only 2 windows are open in the current tab, execute '<C-W>x'
   "              Calling this the first time selects the 1st window of the pair to swap.
@@ -559,7 +559,7 @@ function! my#WindowSwap()                                                       
 endfunction
 
 
-function! my#CscopeMap(view, exec, ...)                                                                           " {{{1
+function! utils#CscopeMap(view, exec, ...)                                                                        " {{{1
   " Description: One function to execute cscope commands instead of a ton of mappings
   " Arguments:
   "   view (char) : How to display results (l: Location list, s: Horizontal split, v: Vertical split)
@@ -631,25 +631,25 @@ function! my#CscopeMap(view, exec, ...)                                         
 endfunction
 
 
-function! my#CombineSelection(line1, line2, cp)                                                                   " {{{1
+function! utils#CombineSelection(line1, line2, cp)                                                                " {{{1
   " Description: Modify selected text using combining diacritics
   execute 'let char = "\u' . a:cp . '"'
   execute a:line1 . ',' . a:line2 . 's/\%V[^[:cntrl:]]/&' . char . '/ge'
 endfunction
-command! -range -nargs=0 Overline        call my#CombineSelection(<line1>, <line2>, '0305')
-command! -range -nargs=0 Underline       call my#CombineSelection(<line1>, <line2>, '0332')
-command! -range -nargs=0 DoubleUnderline call my#CombineSelection(<line1>, <line2>, '0333')
-command! -range -nargs=0 Strikethrough   call my#CombineSelection(<line1>, <line2>, '0336')
+command! -range -nargs=0 Overline        call utils#CombineSelection(<line1>, <line2>, '0305')
+command! -range -nargs=0 Underline       call utils#CombineSelection(<line1>, <line2>, '0332')
+command! -range -nargs=0 DoubleUnderline call utils#CombineSelection(<line1>, <line2>, '0333')
+command! -range -nargs=0 Strikethrough   call utils#CombineSelection(<line1>, <line2>, '0336')
 
 
-function! my#SetDiffFileType()                                                                                    " {{{1
+function! utils#SetDiffFileType()                                                                                 " {{{1
   let l:filetype=''
   windo if (l:filetype == '')|let l:filetype=&filetype|endif
   windo let &filetype=l:filetype
 endfunction
 
 
-function! my#GetWindowColumnsWidth()                                                                              " {{{1
+function! utils#GetWindowColumnsWidth()                                                                           " {{{1
   " Get the width of the decorative columns of the CURRENT window
 
   let l:width = 0
@@ -689,7 +689,7 @@ function! my#GetWindowColumnsWidth()                                            
 endfunction
 
 
-function! my#Journal(cmd, ...)                                                                                    " {{{1
+function! utils#Journal(cmd, ...)                                                                                 " {{{1
   " Description: Execute cmd and return the output as a list of lines.
   "              If an additional argument is provided, use it to filter the output.
   " Arguments:   cmd - The command to execute
@@ -712,7 +712,7 @@ function! my#Journal(cmd, ...)                                                  
 endfunction
 
 
-function! my#WindowToggleZoom ()                                                                                  " {{{1
+function! utils#WindowToggleZoom ()                                                                               " {{{1
   " Description: Zoom/unzoom similar to TMUX
 
   if (winnr('$') == 1)
@@ -737,7 +737,7 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " VERSION CONTROL                                                                                                 " {{{1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! my#VcsSetupMergeLayout()                                                                                " {{{2
+function! utils#VcsSetupMergeLayout()                                                                             " {{{2
   " Description: Setup layout for merges
   "              Tab 1: Main window with all 4 panes (Clockwise from top-left)
   "                - Base (Original), Remote (Theirs), Local (Yours) and Merge
@@ -830,14 +830,14 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Temporary functions only
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! my#_RemoveAllErrInBut_(num)                                                                             " {{{1
+function! utils#_RemoveAllErrInBut_(num)                                                                          " {{{1
   " Delete everything but the entry we're interested in just the ErrIn field
   silent! execute '%g/L3ErrPkt/ .s/\v(ErrIn\w*)@<=\=\{[^}]{-}(\[' . a:num . '\]\s*\=\s*[^,]+)[^}]{-}\}/\2/g'
 endfunction
-"nnoremap K :<C-U>call my#TestFunc(v:count, v:count1)<CR>
+"nnoremap K :<C-U>call utils#TestFunc(v:count, v:count1)<CR>
 
 
-function! my#Bisect()                                                                                             " {{{1
+function! utils#Bisect()                                                                                          " {{{1
   let l:pos=getpos('.')
   norm %
   let l:pos[1]=(l:pos[1]+line('.'))/2

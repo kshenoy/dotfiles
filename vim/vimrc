@@ -66,9 +66,6 @@ set cscopetagorder=0                                                            
 "set cscopequickfix=s-,g-,c-,d-,i-,t-,e-            " Show symbols, calls, called, includes, tags and egreps in quickfix
 set nocscoperelative
 
-" Add any cscope database in current directory
-call my#LoadCscopeDB()
-
 
 "
 " 4.  DISPLAYING TEXT                                                                                               {{{1
@@ -151,8 +148,8 @@ if DISABLE_FROM == 7 | finish | endif
 
 set showtabline=1                                                                 " Only when at least two tabs are open
 set tabpagemax=20                                                                         " Max no. of tab pages to open
-set guitablabel=%{my#GuiTabLabel()}
-set guitabtooltip=%{my#GuiTabToolTip()}
+set guitablabel=%{utils#GuiTabLabel()}
+set guitabtooltip=%{utils#GuiTabToolTip()}
 
 
 "
@@ -272,7 +269,7 @@ set cinkeys-=0#                                                          " Preve
 if DISABLE_FROM == 16 | finish | endif
 
 "set foldcolumn=3                                                               " Width of column used to indicate folds
-set foldtext=my#FoldText()
+set foldtext=utils#FoldText()
 set foldmethod=marker
 "set foldmarker={{{,}}}                                                    " Markers used when 'foldmethod' is "marker"}
 "set foldmarker=>_>,<_<                                                     " Markers used when 'foldmethod' is "marker"
@@ -419,7 +416,7 @@ if has('autocmd')
   "     \ if line("'\"") > 0 && line("'\"") <= line("$") |
   "     \   execute 'normal! g`"zvzz' |
   "     \ endif
-  "   autocmd BufWritePost * call my#UpdateTags()
+  "   autocmd BufWritePost * call utils#UpdateTags()
   " augroup END
 
   " Resize split windows when size of xterm's window changes
@@ -438,7 +435,7 @@ if has('autocmd')
   augroup Diff
     autocmd!
     autocmd BufWritePost * if &diff | diffupdate | endif
-    autocmd VimEnter * if &diff|call my#SetDiffFileType()|endif
+    autocmd VimEnter * if &diff|call utils#SetDiffFileType()|endif
   augroup END
 endif
 " }}}2
