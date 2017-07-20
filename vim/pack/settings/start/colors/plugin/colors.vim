@@ -46,7 +46,7 @@ function! s:After()                                                             
 
   " This is a deliberate choice to stick the file under after/colors. This is because if it's under after/plugin then
   " the code seems to be run before the colorscheme gets loaded and thus can't be relied upon to run everytime.
-  let l:color_file = g:dotvim . "/after/colors/" . g:colors_name . ".vim"
+  let l:color_file = g:dotvim . "/pack/settings/start/" . g:colors_name . "/after/colors/" . g:colors_name . ".vim"
   if filereadable(l:color_file)
     execute "source " . l:color_file
   endif
