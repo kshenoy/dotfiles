@@ -441,6 +441,7 @@ endif
 " }}}2
 " }}}1
 
+
 """ Local vimrc
 let s:user = substitute(g:dotvim, '\v/home/(\w+)/.*', '\1', '')
 if filereadable(glob('~' . s:user . '/.vimrc_local'))

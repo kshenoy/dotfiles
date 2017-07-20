@@ -3,9 +3,10 @@
 "
 
 " Automatically install plugins
-let s:plug_path=glob(g:dotvim . '/autoload/plug.vim')
-if empty(s:plug_path)
-  silent '!curl -fLo ' . s:plug_path . ' --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+let s:plug_path=expand(g:dotvim . '/autoload/plug.vim')
+if !filereadable(s:plug_path)
+  execute 'silent !curl -fLo ' . s:plug_path . ' --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  execute 'source ' . s:plug_path
   augroup Plug
     autocmd!
     autocmd VimEnter * PlugInstall --sync
