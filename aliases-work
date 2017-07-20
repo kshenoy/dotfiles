@@ -205,6 +205,11 @@ make_wa_vars
 # Dynamic variables (Recomputed everytime path changes via preprompt or equivalent)
 # If $REPO_PATH is set, expand ${...} to $REPO_PATH/ (append trailing slash)
 # This allows us to use $rtl etc as an absolute path when $REPO_PATH is set and when bootenv isn't done, as a relative path
+#
+# Note that something similar could be achieved by setting CDPATH=$REPO_PATH
+# And as long as we're in a CH workarea, all the below variables should work the same
+# However, if we're in a non-CH repository like VH then it'll not work.
+# Hence, I've created explicit variables by basing them off ch which in turn is set based on the value of ANCHOR_ch
 dyn_vars() {
   export ch="${ANCHOR_ch-${REPO_PATH+$REPO_PATH/}ch}"
   export reg="${ANCHOR_local_rdl-${REPO_PATH+$REPO_PATH/}meta/registers}"
@@ -213,6 +218,9 @@ dyn_vars() {
   export tc="${ch}/tc"
   export v="${ch}/verif"
   export cl23="${v}/chk_l2l3"
+  export al3="${v}/l3/arch_l3"
+  export al3c="${v}/l3/arch_l3/arch_lci"
+  export al3x="${v}/l3/arch_l3/arch_lxi"
   export cl3="${v}/chk_l3"
   export clk="${v}/chk_lock"
   export txn="${v}/txn"
@@ -432,15 +440,19 @@ but() {
   shift;
 
   echo build -model $model
-  rerun --norun --build --nowtf --model $model $@
-  if (( $? != 0 )); then
-    WhyTheFail;
-    return 1;
+  rerun --norun --build --model $model $@
+  local _ret=$?
+  if (( $_ret != 0 )); then
+    return $_ret;
   fi
 
-  echo $REPO_PATH/build/${model}/${model}
-  ( $REPO_PATH/build/${model}/${model} | tee ${model}.log )
-  if (( $? != 0 )); then WhyTheFail; return 1; fi
+  if [[ ${model} =~ _dbg$ ]]; then
+    echo gdb $REPO_PATH/build/${model}/${model}
+    gdb $REPO_PATH/build/${model}/${model}
+  else
+    echo $REPO_PATH/build/${model}/${model}
+    ( $REPO_PATH/build/${model}/${model} | tee ${model}.log )
+  fi
 }
 
 unset -f pfrem
