@@ -539,8 +539,7 @@ let g:targets_separators = ', . ; : + - = ~ * # / | \ & $'
 " UltiSnips ------------------------------------------------------------------------------------------------------- {{{1
 let g:UltiSnipsEditSplit = "vertical"
 " Location of snippets
-execute 'let g:UltiSnipsSnippetDirectories=["' . g:dotvim . '/UltiSnips"]'
-" execute 'let g:UltiSnipsSnippetsDir="' . g:dotvim . '/UltiSnips"'
+execute 'let g:UltiSnipsSnippetDirectories=["' . g:dotvim . '/pack/settings/start/UltiSnips/snippets"]'
 let g:UltiSnipsEnableSnipMate=0
 let g:UltiSnipsExpandTrigger='<S-Tab>'
 
