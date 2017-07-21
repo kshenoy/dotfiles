@@ -57,7 +57,7 @@ call plug#('triglav/vim-visual-increment')
 
 " Misc -----------------------------------------------------------------------------------------------------------------
 call plug#('tpope/vim-abolish')
-call plug#('w0rp/ale')
+call plug#('w0rp/ale',                         {'on': 'ALEToggle'})
 " call plug#('skywind3000/asyncrun.vim')
 " call plug#('tpope/vim-dispatch')
 call plug#('sjl/gundo.vim',                    {'on': 'GundoToggle'})
@@ -77,8 +77,8 @@ call plug#('tpope/vim-vinegar',                {'on': '<Plug>VinegarUp'})
 
 " Colorshemes ----------------------------------------------------------------------------------------------------------
 " call plug#('chriskempson/base16-vim')
-call plug#('kshenoy/vim-sol')
-call plug#('rakr/vim-one')
+" call plug#('kshenoy/vim-sol')
+" call plug#('rakr/vim-one')
 
 call plug#end()
 
