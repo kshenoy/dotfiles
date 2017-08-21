@@ -9,48 +9,48 @@ MYSHELL=$(basename $(ps h p $$ | awk '{ print $NF }' | sed 's/-//g'))
 #=================================
 # Global aliases (Zsh specific)
 #
-if [[ $MYSHELL =~ "zsh" ]]; then
-  #alias -g ...='../..'
-  #alias -g ....='../../..'
-  #alias -g .....='../../../..'
-  #alias -g CA="2>&1 | cat -A"
-  alias -g WCL='| wc -l'
-  #alias -g D="DISPLAY=:0.0"
-  alias -g DN=/dev/null
-  #alias -g ED="export DISPLAY=:0.0"
-  #alias -g EG='|& egrep'
-  #alias -g EH='|& head'
-  #alias -g EL='|& less'
-  #alias -g ELS='|& less -S'
-  #alias -g ETL='|& tail -20'
-  #alias -g ET='|& tail'
-  #alias -g F=' | fmt -'
-  alias -g G='| grep'
-  alias -g H='| head'
-  #alias -g HL='|& head -20'
-  #alias -g Sk="*~(*.bz2|*.gz|*.tgz|*.zip|*.z)"
-  #alias -g LL="2>&1 | less"
-  alias -g L="| less"
-  #alias -g LS='| less -S'
-  #alias -g MM='| most'
-  #alias -g M='| more'
-  #alias -g NE="2> /dev/null"
-  #alias -g NS='| sort -n'
-  #alias -g NUL="> /dev/null 2>&1"
-  #alias -g PIPE='|'
-  #alias -g R=' > /c/aaa/tee.txt '
-  alias -g RD='| rm -rf'
-  #alias -g RNS='| sort -nr'
-  alias -g S='| sort'
-  #alias -g TL='| tail -20'
-  alias -g T='| tail'
-  alias -g SU='| sort -u'
-  #alias -g VM=/var/log/messages
-  #alias -g X0G='| xargs -0 egrep'
-  #alias -g X0='| xargs -0'
-  #alias -g XG='| xargs egrep'
-  alias -g X='| xargs'
-fi
+# if [[ $MYSHELL =~ "zsh" ]]; then
+  # alias -g ...='../..'
+  # alias -g ....='../../..'
+  # alias -g .....='../../../..'
+  # alias -g CA="2>&1 | cat -A"
+  # alias -g WCL='| wc -l'
+  # alias -g D="DISPLAY=:0.0"
+  # alias -g DN=/dev/null
+  # alias -g ED="export DISPLAY=:0.0"
+  # alias -g EG='|& egrep'
+  # alias -g EH='|& head'
+  # alias -g EL='|& less'
+  # alias -g ELS='|& less -S'
+  # alias -g ETL='|& tail -20'
+  # alias -g ET='|& tail'
+  # alias -g F=' | fmt -'
+  # alias -g G='| grep'
+  # alias -g H='| head'
+  # alias -g HL='|& head -20'
+  # alias -g Sk="*~(*.bz2|*.gz|*.tgz|*.zip|*.z)"
+  # alias -g LL="2>&1 | less"
+  # alias -g L="| less"
+  # alias -g LS='| less -S'
+  # alias -g MM='| most'
+  # alias -g M='| more'
+  # alias -g NE="2> /dev/null"
+  # alias -g NS='| sort -n'
+  # alias -g NUL="> /dev/null 2>&1"
+  # alias -g PIPE='|'
+  # alias -g R=' > /c/aaa/tee.txt '
+  # alias -g RD='| rm -rf'
+  # alias -g RNS='| sort -nr'
+  # alias -g S='| sort'
+  # alias -g TL='| tail -20'
+  # alias -g T='| tail'
+  # alias -g SU='| sort -u'
+  # alias -g VM=/var/log/messages
+  # alias -g X0G='| xargs -0 egrep'
+  # alias -g X0='| xargs -0'
+  # alias -g XG='| xargs egrep'
+  # alias -g X='| xargs'
+# fi
 
 
 #=============
@@ -142,29 +142,26 @@ pgrep() {
   #echo ps aux \| command grep -e "[P]ID" -e $_i
 }
 
-alias g='grep -sP --color=always'
-alias gi='g -i'
-alias gv='g -v'
+alias grep='grep -sP --color=always'
 
 # If Ag/Pt/Ack exists, use it!!
 if hash ag 2> /dev/null; then
-  alias G='ag'
-  alias Gtc='ag --cpp'
-  alias Gtch='ag -G "\.(h|hh|hpp|tpp)$"'
-  alias Gtcc='ag -G "\.(c|cc|cpp|C|CC)$"'
-  alias Gtsbs='ag -G "\.sbs$"'
-  alias Gtsv='ag -G "\.(sv|svh)$"'
-  alias Gtv='ag -G "\.(v|x)$"'
+  alias g='ag'
+  alias gtc='ag --cpp'
+  alias gtch='ag -G "\.(h|hh|hpp|tpp)$"'
+  alias gtcc='ag -G "\.(c|cc|cpp|C|CC)$"'
+  alias gtsv='ag -G "\.(sv|svh)$"'
+  alias gtv='ag -G "\.(v|x)$"'
 elif hash pt 2> /dev/null; then
-  alias G='pt'
+  alias g='pt'
 elif hash ack 2> /dev/null; then
-  alias G='ack --color'
-  alias Gtc='a --type=cpp'
-  alias Gtcc='a --type=cpp --nohh'
-  alias Gtch='a --type=hh'
+  alias g='ack --color'
+  alias gtc='a --type=cpp'
+  alias gtcc='a --type=cpp --nohh'
+  alias gtch='a --type=hh'
 fi
-alias Gi='G -i'
-alias Gv='G -v'
+alias gi='g -i'
+alias gv='g -v'
 
 alias C=cat
 alias P=$PAGER
@@ -277,7 +274,7 @@ alias sosa='. ~/.dotfiles/aliases && echo Sourced aliases'
 #=======
 # Misc
 #
-alias j='jobs'
+alias j='jobs -l'
 alias archdate='date +%Y-%m-%d'
 alias so=source
 alias sco='. command'

@@ -31,10 +31,10 @@ P() {
 
 
 #=======================================================================================================================
-# Editor Aliases                                                                                                    {{{1
-##
+# EDITOR                                                                                                            {{{1
+#=======================================================================================================================
 unset -f vim_func_work
-gvim_func_work() {
+gvim_func_work() {                                                                                                # {{{2
   # This is a hack to weed out the arguments. The last argument is more likely to be a file than any of the other ones
   local _file=$(eval echo $(echo '$'"$#"))
   if [[ -f $_file ]] && [[ -n $REPO_PATH ]]; then
@@ -50,13 +50,14 @@ gvim_func_work() {
 
   gvim_func -geometry 273x66+1911+0 ${_server:+--servername $_server} "$@"
 }
+# }}}2
 alias v="gvim_func -geometry 273x66+0+0"
 alias vlog="v -p *ChkL3.log *Seq.log dsp_ch.txt sim.out -c 'set autoread'"
 alias v="gvim_func -geometry 273x66+0+0"
 
 
 unset -f emacs_func_work
-emacs_func_work() {
+emacs_func_work() {                                                                                               # {{{2
   local _socket="server"
   if [[ -n $REPO_PATH ]]; then
     _socket="${REPO_PATH//\//_}"
@@ -64,12 +65,14 @@ emacs_func_work() {
   # echo emacs_func ${_socket+--socket-name=$_socket} "$@"
   emacs_func ${_socket+--socket-name=$_socket} "$@"
 }
+# }}}2
 alias e="emacs_func_work"
 
 
 # Project Aliases
 # alias as_bsub="lsf_bsub -Is -R 'rusage[mem=2000]' -q high -P aspen-ver"
 #alias amdfind='find $REPO_PATH -path "$REPO_PATH/simenv/build" -prune -or -path "$REPO_PATH/.ccache" -prune -or -path "$REPO_PATH/.autoio_cache" -prune -or -path "$REPO_PATH/release_gate_run" -prune -or -print'
+# Use p4 have
 alias amdfind="find $REPO_PATH -type d \( -name _env -o -name dfx -o -name emu -o -name fp -o -name powerPro -o -name build -o -name sim -o -name release_gate_tmp -o -wholename '*/ch/tc' -o -wholename '*/ch/tb' -o -wholename '*/ch/verif/dft' -o -wholename '*/txn/gen' -o -wholename '*/generated' \) -prune -o -type f ! \( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' -o -iname '*.cc.o' -o -iname '*tags*' \) -print 2> /dev/null"
 alias amdgrep='find $REPO_PATH -path "$REPO_PATH/simenv/build" -prune -or -path "$REPO_PATH/.ccache" -prune -or -path "$REPO_PATH/.autoio_cache" -prune -or -path "$REPO_PATH/release_gate_run" -prune -or -print | xargs grep'
 
@@ -85,9 +88,7 @@ alias bk='lsf_bkill'
 alias bq='lsf_bqueues'
 
 unset -f bjg
-bjg() {
-  bj | grep "${1:-$$:}"
-}
+bjg() { bj | \grep "${1:-$$:}"; }
 
 alias wtf='WhyTheFail'
 alias lmn='ljd -nomail -l'
@@ -116,7 +117,8 @@ alias bus='bucket -s'
 alias bus1='bucket -n 1'
 alias bus3='bucket -n 3'
 alias busw='watch -n15 "bucket -n 1"'
-alias toclippy="sed -e 's/$//' | tee ~/clippy.txt"
+alias toclippy="sed -e 's/$/
+/' | tee ~/clippy.txt"
 
 alias xt='xterm -geometry 273x60+1919+21 &'
 alias xtr='resize -s 60 273'
@@ -124,9 +126,10 @@ alias xtr='resize -s 60 273'
 alias tmxvnc='tmux new-window -d -n "XVNC" "x11vnc"'
 
 
+
 #=======================================================================================================================
-# Perforce                                                                                                          {{{1
-#===========
+# PERFORCE                                                                                                          {{{1
+#=======================================================================================================================
 alias pf='p4w'
 alias pfa='pf add'
 alias pfd='pf diff'
@@ -139,15 +142,18 @@ alias pflog='pf filelog -stl'
 alias pfs='pf submit'
 alias pful='pfu @latest'
 
-unset -f pfop
-pfop() {
-  while read; do
-    local d=$(sed 's/#.*$//' <<< $REPLY);
-    local f=$(p4 where $d | cut -d " " -f3);
-    sed "s:$d:$f:" <<< $REPLY;
-  done < <(p4w opened)
-}
-pfu() {
+# unset -f pfop
+# pfop() {                                                                                                          # {{{2
+#   while read; do
+#     local d=$(sed -e 's/#.*$//' <<< $REPLY);
+#     local f=$(p4 where $d | cut -d " " -f3);
+#     sed "s:$d:$f:" <<< $REPLY;
+#   done < <(p4w opened)
+# }
+alias pfor="p4w opened | sed -r -e 's/#.*$//' -e 's:^//depot/[^/]*/(trunk|branches/[^/]*)/::'"
+
+unset -f pfu
+pfu() {                                                                                                           # {{{2
   # Save ENV variables
   local _env_tmux=$TMUX
   local _env_tmux_pane=$TMUX_PANE
@@ -166,23 +172,63 @@ pfu() {
   [[ -f ~/.fzf.bash ]] && . ~/.fzf.bash
 }
 
-pf_find() {
-  local _scope=""
-  if [[ $1 == "." ]]; then
-    _scope="..."
-    shift;
+" Generate a list of files
+unset -f pf_list
+pf_list() {                                                                                                       # {{{2
+  if [[ "$1" == "--check" ]] && [[ -f ${STEM:+$STEM/}.filelist ]]; then
+    return 0
   fi
 
-  pf have $_scope | grep $@ | awk '{print $3}' | sed -e "s:$PWD:.:"
+  [[ -z $STEM ]] && return 1
+  p4 have | awk {'print $3'} >| $STEM/.filelist
 }
-alias pff=pf_find
+
+" Find a file
+unset -f pff
+pff() {                                                                                                           # {{{2
+  pf_list --check
+  if [[ ! -s ${STEM:+$STEM/}.filelist ]]; then
+    ag --nocolor --no-numbers "$@" ${STEM:+$STEM/}.filelist
+  else
+    p4 have | awk {'print $3'} | command grep -P "$@"
+  fi
+}
+
+" Grep from the list of files in the repo
+unset -f pfg
+pfg() {                                                                                                           # {{{2
+  pf_list --check
+
+  if [[ -s ${STEM:+$STEM/}.filelist ]]; then
+    local _filter='""'
+    if [[ "$1" == "-g" ]]; then
+      _filter="$2"
+      shift 2
+    fi
+    # echo $_filter
+
+    # If $_filter is empty, it acts as cat
+    echo "ag $@ $(command grep -P $_filter ${STEM:+$STEM/}.filelist)"
+    ag $@ $(command grep -P $_filter ${STEM:+$STEM/}.filelist)
+  else
+    ag $@
+  fi
+}
+# }}}2
+
+alias pfgc='pfg --cpp'
+alias pfgch="pfg -g '\.(h|hh|hpp|tpp)$'"
+alias pfgcc="pfg -g '\.(c|cc|cpp|C|CC)$'"
+alias pfgsbs="pfg -g '\.sbs$'"
+
+
 
 #=======================================================================================================================
-# Locations                                                                                                         {{{1
-#============
+# WORKAREA                                                                                                          {{{1
+#=======================================================================================================================
 # Declaring these as environment variables instead of regular ones allows access from within vim
 unset -f make_wa_vars
-make_wa_vars() {
+make_wa_vars() {                                                                                                  # {{{2
   local _proj _ch _wa _scr
   for _proj in as ah br; do
     local _proj_full=$(sed -e 's/as/ASPEN/i' -e 's/ah/ASPEN_HIGHLANDS/i' -e 's/br/BRECKENRIDGE/i' <<< $_proj)
@@ -210,7 +256,7 @@ make_wa_vars
 # And as long as we're in a CH workarea, all the below variables should work the same
 # However, if we're in a non-CH repository like VH then it'll not work.
 # Hence, I've created explicit variables by basing them off ch which in turn is set based on the value of ANCHOR_ch
-dyn_vars() {
+dyn_vars() {                                                                                                      # {{{2
   export ch="${ANCHOR_ch-${REPO_PATH+$REPO_PATH/}ch}"
   export reg="${ANCHOR_local_rdl-${REPO_PATH+$REPO_PATH/}meta/registers}"
   export r="${ch}/rtl"
@@ -231,93 +277,8 @@ dyn_vars() {
 dyn_vars
 
 
-#=======================================================================================================================
-# Functions
-#============
-
-unset -f benv
-benv() {
-  # Save ENV variables
-  local _env_tmux=$TMUX
-  local _env_tmux_pane=$TMUX_PANE
-  local _old_pwd=$PWD
-  local _workarea=${1:-$PWD}
-
-  # Start emacs daemon if one isn't present
-  # [[ -n "${_workarea}" ]] && ~kshenoy/bin/emacs_daemon -s ${workarea//\//_} &> /dev/null &
-
-  command pushd "${_workarea}" > /dev/null
-  sbi && bootenv
-  local ret=$?
-
-  # Restore ENV variables
-  export TMUX=$_env_tmux
-  export TMUX_PANE=$_env_tmux_pane
-
-  if [[ $ret != 0 ]]; then return; fi
-
-  # Source aliases etc.
-  sosa; sosf
-  [[ -f ~/.fzf.bash ]] && . ~/.fzf.bash
-
-  command popd > /dev/null
-}
-
-unset -f trapbug_rm
-trapbug_rm() {
-ssh atlvsub01 xargs /home/ainfra/bin/rm_defunct_bug_data --bug_data_path /proj/aspen_bug_data/ASPEN --bug_dirs << BUGS
-"$@"
-BUGS
-}
-
-unset -f psig
-psig() {
-  perl -lne 'if(/^\s+-+$/../^\s*$/){if(/^\s+-+$/){$c=0;}elsif(/^\s*$/){print "  ($c) $s";}else{$c++;}}else{s/^\s+|\s+$//g;$s=$_}' $1
-}
-
-unset -f rgsig
-rgsig() {
-  for i in $(grep FAIL ${REPO_PATH+$REPO_PATH/}release_gate_tmp/release_gate.log | colm -1); do
-    local _sim=${i##*release_gate_tmp/}
-    _sim=${_sim%%/*}
-    echo -e "\n${_sim}";
-    psig $i;
-  done
-}
-
-unset -f rgww
-rgww() {
-  for i in `g FAIL ${REPO_PATH+$REPO_PATH/}release_gate_tmp/release_gate.log | colm -1`; do
-    local _sim=${i##*release_gate_tmp/}
-    _sim=${_sim%%/*}
-    echo -e "\n${_sim}";
-    pww $i;
-  done
-}
-
-unset -f plastlock
-plastlock() {
-  for i in $*; do
-    echo -e "\n$i:"
-    perl -ne 'if(/BUS_LOCK|SYS_MGMT/){$p="";}$p.=$_;END{print $p;}' $i
-  done
-}
-
-unset -f vsig
-vsig() {
-  file=`grep -Po -m1 '(?<=source\=)[^:]+' summary.rj`
-  file=`find $REPO_PATH -name $file -print -quit`
-  lnum=`grep -Po -m1 '(?<=source\=)[^:]+:\d+' summary.rj | cut -d: -f2`
-  v +$lnum $file -c "norm! zv"
-}
-
-unset -f tel
-tel() {
-  perl -aF/,/ -lne 'print "\nName: $F[1], $F[2]\nCube: $F[0]\nExt : $F[3]" if /'$1'/i' ~/tel.csv;
-}
-
 unset -f mkwa
-mkwa() {
+mkwa() {                                                                                                          # {{{2
   _mkwa_help() {
     echo 'SYNTAX:'
     echo '  mkwa PROJ[/BRANCH=PROJ_trunk][@CHANGELIST=latest]'
@@ -392,6 +353,8 @@ mkwa() {
     return 1
   fi
 
+  p4 have | awk {'print $3'} >| .filelist
+
   # Start an emacs daemon
   # echo "${_fg_green}[Starting emacs daemon...]${_reset}"
   # ~kshenoy/bin/emacs_daemon -s &> /dev/null &
@@ -410,7 +373,7 @@ mkwa() {
 
 
 unset -f wa_list
-wa_list() {
+wa_list() {                                                                                                       # {{{2
   local _proj _ch _wa _path
   for _ch in {0..1}; do
     for _proj in as ah br; do
@@ -426,6 +389,118 @@ wa_list() {
   done
 }
 
+
+unset -f benv
+benv() {                                                                                                          # {{{2
+  # Save ENV variables
+  local _env_tmux=$TMUX
+  local _env_tmux_pane=$TMUX_PANE
+  local _old_pwd=$PWD
+  local _workarea=${1:-$PWD}
+
+  # Start emacs daemon if one isn't present
+  # [[ -n "${_workarea}" ]] && ~kshenoy/bin/emacs_daemon -s ${workarea//\//_} &> /dev/null &
+
+  command pushd "${_workarea}" > /dev/null
+  sbi && bootenv
+  local ret=$?
+
+  # Restore ENV variables
+  export TMUX=$_env_tmux
+  export TMUX_PANE=$_env_tmux_pane
+
+  if [[ $ret != 0 ]]; then return; fi
+
+  # Source aliases etc.
+  sosa; sosf
+  [[ -f ~/.fzf.bash ]] && . ~/.fzf.bash
+
+  command popd > /dev/null
+}
+
+unset -f pfrem
+pfrem() {                                                                                                         # {{{2
+  local _workarea=$(readlink -f ${1:-${REPO_PATH:-$PWD}})
+  if [[ $_workarea != $REPO_PATH ]]; then
+    command cd $_workarea
+    . /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash
+    bootenv
+  fi
+
+  local _scratch_dir=$(readlink -f ${_workarea}/build | command sed 's/build$//')
+  echo -e "\nDeleting workarea: '$_workarea'"
+  cd $_workarea/..
+
+  p4w remove $_workarea
+  local _exit_code=$?
+  if (( $_exit_code != 0 )); then
+    return $_exit_code;
+  fi
+
+  echo -e "\nDeleting workarea from scratch disk..."
+  echo "  command rm -rf $_scratch_dir"
+  rm_rf_silent $_scratch_dir
+
+  # Kill emacs daemon. Use explicit path to avoid kill any other daemons
+  ~kshenoy/bin/emacs_daemon -k ${_workarea//\//_}
+}
+
+unset -f trapbug_rm
+trapbug_rm() {                                                                                                    # {{{2
+ssh atlvsub01 xargs /home/ainfra/bin/rm_defunct_bug_data --bug_data_path /proj/aspen_bug_data/ASPEN --bug_dirs << BUGS
+"$@"
+BUGS
+}
+# }}}2
+# }}}1
+
+
+
+unset -f psig
+psig() {
+  perl -lne 'if(/^\s+-+$/../^\s*$/){if(/^\s+-+$/){$c=0;}elsif(/^\s*$/){print "  ($c) $s";}else{$c++;}}else{s/^\s+|\s+$//g;$s=$_}' $1
+}
+
+unset -f rgsig
+rgsig() {
+  for i in $(grep FAIL ${REPO_PATH+$REPO_PATH/}release_gate_tmp/release_gate.log | colm -1); do
+    local _sim=${i##*release_gate_tmp/}
+    _sim=${_sim%%/*}
+    echo -e "\n${_sim}";
+    psig $i;
+  done
+}
+
+unset -f rgww
+rgww() {
+  for i in `g FAIL ${REPO_PATH+$REPO_PATH/}release_gate_tmp/release_gate.log | colm -1`; do
+    local _sim=${i##*release_gate_tmp/}
+    _sim=${_sim%%/*}
+    echo -e "\n${_sim}";
+    pww $i;
+  done
+}
+
+unset -f plastlock
+plastlock() {
+  for i in $*; do
+    echo -e "\n$i:"
+    perl -ne 'if(/BUS_LOCK|SYS_MGMT/){$p="";}$p.=$_;END{print $p;}' $i
+  done
+}
+
+unset -f vsig
+vsig() {
+  file=`grep -Po -m1 '(?<=source\=)[^:]+' summary.rj`
+  file=`find $REPO_PATH -name $file -print -quit`
+  lnum=`grep -Po -m1 '(?<=source\=)[^:]+:\d+' summary.rj | cut -d: -f2`
+  v +$lnum $file -c "norm! zv"
+}
+
+unset -f tel
+tel() {
+  perl -aF/,/ -lne 'print "\nName: $F[1], $F[2]\nCube: $F[0]\nExt : $F[3]" if /'$1'/i' ~/tel.csv;
+}
 
 unset -f dotty
 dotty() {
@@ -453,33 +528,6 @@ but() {
     echo $REPO_PATH/build/${model}/${model}
     ( $REPO_PATH/build/${model}/${model} | tee ${model}.log )
   fi
-}
-
-unset -f pfrem
-pfrem() {
-  local _workarea=$(readlink -f ${1:-${REPO_PATH:-$PWD}})
-  if [[ $_workarea != $REPO_PATH ]]; then
-    command cd $_workarea
-    . /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash
-    bootenv
-  fi
-
-  local _scratch_dir=$(readlink -f ${_workarea}/build | command sed 's/build$//')
-  echo -e "\nDeleting workarea: '$_workarea'"
-  cd $_workarea/..
-
-  p4w remove $_workarea
-  local _exit_code=$?
-  if (( $_exit_code != 0 )); then
-    return $_exit_code;
-  fi
-
-  echo -e "\nDeleting workarea from scratch disk..."
-  echo "  command rm -rf $_scratch_dir"
-  rm_rf_silent $_scratch_dir
-
-  # Kill emacs daemon. Use explicit path to avoid kill any other daemons
-  ~kshenoy/bin/emacs_daemon -k ${_workarea//\//_}
 }
 
 unset -f wtff
