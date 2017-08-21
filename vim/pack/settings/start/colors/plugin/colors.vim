@@ -12,17 +12,7 @@ function! s:ReadBase16Config()                                                  
   " endif
 
   if filereadable(expand('~/.vimrc_background'))
-    source ~/.vimrc_background
-  endif
-endfunction
-
-
-function! s:WriteBase16Config()                                                                                   " {{{1
-  if (  !has('gui_running')
-   \ && filewritable(s:config_file)
-   \ )
-    let l:color = substitute(g:colors_name, "base16-", "", "")
-    call writefile([l:color . " " . &background], s:config_file)
+    silent! source ~/.vimrc_background
   endif
 endfunction
 
@@ -41,8 +31,6 @@ function! s:After()                                                             
    \ )
     return
   endif
-
-  " call s:WriteBase16Config()
 
   " This is a deliberate choice to stick the file under after/colors. This is because if it's under after/plugin then
   " the code seems to be run before the colorscheme gets loaded and thus can't be relied upon to run everytime.
@@ -93,12 +81,11 @@ function! s:UpdateUserColors()                                                  
 endfunction
 " }}}1
 
-call s:ReadBase16Config()
 
 if has('autocmd')
   augroup Color
     autocmd!
-    " autocmd FocusGained * call s:ReadBase16Config()
+    autocmd VimEnter,FocusGained * call s:ReadBase16Config()
     autocmd Colorscheme * call s:After()
   augroup END
 endif

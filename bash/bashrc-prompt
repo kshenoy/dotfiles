@@ -179,14 +179,20 @@ _setprompt_sjlmod_() {
   # Colors
   # NOTE: Non-printable sequences should be enclosed in \[ and \] else it'll cause long commands to not wrap correctly
   local prc_norm='\[$(tput sgr0)\]'
-  local prc_grey='\[$(tput setaf 250)\]'
-  local prc_white='\[$(tput setaf 7)\]'
-  local prc_red='\[$(tput setaf 160)\]'
-  local prc_lime='\[$(tput setaf 154)\]'
-  local prc_cherry='\[$(tput setaf 161)\]'
-  local prc_yellow='\[$(tput setaf 221)\]'
-  local prc_orange='\[$(tput setaf 214)\]'
-  local prc_rose='\[$(tput setaf 211)\]'
+  # local prc_grey='\[$(tput setaf 250)\]'
+  # local prc_white='\[$(tput setaf 7)\]'
+  # local prc_red='\[$(tput setaf 160)\]'
+  # local prc_green='\[$(tput setaf 154)\]'
+  # local prc_bright_red='\[$(tput setaf 161)\]'
+  # local prc_yellow='\[$(tput setaf 221)\]'
+  # local prc_orange='\[$(tput setaf 214)\]'
+
+  local prc_grey="\[\033[1;30m\]"
+  local prc_red="\[\033[0;31m\]"
+  local prc_green="\[\033[1;32m\]"
+  local prc_bright_red=${prc_red}
+  local prc_yellow="\[\033[0;33m\]"
+  local prc_orange=${prc_yellow}
 
   # Set line graphics
   local pr_dash="─"
@@ -207,7 +213,7 @@ _setprompt_sjlmod_() {
     local prc_user_symbol=${prc_red}
     #local pr_user_symbol=" \$"
   else
-    local prc_user_symbol=${prc_white}
+    local prc_user_symbol=${prc_grey}
     #local pr_user_symbol=" #"
   fi
 
@@ -242,9 +248,9 @@ _setprompt_sjlmod_() {
     if $(echo "$(git log origin/$pr_vcs_branch..HEAD 2> /dev/null)" | grep '^commit' &> /dev/null); then
       local prc_vcs_branch=${prc_orange}
     elif [[ -n $(git status -s --ignore-submodules=dirty  2> /dev/null) ]]; then
-      local prc_vcs_branch=${prc_cherry}
+      local prc_vcs_branch=${prc_bright_red}
     else
-      local prc_vcs_branch=${prc_lime}
+      local prc_vcs_branch=${prc_green}
     fi
 
   elif [[ $pr_vcs_type == "hg" ]]; then
@@ -272,7 +278,7 @@ _setprompt_sjlmod_() {
     pr_host=""
     pr_info="${pr_ulcorner} ${pr_pwd_sep}${pr_pwd}${pr_vcs_sep}${pr_vcs_branch} "
   fi
-  pr_pwd_sep="${prc_white}${pr_pwd_sep}"
+  pr_pwd_sep="${prc_grey}${pr_pwd_sep}"
 
   # If the info still can't fit, drop vcs branch
   if (( $columns < ${#pr_info} )); then
@@ -280,7 +286,7 @@ _setprompt_sjlmod_() {
     pr_vcs_branch=""
     pr_info="${pr_ulcorner} ${pr_pwd_sep}${pr_pwd} "
   fi
-  pr_pwd_sep="${prc_white}${pr_pwd_sep}"
+  pr_pwd_sep="${prc_grey}${pr_pwd_sep}"
 
   # If the info still can't fit, truncate PWD
   if (( $columns < ${#pr_info} )); then
@@ -289,22 +295,22 @@ _setprompt_sjlmod_() {
       pr_pwd=`echo $pr_pwd | sed 's|^/\?[^/]*/||'`
       pr_info="${pr_ulcorner} ${pr_pwd_sep}${pr_pwd} "
     done
-    pr_pwd_sep="${prc_lime}${pr_pwd_sep}"
+    pr_pwd_sep="${prc_green}${pr_pwd_sep}"
   fi
-  pr_pwd="${prc_lime}${pr_pwd}${pr_norm}"
+  pr_pwd="${prc_green}${pr_pwd}${pr_norm}"
 
   local pr_fillsize=$(( $columns - ${#pr_info} - 1 ))
   local pr_fill=$(printf "${pr_dash}%.0s" $(seq 1 $pr_fillsize))" "
 
   # Color pr_pwd based upon exit status of last command
   if [ "$cmd_exit" = "0" ]; then
-    local pr_cmd_exit="${prc_lime} (^_^)${prc_norm}"
+    local pr_cmd_exit="${prc_green} (^_^)${prc_norm}"
   else
     local pr_cmd_exit="${prc_red} (@_@)${prc_norm}"
   fi
 
-  PS1="\n${prc_norm}${prc_grey}${pr_ulcorner} ${prc_cherry}${pr_user}${prc_white}${pr_user_host_sep}${prc_orange}${pr_host}"
-  PS1+="${pr_pwd_sep}${pr_pwd}${prc_white}${pr_vcs_sep}${prc_vcs_branch}${pr_vcs_branch} "
+  PS1="\n${prc_norm}${prc_grey}${pr_ulcorner} ${prc_bright_red}${pr_user}${prc_grey}${pr_user_host_sep}${prc_orange}${pr_host}"
+  PS1+="${pr_pwd_sep}${pr_pwd}${prc_grey}${pr_vcs_sep}${prc_vcs_branch}${pr_vcs_branch} "
   PS1+="${prc_grey}${pr_fill}${prc_orange}${pr_time}"
   PS1+="\n${prc_grey}${pr_llcorner}${pr_cmd_exit}${prc_user_symbol}${pr_user_symbol}${prc_norm} "
 

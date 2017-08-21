@@ -76,7 +76,7 @@ call plug#('tpope/vim-unimpaired')
 call plug#('tpope/vim-vinegar',                {'on': '<Plug>VinegarUp'})
 
 " Colorshemes ----------------------------------------------------------------------------------------------------------
-" call plug#('chriskempson/base16-vim')
+call plug#('chriskempson/base16-vim')
 " call plug#('kshenoy/vim-sol')
 " call plug#('rakr/vim-one')
 
@@ -104,7 +104,7 @@ let g:acp_completeoptPreview = 0                                              " 
 
 
 " Base16 ---------------------------------------------------------------------------------------------------------- {{{1
-let g:base16_shell_path=glob('~/.dotfiles/base16/shell/scripts')
+let g:base16_shell_path=glob('~/.config/base16-shell/scripts/')
 
 
 " CommandT -------------------------------------------------------------------------------------------------------- {{{1
@@ -144,13 +144,12 @@ if has('unix')
     \ 'types': {
       \ 1: ['.git', 'cd %s && git ls-files --cached --exclude-standard --others'],
       \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
-      \ 3: ['P4CONFIG', 'cd %s && cat <(p4 have | ' .
-                                     \ 'grep -v "^\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/variants\|' .
-                                     \ 'ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)") ' .
-                                   \ '<(find import/avf -type f 2> /dev/null) ' .
-                                   \ '<(p4 opened | grep add | sed "s/#.*//" | command xargs -I{} -n1 p4 where {} | ' .
-                                     \   'cut -d" " -f3) | ' .
-                               \ 'grep -v "\.\(so\|log\)" | sed "s:^.*$PWD/::"'
+      \ 3: ['P4CONFIG', 'cat <(p4 have $STEM/... | ' .
+                         \    'grep -v "^\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/variants\|' .
+                         \    'ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)" | awk "{print \$3}")' .
+                         \  '<(find import/avf -type f 2> /dev/null) ' .
+                         \  '<(p4 opened | grep add | sed "s/#.*//" | command xargs -I{} -n1 p4 where {} | ' .
+                         \    'cut -d" " -f3) | grep -v "\.\(so\|log\)" | sed "s:^.*$PWD/::"'
          \ ]
     \ },
     \ 'fallback': "find %s -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune -o " .
