@@ -1,0 +1,15 @@
+# Readline settings
+set show-mode-in-prompt-on
+
+set keymap emacs
+# Switch to vi mode
+"\C-x\C-t": vi-editing-mode
+
+# Switch to emacs mode
+set keymap vi-command
+"\C-x\C-t": emacs-editing-mode
+set keymap vi-insert
+"\C-x\C-t": emacs-editing-mode
+
+# Set default editing mode
+set editing-mode emacs
