@@ -27,6 +27,8 @@ vim/pack/bundles
 vim/pack/settings/start/UltiSnips/pythonx/UltiSnips_globals.pyc
 vim/pack/settings/start/UltiSnips/pythonx/vimsnippets.pyc
 vim/tmp
+nvim/autoload/plug*
+nvim/bundles
 wallpapers/
 zsh/history
 zsh/oh-my-zsh/

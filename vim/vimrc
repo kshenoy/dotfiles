@@ -125,6 +125,7 @@ if exists('+colorcolumn')
   set colorcolumn=+1
 endif
 "set spell
+autocmd FileType gitcommit setlocal spell
 set spelllang=en_us
 
 

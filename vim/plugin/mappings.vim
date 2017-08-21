@@ -39,7 +39,6 @@ noremap <F1> :vert bo h index<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " RE-MAPPING FOR CONVENIENCE                                                                                        {{{1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 """ Netrw
 "nnoremap - :Ex<CR>
 "autocmd FileType netrw nnoremap qq :Rex<CR>
@@ -104,9 +103,8 @@ nnoremap ZQ :qall!<CR>
 """ Make the repeat operator accept a count (repeat.vim does this too)
 " nnoremap . :<C-U>execute 'normal! ' . repeat('.', v:count1)<CR>
 
-""" Swap * and g* as I don't do a lot of whole word searches
-nnoremap <silent> *  g*
-nnoremap <silent> g* *
+""" Easily quit help pages
+autocmd FileType help nnoremap <buffer> q :q<CR>
 
 
 
@@ -273,11 +271,11 @@ cnoremap <C-W> <C-R>=utils#CmdIsk(1)<CR><C-W><C-R>=utils#CmdIsk(0)<CR>
 " |--------+------------+-----------------------------------------------------------------------------------------|
 " | Mode   | Map        | Description                                                                             |
 " |--------+------------+-----------------------------------------------------------------------------------------|
-" | Normal | *    #     | Search word under cursor                                                                |
-" |        | g*   g#    | Search whole-word under cursor                                                          |
+" | Normal | *    #     | Search whole-word under cursor                                                                |
+" |        | g*   g#    | Search word under cursor                                                          |
 " |--------+------------+-----------------------------------------------------------------------------------------|
-" | Normal | <leader>*  | Set search pattern to word under cursor                                                 |
-" |        | <leader>g* | Set search pattern to whole-word under cursor                                           |
+" | Normal | <leader>*  | Set search pattern to whole-word under cursor                                                 |
+" |        | <leader>g* | Set search pattern to word under cursor                                           |
 " |--------+------------+-----------------------------------------------------------------------------------------|
 " | Normal | <leader>/  | Display all lines in current buffer containing the search term in a location-list       |
 " |        | <leader>g/ | Display all lines in all buffers containing the search term in a quickfix-list          |
@@ -287,8 +285,8 @@ cnoremap <C-W> <C-R>=utils#CmdIsk(1)<CR><C-W><C-R>=utils#CmdIsk(0)<CR>
 " |--------+------------+-----------------------------------------------------------------------------------------|
 " | Visual | /    ?     | Open search with visual selection but don't start searching                             |
 " |--------+------------+-----------------------------------------------------------------------------------------|
-" | Visual | *    #     | Start search with visual selection                                                      |
-" |        | g*   g#    | Start searching whole-word with visual selection                                        |
+" | Visual | *    #     | Start searching whole-word with visual selection                                        |
+" |        | g*   g#    | Start search with visual selection                                                      |
 " |--------+------------+-----------------------------------------------------------------------------------------|
 " | Visual | &          | Open substitute with visual selection                                                   |
 " |--------+------------+-----------------------------------------------------------------------------------------|
@@ -309,10 +307,10 @@ cnoremap .s/ .s/\v
 xnoremap :s/ :s/\%V\v
 
 """ Search with visual selection (* doesn't do whole-word searches - to match what I do in normal mode)
-vnoremap *  <ESC>/<C-R>=escape( @*, '$*[]\/' )<CR><CR>
-vnoremap g* <ESC>/\<<C-R>=escape( @*, '$*[]\/' )<CR>\><CR>
-vnoremap #  <ESC>?<C-R>=escape( @*, '$*[]\/' )<CR><CR>
-vnoremap g# <ESC>?\<<C-R>=escape( @*, '$*[]\/' )<CR>\><CR>
+vnoremap *  <ESC>/\<<C-R>=escape( @*, '$*[]\/' )<CR>\><CR>
+vnoremap g* <ESC>/<C-R>=escape( @*, '$*[]\/' )<CR><CR>
+vnoremap #  <ESC>?\<<C-R>=escape( @*, '$*[]\/' )<CR>\><CR>
+vnoremap g# <ESC>?<C-R>=escape( @*, '$*[]\/' )<CR><CR>
 
 """ Start substitute with visual selection
 " This escape function is meant for use with normal substitution
@@ -321,10 +319,10 @@ vnoremap & <ESC>:%s/<C-R>=escape( @*, '$*[]\\|\/' )<CR>/
 "vnoremap & <ESC>:%s/\v<C-R>=escape( @*, '$%^*=+<>()[]{}&/' )<CR>/
 
 """ Set search pattern without moving the cursor
-nnoremap <silent> <leader>*  :let @/=escape(expand('<cword>'),'$*[]/')<CR>
-nnoremap <silent> <leader>g* :let @/='\<'.escape(expand('<cword>'),'$*[]/').'\>'<CR>
-vnoremap <silent> <leader>*  :<C-U>let @/=escape(@*,'$*[]/')<CR>
-vnoremap <silent> <leader>g* :<C-U>let @/='\<'.escape(@*,'$*[]/').'\>'<CR>
+nnoremap <silent> <leader>*  :let @/='\<'.escape(expand('<cword>'),'$*[]/').'\><CR>
+nnoremap <silent> <leader>g* :let @/=escape(expand('<cword>'),'$*[]/')'<CR>
+vnoremap <silent> <leader>*  :<C-U>let @/='\<'.escape(@*,'$*[]/').'\>'<CR>
+vnoremap <silent> <leader>g* :<C-U>let @/=escape(@*,'$*[]/')<CR>
 
 """ Find and show results in a LocationList (Buffer-specific)
 nnoremap <silent> <leader>/ :call utils#FindAndList('local', 'normal')<CR>

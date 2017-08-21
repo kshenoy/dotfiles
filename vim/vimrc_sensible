@@ -19,6 +19,7 @@ endif
 
 set autoindent
 set backspace=indent,eol,start
+set whichwrap=b,s,<,>,h,l,[,]
 set complete-=i
 set smarttab
 

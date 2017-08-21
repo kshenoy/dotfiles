@@ -9,7 +9,7 @@ umask 002
 
 #=======================================================================================================================
 # SHELL CONFIGURATION                                                                                               {{{1
-#======================
+#=======================================================================================================================
 if [[ $- == *i* ]]; then
   # Shell is interactive
   # Turn off TTY "start" and "stop" commands in all interactive shells.
@@ -142,7 +142,11 @@ set +o nounset
 
 #=======================================================================================================================
 # COMPLETION                                                                                                        {{{1
-#=============
+#=======================================================================================================================
+if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
+  . /etc/bash_completion
+fi
+
 complete -A hostname   rsh rcp telnet rlogin r ftp ping disk
 complete -A export     printenv
 complete -A variable   export local readonly unset
@@ -193,8 +197,8 @@ complete -f -o default -X '!*.gif'  kview
 
 #=======================================================================================================================
 # ENVIRONMENT VARIABLES                                                                                             {{{1
-#========================
-# History
+#=======================================================================================================================
+## HISTORY
 HISTSIZE=65535
 HISTFILESIZE=65535
 # Show timestamps in history
@@ -230,8 +234,7 @@ LANG=en_US.UTF-8
 
 #=======================================================================================================================
 # MISC SETTINGS                                                                                                     {{{1
-#================
-
+#=======================================================================================================================
 # Make less more friendly for non-text input files, see lesspipe(1)
 [[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
 
@@ -239,16 +242,6 @@ LANG=en_US.UTF-8
 if [[ -z "$debian_chroot" ]] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
-
-
-#=======================================================================================================================
-# BINDINGS                                                                                                          {{{1
-#===========
-
-
-#=======================================================================================================================
-# EXTERNAL CUSTOMISATIONS                                                                                           {{{1
-#==========================
 
 # If not running interactively, don't do anything
 [[ -z "$PS1" ]] && return
@@ -259,10 +252,10 @@ if [[ -x /usr/bin/dircolors ]]; then
   [[ -r ~/.dircolors ]] && eval "$(/usr/bin/dircolors -b ${HOME}/.dircolors)" || eval "$(/usr/bin/dircolors -b)"
 fi
 
-if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
-  . /etc/bash_completion
-fi
 
+#=======================================================================================================================
+# SOURCE UTILS                                                                                                      {{{1
+#=======================================================================================================================
 for i in \
   ~/.dotfiles/bash/bashrc-func          \
   ~/.dotfiles/bash/bashrc-prompt        \
@@ -285,12 +278,21 @@ BASE16_SHELL=$HOME/.config/base16-shell
 [[ -n "$PS1" ]] && [[ -s $BASE16_SHELL/profile_helper.sh ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
 
 
+#=======================================================================================================================
+# PATH                                                                                                              {{{1
+#=======================================================================================================================
 # Keep PATH customizations at the end
 # Ruby gem path
 if ((which ruby &> /dev/null) && (which gem &> /dev/null)); then
   PATH="$(ruby -rubygems -e 'puts Gem.user_dir')/bin":$PATH
 fi
 PATH=${HOME}/bin:$PATH
+
+for dir in /usr/man /usr/share/man; do
+  if [[ -d $dir ]]; then
+    MANPATH=$MANPATH:$dir
+  fi
+done
 
 
 # Automatically add completion for all aliases to commands having completion functions. Should be called at the end
