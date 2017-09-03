@@ -47,7 +47,6 @@ set nostartofline                             " Prevent cursor from jumping to s
 set path=.,/usr/local/include,/usr/include,**;
 set autochdir                                                                       " Change directory to file in buffer
 set incsearch                                                                          " Incremental search highlighting
-set magic                                                  " Enable non-alphanumeric characters to have special meanings
 set ignorecase                                                                              " Ignore Case when searching
 set smartcase                                               " Override ignorecase when pattern has upper case characters
 
@@ -63,9 +62,7 @@ set tags+=.tags;
 set tags+=tags;
 execute 'set tags+=' . g:dotvim . '/tags/cpp_stl.tags'
 set cscopetag                                                       " Use cscope as well as tags when searching for tags
-set cscopetagorder=0                                                                     " Search cscope.out before tags
 "set cscopequickfix=s-,g-,c-,d-,i-,t-,e-            " Show symbols, calls, called, includes, tags and egreps in quickfix
-set nocscoperelative
 
 
 "
@@ -75,7 +72,6 @@ if DISABLE_FROM == 4 | finish | endif
 
 set scrolloff=3                                                       " Number of screen lines to show around the cursor
 set sidescroll=3
-set wrap                                                                                              " Enable word wrap
 set sidescrolloff=10
 set cmdheight=2                                                                                    " Command area height
 "set columns=120                                                                                Set width of the display
@@ -148,8 +144,6 @@ set splitright                                           " Open new split to the
 "
 if DISABLE_FROM == 7 | finish | endif
 
-set showtabline=1                                                                 " Only when at least two tabs are open
-set tabpagemax=20                                                                         " Max no. of tab pages to open
 set guitablabel=%{utils#GuiTabLabel()}
 set guitabtooltip=%{utils#GuiTabToolTip()}
 
@@ -211,11 +205,8 @@ if DISABLE_FROM == 12 | finish | endif
 
 set shortmess=ilsI                                         " To avoid intro screen, search direction change notification
 set showcmd                                              " Display an incomplete command in lower right corner of window
-set showmode                                                                                      " Display current mode
 set ruler                                                      " Display cursor position in lower-right corner of window
 set report=0                          " Show a report when N lines were changed. report=0 thus means "show all changes"!
-set noerrorbells                                                                                   " Damn this beep! ;-)
-set novisualbell                                                                    " Use visual bell instead of beeping
 
 
 "
@@ -236,12 +227,12 @@ if DISABLE_FROM == 13 | finish | endif
 if DISABLE_FROM == 14 | finish | endif
 
 set textwidth=120                                            " Line length above which to break a line. 0 => Don't break
-set wrapmargin=0                                                             " Margin to the right at which to wrap text
 set backspace=indent,eol,start        " Allow backspace to erase previously entered characters, autoindent, and newlines
 set formatoptions+=j                                                        " Remove a comment leader when joining lines
 set formatoptions+=n                                                                          " Recognize numbered lists
-set complete=.,w,b,u,t,kspell   " Scan current buffer, open windows, other unloaded buffers, tags but not included files
-set completeopt=menu                                                                " Use popup menu to show completions
+set complete-=i                                                                 " Do not scan current and included files
+set complete+=kspell                                                           " Use the currently active spell checking
+set completeopt-=preview                                            " Don't show extra information in the preview window
 set completeopt+=menuone                                                       " Show popup menu even for a single match
 set completeopt+=noinsert                                                        " Do not insert any text until selected
 set completeopt+=noselect                                                               " Do not select a match on popup
@@ -256,11 +247,10 @@ set nojoinspaces                                   " Don't insert two spaces aft
 "
 if DISABLE_FROM == 15 | finish | endif
 
-set tabstop=8                                                                                     " Set manual tab-width
-set shiftwidth=2                                                  " Set software tab-width (for eg in case of << and >>)
-set softtabstop=2                                          " No. of spaces to insert for a tab when expandtab is enabled
-set shiftround                                                                 " Round to 'shiftwidth' for "<<" and ">>"
 set expandtab                                                                                 " Replace tabs with spaces
+set softtabstop=2                                          " No. of spaces to insert for a tab when expandtab is enabled
+let shiftwidth=&softtabstop                                       " Set software tab-width (for eg in case of << and >>)
+set shiftround                                                                 " Round to 'shiftwidth' for "<<" and ">>"
 set autoindent                                                                                   " Auto-indent new lines
 set cinkeys-=0#                                                          " Prevent forcing of C-preprocessor to column 1
 
@@ -273,8 +263,6 @@ if DISABLE_FROM == 16 | finish | endif
 "set foldcolumn=3                                                               " Width of column used to indicate folds
 set foldtext=utils#FoldText()
 set foldmethod=marker
-"set foldmarker={{{,}}}                                                    " Markers used when 'foldmethod' is "marker"}
-"set foldmarker=>_>,<_<                                                     " Markers used when 'foldmethod' is "marker"
 set foldnestmax=2                                      " Maximum fold depth for when 'foldmethod is "indent" or "syntax"
 
 
@@ -307,11 +295,9 @@ if DISABLE_FROM == 19 | finish | endif
 if &modifiable
   set fileformat=unix                                                                                       " EOL format
 endif
-set writebackup                                                          " Write a backup file before overwriting a file
 set backup                                                              " Create backup of files before overwriting them
 execute 'set backupdir=' . g:dotvim . '/tmp/backups'
 if !isdirectory(&backupdir) | call mkdir(&backupdir, 'p') | endif
-set noshortname                                                                       " Don't restrict to 8.3 file names
 
 
 "
@@ -334,7 +320,6 @@ if DISABLE_FROM == 21 | finish | endif
 set history=1000                                                                      " No. of command lines to remember
 set suffixes=.aux,.dvi,.gz,.idx,.ps,.swp,~,.o,.info,.obj,.so                       " Ignore these files when using :edit
 set wildmenu                                                           " Command-line completion shows a list of matches
-set wildchar=<Tab>                                                            " Key that triggers command-line expansion
 set wildmode=list:longest,full                                  " Specifies command line completion to behave like shell
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.o,*.obj                 " List of patterns to ignore for file name completion
 
@@ -359,10 +344,7 @@ set formatprg=clang-format\ --style=google                                      
 "
 if DISABLE_FROM == 23 | finish | endif
 
-if     executable('ag')  | let &grepprg = 'ag  --nogroup --nocolor --follow'    .(&smartcase ? ' --smart-case' : '')
-elseif executable('pt')  | let &grepprg = 'pt  --nogroup --nocolor --follow'    .(&smartcase ? ' --smart-case' : '')
-elseif executable('ack') | let &grepprg = 'ack --nogroup --nocolor --follow -H' .(&smartcase ? ' --smart-case' : '')
-endif
+if executable('ag') | let &grepprg='ag --nogroup --nocolor --follow'.(&smartcase ? ' --smart-case' : '') | endif
 
 
 
@@ -386,7 +368,6 @@ if DISABLE_FROM == 25 | finish | endif
 if DISABLE_FROM == 26 | finish | endif
 
 "set gdefault                                                                          " Enable global search by default
-set noexrc                                              " Disable reading of .vimrc/.exrc/.gvimrc from current directory
 execute 'set viewdir=' . g:dotvim . '/tmp/views'
 " Directory to save views to
 if !isdirectory(&viewdir) | call mkdir(&viewdir, 'p') | endif
