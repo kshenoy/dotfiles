@@ -27,9 +27,6 @@ nnoremap <silent> gosp :e ~/.dotfiles/bash/bashrc-prompt<CR>
 nnoremap <silent> gosc :e ~/.bashrc<CR>
 nnoremap <silent> gost :e ~/.dotfiles/tmux/tmux.conf<CR>
 nnoremap <silent> gosw :e ~/.dotfiles/aliases-work<CR>
-nnoremap <silent> gosx :e ~/.Xresources<CR>
-nnoremap <silent> gosi :e ~/.config/i3/config<CR>
-nnoremap <silent> gon  :e ~/Notes<CR>
 
 """ Redirect F1 to list of all commands which is more useful than the default help page
 noremap <F1> :vert bo h index<CR>
@@ -50,17 +47,14 @@ noremap <F1> :vert bo h index<CR>
 onoremap <silent> <expr> w (v:count > 1 ? ":normal! " . v:count . "w<CR>" : ":normal! w<CR>")
 onoremap <silent> <expr> W (v:count > 1 ? ":normal! " . v:count . "W<CR>" : ":normal! W<CR>")
 
-""" Save read-only files with sudo
-command! W w !sudo tee % > /dev/null
-
 """ Show full file path while opening file
 cabbrev %%p <C-R>=fnameescape(expand('%:p'))<CR>
 cabbrev %%h <C-R>=fnameescape(expand('%:p:h'))<CR>
 cabbrev %%t <C-R>=fnameescape(expand('%:p:t'))<CR>
 cabbrev %%r <C-R>=fnameescape(expand('%:p:r'))<CR>
 
-nnoremap <leader>s% :silent! source <C-R>=fnameescape( expand( '%:p' ))<CR><CR>
-cabbrev <expr> E (( getcmdtype() == ':' && getcmdpos() <= 2 ) ? 'e <C-R>=fnameescape( expand( "%:p:h" ))."/"<CR><C-R>=utils#EatChar("\\s")<CR>' : 'E' )
+nnoremap <leader>s% :silent! source <C-R>=fnameescape(expand('%:p'))<CR><CR>
+cabbrev <expr> E ((getcmdtype() == ':' && getcmdpos() <= 2) ? 'e <C-R>=fnameescape(expand("%:p:h"))."/"<CR><C-R>=utils#EatChar("\\s")<CR>' : 'E')
 
 """ Display full path and filename
 nnoremap <C-G> 2<C-G>
@@ -69,7 +63,7 @@ nnoremap <C-G> 2<C-G>
 nnoremap <expr> y<C-G> ':let @' . (has('win_32') ? '+' : '*') . '="' . expand("%:p") . '"<CR>'
 
 """ Open help in a vertically split window. Use `:set splitright` to open on the right
-cabbrev <expr> h (( getcmdtype() == ':' && getcmdpos() <= 2 ) ? 'vert bo h' : 'h' )
+cabbrev <expr> h ((getcmdtype() == ':' && getcmdpos() <= 2) ? 'vert bo h' : 'h')
 
 """ Persistent paste in visual mode
 " By default, p/P in visual mode pastes the contents of the default register and replaces it with the visual selection.
@@ -79,9 +73,9 @@ xnoremap <expr> p v:register=='"'?'pgvy':'p'
 
 """ Jumping to next/previous start/end of Methods
 noremap <silent> ][ :call utils#SectionJump('next', 'start')<CR>
-noremap <silent> ]] :call utils#SectionJump('next', 'end'  )<CR>
+noremap <silent> ]] :call utils#SectionJump('next', 'end')<CR>
 noremap <silent> [[ :call utils#SectionJump('prev', 'start')<CR>
-noremap <silent> [] :call utils#SectionJump('prev', 'end'  )<CR>
+noremap <silent> [] :call utils#SectionJump('prev', 'end')<CR>
 
 noremap <silent> ]m :call utils#MethodJump(']m')<CR>
 noremap <silent> ]M :call utils#MethodJump(']M')<CR>
@@ -191,10 +185,6 @@ noremap <silent> <F2> :call utils#CycleNumbering()<CR>
 """ Visually select the text that was last edited/pasted
 nnoremap gV `[v`]
 
-""" Jump to beginning/end lines of the paragraph instead of to a blank line between paragraphs
-map g{ <Plug>(ParJumpBackward)
-map g} <Plug>(ParJumpForward)
-
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -247,11 +237,11 @@ if v:version >= 700
   nnoremap <silent> <C-S-PageDown> :execute 'silent! tabmove ' . tabpagenr()<CR>
 
   " Toggle between all buffers and all tabs
-  nnoremap <silent> <expr> <F8> ( tabpagenr('$') == 1 ? ':tab ball<Bar>tabn' : ':tabo' ) . '<CR>'
+  nnoremap <silent> <expr> <F8> (tabpagenr('$') == 1 ? ':tab ball<Bar>tabn' : ':tabo') . '<CR>'
 endif
 
 
-""" Command-line Window ( :h c_CTRL-F )
+""" Command-line Window (:h c_CTRL-F)
 " Make Vim start in Insert mode in the command-line window.
 "autocmd CmdwinEnter [/?] startinsert
 " Make closing cmdline-window easier
@@ -307,16 +297,16 @@ cnoremap .s/ .s/\v
 xnoremap :s/ :s/\%V\v
 
 """ Search with visual selection (* doesn't do whole-word searches - to match what I do in normal mode)
-vnoremap *  <ESC>/\<<C-R>=escape( @*, '$*[]\/' )<CR>\><CR>
-vnoremap g* <ESC>/<C-R>=escape( @*, '$*[]\/' )<CR><CR>
-vnoremap #  <ESC>?\<<C-R>=escape( @*, '$*[]\/' )<CR>\><CR>
-vnoremap g# <ESC>?<C-R>=escape( @*, '$*[]\/' )<CR><CR>
+vnoremap *  <ESC>/\<<C-R>=escape(@*, '$*[]\/')<CR>\><CR>
+vnoremap g* <ESC>/<C-R>=escape(@*, '$*[]\/')<CR><CR>
+vnoremap #  <ESC>?\<<C-R>=escape(@*, '$*[]\/')<CR>\><CR>
+vnoremap g# <ESC>?<C-R>=escape(@*, '$*[]\/')<CR><CR>
 
 """ Start substitute with visual selection
 " This escape function is meant for use with normal substitution
-vnoremap & <ESC>:%s/<C-R>=escape( @*, '$*[]\\|\/' )<CR>/
+vnoremap & <ESC>:%s/<C-R>=escape(@*, '$*[]\\|\/')<CR>/
 " This escape function is meant only for use with verymagic substitution
-"vnoremap & <ESC>:%s/\v<C-R>=escape( @*, '$%^*=+<>()[]{}&/' )<CR>/
+"vnoremap & <ESC>:%s/\v<C-R>=escape(@*, '$%^*=+<>()[]{}&/')<CR>/
 
 """ Set search pattern without moving the cursor
 nnoremap <silent> <leader>*  :let @/='\<'.escape(expand('<cword>'),'$*[]/').'\>'<CR>
@@ -345,7 +335,7 @@ nnoremap <silent> N :call utils#SearchSaveAndRestore()<CR>?<CR>zvzz
 """ Jump to corresponding <Tag> (AMD)
 nmap <leader>< va><ESC>:<C-U>/<C-R>*<CR>
 
-""" Clear search string itself ( Save before clearing )
+""" Clear search string itself (Save before clearing)
 nnoremap <silent> <C-L> :call utils#SearchSaveAndRestore()<Bar>let @/=""<CR><C-L>
 "nnoremap <S-F5> :set hlsearch!<CR>:set hlsearch?<cr>   " Use coh from Unimpaired
 

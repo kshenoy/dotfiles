@@ -1,1 +1,1 @@
-autocmd! BufEnter *.tpp set ft=cpp
+autocmd! BufNewFile,BufRead *.tpp set ft=cpp

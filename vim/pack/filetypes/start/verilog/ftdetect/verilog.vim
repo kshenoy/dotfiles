@@ -1,2 +1,2 @@
 " Recognize .x files as Verilog
-autocmd! BufEnter *.x,*.d set ft=verilog
+autocmd! BufNewFile,BufRead *.x,*.d set ft=verilog

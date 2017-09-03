@@ -30,9 +30,8 @@ runtime! macros/matchit.vim
 
 call plug#('PeterRincker/vim-argumentative')
 " call plug#('justinmk/vim-sneak')
-" call plug#('wellle/targets.vim')
-call plug#('rhysd/vim-textobj-word-column',    {'on': '<Plug>(textobj-wordcolumn'})
 call plug#('chaoren/vim-wordmotion')
+call plug#('rhysd/vim-textobj-word-column',    {'on': '<Plug>(textobj-wordcolumn'})
 call plug#('kana/vim-textobj-user')
 call plug#('glts/vim-textobj-comment',         {'on': '<Plug>(textobj-comment'})
 call plug#('kana/vim-textobj-function',        {'on': '<Plug>(textobj-function'})
@@ -40,7 +39,6 @@ call plug#('kana/vim-textobj-indent',          {'on': '<Plug>(textobj-indent'})
 call plug#('saihoooooooo/vim-textobj-space',   {'on': '<Plug>(textobj-space'})
 
 " Completion/Text insertion --------------------------------------------------------------------------------------------
-" call plug#('vim-scripts/AutoComplPop')
 call plug#('lifepillar/vim-mucomplete')
 call plug#('Raimondi/delimitMate')
 call plug#('tpope/vim-endwise')
@@ -318,6 +316,11 @@ let g:OrigamiFoldAtCol = 117
 augroup Origami
   autocmd FileType c,cpp,systemverilog let g:OrigamiCommentString = '//%s'
 augroup END
+
+
+" vim-parjumper --------------------------------------------------------------------------------------------------- {{{1
+" map g{ <Plug>(ParJumpBackward)
+" map g} <Plug>(ParJumpForward)
 
 
 " Repeat ---------------------------------------------------------------------------------------------------------- {{{1
