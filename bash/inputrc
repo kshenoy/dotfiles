@@ -11,5 +11,12 @@ set keymap vi-command
 set keymap vi-insert
 "\C-x\C-t": emacs-editing-mode
 
+# Open up $VISUAL to edit command
+set keymap vi-command
+"\C-x\C-e": edit-and-execute-command
+set keymap vi-insert
+"\C-x\C-e": edit-and-execute-command
+
+
 # Set default editing mode
 set editing-mode emacs

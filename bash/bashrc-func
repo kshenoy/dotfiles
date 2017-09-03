@@ -43,30 +43,30 @@ alert() {
 
 # Human-readable du sorted by size                                                                                  {{{1
 unset -f duh
-duh() {
-  depth="0"
-  dir="."
-  if (( $# > 0 )); then
-    depth=$1
-    shift
-  fi
-  if (( $# > 0 )); then
-    dir=$1
-    shift
-  fi
+# duh() {
+#   depth="0"
+#   dir="."
+#   if (( $# > 0 )); then
+#     depth=$1
+#     shift
+#   fi
+#   if (( $# > 0 )); then
+#     dir=$1
+#     shift
+#   fi
 
-  # Check to see if sort supports -h or not
-  echo "A" | sort -h &> /dev/null
-  if [[ $? ]]; then
-    # sort -h is not supported
-    command du -k --max-depth=$depth $dir | sort -n | while read size fname; do for unit in K M G T P E Z Y; do if [ $size -lt 1024 ]; then printf " %4d%sB\t  %s\n" ${size} ${unit} ${fname}; break; fi; size=$((size/1024)); done; done
-  else
-    # sort -h is supported
-    echo "du -kh --max-depth=$depth $dir 2> /dev/null | sort -h"
-    du -kh --max-depth=$depth $dir 2> /dev/null | sort -h
-  fi
-}
-
+#   # Check to see if sort supports -h or not
+#   echo "A" | sort -h &> /dev/null
+#   if [[ $? ]]; then
+#     # sort -h is not supported
+#     command du -k --max-depth=$depth $dir | sort -n | while read size fname; do for unit in K M G T P E Z Y; do if [ $size -lt 1024 ]; then printf " %4d%sB\t  %s\n" ${size} ${unit} ${fname}; break; fi; size=$((size/1024)); done; done
+#   else
+#     # sort -h is supported
+#     echo "du -kh --max-depth=$depth $dir 2> /dev/null | sort -h"
+#     du -kh --max-depth=$depth $dir 2> /dev/null | sort -h
+#   fi
+# }
+duh() { du -h "$@" | sort -rh; }
 
 # Silent push and popd. Use dirs -v for vertical dirstack                                                           {{{1
 pushd() { command pushd $@ > /dev/null ; }

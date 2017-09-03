@@ -44,6 +44,7 @@ if DISABLE_FROM == 2 | finish | endif
 set whichwrap=b,s,<,>,h,l,[,]                     " Allows backspace, space, left, right arrow keys, as well as h and l,
                                                                         " to wrap when used at beginning or end of lines
 set nostartofline                             " Prevent cursor from jumping to start of line in case of certain commands
+set path=.,/usr/local/include,/usr/include,**;
 set autochdir                                                                       " Change directory to file in buffer
 set incsearch                                                                          " Incremental search highlighting
 set magic                                                  " Enable non-alphanumeric characters to have special meanings

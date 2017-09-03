@@ -319,9 +319,10 @@ vnoremap & <ESC>:%s/<C-R>=escape( @*, '$*[]\\|\/' )<CR>/
 "vnoremap & <ESC>:%s/\v<C-R>=escape( @*, '$%^*=+<>()[]{}&/' )<CR>/
 
 """ Set search pattern without moving the cursor
-nnoremap <silent> <leader>*  :let @/='\<'.escape(expand('<cword>'),'$*[]/').'\><CR>
-nnoremap <silent> <leader>g* :let @/=escape(expand('<cword>'),'$*[]/')'<CR>
+nnoremap <silent> <leader>*  :let @/='\<'.escape(expand('<cword>'),'$*[]/').'\>'<CR>
 vnoremap <silent> <leader>*  :<C-U>let @/='\<'.escape(@*,'$*[]/').'\>'<CR>
+
+nnoremap <silent> <leader>g* :let @/=escape(expand('<cword>'),'$*[]/')<CR>
 vnoremap <silent> <leader>g* :<C-U>let @/=escape(@*,'$*[]/')<CR>
 
 """ Find and show results in a LocationList (Buffer-specific)

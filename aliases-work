@@ -172,7 +172,7 @@ pfu() {                                                                         
   [[ -f ~/.fzf.bash ]] && . ~/.fzf.bash
 }
 
-" Generate a list of files
+# Generate a list of files
 unset -f pf_list
 pf_list() {                                                                                                       # {{{2
   if [[ "$1" == "--check" ]] && [[ -f ${STEM:+$STEM/}.filelist ]]; then
@@ -183,7 +183,7 @@ pf_list() {                                                                     
   p4 have | awk {'print $3'} >| $STEM/.filelist
 }
 
-" Find a file
+# Find a file
 unset -f pff
 pff() {                                                                                                           # {{{2
   pf_list --check
@@ -194,7 +194,7 @@ pff() {                                                                         
   fi
 }
 
-" Grep from the list of files in the repo
+# Grep from the list of files in the repo
 unset -f pfg
 pfg() {                                                                                                           # {{{2
   pf_list --check
@@ -491,9 +491,11 @@ plastlock() {
 
 unset -f vsig
 vsig() {
-  file=`grep -Po -m1 '(?<=source\=)[^:]+' summary.rj`
-  file=`find $REPO_PATH -name $file -print -quit`
-  lnum=`grep -Po -m1 '(?<=source\=)[^:]+:\d+' summary.rj | cut -d: -f2`
+  file_lnum=$(\grep -Po -m1 '(?<=source\=)[^:]+:\d+' summary.rj)
+  file=${file_lnum%:*}
+  lnum=${file_lnum#*:}
+
+  file=$(pff ${file})
   v +$lnum $file -c "norm! zv"
 }
 
@@ -526,7 +528,7 @@ but() {
     gdb $REPO_PATH/build/${model}/${model}
   else
     echo $REPO_PATH/build/${model}/${model}
-    ( $REPO_PATH/build/${model}/${model} | tee ${model}.log )
+    $REPO_PATH/build/${model}/${model}
   fi
 }
 

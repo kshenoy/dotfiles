@@ -109,7 +109,7 @@ _setprompt_philmod_() {
 %{$fg_no_bold[white]%}$PR_SHIFT_IN${(e)PR_FILLBAR}$PR_URCORNER$PR_SHIFT_OUT\
 
 $PR_SHIFT_IN$PR_LLCORNER$PR_HBAR$PR_SHIFT_OUT\
-%(?.%{$fg_bold[green]%}(^_^%).%{$fg_bold[red]%}(@_@%)) \
+%(?.%{$fg_bold[green]%}(^_^%).%{$fg_bold[red]%}(>_<%)) \
 %{%(!.$fg_bold[red].$fg_bold[white])%}%#$normal '
 
     RPROMPT=' %{$fg_bold[black]%}(%{$fg_no_bold[yellow]%}%D{%H:%M %b %d, %a}%{$fg_bold[black]%})\

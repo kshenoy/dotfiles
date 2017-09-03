@@ -23,6 +23,7 @@ endfunction
 call plug#('ctrlpvim/ctrlp.vim')
 call plug#('tacahiroy/ctrlp-funky')
 call plug#('FelikZ/ctrlp-py-matcher',          s:PlugCond(has('python')||has('python3')))
+" call plug#('ivan-cukic/vim-ctrlp-switcher',    {'on': ['CtrlPSwitch', 'CtrlPSwitchBasic', 'CtrlPSwitchFull']})
 
 " Motion/TextObjects ---------------------------------------------------------------------------------------------------
 runtime! macros/matchit.vim
@@ -30,55 +31,53 @@ runtime! macros/matchit.vim
 call plug#('PeterRincker/vim-argumentative')
 " call plug#('justinmk/vim-sneak')
 " call plug#('wellle/targets.vim')
-call plug#('kshenoy/vim-parjumper',            {'on': '<Plug>(ParJump'})
 call plug#('rhysd/vim-textobj-word-column',    {'on': '<Plug>(textobj-wordcolumn'})
 call plug#('chaoren/vim-wordmotion')
 call plug#('kana/vim-textobj-user')
 call plug#('glts/vim-textobj-comment',         {'on': '<Plug>(textobj-comment'})
 call plug#('kana/vim-textobj-function',        {'on': '<Plug>(textobj-function'})
 call plug#('kana/vim-textobj-indent',          {'on': '<Plug>(textobj-indent'})
-call plug#('kana/vim-textobj-line',            {'on': '<Plug>(textobj-line'})
 call plug#('saihoooooooo/vim-textobj-space',   {'on': '<Plug>(textobj-space'})
 
 " Completion/Text insertion --------------------------------------------------------------------------------------------
 " call plug#('vim-scripts/AutoComplPop')
+call plug#('lifepillar/vim-mucomplete')
 call plug#('Raimondi/delimitMate')
 call plug#('tpope/vim-endwise')
+call plug#('SirVer/ultisnips',                 s:PlugCond(has('python')||has('python3')))
 call plug#('tpope/vim-commentary',             {'on': '<Plug>Commentary'})
-"call plug#('vim-scripts/DrawIt')
+call plug#('kshenoy/vim-origami')
+" call plug#('dhruvasagar/vim-table-mode')
+" call plug#('vim-scripts/DrawIt')
 call plug#('junegunn/vim-easy-align',          {'on': ['EasyAlign', '<Plug>(EasyAlign)']})
 call plug#('tommcdo/vim-exchange',             {'on': '<Plug>(Exchange'})
-call plug#('derekwyatt/vim-fswitch')
-call plug#('lifepillar/vim-mucomplete')
-call plug#('kshenoy/vim-origami')
-call plug#('dhruvasagar/vim-table-mode',       {'on': ['TableModeToggle', 'TableModeEnable']})
-call plug#('SirVer/ultisnips',                 s:PlugCond(has('python')||has('python3')))
-call plug#('triglav/vim-visual-increment')
+call plug#('triglav/vim-visual-increment',     {'on': '<Plug>VisualIncrement'})
+call plug#('AndrewRadev/switch.vim',           {'on': 'Switch'})
 
 " Misc -----------------------------------------------------------------------------------------------------------------
+call plug#('derekwyatt/vim-fswitch')
 call plug#('tpope/vim-abolish')
 call plug#('w0rp/ale',                         {'on': 'ALEToggle'})
 " call plug#('skywind3000/asyncrun.vim')
 " call plug#('tpope/vim-dispatch')
 call plug#('sjl/gundo.vim',                    {'on': 'GundoToggle'})
-" call plug#('nathanaelkane/vim-indent-guides',  {'on': ['IndentGuidesToggle', 'IndentGuidesEnable']})
 " call plug#('Yggdroot/indentLine',              PlugCond(has('conceal'), {'on': 'IndentLinesToggle'}))
 call plug#('Valloric/ListToggle',              {'on': ['LToggle', 'QToggle']})
 call plug#('Yggdroot/vim-mark')
 call plug#('tpope/vim-repeat')
 call plug#('kshenoy/vim-signature')
-call plug#('kana/vim-submode')
+" call plug#('kana/vim-submode')
 call plug#('tpope/vim-surround')
-call plug#('AndrewRadev/switch.vim',           {'on': 'Switch'})
+call plug#('tpope/vim-unimpaired')
+call plug#('tpope/vim-vinegar')
+
+" FileTypes ------------------------------------------------------------------------------------------------------------
 call plug#('WeiChungWu/vim-SystemVerilog',     {'for': 'systemverilog'})
 call plug#('kshenoy/TWiki-Syntax',             {'for': 'twiki'})
-call plug#('tpope/vim-unimpaired')
-call plug#('tpope/vim-vinegar',                {'on': '<Plug>VinegarUp'})
 
 " Colorshemes ----------------------------------------------------------------------------------------------------------
 call plug#('chriskempson/base16-vim')
 " call plug#('kshenoy/vim-sol')
-" call plug#('rakr/vim-one')
 
 call plug#end()
 
@@ -105,10 +104,6 @@ let g:acp_completeoptPreview = 0                                              " 
 
 " Base16 ---------------------------------------------------------------------------------------------------------- {{{1
 let g:base16_shell_path=glob('~/.config/base16-shell/scripts/')
-
-
-" CommandT -------------------------------------------------------------------------------------------------------- {{{1
-let g:CommandTMaxHeight = 20
 
 
 " Commentary ------------------------------------------------------------------------------------------------------ {{{1
@@ -144,12 +139,12 @@ if has('unix')
     \ 'types': {
       \ 1: ['.git', 'cd %s && git ls-files --cached --exclude-standard --others'],
       \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
-      \ 3: ['P4CONFIG', 'cat <(p4 have $STEM/... | ' .
-                         \    'grep -v "^\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/variants\|' .
-                         \    'ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)" | awk "{print \$3}")' .
-                         \  '<(find import/avf -type f 2> /dev/null) ' .
-                         \  '<(p4 opened | grep add | sed "s/#.*//" | command xargs -I{} -n1 p4 where {} | ' .
-                         \    'cut -d" " -f3) | grep -v "\.\(so\|log\)" | sed "s:^.*$PWD/::"'
+      \ 3: ['P4CONFIG', 'cd %s; cat ' .
+                         \     '<(p4 have ... | ' .
+                         \       '\grep -v "^\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/variants\|' .
+                         \       'ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)" | \awk "{print \$3}") ' .
+                         \     '<(p4 opened ... | \grep add | \sed "s/#.*//" | \xargs -I{} -n1 p4 where {} | ' .
+                         \       '\awk "{print \$3}") '
          \ ]
     \ },
     \ 'fallback': "find %s -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune -o " .
@@ -201,7 +196,7 @@ let g:ctrlp_prompt_mappings = {
 
 map      <leader>j <Plug>my(CtrlP)
 nnoremap <silent>  <Plug>my(CtrlP)b :CtrlPBuffer<CR>
-nnoremap <silent>  <Plug>my(CtrlP)a :CtrlPArgs<CR>
+nnoremap <silent>  <Plug>my(CtrlP)a :CtrlPSwitchBasic<CR>
 nnoremap <silent>  <Plug>my(CtrlP)e :CtrlPCurWD<CR>
 nnoremap <silent>  <Plug>my(CtrlP)f :CtrlP<CR>
 nnoremap <silent>  <Plug>my(CtrlP)j :CtrlPMixed<CR>
@@ -211,6 +206,8 @@ nnoremap <silent>  <Plug>my(CtrlP)o :CtrlPFunky<CR>
 nnoremap <silent>  <Plug>my(CtrlP)] :CtrlPtjump<CR>
 vnoremap <silent>  <Plug>my(CtrlP)] :CtrlPtjumpVisual<CR>
 nnoremap <silent>  <leader><leader> :CtrlPBuffer<CR>
+
+let g:ctrlpswitcher_mode=1
 
 
 " delimitMate ----------------------------------------------------------------------------------------------------- {{{1
@@ -260,9 +257,11 @@ xmap X   <Plug>(Exchange)
 " FSwitch --------------------------------------------------------------------------------------------------------- {{{1
 let g:fsnonewfiles = 1
 augroup FSwitch
-  autocmd BufWinEnter *.cc  let b:fswitchdst = 'h'
-  autocmd BufWinEnter *.cpp let b:fswitchdst = 'hpp,h'
-  autocmd BufWinEnter *.h   let b:fswitchdst = 'c,cc,cpp'
+  autocmd!
+  autocmd BufEnter *.h   let b:fswitchdst = 'c,cc,cpp,tpp'
+  autocmd BufEnter *.cc  let b:fswitchdst = 'hh,h'
+  autocmd BufEnter *.cpp let b:fswitchdst = 'hpp,h'
+  autocmd BufEnter *.tpp let b:fswitchlocs = 'reg:/src/include/,reg:|src|include/**|,ifrel:|/src/|../include|' | b:fswitchdst = 'hpp,h'
 augroup END
 
 map      gof      <Plug>my(FSwitch)
@@ -304,14 +303,6 @@ nmap <unique> <silent> <Plug>my(Mark)<C-A-N> <Plug>MarkSearchAnyNext
 nmap <unique> <silent> <Plug>my(Mark)<C-A-P> <Plug>MarkSearchAnyPrev
 
 
-" vim-markdown ---------------------------------------------------------------------------------------------------- {{{1
-let g:markdown_fenced_languages = [ 'sh', 'bash=sh.bash', 'zsh=sh.bash.zsh', 'css', 'django', 'html', 'javascript',
-                                  \ 'js=javascript', 'json=javascript', 'perl', 'php', 'python', 'ruby', 'sass', 'vim',
-                                  \ 'xml' ]
-let g:markdown_fold_style = 'nested'
-let g:markdown_fold_override_foldtext = 0
-
-
 " vim-mucomplete -------------------------------------------------------------------------------------------------- {{{1
 let g:mucomplete#chains = {
   \ 'default': ['path', 'omni', 'keyn', 'dict', 'c-n', 'user', 'ulti'],
@@ -321,34 +312,12 @@ let g:mucomplete#chains = {
 let g:mucomplete#enable_auto_at_startup = 1
 
 
-" OmniCpp --------------------------------------------------------------------------------------------------------- {{{1
-let OmniCpp_ShowPrototypeInAbbr = 1
-let OmniCpp_MayCompleteScope    = 1
-
-
 " Origami --------------------------------------------------------------------------------------------------------- {{{1
 let g:OrigamiPadding = 4
 let g:OrigamiFoldAtCol = 117
 augroup Origami
   autocmd FileType c,cpp,systemverilog let g:OrigamiCommentString = '//%s'
 augroup END
-
-
-" Rainbow --------------------------------------------------------------------------------------------------------- {{{1
-"let g:rainbow_active = 1
-" augroup Rainbow
-"   autocmd FileType c,cpp if exists('*rainbow#load')|call rainbow#load()|endif
-" augroup END
-
-" if &bg ==# 'dark'
-"   let g:rainbow_guifgs   = [ 'OrangeRed1', 'LightGoldenRod1', 'DeepSkyBlue1', 'HotPink1', 'Chartreuse1', 'Yellow' ]
-"   let g:rainbow_ctermfgs = [ 'Brown', 'DarkBlue', 'DarkGray', 'DarkGreen', 'DarkCyan', 'DarkRed', 'DarkMagenta' ]
-" else
-"   let g:rainbow_guifgs = [ 'RoyalBlue3', 'DarkOrange3', 'SeaGreen3', 'DarkOrchid3', 'FireBrick3' ]
-"   "let g:rainbow_guifgs   = ["#8a2be2" , "#ff69b4" , "#b294bb" , "#81a2be" , "#b5bd68" , "#ee6" , "#de935f" , "#c66" ]
-" endif
-
-" nnoremap coR :RainbowToggle<CR>
 
 
 " Repeat ---------------------------------------------------------------------------------------------------------- {{{1
@@ -389,85 +358,85 @@ endif
 let g:submode_always_show_submode = 1
 let g:submode_keep_leaving_key    = 1
 
-if exists('*submode#')
-  call submode#enter_with( 'WinResize', 'n', '', '<C-W><'      , '<C-W><'       )
-  call submode#map       ( 'WinResize', 'n', '', '<'           , '<C-W><'       )
-  call submode#enter_with( 'WinResize', 'n', '', '<C-W>>'      , '<C-W>>'       )
-  call submode#map       ( 'WinResize', 'n', '', '>'           , '<C-W>>'       )
-  call submode#enter_with( 'WinResize', 'n', '', '<C-W>+'      , '<C-W>+'       )
-  call submode#map       ( 'WinResize', 'n', '', '+'           , '<C-W>+'       )
-  call submode#enter_with( 'WinResize', 'n', '', '<C-W>-'      , '<C-W>-'       )
-  call submode#map       ( 'WinResize', 'n', '', '-'           , '<C-W>-'       )
-  "call submode#enter_with( 'WinMove'  , 'n', '', '<C-W>h'      , '<C-W>h'       )
-  "call submode#enter_with( 'WinMove'  , 'n', '', '<C-W>j'      , '<C-W>j'       )
-  "call submode#enter_with( 'WinMove'  , 'n', '', '<C-W>k'      , '<C-W>k'       )
-  "call submode#enter_with( 'WinMove'  , 'n', '', '<C-W>l'      , '<C-W>l'       )
-  "call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><C-H>'  , '<C-W><C-H>'   )
-  "call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><C-J>'  , '<C-W><C-J>'   )
-  "call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><C-K>'  , '<C-W><C-K>'   )
-  "call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><C-L>'  , '<C-W><C-L>'   )
-  "call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><Up>'   , '<C-W><Up>'    )
-  "call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><Down>' , '<C-W><Down>'  )
-  "call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><Left>' , '<C-W><Left>'  )
-  "call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><Right>', '<C-W><Right>' )
-  "call submode#map       ( 'WinMove'  , 'n', '', 'h'           , '<C-W>h'       )
-  "call submode#map       ( 'WinMove'  , 'n', '', 'j'           , '<C-W>j'       )
-  "call submode#map       ( 'WinMove'  , 'n', '', 'k'           , '<C-W>k'       )
-  "call submode#map       ( 'WinMove'  , 'n', '', 'l'           , '<C-W>l'       )
-  "call submode#map       ( 'WinMove'  , 'n', '', '<C-H>'       , '<C-W><C-H>'   )
-  "call submode#map       ( 'WinMove'  , 'n', '', '<C-J>'       , '<C-W><C-J>'   )
-  "call submode#map       ( 'WinMove'  , 'n', '', '<C-K>'       , '<C-W><C-K>'   )
-  "call submode#map       ( 'WinMove'  , 'n', '', '<C-L>'       , '<C-W><C-L>'   )
-  "call submode#map       ( 'WinMove'  , 'n', '', '<Up>'        , '<C-W><Up>'    )
-  "call submode#map       ( 'WinMove'  , 'n', '', '<Down>'      , '<C-W><Down>'  )
-  "call submode#map       ( 'WinMove'  , 'n', '', '<Left>'      , '<C-W><Left>'  )
-  "call submode#map       ( 'WinMove'  , 'n', '', '<Right>'     , '<C-W><Right>' )
-  "call submode#enter_with( 'Indent'   , 'n', '', '>>'          , '>>'           )
-  "call submode#enter_with( 'Indent'   , 'n', '', '<<'          , '<<'           )
-  "call submode#map       ( 'Indent'   , 'n', '', '>'           , '>>'           )
-  "call submode#map       ( 'Indent'   , 'n', '', '<'           , '<<'           )
-  "call submode#enter_with( 'WinCycle' , 'n', '', '<C-W><C-W>'  , '<C-W><C-W>'   )
-  "call submode#enter_with( 'WinCycle' , 'n', '', '<C-W>w'      , '<C-W>w'       )
-  "call submode#enter_with( 'WinCycle' , 'n', '', '<C-W>W'      , '<C-W>W'       )
-  "call submode#map       ( 'WinCycle' , 'n', '', '<C-W>'       , '<C-W><C-W>'   )
-  "call submode#map       ( 'WinCycle' , 'n', '', 'w'           , '<C-W>w'       )
-  "call submode#map       ( 'WinCycle' , 'n', '', 'W'           , '<C-W>W'       )
+" if exists('*submode#')
+"   call submode#enter_with( 'WinResize', 'n', '', '<C-W><'      , '<C-W><'       )
+"   call submode#map       ( 'WinResize', 'n', '', '<'           , '<C-W><'       )
+"   call submode#enter_with( 'WinResize', 'n', '', '<C-W>>'      , '<C-W>>'       )
+"   call submode#map       ( 'WinResize', 'n', '', '>'           , '<C-W>>'       )
+"   call submode#enter_with( 'WinResize', 'n', '', '<C-W>+'      , '<C-W>+'       )
+"   call submode#map       ( 'WinResize', 'n', '', '+'           , '<C-W>+'       )
+"   call submode#enter_with( 'WinResize', 'n', '', '<C-W>-'      , '<C-W>-'       )
+"   call submode#map       ( 'WinResize', 'n', '', '-'           , '<C-W>-'       )
+"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W>h'      , '<C-W>h'       )
+"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W>j'      , '<C-W>j'       )
+"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W>k'      , '<C-W>k'       )
+"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W>l'      , '<C-W>l'       )
+"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><C-H>'  , '<C-W><C-H>'   )
+"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><C-J>'  , '<C-W><C-J>'   )
+"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><C-K>'  , '<C-W><C-K>'   )
+"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><C-L>'  , '<C-W><C-L>'   )
+"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><Up>'   , '<C-W><Up>'    )
+"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><Down>' , '<C-W><Down>'  )
+"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><Left>' , '<C-W><Left>'  )
+"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><Right>', '<C-W><Right>' )
+"   call submode#map       ( 'WinMove'  , 'n', '', 'h'           , '<C-W>h'       )
+"   call submode#map       ( 'WinMove'  , 'n', '', 'j'           , '<C-W>j'       )
+"   call submode#map       ( 'WinMove'  , 'n', '', 'k'           , '<C-W>k'       )
+"   call submode#map       ( 'WinMove'  , 'n', '', 'l'           , '<C-W>l'       )
+"   call submode#map       ( 'WinMove'  , 'n', '', '<C-H>'       , '<C-W><C-H>'   )
+"   call submode#map       ( 'WinMove'  , 'n', '', '<C-J>'       , '<C-W><C-J>'   )
+"   call submode#map       ( 'WinMove'  , 'n', '', '<C-K>'       , '<C-W><C-K>'   )
+"   call submode#map       ( 'WinMove'  , 'n', '', '<C-L>'       , '<C-W><C-L>'   )
+"   call submode#map       ( 'WinMove'  , 'n', '', '<Up>'        , '<C-W><Up>'    )
+"   call submode#map       ( 'WinMove'  , 'n', '', '<Down>'      , '<C-W><Down>'  )
+"   call submode#map       ( 'WinMove'  , 'n', '', '<Left>'      , '<C-W><Left>'  )
+"   call submode#map       ( 'WinMove'  , 'n', '', '<Right>'     , '<C-W><Right>' )
+"   call submode#enter_with( 'Indent'   , 'n', '', '>>'          , '>>'           )
+"   call submode#enter_with( 'Indent'   , 'n', '', '<<'          , '<<'           )
+"   call submode#map       ( 'Indent'   , 'n', '', '>'           , '>>'           )
+"   call submode#map       ( 'Indent'   , 'n', '', '<'           , '<<'           )
+"   call submode#enter_with( 'WinCycle' , 'n', '', '<C-W><C-W>'  , '<C-W><C-W>'   )
+"   call submode#enter_with( 'WinCycle' , 'n', '', '<C-W>w'      , '<C-W>w'       )
+"   call submode#enter_with( 'WinCycle' , 'n', '', '<C-W>W'      , '<C-W>W'       )
+"   call submode#map       ( 'WinCycle' , 'n', '', '<C-W>'       , '<C-W><C-W>'   )
+"   call submode#map       ( 'WinCycle' , 'n', '', 'w'           , '<C-W>w'       )
+"   call submode#map       ( 'WinCycle' , 'n', '', 'W'           , '<C-W>W'       )
 
-  call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-N>',   '<Leader>m<C-N>')
-  call submode#map       ('mark.vim', 'n', '', '<C-N>',            '<Leader>m<C-N>')
-  call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-P>',   '<Leader>m<C-P>')
-  call submode#map       ('mark.vim', 'n', '', '<C-P>',            '<Leader>m<C-P>')
-  call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-A-N>', '<Leader>m<C-A-N>')
-  call submode#map       ('mark.vim', 'n', '', '<C-A-N>',          '<Leader>m<C-A-N>')
-  call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-A-P>', '<Leader>m<C-A-P>')
-  call submode#map       ('mark.vim', 'n', '', '<C-A-P>',          '<Leader>m<C-A-P>')
+"   call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-N>',   '<Leader>m<C-N>')
+"   call submode#map       ('mark.vim', 'n', '', '<C-N>',            '<Leader>m<C-N>')
+"   call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-P>',   '<Leader>m<C-P>')
+"   call submode#map       ('mark.vim', 'n', '', '<C-P>',            '<Leader>m<C-P>')
+"   call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-A-N>', '<Leader>m<C-A-N>')
+"   call submode#map       ('mark.vim', 'n', '', '<C-A-N>',          '<Leader>m<C-A-N>')
+"   call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-A-P>', '<Leader>m<C-A-P>')
+"   call submode#map       ('mark.vim', 'n', '', '<C-A-P>',          '<Leader>m<C-A-P>')
 
-  " Custom Maps
-  "nnoremap <Plug>IncLines :<C-U>let &lines += 1<CR>
-  "nnoremap <Plug>DecLines :<C-U>let &lines -= 1<CR>
-  "call submode#enter_with( 'ResizeLines', 'n', 'r', '>l', '<Plug>IncLines' )
-  "call submode#enter_with( 'ResizeLines', 'n', 'r', '<l', '<Plug>DecLines' )
-  "call submode#map       ( 'ResizeLines', 'n', 'r', '>' , '<Plug>IncLines' )
-  "call submode#map       ( 'ResizeLines', 'n', 'r', '<' , '<Plug>DecLines' )
-  "nnoremap <Plug>IncColumns :<C-U>let &columns += 1<CR>
-  "nnoremap <Plug>DecColumns :<C-U>let &columns -= 1<CR>
-  "call submode#enter_with( 'ResizeColumns', 'n', 'r', '>c', '<Plug>IncColumns' )
-  "call submode#enter_with( 'ResizeColumns', 'n', 'r', '<c', '<Plug>DecColumns' )
-  "call submode#map       ( 'ResizeColumns', 'n', 'r', '>' , '<Plug>IncColumns' )
-  "call submode#map       ( 'ResizeColumns', 'n', 'r', '<' , '<Plug>DecColumns' )
-  "nnoremap <Plug>IncLineSpace :<C-U>let &linespace += 1<CR>
-  "nnoremap <Plug>DecLineSpace :<C-U>let &linespace -= 1<CR>
-  "call submode#enter_with( 'ResizeLsp', 'n', 'r', '>s', '<Plug>IncLineSpace' )
-  "call submode#enter_with( 'ResizeLsp', 'n', 'r', '<s', '<Plug>DecLineSpace' )
-  "call submode#map       ( 'ResizeLsp', 'n', 'r', '>' , '<Plug>IncLineSpace' )
-  "call submode#map       ( 'ResizeLsp', 'n', 'r', '<' , '<Plug>DecLineSpace' )
-  "nnoremap <Plug>IncFontSize :<C-U>IncFontSize<CR>
-  "nnoremap <Plug>DecFontSize :<C-U>DecFontSize<CR>
-  "call submode#enter_with( 'ResizeFont', 'n', 'r', '<f', '<Plug>DecFontSize' )
-  "call submode#enter_with( 'ResizeFont', 'n', 'r', '>f', '<Plug>IncFontSize' )
-  "call submode#map       ( 'ResizeFont', 'n', 'r', '<' , '<Plug>DecFontSize' )
-  "call submode#map       ( 'ResizeFont', 'n', 'r', '>' , '<Plug>IncFontSize' )
-endif
+"   " Custom Maps
+"   nnoremap <Plug>IncLines :<C-U>let &lines += 1<CR>
+"   nnoremap <Plug>DecLines :<C-U>let &lines -= 1<CR>
+"   call submode#enter_with( 'ResizeLines', 'n', 'r', '>l', '<Plug>IncLines' )
+"   call submode#enter_with( 'ResizeLines', 'n', 'r', '<l', '<Plug>DecLines' )
+"   call submode#map       ( 'ResizeLines', 'n', 'r', '>' , '<Plug>IncLines' )
+"   call submode#map       ( 'ResizeLines', 'n', 'r', '<' , '<Plug>DecLines' )
+"   nnoremap <Plug>IncColumns :<C-U>let &columns += 1<CR>
+"   nnoremap <Plug>DecColumns :<C-U>let &columns -= 1<CR>
+"   call submode#enter_with( 'ResizeColumns', 'n', 'r', '>c', '<Plug>IncColumns' )
+"   call submode#enter_with( 'ResizeColumns', 'n', 'r', '<c', '<Plug>DecColumns' )
+"   call submode#map       ( 'ResizeColumns', 'n', 'r', '>' , '<Plug>IncColumns' )
+"   call submode#map       ( 'ResizeColumns', 'n', 'r', '<' , '<Plug>DecColumns' )
+"   nnoremap <Plug>IncLineSpace :<C-U>let &linespace += 1<CR>
+"   nnoremap <Plug>DecLineSpace :<C-U>let &linespace -= 1<CR>
+"   call submode#enter_with( 'ResizeLsp', 'n', 'r', '>s', '<Plug>IncLineSpace' )
+"   call submode#enter_with( 'ResizeLsp', 'n', 'r', '<s', '<Plug>DecLineSpace' )
+"   call submode#map       ( 'ResizeLsp', 'n', 'r', '>' , '<Plug>IncLineSpace' )
+"   call submode#map       ( 'ResizeLsp', 'n', 'r', '<' , '<Plug>DecLineSpace' )
+"   nnoremap <Plug>IncFontSize :<C-U>IncFontSize<CR>
+"   nnoremap <Plug>DecFontSize :<C-U>DecFontSize<CR>
+"   call submode#enter_with( 'ResizeFont', 'n', 'r', '<f', '<Plug>DecFontSize' )
+"   call submode#enter_with( 'ResizeFont', 'n', 'r', '>f', '<Plug>IncFontSize' )
+"   call submode#map       ( 'ResizeFont', 'n', 'r', '<' , '<Plug>DecFontSize' )
+"   call submode#map       ( 'ResizeFont', 'n', 'r', '>' , '<Plug>IncFontSize' )
+" endif
 
 
 " Solarized ------------------------------------------------------------------------------------------------------- {{{1
@@ -489,23 +458,6 @@ let g:switch_custom_definitions    = [
 " TableMode ------------------------------------------------------------------------------------------------------- {{{1
 let g:table_mode_map_prefix = '<Plug>[table]'
 nnoremap coB :TableModeToggle<CR>
-
-
-" Tabular --------------------------------------------------------------------------------------------------------- {{{1
-" map     =t       <Plug>my(Tabular)
-" noremap <silent> <Plug>my(Tabular)t       :Tabularize<Space>/
-" noremap <silent> <Plug>my(Tabular)]       :Tabularize /\m]/l0r1<CR> //
-" noremap <silent> <Plug>my(Tabular)<Bar>   :Tabularize /\|<CR>
-" noremap <silent> <Plug>my(Tabular)(0      :Tabularize /\v^[^(]*\zs\(/l0r0<CR>
-" noremap <silent> <Plug>my(Tabular)(1      :Tabularize /\v^[^(]*\zs\(/l0r1<CR>
-" noremap <silent> <Plug>my(Tabular))0      :Tabularize /\v\)\ze[^)]*$/l0r0<CR>
-" noremap <silent> <Plug>my(Tabular))1      :Tabularize /\v\)\ze[^)]*$/l1r0<CR>
-" noremap <silent> <Plug>my(Tabular)b       :Tabularize align_braces<CR>
-" noremap <silent> <Plug>my(Tabular),       :Tabularize /,/l0r1<CR>
-" noremap <silent> <Plug>my(Tabular)=       :Tabularize assignment<CR>
-" noremap <silent> <Plug>my(Tabular)?:      :Tabularize ternary_operator<CR>
-" noremap <silent> <Plug>my(Tabular)/       :Tabularize trailing_c_comments<CR>
-" noremap <silent> <Plug>my(Tabular)<Space> :Tabularize align_words<CR>
 
 
 " vim-textobj-* --------------------------------------------------------------------------------------------------- {{{1
@@ -558,8 +510,3 @@ let g:wordmotion_mappings = {
 \ 'iw':         'i<M-w>',
 \ '<C-R><C-W>': '<C-R><M-w>'
 \ }
-
-
-" YouCompleteMe --------------------------------------------------------------------------------------------------- {{{1
-let g:ycm_key_list_select_completion   = ['<C-N>']
-let g:ycm_key_list_previous_completion = ['<C-P>']

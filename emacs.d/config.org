@@ -1002,7 +1002,7 @@ This is because, the entire tag string is treated as a single value and Helm tri
 
   (setq org-babel-default-header-args:C
         '((:results . "output")
-          (:flags   . "-std=c++11")))
+          (:flags   . "-std=c++14")))
 #+END_SRC
 
 ***** Display errors and warnings in an org-babel code block
