@@ -594,8 +594,8 @@ Similar to vim's easy-motion plugin
     :diminish flycheck-mode
     :init (global-flycheck-mode t)
     :config
-    (add-hook 'c++-mode-hook (lambda() (setq flycheck-gcc-language-standard "c++11")
-                                       (setq flycheck-clang-language-standard "c++11"))))
+    (add-hook 'c++-mode-hook (lambda() (setq flycheck-gcc-language-standard "c++14")
+                                       (setq flycheck-clang-language-standard "c++14"))))
 #+END_SRC
 
 ** helm
@@ -730,6 +730,7 @@ Passing an argument to =:ensure= (other than t or nil) allows us to use a differ
 Also, using =:pin= allows us to prefer which package-archive we'd like to use to download the package from.
 I don't remember why we need to specifically grab =org-plus-contrib= from the org repository instead of from one of the other ones.
 
+Org customization guide: http://orgmode.org/worg/org-configs/org-customization-guide.html
 *** :init
 #+BEGIN_SRC emacs-lisp
   :init
@@ -876,7 +877,7 @@ Change from any todo state to any other state using =C-c C-t KEY=
   (setq org-use-fast-todo-selection t)
 #+END_SRC
 
-This frees up S-left and S-right which I can then use to cycles through the todo states but skip setting timestamps and entering notes which is very convenient when all I want to do is fix up the status of an entry.
+This frees up S-left and S-right which I can then use to cycles through the todo states but skip setting timestamps and entering notes which is very convenient when all I want to do is change the status of an entry without changing its timestamps
 #+BEGIN_SRC emacs-lisp
   (setq org-treat-S-cursor-todo-selection-as-state-change nil)
 #+END_SRC
@@ -1001,7 +1002,7 @@ This is because, the entire tag string is treated as a single value and Helm tri
     (setq org-babel-C++-compiler "clang++"))
 
   (setq org-babel-default-header-args:C
-        '((:results . "output")
+        '((:results . "verbatim")
           (:flags   . "-std=c++14")))
 #+END_SRC
 
@@ -1056,7 +1057,9 @@ A good way to find more characters is to use =M-x insert-char=
 #+BEGIN_SRC emacs-lisp
   :init
   (setq org-agenda-files
-        (seq-filter 'file-exists-p
+        (seq-filter (lambda (x)
+                      (and 'file-exists-p
+                           (not (string= x "Spanish.org"))))
                     (mapcar (lambda (x) (concat org-directory x))
                             '("organizer.org" "Software/" "Personal/"))))
 
@@ -1201,9 +1204,9 @@ Autocomplete sources for org mode
 #+END_SRC
 
 **** org-capture
-
 Show hierarchical headlines when refiling instead of flattening it out
 Show all the hierarchical headlines instead of having to step down them
+
 #+BEGIN_SRC emacs-lisp
   (setq org-refile-use-outline-path t)
   (setq org-outline-path-complete-in-steps nil)
@@ -1525,6 +1528,7 @@ From [[https://www.reddit.com/r/emacs/comments/60nb8b/favorite_builtin_emacs_com
 [[https://github.com/fniessen/emacs-leuven-theme][Github Link]]
 #+BEGIN_SRC emacs-lisp
   (use-package leuven-theme
+    ;; :disabled
     :config
     (load-theme 'leuven t)
 

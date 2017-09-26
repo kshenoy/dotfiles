@@ -39,10 +39,20 @@
   " Make 'File Open' use current directory
   set browsedir=buffer
 
-  set background=light
-  colorscheme solarized
-  " colorscheme sol
+  if &diff
+    set background=light
+    colorscheme solarized
+  else
+    set background=dark
+    colorscheme base16-eighties
+  endif
 
+  " Light colorschemes
+  " set background=light
+  " colorscheme sol
+  " colorscheme solarized
+
+  " Dark colorschemes
   " set background=dark
   " colorscheme base16-ocean
   " colorscheme one

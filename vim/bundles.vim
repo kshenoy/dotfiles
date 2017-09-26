@@ -34,6 +34,7 @@ call plug#('chaoren/vim-wordmotion')
 call plug#('rhysd/vim-textobj-word-column',    {'on': '<Plug>(textobj-wordcolumn'})
 call plug#('kana/vim-textobj-user')
 call plug#('glts/vim-textobj-comment',         {'on': '<Plug>(textobj-comment'})
+call plug#('kana/vim-textobj-entire',          {'on': '<Plug>(textobj-entire'})
 call plug#('kana/vim-textobj-function',        {'on': '<Plug>(textobj-function'})
 call plug#('kana/vim-textobj-indent',          {'on': '<Plug>(textobj-indent'})
 call plug#('saihoooooooo/vim-textobj-space',   {'on': '<Plug>(textobj-space'})
@@ -53,9 +54,10 @@ call plug#('triglav/vim-visual-increment',     {'on': '<Plug>VisualIncrement'})
 call plug#('AndrewRadev/switch.vim',           {'on': 'Switch'})
 
 " Misc -----------------------------------------------------------------------------------------------------------------
-call plug#('derekwyatt/vim-fswitch')
 call plug#('tpope/vim-abolish')
-call plug#('w0rp/ale',                         {'on': 'ALEToggle'})
+call plug#('chrisbra/vim-diff-enhanced')
+call plug#('derekwyatt/vim-fswitch')
+call plug#('w0rp/ale')
 " call plug#('skywind3000/asyncrun.vim')
 " call plug#('tpope/vim-dispatch')
 call plug#('sjl/gundo.vim',                    {'on': 'GundoToggle'})
@@ -85,11 +87,16 @@ call plug#end()
 let g:ale_lint_on_enter=0
 let g:ale_sign_error='✗ '
 let g:ale_sign_style_error='✠ '
-let g:ale_sign_warning='⚠ '
+let g:ale_sign_warning='! '
 " let g:syntastic_error_symbol='✗✗'
 " let g:syntastic_style_error_symbol='✠✠'
 " let g:syntastic_warning_symbol='∆∆'
 " let g:syntastic_style_warning_symbol='≈≈'
+
+" Initialize list if it doesn't exist
+let g:ale_cpp_clangtidy_checks = get(g:, 'ale_cpp_clangtidy_checks', [])
+call add(g:ale_cpp_clangtidy_checks, '-google-build-using-namespace')
+call add(g:ale_cpp_clangtidy_checks, '-llvm-header-guard')
 
 nmap <leader>cp <Plug>my(ale_previous_wrap)
 nmap <leader>cn <Plug>my(ale_next_wrap)
@@ -109,8 +116,7 @@ map  gc  <Plug>Commentary
 nmap gcc <Plug>CommentaryLine
 
 augroup Commentary
-  autocmd FileType c,cpp,systemverilog let &commentstring='//%s'
-  autocmd FileType xdefaults           let &commentstring='!%s'
+  autocmd FileType xdefaults let &commentstring='!%s'
 augroup END
 
 
@@ -129,6 +135,7 @@ let g:ctrlp_follow_symlinks     = 1
 if has('python')
   let g:ctrlp_match_func        = {'match': 'pymatcher#PyMatch'}
 endif
+" let g:ctrlp_cache_dir           =
 
 if has('unix')
   " The 'while read fname' section sorts the filenames in descending order by length thereby allowing to find the
@@ -259,7 +266,8 @@ augroup FSwitch
   autocmd BufEnter *.h   let b:fswitchdst = 'c,cc,cpp,tpp'
   autocmd BufEnter *.cc  let b:fswitchdst = 'hh,h'
   autocmd BufEnter *.cpp let b:fswitchdst = 'hpp,h'
-  autocmd BufEnter *.tpp let b:fswitchlocs = 'reg:/src/include/,reg:|src|include/**|,ifrel:|/src/|../include|' | b:fswitchdst = 'hpp,h'
+  autocmd BufEnter *.tpp let b:fswitchlocs = 'reg:/src/include/,reg:|src|include/**|,ifrel:|/src/|../include|'
+  autocmd BufEnter *.tpp let b:fswitchdst = 'hpp,h'
 augroup END
 
 map      gof      <Plug>my(FSwitch)
@@ -311,11 +319,7 @@ let g:mucomplete#enable_auto_at_startup = 1
 
 
 " Origami --------------------------------------------------------------------------------------------------------- {{{1
-let g:OrigamiPadding = 4
-let g:OrigamiFoldAtCol = 117
-augroup Origami
-  autocmd FileType c,cpp,systemverilog let g:OrigamiCommentString = '//%s'
-augroup END
+let g:OrigamiFoldAtCol = -3
 
 
 " vim-parjumper --------------------------------------------------------------------------------------------------- {{{1
@@ -465,6 +469,7 @@ nnoremap coB :TableModeToggle<CR>
 
 " vim-textobj-* --------------------------------------------------------------------------------------------------- {{{1
 let g:textobj_comment_no_default_key_mappings    = 1
+let g:textobj_entire_no_default_key_mappings     = 1
 let g:textobj_function_no_default_key_mappings   = 1
 let g:textobj_indent_no_default_key_mappings     = 1
 let g:textobj_line_no_default_key_mappings       = 1
@@ -474,6 +479,7 @@ let g:textobj_wordcolumn_no_default_key_mappings = 1
 for s:mode in ['x', 'o']
   for s:motion in ['i', 'a']
     execute s:mode . 'map ' . s:motion . 'c       <Plug>(textobj-comment-'      . s:motion          . ')'
+    execute s:mode . 'map ' . s:motion . '%       <Plug>(textobj-entire-'       . s:motion          . ')'
     execute s:mode . 'map ' . s:motion . 'f       <Plug>(textobj-function-'     . s:motion          . ')'
     execute s:mode . 'map ' . s:motion . 'F       <Plug>(textobj-function-'     . toupper(s:motion) . ')'
     execute s:mode . 'map ' . s:motion . 'i       <Plug>(textobj-indent-same-'  . s:motion          . ')'

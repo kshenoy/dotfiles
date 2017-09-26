@@ -317,8 +317,14 @@ function! s:CreateMergeMaps()                                                   
   for l:ai in ['i', 'a']
     for l:map in ['o', 'x']
       execute l:map."noremap <silent> ".l:ai         . "C :call <SID>ConflictInnerMotion('".l:ai."')<CR>"
+
+      execute l:map."noremap <silent> ".toupper(l:ai)."oC :call <SID>ConflictInnerMotion('".l:ai."', 'ORIGINAL')<CR>"
       execute l:map."noremap <silent> ".toupper(l:ai)."OC :call <SID>ConflictInnerMotion('".l:ai."', 'ORIGINAL')<CR>"
+
+      execute l:map."noremap <silent> ".toupper(l:ai)."tC :call <SID>ConflictInnerMotion('".l:ai."', 'THEIRS')<CR>"
       execute l:map."noremap <silent> ".toupper(l:ai)."TC :call <SID>ConflictInnerMotion('".l:ai."', 'THEIRS')<CR>"
+
+      execute l:map."noremap <silent> ".toupper(l:ai)."yC :call <SID>ConflictInnerMotion('".l:ai."', 'YOURS')<CR>"
       execute l:map."noremap <silent> ".toupper(l:ai)."YC :call <SID>ConflictInnerMotion('".l:ai."', 'YOURS')<CR>"
     endfor
   endfor

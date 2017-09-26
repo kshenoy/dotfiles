@@ -249,7 +249,7 @@ if DISABLE_FROM == 15 | finish | endif
 
 set expandtab                                                                                 " Replace tabs with spaces
 set softtabstop=2                                          " No. of spaces to insert for a tab when expandtab is enabled
-let shiftwidth=&softtabstop                                       " Set software tab-width (for eg in case of << and >>)
+set shiftwidth=2                                                  " Set software tab-width (for eg in case of << and >>)
 set shiftround                                                                 " Round to 'shiftwidth' for "<<" and ">>"
 set autoindent                                                                                   " Auto-indent new lines
 set cinkeys-=0#                                                          " Prevent forcing of C-preprocessor to column 1
@@ -336,15 +336,16 @@ endif
 "
 if DISABLE_FROM == 22 | finish | endif
 
-set formatprg=clang-format\ --style=google                                                      " Set formatting program
-
 
 "
 " 23. RUNNING MAKE AND JUMPING TO ERRORS                                                                            {{{1
 "
 if DISABLE_FROM == 23 | finish | endif
 
-if executable('ag') | let &grepprg='ag --nogroup --nocolor --follow'.(&smartcase ? ' --smart-case' : '') | endif
+if executable('ag')
+  set grepformat=%f:%l:%m
+  let &grepprg='ag --nogroup --nocolor' . (&smartcase ? ' --smart-case' : '')
+endif
 
 
 

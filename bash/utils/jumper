@@ -1,7 +1,7 @@
 #!/bin/bash -f
 #
 # Path Jumper - Jump to a directory in the path that starts with targ. Case-insensitive and supports fuzzy matching
-#               Needs ruby
+# Based on http://brettterpstra.com/2014/05/14/up-fuzzy-navigation-up-a-directory-tree/
 
 unset -f jumper
 jumper() {

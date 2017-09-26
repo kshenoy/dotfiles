@@ -17,7 +17,7 @@ nnoremap <silent> <expr> <leader>sd ':set lines=' . (tabpagenr("$") == 1 ? '66' 
 
 execute 'nnoremap <silent> govv :e ' . g:dotvim . '/vimrc<CR>'
 execute 'nnoremap <silent> govg :e ' . g:dotvim . '/gvimrc<CR>'
-execute 'nnoremap <silent> govf :e ' . g:dotvim . '/autoload/my.vim<CR>'
+execute 'nnoremap <silent> govf :e ' . g:dotvim . '/pack/utils/start/utils/plugin/utils.vim<CR>'
 execute 'nnoremap <silent> govm :e ' . g:dotvim . '/plugin/mappings.vim<CR>'
 execute 'nnoremap <silent> govb :e ' . g:dotvim . '/bundles.vim<CR>'
 
@@ -54,7 +54,7 @@ cabbrev %%t <C-R>=fnameescape(expand('%:p:t'))<CR>
 cabbrev %%r <C-R>=fnameescape(expand('%:p:r'))<CR>
 
 nnoremap <leader>s% :silent! source <C-R>=fnameescape(expand('%:p'))<CR><CR>
-cabbrev <expr> E ((getcmdtype() == ':' && getcmdpos() <= 2) ? 'e <C-R>=fnameescape(expand("%:p:h"))."/"<CR><C-R>=utils#EatChar("\\s")<CR>' : 'E')
+cnoreabbrev <expr> E ((getcmdtype() == ':' && getcmdline() ==# 'E') ? 'e <C-R>=fnameescape(expand("%:p:h"))."/"<CR><C-R>=utils#EatChar("\\s")<CR>' : 'E')
 
 """ Display full path and filename
 nnoremap <C-G> 2<C-G>
@@ -63,7 +63,8 @@ nnoremap <C-G> 2<C-G>
 nnoremap <expr> y<C-G> ':let @' . (has('win_32') ? '+' : '*') . '="' . expand("%:p") . '"<CR>'
 
 """ Open help in a vertically split window. Use `:set splitright` to open on the right
-cabbrev <expr> h ((getcmdtype() == ':' && getcmdpos() <= 2) ? 'vert bo h' : 'h')
+" From https://stackoverflow.com/a/3879737/734153
+cnoreabbrev <expr> h ((getcmdtype() == ':' && getcmdline() ==# 'h') ? 'vert bo h' : 'h')
 
 """ Persistent paste in visual mode
 " By default, p/P in visual mode pastes the contents of the default register and replaces it with the visual selection.

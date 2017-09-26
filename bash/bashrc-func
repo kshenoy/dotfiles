@@ -84,6 +84,7 @@ popd()  { command popd  $@ > /dev/null ; }
 
 
 # Function to create new dir(s) and enter it (last directory if multiple arguments are given)                       {{{1
+unset -f mcd
 mcd() {
   command mkdir -p "$@" || return
   cd -- "${@: -1}"

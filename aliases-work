@@ -19,54 +19,27 @@ unalias P
 unset -f P
 P() {
   if [[ -f ${1} ]] && [[ "${1}" == "sim.out" ]]; then
-    if [[ $PAGER =~ vim ]]; then
+    if [[ $PAGER =~ vile ]]; then
       eval "$PAGER -c 'silent! /error:\|Backtrace:' -c 'norm zt' $@"
+      return
     elif [[ $PAGER =~ less ]]; then
       eval "$PAGER -p error: $@"
+      return
     fi
-  else
-    eval "$PAGER $@"
   fi
+
+  eval "$PAGER $@"
 }
 
 
 #=======================================================================================================================
 # EDITOR                                                                                                            {{{1
 #=======================================================================================================================
-unset -f vim_func_work
-gvim_func_work() {                                                                                                # {{{2
-  # This is a hack to weed out the arguments. The last argument is more likely to be a file than any of the other ones
-  local _file=$(eval echo $(echo '$'"$#"))
-  if [[ -f $_file ]] && [[ -n $REPO_PATH ]]; then
-    local _server=${REPO_PATH}
-    local _scratch_dir=$(dirname $(readlink -f $REPO_PATH/sim))
-    if [[ $(readlink -f $_file 2> /dev/null) =~ ^$_scratch_dir ]]; then
-      _server="${_server}_SCRATCH"
-    elif [[ ! $(readlink -f $_file 2> /dev/null) =~ ^$REPO_PATH ]]; then
-      _server=""
-    fi
-    #echo "[$(tput setaf 2)Server: $(tput sgr0)'$(tput setaf 4)${_server}$(tput sgr0)']"
-  fi
-
-  gvim_func -geometry 273x66+1911+0 ${_server:+--servername $_server} "$@"
-}
-# }}}2
-alias v="gvim_func -geometry 273x66+0+0"
+alias v="gvim_func -geometry 273x66+0+0 ${STEM:+--servername $STEM}"
 alias vlog="v -p *ChkL3.log *Seq.log dsp_ch.txt sim.out -c 'set autoread'"
-alias v="gvim_func -geometry 273x66+0+0"
+alias vc='v --remote-silent'
 
-
-unset -f emacs_func_work
-emacs_func_work() {                                                                                               # {{{2
-  local _socket="server"
-  if [[ -n $REPO_PATH ]]; then
-    _socket="${REPO_PATH//\//_}"
-  fi
-  # echo emacs_func ${_socket+--socket-name=$_socket} "$@"
-  emacs_func ${_socket+--socket-name=$_socket} "$@"
-}
-# }}}2
-alias e="emacs_func_work"
+alias e="emacs_func ${STEM+--socket-name=${STEM//\//_}}"
 
 
 # Project Aliases
@@ -131,26 +104,28 @@ alias tmxvnc='tmux new-window -d -n "XVNC" "x11vnc"'
 # PERFORCE                                                                                                          {{{1
 #=======================================================================================================================
 alias pf='p4w'
-alias pfa='pf add'
-alias pfd='pf diff'
-alias pfe='pf edit'
+alias pfa='p4 add'
+alias pfd='p4 diff'
+alias pfd2='p4diff2'
+alias pfe='p4 edit'
 alias pfh='pf help'
-alias pfo='pf opened'
-alias pfres='pf resolve'
-alias pfrev='pf revert'
-alias pflog='pf filelog -stl'
-alias pfs='pf submit'
+alias pfo='p4 opened'
+alias pfco='p4_mkwa -change_branch'
+alias pfres='p4 resolve'
+alias pfrev='p4 revert'
+alias pflog='p4 filelog -stl'
+alias pfs='p4w submit'
 alias pful='pfu @latest'
 
 # unset -f pfop
-# pfop() {                                                                                                          # {{{2
+# pfop() {                                                                                                        # {{{2
 #   while read; do
 #     local d=$(sed -e 's/#.*$//' <<< $REPLY);
 #     local f=$(p4 where $d | cut -d " " -f3);
 #     sed "s:$d:$f:" <<< $REPLY;
-#   done < <(p4w opened)
+#   done < <(p4 opened)
 # }
-alias pfor="p4w opened | sed -r -e 's/#.*$//' -e 's:^//depot/[^/]*/(trunk|branches/[^/]*)/::'"
+alias pfor="p4 opened | sed -r -e 's/#.*$//' -e 's:^//depot/[^/]*/(trunk|branches/[^/]*)/::'"
 
 unset -f pfu
 pfu() {                                                                                                           # {{{2
@@ -158,7 +133,7 @@ pfu() {                                                                         
   local _env_tmux=$TMUX
   local _env_tmux_pane=$TMUX_PANE
 
-  pf update_env "$@"
+  p4w update_env "$@"
   local ret=$?
 
   # Restore ENV variables
@@ -266,6 +241,8 @@ dyn_vars() {                                                                    
   export cl23="${v}/chk_l2l3"
   export al3="${v}/l3/arch_l3"
   export al3c="${v}/l3/arch_l3/arch_lci"
+  export al3f="${v}/l3/arch_l3/arch_l3f"
+  export al3s="${v}/l3/arch_l3/arch_slice"
   export al3x="${v}/l3/arch_l3/arch_lxi"
   export cl3="${v}/chk_l3"
   export clk="${v}/chk_lock"
@@ -390,8 +367,8 @@ wa_list() {                                                                     
 }
 
 
-unset -f benv
-benv() {                                                                                                          # {{{2
+unset -f lenv
+lenv() {                                                                                                          # {{{2
   # Save ENV variables
   local _env_tmux=$TMUX
   local _env_tmux_pane=$TMUX_PANE
@@ -402,7 +379,7 @@ benv() {                                                                        
   # [[ -n "${_workarea}" ]] && ~kshenoy/bin/emacs_daemon -s ${workarea//\//_} &> /dev/null &
 
   command pushd "${_workarea}" > /dev/null
-  sbi && bootenv
+  sbi && loadenv
   local ret=$?
 
   # Restore ENV variables
@@ -424,7 +401,7 @@ pfrem() {                                                                       
   if [[ $_workarea != $REPO_PATH ]]; then
     command cd $_workarea
     . /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash
-    bootenv
+    loadenv
   fi
 
   local _scratch_dir=$(readlink -f ${_workarea}/build | command sed 's/build$//')

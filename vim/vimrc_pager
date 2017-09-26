@@ -11,17 +11,29 @@ set cursorline
 set hlsearch
 highlight Search cterm=reverse ctermfg=NONE ctermbg=NONE
 
+" Never show a statusline
+set laststatus=0
+
 " set scrolloff=999
 
 nnoremap <silent> q :qall!<CR>
 nnoremap <silent> n nzz
 nnoremap <silent> N Nzz
 
+
+""" Show cursor information and position when moving around
+nnoremap <silent> <C-G> 1<C-G>
+for lhs in ['<C-D>', '<C-U>', '<C-B>', '<C-F>', 'gg', 'G']
+  exec "nnoremap <silent> " . lhs . " " . lhs . "1<C-G>"
+endfor
+
+
 """ Move by visual lines
 noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
 noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
 noremap <silent> gj j
 noremap <silent> gk k
+
 
 """ Copy the file name to unix visual select buffer
 nnoremap <expr> y<C-G> ':let @' . (has('win_32') ? '+' : '*') . '="' . expand("%:p") . '"<CR>'
