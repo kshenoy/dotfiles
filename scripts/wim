@@ -51,7 +51,7 @@ my %opts = (
 );
 
 # Since this is a wrapper, after processing the extra options I have to invoke the non-wrapper version to pass vim its
-# base options.
+# base options so find the root executable to call.
 my $root_exec = dirname($0)  . "/vim_path/" . basename($0);
 unless (-f $root_exec) {
   foreach my $i (`bash -c "type -a \$(basename $0)"`) {
@@ -98,8 +98,9 @@ my $U_set = grep(/^-U$/, @ARGV);
 if ($opts{'config'} eq "NONE") {
   # -u NONE prevents loading of system plugins too. Thus, we use NORC instead
   push @args, qw(-N --cmd), 'set rtp=$VIM,$VIMRUNTIME,$VIM/after';
-  push @args, qw(-u NORC) if (!$u_set);
-  push @args, qw(-U NORC) if (!$U_set);
+  push @args, qw(-u NORC) if !$u_set;
+  push @args, qw(-U NORC) if !$U_set;
+  push @args, qw(--noplugins) if !grep(/^--noplugins$/, @ARGV);
 } elsif ($opts{'config'} ne "") {
   push @args, qw(-N --cmd), sprintf("set rtp=%s,\$VIM,\$VIMRUNTIME,\$VIM/after,%s/after", $opts{'config'}, $opts{'config'});
   push @args, '-u', "$opts{'config'}/vimrc"  if (!$u_set && (-f "$opts{'config'}/vimrc"));
@@ -110,81 +111,81 @@ if ($opts{'config'} eq "NONE") {
 push @args, @ARGV;
 # print Dumper \@args;
 
+
 # print "STDOUT connected to " . (-t STDOUT ? "terminal" : "pipe") . "\n";
 # print "STDIN connected to "  . (-t STDIN  ? "terminal" : "pipe") . "\n";
 
 if (-t STDIN) {
-  # vim is not present in the middle of a pipe
+  # STDIN is connected to the tty <==> vim is not present in the middle of a pipe
+  # Execute vim and return
   exec(@args);
-
-} else {
-  # vim is present in the middle of a pipe
-  # FIXME: Add support for processing batch commands
-
-  # Add -f option to avoid creating a fork if using gvim
-  if ($root_exec =~ /gvim/) {
-    push @args, '-f';
-  }
-
-  $/=undef;
-
-  ## Create a temp file
-  my ($tmp_fh, $tmp)=tempfile();
-  die "Unable to create tempfile" unless $tmp_fh;
-
-  ## Dump the stdin to the temp file
-  print ($tmp_fh <STDIN>) || die "Unable to write stdin to a temp file: $!";
-  close $tmp_fh;
-
-  ## Save if vim was originally connected to terminal/pipe
-  ## We need to save this because we'll be reconnecting vim to tty
-  my $stdout_tty = (-t STDOUT);
-
-  ## Reconnect stdin and stdout to the terminal
-  # http://superuser.com/a/336020/99982
-  # Vim expects its stdin to be the same as its controlling terminal, and performs various terminal-related ioctl's on
-  # stdin directly. When done on any non-tty file descriptor, those ioctls are meaningless and return ENOTTY, which gets
-  # silently ignored. On startup Vim reads and remembers the old terminal settings, and restores them back when exiting.
-  # Thus, when the "old settings" are requested for a non-tty file descriptor, Vim receives all values empty and all
-  # options disabled, and carelessly sets the same to the terminal.
-  # This can be seen by running vim < /dev/null, exiting it, then running stty, which will output a whole lot of <undef>s.
-  # This could be considered as a bug in vim, since it can open /dev/tty for terminal control, but doesn't.
-  # Thus, to make vim interactive again, we need to explicitly connect its input and output to the terminal
-  close STDIN;
-  open(STDIN, "<", "/dev/tty") || die "Unable to reopen stdin: $!";
-  close STDOUT;
-  open(STDOUT, ">", "/dev/tty") || die "Unable to reopen stdout: $!";
-
-  # +------+------------------+-------------------------------------------------------------------------+
-  # | Mode | Location in Pipe | Action                                                                  |
-  # +------+------------------+-------------------------------------------------------------------------+
-  # | RO   | End              | Vim is probably being used a pager => Open vim but don't dump to STDOUT |
-  # | RO   | Middle           | Weird case; behave like less does in this situation, i.e. like cat =>   |
-  # |      |                  |   Don't open vim and don't dump to STDOUT                               |
-  # |!RO   | End/Middle       | Vim is probably being used in vipe mode => Open vim and dump to STDOUT  |
-  # +------+------------------+-------------------------------------------------------------------------+
-
-  if (  !(  scalar(grep(/^-R$/, @args))
-         || ($root_exec =~ /view$/)
-         )
-     || $stdout_tty
-     ) {
-    my $ret=system(@args, $tmp);
-    if ($ret != 0) {
-      die "$args[0] exited with a non-zero code; aborting\n";
-    }
-  }
-
-  unless (  (  grep(/^-R$/, @args)
-            || ($root_exec =~ /view$/)
-            )
-         && $stdout_tty
-         ) {
-    open($tmp_fh, "<", $tmp) || die "Unable to read $tmp: $!\n";
-    print (STDOUT <$tmp_fh>) || die "Write failure: $!";
-  }
-
-  ## Clean-up
-  close $tmp_fh;
-  unlink($tmp);
 }
+
+
+# If we've reached here then it means that vim is present in the middle of a pipe
+my $stdout_tty = (-t STDOUT);
+
+# Add -f option to avoid creating a fork if using gvim
+if ($root_exec =~ /gvim/) {
+  push @args, '-f';
+}
+
+$/=undef;
+
+## Create a temp file and dump the stdin to it
+my ($fh, $tmp_file)=tempfile();
+die "Unable to create tempfile" unless $fh;
+
+print ($fh <STDIN>) || die "Unable to write stdin to a temp file: $!";
+close $fh;
+close STDIN;
+
+## Reconnect stdin and stdout to the terminal
+# http://superuser.com/a/336020/99982
+# Vim expects its stdin to be the same as its controlling terminal, and performs various terminal-related ioctl's on
+# stdin directly. When done on any non-tty file descriptor, those ioctls are meaningless and return ENOTTY, which gets
+# silently ignored. On startup Vim reads and remembers the old terminal settings, and restores them back when exiting.
+# Thus, when the "old settings" are requested for a non-tty file descriptor, Vim receives all values empty and all
+# options disabled, and carelessly sets the same to the terminal.
+# This can be seen by running vim < /dev/null, exiting it, then running stty, which will output a whole lot of <undef>s.
+# This could be considered as a bug in vim, since it can open /dev/tty for terminal control, but doesn't.
+# Thus, to make vim interactive again, we need to explicitly close STDIN and STDOUt and connect them to the terminal
+open(STDIN, "<", "/dev/tty") || die "Unable to reopen stdin: $!";
+open(OUT, ">&", "STDOUT") || die "save stdout: $!";
+close STDOUT;
+open(STDOUT, ">", "/dev/tty") || die "Unable to reopen stdout: $!";
+
+# +------------+------+------+---------+--------------------------------------------------------------------+
+# | Location   | Mode | Open | Dump to | Description                                                        |
+# | in Pipe    |      | Vim? | STDOUT? |                                                                    |
+# +------------+------+------+---------+--------------------------------------------------------------------+
+# | End/Middle | !RO  | Y    | Y       | Vim is being used in vipe mode                                     |
+# | End        |  RO  | Y    | N       | Vim is probably being used a pager                                 |
+# | Middle     |  RO  | N    | Y       | Weird case; behave like less does in this situation, i.e. like cat |
+# +------------+------+------+---------+--------------------------------------------------------------------+
+
+## Open $tmp_file in vim
+if (  !(  scalar(grep(/^-R$/, @args))
+       || ($root_exec =~ /view$/)
+       )
+   || $stdout_tty
+   ) {
+  my $ret=system(@args, '-c "runtime! macros/less.vim"', $tmp_file);
+  if ($ret != 0) {
+    die "$args[0] exited with a non-zero code; aborting\n";
+  }
+}
+
+## Dump $tmp_file to STDOUT
+if (  !(  scalar(grep(/^-R$/, @args))
+       || ($root_exec =~ /view$/)
+       )
+   || !$stdout_tty
+   ) {
+  open($fh, "<", $tmp_file) || die "Unable to read $tmp_file: $!\n";
+  print (OUT <$fh>) || die "Write failure: $!";
+}
+
+## Clean-up
+close $fh;
+unlink($tmp_file);
