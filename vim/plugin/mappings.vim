@@ -272,7 +272,7 @@ cnoremap <C-W> <C-R>=utils#CmdIsk(1)<CR><C-W><C-R>=utils#CmdIsk(0)<CR>
 " |        | <leader>g/ | Display all lines in all buffers containing the search term in a quickfix-list          |
 " |--------+------------+-----------------------------------------------------------------------------------------|
 " | Normal | g/         | Grep all files containing the search term and show results in a quickfix-list           |
-" |        | K          | Grep all files containing the word under the cursor and show results in a quickfix-list |
+" |        | gK         | Grep all files containing the word under the cursor and show results in a quickfix-list |
 " |--------+------------+-----------------------------------------------------------------------------------------|
 " | Visual | /    ?     | Open search with visual selection but don't start searching                             |
 " |--------+------------+-----------------------------------------------------------------------------------------|
@@ -327,7 +327,7 @@ vnoremap <silent> <leader>g/ :<C-U>call utils#FindAndList('global', 'visual')<CR
 """ Grep
 command! -nargs=+ -complete=file -bar Grep silent grep! <args>|cwindow 20|redraw!
 nnoremap g/ :Grep<Space>
-nnoremap K  :Grep <C-R><C-W><CR>
+nnoremap gK :Grep <C-R><C-W><CR>
 
 """ Keep searches in middle of screen
 nnoremap <silent> n :call utils#SearchSaveAndRestore()<CR>/<CR>zvzz
@@ -375,7 +375,7 @@ vnoremap <silent> <A-d> "_d
 nnoremap <F12> :call utils#UpdateTags()<CR>
 
 """ Execute selection as vimscript
-vnoremap g: <Esc>:@*<CR>
+" vnoremap g: <Esc>:@*<CR>
 
 """ Run peforce diff on current file
-nnoremap <leader>pd :!p4 diff %<CR>
+nnoremap <silent> <leader>pd :call perforce#DiffCurrentFile()<CR>

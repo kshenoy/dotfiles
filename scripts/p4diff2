@@ -7,13 +7,13 @@ _cmd=${P4DIFF2:-${P4DIFF}}
 # Thus, I check if the file belongs to the local workarea or the depot and use process substitution accordingly.
 
 if [[ -n "${_cmd}" ]]; then
-  local _file1="$1"
+  _file1="$1"
   if [[ "$1" =~ "#" ]]; then
     _file1="/tmp/$$_1"
     p4 print -q "$1" >| "$_file1"
   fi
 
-  local _file2="$2"
+  _file2="$2"
   if [[ "$2" =~ "#" ]]; then
     _file2="/tmp/$$_2"
     p4 print -q "$2" >| "$_file2"
@@ -26,4 +26,4 @@ else
   p4 diff2 "$@"
 fi
 
-unset -v _cmd
+unset -v _cmd _file1 _file2

@@ -333,3 +333,18 @@ function! s:CreateMergeMaps()                                                   
   nmap <silent> dgt :silent call <SID>DiffGetTheirs()<CR>
   nmap <silent> dgy :silent call <SID>DiffGetYours()<CR>
 endfunction
+
+
+function! perforce#DiffCurrentFile()                                                                              " {{{1
+  " Save current settings
+  let l:autoread=&l:autoread
+
+  " Set what is required
+  setl autoread
+
+  " Execute command
+  silent execute "!p4 diff " . expand('%:p')
+
+  " Restore settings
+  let &l:autoread=l:autoread
+endfunction

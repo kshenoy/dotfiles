@@ -12,13 +12,14 @@
 " GUI
 "
   " Set Font
-  if has('unix')
+  if g:env ==? 'linux'
+    " Note that this doesn't include Cygwin or Mingw
     set guifont=
     set guifont+=Hack\ 9
     set guifont+=MesloLGLDZ\ Nerd\ Font\ 8
     set guifont+=Monospace\ 8
     set linespace=3
-  elseif has('win32')
+  elseif g:env ==? 'windows'
     set guifont=
     set guifont+=Hack:h9:cANSI:qDRAFT
     set guifont+=Consolas:h9:cANSI
@@ -39,18 +40,18 @@
   " Make 'File Open' use current directory
   set browsedir=buffer
 
-  if &diff
-    set background=light
-    colorscheme solarized
-  else
-    set background=dark
-    colorscheme base16-eighties
-  endif
+  " if &diff
+  "   set background=light
+  "   colorscheme solarized
+  " else
+  "   set background=dark
+  "   colorscheme base16-eighties
+  " endif
 
   " Light colorschemes
-  " set background=light
+  set background=light
   " colorscheme sol
-  " colorscheme solarized
+  colorscheme solarized
 
   " Dark colorschemes
   " set background=dark

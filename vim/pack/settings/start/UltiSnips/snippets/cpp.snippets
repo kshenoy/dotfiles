@@ -28,10 +28,10 @@ opts.sort()
 if snip.basename:
   opts.insert(0, snip.basename + '.h')
 snip.rv = complete(t[1], opts)
-`${2:>}
+`${2:`!p
+snip.rv = '"' if (t[1][-2:] == '.h') else ">"
+`}
 endsnippet
-
-
 
 #=======================================================================================================================
 # Namespaces                                                                                                        {{{1

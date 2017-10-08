@@ -15,20 +15,19 @@ fi
 #  alias precmd 'set prompt = "<%c> "'
 #endif
 
-unalias P
 unset -f P
 P() {
   if [[ -f ${1} ]] && [[ "${1}" == "sim.out" ]]; then
     if [[ $PAGER =~ vile ]]; then
-      eval "$PAGER -c 'silent! /error:\|Backtrace:' -c 'norm zt' $@"
+      $PAGER -c 'silent! /error:\|Backtrace:' -c 'norm zt' "$@"
       return
     elif [[ $PAGER =~ less ]]; then
-      eval "$PAGER -p error: $@"
+      $PAGER -p error: "$@"
       return
     fi
   fi
 
-  eval "$PAGER $@"
+  $PAGER "$@"
 }
 
 
@@ -125,7 +124,16 @@ alias pful='pfu @latest'
 #     sed "s:$d:$f:" <<< $REPLY;
 #   done < <(p4 opened)
 # }
-alias pfor="p4 opened | sed -r -e 's/#.*$//' -e 's:^//depot/[^/]*/(trunk|branches/[^/]*)/::'"
+
+unalias pfor
+unset -f pfor
+pfor() {
+  if (( $# > 0 )); then
+    p4 opened "${1}" | sed -r -e "s/#.*$//" -e "s:^//depot/[^/]*/(trunk|branches/[^/]*):$STEM:" -e "s:$PWD/::"
+  else
+    p4 opened | sed -r -e "s/#.*$//" -e "s:^//depot/[^/]*/(trunk|branches/[^/]*):$STEM:" -e "s:$PWD/::"
+  fi
+}
 
 unset -f pfu
 pfu() {                                                                                                           # {{{2
@@ -217,7 +225,7 @@ make_wa_vars() {                                                                
     done
 
     for _scr in {0..2}; do
-      eval "export ${_proj}s${_scr}='/proj/ch_func_gen_scratch${_scr}/${_proj_full}'"
+      eval "export ${_proj}s${_scr}='/proj/ch_func_gen_scratch${_scr}/${_proj_full}/kshenoy'"
     done
   done
 }
@@ -432,6 +440,9 @@ BUGS
 # }}}1
 
 
+
+alias g++="/tool/pandora64/.package/gcc-6.3.0/bin/g++ -std=c++14"
+alias clang++="/tool/pandora64/.package/llvm-4.0.0-gcc630/bin/clang++ -std=c++14"
 
 unset -f psig
 psig() {

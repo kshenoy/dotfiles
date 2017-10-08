@@ -85,26 +85,20 @@ function! utils#UpdateTags()                                                    
   execute "!gentags --create -w $REPO_PATH &"
 endfunction
 
-function! utils#Preserve(command, ...)                                                                            " {{{1
+function! utils#Preserve(expr, ...)                                                                               " {{{1
   " Description: Function to execute commands without modifying the original settings like cursor position, search string etc.
-
-  " Find if the command should be executed in visual mode or normal mode
-  if (a:0 > 0)
-    normal! <Esc>
-  endif
+  " Arguments:   The expression to execute.
+  "              TODO: Any settings that must be saved and restored can be supplied in a list as the optional argument
+  "              SYNTAX of Optional Args: [ (argname1, argval1), ... ]
 
   " Save last search, and cursor position.
   let currview = winsaveview()
-
-  if (a:0 > 0)
-    normal! gv
-  endif
 
   " Do the business
   let l:keep_cmds = ""
   if exists(":keepjumps")    | let l:keep_cmds .= "keepjumps "    | endif
   if exists(":keeppatterns") | let l:keep_cmds .= "keeppatterns " | endif
-  silent! execute l:keep_cmds . a:command
+  silent! execute l:keep_cmds . a:expr
 
   " Restore previous search history, and cursor position
   call winrestview(currview)

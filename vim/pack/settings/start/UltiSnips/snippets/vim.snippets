@@ -36,11 +36,9 @@ else
 endsnippet
 
 
-snippet fu "function" b
-function! `!v substitute(substitute((expand('%:p') =~ "autoload" ? expand('%:p:r') : ""), '^.*autoload/', '', ''), '/', '#', '') . '#'`${1:funcName}(${2})
-  " Description:
-
-  $0
+snippet 'fu(n(ction)?)?' "function" br
+function! ${1:`!v expand('%:r') . '#'`}${2:funcName}(${3})
+  " Description: $0
 endfunction
 endsnippet
 

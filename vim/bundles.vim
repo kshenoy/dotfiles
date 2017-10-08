@@ -38,6 +38,7 @@ call plug#('kana/vim-textobj-entire',          {'on': '<Plug>(textobj-entire'})
 call plug#('kana/vim-textobj-function',        {'on': '<Plug>(textobj-function'})
 call plug#('kana/vim-textobj-indent',          {'on': '<Plug>(textobj-indent'})
 call plug#('saihoooooooo/vim-textobj-space',   {'on': '<Plug>(textobj-space'})
+call plug#('tommcdo/vim-express')
 
 " Completion/Text insertion --------------------------------------------------------------------------------------------
 call plug#('lifepillar/vim-mucomplete')
@@ -259,6 +260,18 @@ nmap cxc <Plug>(ExchangeClear)
 xmap X   <Plug>(Exchange)
 
 
+" vim-express ----------------------------------------------------------------------------------------------------- {{{1
+function! s:InitVimExpress()
+  " Description: Creates operators upon startup as the plugin might not have beeen loaded at this point
+  MapExpress gs join(sort(split(v:val, '\n')), '')
+endfunction
+
+augroup BundleInit
+  autocmd!
+  autocmd VimEnter * call s:InitVimExpress()
+augroup END
+
+
 " FSwitch --------------------------------------------------------------------------------------------------------- {{{1
 let g:fsnonewfiles = 1
 augroup FSwitch
@@ -319,7 +332,7 @@ let g:mucomplete#enable_auto_at_startup = 1
 
 
 " Origami --------------------------------------------------------------------------------------------------------- {{{1
-let g:OrigamiFoldAtCol = -3
+let g:OrigamiFoldAtCol = -4
 
 
 " vim-parjumper --------------------------------------------------------------------------------------------------- {{{1

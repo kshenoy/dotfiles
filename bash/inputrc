@@ -1,5 +1,15 @@
-# Readline settings
+## Readline settings
 set show-mode-in-prompt-on
+
+# Handle Meta (Alt) correctly
+set meta-flag on
+set convert-meta off
+set output-meta on
+
+# Rebind C-A-H to ignore hyphens and underscores while deleteing a filename
+#$if mode=emacs
+#"\eC-h": unix-filename-rubout
+#$endif
 
 set keymap emacs
 # Switch to vi mode

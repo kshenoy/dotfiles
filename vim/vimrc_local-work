@@ -9,8 +9,11 @@ function! s:SetLocalSettings(filename)
   elseif (a:filename =~ '\vch/verif/(chk_)?l3/')
     setlocal textwidth=100
   endif
-  let b:OrigamiFoldAtCol=(&l:textwidth - 3)
 endfunction
+
+if ($STEM != "")
+  set path=.,$STEM/build/latest/fake_c_incl,/usr/local/include,/usr/include,**;
+endif
 
 augroup AMD
   autocmd!

@@ -594,7 +594,7 @@ Similar to vim's easy-motion plugin
     :diminish flycheck-mode
     :init (global-flycheck-mode t)
     :config
-    (add-hook 'c++-mode-hook (lambda() (setq flycheck-gcc-language-standard "c++14")
+    (add-hook 'c++-mode-hook (lambda() (setq flycheck-gcc-language-standard   "c++14")
                                        (setq flycheck-clang-language-standard "c++14"))))
 #+END_SRC
 
@@ -737,7 +737,7 @@ Org customization guide: http://orgmode.org/worg/org-configs/org-customization-g
   (setq org-indent-mode t)
 
   (setq org-directory "~/Notes/")
-  (setq org-default-notes-file (concat org-directory "organizer.org"))
+  (setq org-default-notes-file (concat org-directory "Inbox.org"))
 
   (setq org-M-RET-may-split-line '((item) (default . t)))
   (setq org-log-done 'time) ; 'time/'note
@@ -1061,7 +1061,7 @@ A good way to find more characters is to use =M-x insert-char=
                       (and 'file-exists-p
                            (not (string= x "Spanish.org"))))
                     (mapcar (lambda (x) (concat org-directory x))
-                            '("organizer.org" "Software/" "Personal/"))))
+                            '("Inbox.org" "Software/" "Personal/"))))
 
   (setq org-agenda-tags-column            -120) ; Monitors are wide, might as well use it :/
   (setq org-agenda-skip-scheduled-if-done t)    ; Why isn't this default?

@@ -153,6 +153,22 @@ function! utils#GetHighlightInfo(hl_group)                                      
 endfunction
 
 
+function! utils#SetEnvInfo()
+  " Description: Define a global variable containing current environment's name
+  "              From: https://gist.github.com/romainl/4df4cde3498fada91032858d7af213c2
+
+  if exists('g:env')
+    return
+  endif
+
+  if has('win64') || has('win32') || has('win16')
+    let g:env = 'windows'
+  else
+    let g:env = tolower(substitute(system('uname'), '\n', '', ''))
+  endif
+endfunction
+
+
 function! utils#SetHighlightInfo(hl_group, hl_info)                                                               " {{{1
   let l:hl_cmd = 'highlight ' . a:hl_group . ' '
   for l:attr in keys(a:hl_info)
