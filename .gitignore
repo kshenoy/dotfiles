@@ -1,6 +1,7 @@
 *.bak
 *conflicted*
 *unison.tmp
+.nfs*
 bash/history
 compiz/
 emacs.d/abbrev_defs
