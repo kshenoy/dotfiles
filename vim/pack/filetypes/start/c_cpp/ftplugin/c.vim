@@ -1,23 +1,23 @@
 "
 " 15. TABS AND INDENTING
 "
-set noautoindent                                                                                 " Auto-indent new lines
-set cindent                                                                       " Enable specific indenting for C code
+setl noautoindent                                                                                " Auto-indent new lines
+setl cindent                                                                      " Enable specific indenting for C code
 
 
 "
 " 16. FOLDING
 "
-set commentstring=//\ %s
+setl commentstring=//\ %s
 
 
 "
 " 22. EXECUTING EXTERNAL COMMANDS
 "
-set formatprg=clang-format\ --style=file                                                        " Set formatting program
+setl formatprg=/tool/pandora64/.package/llvm-4.0.0-gcc630/bin/clang-format\ --style=file
 
 
 "
 " 24. LANGUAGE SPECIFIC
 "
-set isk-=:
+setl isk-=:

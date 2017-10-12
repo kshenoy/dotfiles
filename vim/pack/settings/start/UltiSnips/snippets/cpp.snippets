@@ -23,7 +23,7 @@ endglobal
 snippet inc "#include <>" b
 #include ${2/>/</}$1`!p
 opts = ['algorithm', 'array', 'cassert', 'cstdint', 'cstdio', 'cstdlib', 'cstring', 'fstream', 'iostream', 'list', 'map', 'memory',
-        'sstream', 'string', 'unordered_map', 'vector']
+        'set', 'sstream', 'string', 'unordered_map', 'unordered_set', 'vector']
 opts.sort()
 if snip.basename:
   opts.insert(0, snip.basename + '.h')

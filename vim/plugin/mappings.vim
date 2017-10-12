@@ -20,6 +20,7 @@ execute 'nnoremap <silent> govg :e ' . g:dotvim . '/gvimrc<CR>'
 execute 'nnoremap <silent> govf :e ' . g:dotvim . '/pack/utils/start/utils/plugin/utils.vim<CR>'
 execute 'nnoremap <silent> govm :e ' . g:dotvim . '/plugin/mappings.vim<CR>'
 execute 'nnoremap <silent> govb :e ' . g:dotvim . '/bundles.vim<CR>'
+nnoremap <silent> govl :e ~/.vimrc_local<CR>
 
 nnoremap <silent> gosa :e ~/.dotfiles/aliases<CR>
 nnoremap <silent> gosf :e ~/.dotfiles/bash/bashrc-func<CR>
@@ -131,6 +132,7 @@ nnoremap <silent> <f  :<C-U>DecFontSize<CR>
 nnoremap =f :set guifont=*<CR>
 
 """ Fill Text Width
+command! -nargs=? FTW call utils#FillTW(<args>)
 nnoremap <silent> <leader>fw :FTW<CR>
 
 """ Toggle ColorColumn
@@ -377,5 +379,5 @@ nnoremap <F12> :call utils#UpdateTags()<CR>
 """ Execute selection as vimscript
 " vnoremap g: <Esc>:@*<CR>
 
-""" Run peforce diff on current file
+""" Run perforce diff on current file
 nnoremap <silent> <leader>pd :call perforce#DiffCurrentFile()<CR>

@@ -6,14 +6,20 @@ function! s:SetLocalSettings(filename)
     setlocal textwidth=80
     setlocal softtabstop=3
     setlocal shiftwidth=3
-  elseif (a:filename =~ '\vch/verif/(chk_)?l3/')
+  elseif (a:filename =~ '\vch/verif/(chk_)?l3/|\vch/tc/tb_l3')
     setlocal textwidth=100
   endif
 endfunction
 
+
+set isfname+={,}                                          " This will allow vim to understand env vars with curly braces
+set isfname-==
+
+
 if ($STEM != "")
-  set path=.,$STEM/build/latest/fake_c_incl,/usr/local/include,/usr/include,**;
+  set path=.,$STEM/ch/verif/**,$STEM/build/latest/generated/ch,/usr/local/include,/usr/include,**;
 endif
+
 
 augroup AMD
   autocmd!

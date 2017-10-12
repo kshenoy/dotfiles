@@ -30,7 +30,7 @@
  -p, --predicate=PRED  Spin till the PRED succeeds
  -m, --model=MODEL     Spin till the specified model was built successfully
  -j, --job=PATTERN     If PATTERN is a number, spin till the JobId=PATTERN completes.
-                       If PATTERN is alphanumeric, spin till all jobs submitted by user=PATTERN completes.
+                       If PATTERN is alphanumeric, spin till all jobs submitted by user=PATTERN complete.
                        By default, the check is performed once every 5mins to prevent loading the lsf_server
 
  Optional Arguments:
@@ -81,10 +81,16 @@ Getopt::Long::Configure("bundling");
 $Data::Dumper::Sortkeys = 1;
 
 
+# Forward Declarations
+sub Alert;
+
+
 ## Option Handling =====================================================================================================
 my %opts = (                                                                                                      # {{{1
+  'alert'         => 1,
+  'alert_msg'     => "\'Okidoki, job done!\'",
   'interval'      => 60,
-  'num-tries'     => -1,
+  'num_tries'     => -1,
   'predicate'     => "",
   'predicate_set' => 0,
   'interval_set'  => 0,
@@ -93,18 +99,20 @@ my %opts = (                                                                    
 
 GetOptions(                                                                                                       # {{{1
   \%opts,
+  'alert|a:s',      => sub { $opts{'alert_msg'} = $_[1] if ($_[1] ne ""); },
+  'noalert|A',      => sub { $opts{'alert'} = 0; },
   'interval|i=i'    => sub { $opts{'interval'}      = $_[1];
                              $opts{'interval_set'}  = 1; },
   'job|j=s'         => sub { pod2usage(
                                -message => "ERROR: Multiple uses of predicate detected."
                                -verbose => 0, -exitval => 1) if $opts{predicate_set};
                              if ($_[1] =~ /^\d+$/) {
-                               $opts{'predicate'}    .= "[[ -z \$(lsf_bjobs | command grep $_[1]) ]]";
+                               $opts{'predicate'}    .= "[[ -z \$(lsf_bjobs 2> /dev/null | command grep $_[1]) ]]";
                              } else {
-                               $opts{'predicate'}    .= "[[ -z \$(lsf_bjobs -u $_[1]) ]]";
+                               $opts{'predicate'}    .= "[[ -z \$(lsf_bjobs -u $_[1] 2> /dev/null) ]]";
                              }
                              $opts{'predicate_set'} = 1;
-                             $opts{'interval'}      = 300 if (!$opts{'interval_set'});
+                             $opts{'interval'}      = 60 if (!$opts{'interval_set'});
                        },
   'model|m=s'       => sub { pod2usage(
                                -message => "ERROR: Multiple uses of predicate detected."
@@ -139,11 +147,24 @@ print Dumper(\%opts) if $opts{'verbose'};
 my $n=0;
 do {
   my $ret = system($opts{'predicate'});
-  exit 0 if ($? == 0);
+  Alert(0) if ($ret == 0);
 
   $n++;
   sleep $opts{'interval'};
-} while ($n != $opts{'num-tries'});  # Intentionally using != so that we can run infinitely when num-tries = -1
+} while ($n != $opts{'num_tries'});  # Intentionally using != so that we can run infinitely when num_tries = -1
 
 pod2usage(-verbose => 0, -exitval => 1, -message => "ERROR: Hit limit on number of tries");
-exit 1;
+$opts{'alert_msg'} = "Hit limit on number of tries";
+Alert(1);
+
+
+sub Alert {
+  my ($status) = @_;
+
+  my $cmd = "notify-send --urgency=low -i ";
+  $cmd   .= ($status == 0 ? "terminal" : "error" );
+  $cmd   .= " $opts{'alert_msg'}";
+
+  # exec($cmd);
+  exit $status;
+}

@@ -125,7 +125,6 @@ alias pful='pfu @latest'
 #   done < <(p4 opened)
 # }
 
-unalias pfor
 unset -f pfor
 pfor() {
   if (( $# > 0 )); then

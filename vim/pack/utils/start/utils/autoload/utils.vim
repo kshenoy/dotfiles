@@ -217,7 +217,6 @@ function! utils#FillTW(...)                                                     
   execute "normal! i" . l:padding
   call repeat#set(":FTW " . l:textwidth . "\<CR>" . l:filler)
 endfunction
-command! -nargs=? FTW call utils#FillTW(<args>)
 
 
 function! utils#EatChar(pat)                                                                                      " {{{1
