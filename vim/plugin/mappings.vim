@@ -9,8 +9,6 @@ nnoremap <silent> <leader>sm :marks<CR>
 " Set size
 nnoremap <silent> <expr> <leader>sd ':set lines=' . (tabpagenr("$") == 1 ? '66' : '64') . ' columns=273<CR>'
 
-
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " GOTO commands                                                                                                     {{{1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -100,7 +98,11 @@ nnoremap ZQ :qall!<CR>
 " nnoremap . :<C-U>execute 'normal! ' . repeat('.', v:count1)<CR>
 
 """ Easily quit help pages
-autocmd FileType help nnoremap <buffer> q :q<CR>
+augroup Help
+  autocmd!
+  autocmd FileType help nnoremap <buffer> q :q<CR>
+  autocmd BufEnter option-window nnoremap <buffer> q :q<CR>
+augroup END
 
 
 
@@ -198,7 +200,7 @@ nnoremap gV `[v`]
 "nnoremap gb :<C-U>exec (v:count ? 'b '.v:count : 'bn')<cr>
 nnoremap <S-Del>  :bd<CR>
 nnoremap <S-BS>   :bp<BAR>bd#<CR>
-"nnoremap <Space>b :ls<CR>:b<Space>
+nnoremap <Space>b :ls<CR>:b<Space>
 
 
 """ Windows
@@ -264,11 +266,11 @@ cnoremap <C-W> <C-R>=utils#CmdIsk(1)<CR><C-W><C-R>=utils#CmdIsk(0)<CR>
 " |--------+------------+-----------------------------------------------------------------------------------------|
 " | Mode   | Map        | Description                                                                             |
 " |--------+------------+-----------------------------------------------------------------------------------------|
-" | Normal | *    #     | Search whole-word under cursor                                                                |
-" |        | g*   g#    | Search word under cursor                                                          |
+" | Normal | *    #     | Search whole-word under cursor                                                          |
+" |        | g*   g#    | Search word under cursor                                                                |
 " |--------+------------+-----------------------------------------------------------------------------------------|
-" | Normal | <leader>*  | Set search pattern to whole-word under cursor                                                 |
-" |        | <leader>g* | Set search pattern to word under cursor                                           |
+" | Normal | <leader>*  | Set search pattern to whole-word under cursor                                           |
+" |        | <leader>g* | Set search pattern to word under cursor                                                 |
 " |--------+------------+-----------------------------------------------------------------------------------------|
 " | Normal | <leader>/  | Display all lines in current buffer containing the search term in a location-list       |
 " |        | <leader>g/ | Display all lines in all buffers containing the search term in a quickfix-list          |
@@ -298,7 +300,7 @@ cnoremap %s/ %s/\v
 cnoremap .s/ .s/\v
 xnoremap :s/ :s/\%V\v
 
-""" Search with visual selection (* doesn't do whole-word searches - to match what I do in normal mode)
+""" Search with visual selection
 vnoremap *  <ESC>/\<<C-R>=escape(@*, '$*[]\/')<CR>\><CR>
 vnoremap g* <ESC>/<C-R>=escape(@*, '$*[]\/')<CR><CR>
 vnoremap #  <ESC>?\<<C-R>=escape(@*, '$*[]\/')<CR>\><CR>
@@ -326,7 +328,7 @@ nnoremap <silent> <leader>g/ :call utils#FindAndList('global', 'normal')<CR>
 vnoremap <silent> <leader>g/ :<C-U>call utils#FindAndList('global', 'visual')<CR>
 
 """ Grep
-command! -nargs=+ -complete=file -bar Grep silent grep! <args>|cwindow 20|redraw!
+command! -nargs=+ -complete=file -bar Grep silent grep! <args>|botright cwindow 20|redraw!
 nnoremap g/ :Grep<Space>
 
 """ Keep searches in middle of screen

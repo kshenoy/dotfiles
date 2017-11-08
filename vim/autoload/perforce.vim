@@ -197,18 +197,6 @@ function! s:ConflictInnerMotion(ai, ...)                                        
     return
   endif
 
-  if (l:start >= l:end)
-    echoe "Conflict block bounds are not sensible. Something's messed up! Start=" . l:start . ", End=" . l:end
-    call setpos('.', l:curpos)
-    return
-  elseif (  (l:end == l:start + 1)
-       \ && (a:ai ==# 'i')
-       \ )
-    echoe "Nothing to select. Conflict block seems to be empty"
-    call setpos('.', l:curpos)
-    return
-  endif
-
   " If on the 'YOURS' block, keep the final '<<<<' (by not decrementing l:end)
   if (a:ai ==# 'i')
     +
@@ -218,7 +206,13 @@ function! s:ConflictInnerMotion(ai, ...)                                        
     let l:end -= 1
   endif
 
-  execute 'normal! V' . (l:end > l:start + 1 ? (l:end - l:start) . 'j' : '')
+  if (l:start > l:end)
+    echoe "Conflict block bounds are not sensible. Something's messed up! Start=" . l:start . ", End=" . l:end
+    call setpos('.', l:curpos)
+    return
+  endif
+
+  execute 'normal! V' . (l:end > l:start ? (l:end - l:start) . 'j' : '')
 endfunction
 
 
@@ -285,23 +279,23 @@ endfunction
 
 
 function! s:DiffGetOriginal()                                                                                     " {{{1
-  normal! _d:call <SID>ConflictInnerMotion('a', 'THEIRS')
-  normal! _d:call <SID>ConflictInnerMotion('a', 'YOURS')
+  normal! _d:call s:ConflictInnerMotion('a', 'THEIRS')
+  normal! _d:call s:ConflictInnerMotion('a', 'YOURS')
   " Move up to '>>>> ORIGINAL' and delete it
   call s:ConflictMotion(0)
   delete _
 endfunction
 
 function! s:DiffGetTheirs()                                                                                       " {{{1
-  normal! _d:call <SID>ConflictInnerMotion('a', 'ORIGINAL')
+  normal! _d:call s:ConflictInnerMotion('a', 'ORIGINAL')
   " Delete '==== THEIRS'
   delete _
-  normal! _d:call <SID>ConflictInnerMotion('a', 'YOURS')
+  normal! _d:call s:ConflictInnerMotion('a', 'YOURS')
 endfunction
 
 function! s:DiffGetYours()                                                                                        " {{{1
-  normal! _d:call <SID>ConflictInnerMotion('a', 'ORIGINAL')
-  normal! _d:call <SID>ConflictInnerMotion('a', 'THEIRS')
+  normal! _d:call s:ConflictInnerMotion('a', 'ORIGINAL')
+  normal! _d:call s:ConflictInnerMotion('a', 'THEIRS')
   " Delete '==== YOURS'
   delete _
   " Move down to '<<<<' and delete it
@@ -316,16 +310,10 @@ function! s:CreateMergeMaps()                                                   
 
   for l:ai in ['i', 'a']
     for l:map in ['o', 'x']
-      execute l:map."noremap <silent> ".l:ai         . "C :call <SID>ConflictInnerMotion('".l:ai."')<CR>"
-
-      execute l:map."noremap <silent> ".toupper(l:ai)."oC :call <SID>ConflictInnerMotion('".l:ai."', 'ORIGINAL')<CR>"
-      execute l:map."noremap <silent> ".toupper(l:ai)."OC :call <SID>ConflictInnerMotion('".l:ai."', 'ORIGINAL')<CR>"
-
-      execute l:map."noremap <silent> ".toupper(l:ai)."tC :call <SID>ConflictInnerMotion('".l:ai."', 'THEIRS')<CR>"
-      execute l:map."noremap <silent> ".toupper(l:ai)."TC :call <SID>ConflictInnerMotion('".l:ai."', 'THEIRS')<CR>"
-
-      execute l:map."noremap <silent> ".toupper(l:ai)."yC :call <SID>ConflictInnerMotion('".l:ai."', 'YOURS')<CR>"
-      execute l:map."noremap <silent> ".toupper(l:ai)."YC :call <SID>ConflictInnerMotion('".l:ai."', 'YOURS')<CR>"
+      execute l:map."noremap <silent> ".l:ai. "C :call s:ConflictInnerMotion('".l:ai."')<CR>"
+      execute l:map."noremap <silent> ".l:ai."oC :call s:ConflictInnerMotion('".l:ai."', 'ORIGINAL')<CR>"
+      execute l:map."noremap <silent> ".l:ai."tC :call s:ConflictInnerMotion('".l:ai."', 'THEIRS')<CR>"
+      execute l:map."noremap <silent> ".l:ai."yC :call s:ConflictInnerMotion('".l:ai."', 'YOURS')<CR>"
     endfor
   endfor
 

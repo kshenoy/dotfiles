@@ -299,9 +299,13 @@ if DISABLE_FROM == 19 | finish | endif
 if &modifiable
   set fileformat=unix                                                                                       " EOL format
 endif
+
 set backup                                                              " Create backup of files before overwriting them
+
 execute 'set backupdir=' . g:dotvim . '/tmp/backups'
 if !isdirectory(&backupdir) | call mkdir(&backupdir, 'p') | endif
+
+set autoread
 
 
 "
@@ -348,7 +352,7 @@ if DISABLE_FROM == 23 | finish | endif
 
 if executable('ag')
   set grepformat=%f:%l:%m
-  let &grepprg='ag --nogroup --nocolor' . (&smartcase ? ' --smart-case' : '')
+  let &grepprg='ag --vimgrep' . (&smartcase ? ' --smart-case' : '')
 endif
 
 

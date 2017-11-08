@@ -145,12 +145,12 @@ if has('unix')
     \ 'types': {
       \ 1: ['.git', 'cd %s && git ls-files --cached --exclude-standard --others'],
       \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
-      \ 3: ['P4CONFIG', 'cd %s; cat ' .
-                         \     '<(p4 have ... | ' .
-                         \       '\grep -v "^\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/variants\|' .
-                         \       'ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)" | \awk "{print \$3}") ' .
-                         \     '<(p4 opened ... | \grep add | \sed "s/#.*//" | \xargs -I{} -n1 p4 where {} | ' .
-                         \       '\awk "{print \$3}") '
+      \ 3: ['P4CONFIG', 'echo %s; cd $STEM; cat ' .
+             \ '<(p4 have ... | \grep -v "$STEM/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|' .
+             \   'ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)") ' .
+             \ '<(p4 opened ... 2> /dev/null | \grep add | \sed "s/#.*//" | \xargs -I{} -n1 p4 where {}) ' .
+             \ '<(cd $STEM/import/avf; p4 have ... | \grep -v "$STEM/import/avf/\(_env\)") ' .
+             \ '| \awk "{print \$3}" | sed "s:$STEM/::"'
          \ ]
     \ },
     \ 'fallback': "find %s -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune -o " .
