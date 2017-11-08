@@ -15,21 +15,6 @@ fi
 #  alias precmd 'set prompt = "<%c> "'
 #endif
 
-unset -f P
-P() {
-  if [[ -f ${1} ]] && [[ "${1}" == "sim.out" ]]; then
-    if [[ $PAGER =~ vile ]]; then
-      $PAGER -c 'silent! /error:\|Backtrace:' -c 'norm zt' "$@"
-      return
-    elif [[ $PAGER =~ less ]]; then
-      $PAGER -p error: "$@"
-      return
-    fi
-  fi
-
-  $PAGER "$@"
-}
-
 
 #=======================================================================================================================
 # EDITOR                                                                                                            {{{1
@@ -78,7 +63,7 @@ alias bca='build -clean_all'
 alias rrrbr='rr --recompile-all --build'
 alias rrbr='rr --build'
 alias rrcr='rr --clean'
-alias rrdbg=$'rr --add \'-avf "--/ChkL3.Debug/"\' --fsdb --dsp'
+alias rrdbg=$'rr --add \'-avf "--/L3.Debug.*Graph/ --/L3.Debug.*Resources/"\' --dsp'
 
 alias rg='release_gate'
 alias rgd='release_gate -donate'
@@ -93,7 +78,7 @@ alias toclippy="sed -e 's/$/
 /' | tee ~/clippy.txt"
 
 alias xt='xterm -geometry 273x60+1919+21 &'
-alias xtr='resize -s 60 273'
+alias xtr='echo "resize -s 60 273"; resize -s 60 273'
 # alias xtr='wmctrl -i -r $(printf "0x0%x" $(xdotool getactivewindow)) -b add,maximized_vert; wmctrl -i -r $(printf "0x0%x" $(xdotool getactivewindow)) -e 0,1920,25,1915,1144'
 alias tmxvnc='tmux new-window -d -n "XVNC" "x11vnc"'
 
@@ -112,7 +97,8 @@ alias pfo='p4 opened'
 alias pfco='p4_mkwa -change_branch'
 alias pfres='p4 resolve'
 alias pfrev='p4 revert'
-alias pflog='p4 filelog -stl'
+alias pflog='p4 filelog -stl -m 5'
+pftop() { p4 changes -m ${1:-10} $STEM/...; }
 alias pfs='p4w submit'
 alias pful='pfu @latest'
 
@@ -162,18 +148,14 @@ pf_list() {                                                                     
   fi
 
   [[ -z $STEM ]] && return 1
-  p4 have | awk {'print $3'} >| $STEM/.filelist
+  cat <(p4 have) <(cd import/avf; p4 have ...) | awk {'print $3'} >| $STEM/.filelist
 }
 
 # Find a file
 unset -f pff
 pff() {                                                                                                           # {{{2
   pf_list --check
-  if [[ ! -s ${STEM:+$STEM/}.filelist ]]; then
-    ag --nocolor --no-numbers "$@" ${STEM:+$STEM/}.filelist
-  else
-    p4 have | awk {'print $3'} | command grep -P "$@"
-  fi
+  ag --nocolor --no-numbers "$@" ${STEM:+$STEM/}.filelist
 }
 
 # Grep from the list of files in the repo
@@ -181,23 +163,20 @@ unset -f pfg
 pfg() {                                                                                                           # {{{2
   pf_list --check
 
-  if [[ -s ${STEM:+$STEM/}.filelist ]]; then
-    local _filter='""'
-    if [[ "$1" == "-g" ]]; then
-      _filter="$2"
-      shift 2
-    fi
-    # echo $_filter
-
-    # If $_filter is empty, it acts as cat
-    echo "ag $@ $(command grep -P $_filter ${STEM:+$STEM/}.filelist)"
-    ag $@ $(command grep -P $_filter ${STEM:+$STEM/}.filelist)
-  else
-    ag $@
+  local _filter='""'
+  if [[ "$1" == "-g" ]]; then
+    _filter="$2"
+    shift 2
   fi
+  # echo $_filter
+
+  # If $_filter is empty, it acts as cat
+  echo "ag $@ \$(command grep -P $_filter ${STEM:+$STEM/}.filelist)"
+  ag $@ $(command grep -P $_filter ${STEM:+$STEM/}.filelist)
 }
 # }}}2
 
+# -g switch was borrowed from ag
 alias pfgc='pfg --cpp'
 alias pfgch="pfg -g '\.(h|hh|hpp|tpp)$'"
 alias pfgcc="pfg -g '\.(c|cc|cpp|C|CC)$'"
@@ -365,8 +344,12 @@ wa_list() {                                                                     
       for _wa in {1..6}; do
         _path="/proj/ch_func_dev${_ch}/${_proj_ucase}/kshenoy/${_proj}${_ch}${_wa}"
         if [[ -d ${_path} ]] && [[ "$(ls -A ${_path})" ]]; then
-          echo ${_path}:
-          ls ${_path} | sed 's/^/  /'
+          if [[ -t 1 ]]; then
+            echo ${_path}:
+            ls ${_path} | sed 's/^/  /'
+          else
+            find ${_path}  -maxdepth 1 -type d -not -name '\.*'
+          fi
         fi
       done
     done
@@ -396,6 +379,7 @@ lenv() {                                                                        
   if [[ $ret != 0 ]]; then return; fi
 
   # Source aliases etc.
+  lv=$STEM
   sosa; sosf
   [[ -f ~/.fzf.bash ]] && . ~/.fzf.bash
 
@@ -440,8 +424,14 @@ BUGS
 
 
 
-alias g++="/tool/pandora64/.package/gcc-6.3.0/bin/g++ -std=c++14"
-alias clang++="/tool/pandora64/.package/llvm-4.0.0-gcc630/bin/clang++ -std=c++14"
+g++() {
+  /tool/pandora64/.package/gcc-6.3.0/bin/g++ -std=c++14 \
+    ${BOOST_HOME:+-L ${BOOST_HOME}/lib} -I ${BOOST_HOME}/include -Wl,-rpath ${BOOST_HOME}/lib "$@"
+}
+clang++() {
+  /tool/pandora64/.package/llvm-4.0.0-gcc630/bin/clang++ -std=c++14 \
+    ${BOOST_HOME:+-L ${BOOST_HOME}/lib} -I ${BOOST_HOME}/include -Wl,-rpath ${BOOST_HOME}/lib "$@"
+}
 
 unset -f psig
 psig() {

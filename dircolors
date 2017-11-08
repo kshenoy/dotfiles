@@ -13,13 +13,12 @@ COLOR tty
 # Basically these ones are:
 #  -F = show '/' for dirs, '*' for executables, etc.
 #  -T 0 = don't trust tab spacing when formatting ls output.
-OPTIONS -F -T 0
+# OPTIONS -F -T 0
 
 # Below, there should be one TERM entry for each termtype that is colorizable
-TERM linux
-TERM linux-c
-TERM mach-color
-TERM console
+TERM Eterm
+TERM ansi
+TERM color_xterm
 TERM con132x25
 TERM con132x30
 TERM con132x43
@@ -30,24 +29,25 @@ TERM con80x30
 TERM con80x43
 TERM con80x50
 TERM con80x60
+TERM console
 TERM dtterm
-TERM color_xterm
-TERM ansi
-TERM screen
-TERM screen.linux
-TERM kon
-TERM kterm
 TERM gnome
+TERM kon
 TERM konsole
+TERM kterm
+TERM linux
+TERM linux-c
+TERM mach-color
+TERM rxvt
+TERM screen
+TERM screen
+TERM screen-w
+TERM screen.linux
+TERM uxterm
+TERM vt100
 TERM xterm
 TERM xterm-256color
 TERM xterm-debian
-TERM rxvt
-TERM screen
-TERM screen-w
-TERM vt100
-TERM Eterm
-TERM uxterm
 
 # Below are the color init strings for the basic file types. A color init
 # string consists of one or more of the following numeric codes:
@@ -70,18 +70,18 @@ TERM uxterm
 #  | cyan    |     36     |     46     |
 #  | white   |     37     |     47     |
 
-NORMAL  00          # global default, although everything should be something.
-FILE    00          # normal file
-DIR     00;34       # directory
-EXEC    00;32       # files with execute permissions
-LINK    00;36       # symbolic link. (If this is set to 'target' instead of a numerical value, the color is as for the file pointed to.)
-FIFO    40;33       # pipe
-SOCK    01;35       # socket
-DOOR    01;35       # door
 BLK     40;33;01    # block device driver
 CHR     40;33;01    # character device driver
-ORPHAN  01;37;41    # orphaned syminks
+DIR     00;34       # directory
+DOOR    01;35       # door
+EXEC    00;32       # files with execute permissions
+FIFO    40;33       # pipe
+FILE    00          # normal file
+LINK    00;36       # symbolic link. (If this is set to 'target' instead of a numerical value, the color is as for the file pointed to.)
 MISSING 05;37;41    # ... and the files they point to
+NORMAL  00          # global default, although everything should be something.
+ORPHAN  01;37;41    # orphaned syminks
+SOCK    01;35       # socket
 
 # List any file extensions like '.gz' or '.tar' that you would like ls
 # to colorize below. Put the extension, a space, and the color init string.
