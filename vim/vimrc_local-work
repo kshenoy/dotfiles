@@ -2,12 +2,16 @@
 " LOCAL SETTINGS
 "
 function! s:SetLocalSettings(filename)
-  if (a:filename =~ 'ch/rtl')
+  if (a:filename =~ 'ch/rtl') && (a:filename !~ 'txl$')
     setlocal textwidth=80
     setlocal softtabstop=3
     setlocal shiftwidth=3
   elseif (a:filename =~ '\vch/verif/(chk_)?l3/|\vch/tc/tb_l3')
     setlocal textwidth=100
+    setlocal colorcolumn+=121
+  elseif (a:filename =~ '\vch/verif/txn/\w*l3\w*\.txl') && (a:filename != 'txn_l2l3.txl')
+    setlocal textwidth=100
+    setlocal colorcolumn+=121
   endif
 endfunction
 
@@ -17,7 +21,7 @@ set isfname-==
 
 
 if ($STEM != "")
-  set path=.,$STEM/ch/verif/**,$STEM/build/latest/generated/ch,/usr/local/include,/usr/include,**;
+  set path=.,$STEM/build/latest/generated/ch,$STEM/build/latest/fake_c_incl/**,$STEM/ch/**,$STEM/import/avf/**,/usr/local/include,/usr/include,**;
 endif
 
 

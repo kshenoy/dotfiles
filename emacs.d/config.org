@@ -1143,19 +1143,32 @@ Open the custom "Daily agenda and all TODOs" directly. From [[http://emacs.stack
 
 **** org-refile
 By [[https://www.reddit.com/r/emacs/comments/4366f9/how_do_orgrefiletargets_work/czg008y/][/u/awalker4 on reddit]].
-Show upto 9 levels of headings from the current file and two levels of headings from all agenda files
+Show upto 3 levels of headings from the current file and two levels of headings from all agenda files
 #+BEGIN_SRC emacs-lisp
   (setq org-refile-targets
-        '((nil . (:maxlevel . 9))
+        '((nil . (:maxlevel . 3))
           (org-agenda-files . (:maxlevel . 2))))
 #+END_SRC
 Each element of the list generates a set of possible targets.
 /nil/ indicates that all the headings in the current buffer will be considered.
 
+Following are from Aaron Bieber's post [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Organizing Notes with Refile]]
+
+Creating new parents - To create new heading, add =/HeadingName= to the end when using refile (=C-c C-w=)
 #+BEGIN_SRC emacs-lisp
   (setq org-refile-allow-creating-parent-nodes 'confirm)
 #+END_SRC
-To create new heading, add =/HeadingName= to the end when using refile (=C-c C-w=)
+
+Refile to top level
+#+BEGIN_SRC emacs-lisp
+  (setq org-refile-use-outline-path 'file)
+  (setq org-outline-path-complete-in-steps nil)
+#+END_SRC
+
+***** TODO Show filename while refiling to headings in other files
+:LOGBOOK:
+- State "TODO"       from              [2017-10-13 Fri 17:45]
+:END:
 
 ***** TODO Set org-refile targets based on current file
 Why would I want to refile something work-related under Softwares etc.
@@ -1173,11 +1186,7 @@ eg. implementation by abo-abo: [[https://github.com/abo-abo/worf/blob/master/wor
   The intent is to move to a similar file. If I'm in work-related file,
   I almost never have to refile something to a personal file."
     (interactive "p")
-    (let* ((org-refile-targets
-            (seq-filter (lambda (x) (string-match-p
-                                     (directory-file-name (buffer-file-name)) x))
-                        (find-lisp-find-files org-directory org-agenda-file-regexp))))
-
+    (let* ((org-refile-targets '((nil . (:maxlevel . 9)))))
       (org-refile)))
 
   (bind-key* "C-c C-w" 'my/org-refile-targets)

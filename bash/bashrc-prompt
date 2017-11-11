@@ -1,7 +1,7 @@
 #!/bin/bash -f
-#===================================================================================================
+#=======================================================================================================================
 # Helper                                                                                                            {{{1
-#===================================================================================================
+#=======================================================================================================================
 # Foreground/Background Color Codes
   # 30/40 : black
   # 31/41 : red
@@ -30,24 +30,7 @@
   # 27 : Reverse Off
   # 29 : Strike-out Off
 #
-# Syntax
-# zsh: %{\e[<attrib1>;<attrib2>...;<fg>;<bg>m%}
-# bash: \[\033[<attrib1>;<fg>m\]
-
-
-# Using colors based on the color command
-# Color command generates the hashes 'fg', 'fg_bold', 'fg_no_bold', 'bg', 'bg_bold', 'bg_no_bold'
-# The keys of the above hashes are 'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan' and 'white'
-#
-# The following code is required to use hash based call
-#  setopt PROMPT_SUBST
-#  autoload colors zsh/terminfo
-#  if [[ "$terminfo[colors]" -ge 8 ]]; then
-#    colors
-#  fi
-#
-# Syntax : %{$bg_bold[red]$fg[white]%}
-# normal=$terminfo[sgr0]
+# Always use tput to generate these codes.
 
 # This should always point to whatever prompt is desired.
 PROMPT_COMMAND=_setprompt_sjlmod_
@@ -134,17 +117,17 @@ _setprompt_misc_() {
   blink_off=$'\e[25m'
   normal="%{$terminfo[sgr0]%}"
 
-  #PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+  # PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
   #PS1="\`if [ \$? = 0 ]; then echo \[\e[32m\]^_^\[\e[0m\]; else echo \[\e[31m\]@_@\[\e[0m\]; fi\`[!\!] \W/$ "
   #PS1="[\!] \W/$ "
   #PS1="\[\e[0;33m\][!\!]\`if [[ \$? = "0" ]]; then echo "\\[\\e[32m\\]"; else echo "\\[\\e[31m\\]"; fi\` \`if [[ `pwd|wc -c` -gt 18 ]]; then echo "\\W"; else echo "\\w"; fi\`/\$\[\e[0m\] "
   #PS1="\[\e[0;33m\][!\!]\[\e[0m\] \`if [ \$? = 0 ]; then echo '\[\e[1;32m\]\w \n^_^\[\e[0m\]'; else echo '\[\e[1;31m\]\w\n@_@\[\e[0m\]'; fi\` $ "
   #PS1="\[\e[1;30m\](\[\e[0;33m\]!\!\[\e[1;30m\])-(\`if [ \$? = 0 ]; then echo '\[\e[1;32m\]\w\[\e[1;30m\])\n\[\e[1;32m\]^_^'; else echo '\[\e[1;31m\]\w\[\e[1;30m\])\n\[\e[1;31m\]@_@'; fi\` \[\e[1;30m\]$ \[\e[0m\]"
-  PS1="\n\[\e[0;37m\](\[\e[0;33m\]!\!\[\e[0;37m\])-(\`if [ \$? = 0 ]; then echo '\[\e[1;32m\]\w\[\e[0;37m\])\n(\[\e[1;32m\]^_^\[\e[0;37m\])'; else echo '\[\e[1;31m\]\w\[\e[0;37m\])\n(\[\e[1;31m\]@_@\[\e[0;37m\])'; fi\` \[\e[0;37m\]$ \[\e[0m\]"
+  # PS1="\n\[\e[0;37m\](\[\e[0;33m\]!\!\[\e[0;37m\])-(\`if [ \$? = 0 ]; then echo '\[\e[1;32m\]\w\[\e[0;37m\])\n(\[\e[1;32m\]^_^\[\e[0;37m\])'; else echo '\[\e[1;31m\]\w\[\e[0;37m\])\n(\[\e[1;31m\]@_@\[\e[0;37m\])'; fi\` \[\e[0;37m\]$ \[\e[0m\]"
   #PS1="${bg_red_fg_white_blink}%(t.DING!.)%(30t.DONG!.)${att_normal}${fg_dgray}[${fg_brown}%h${fg_dgray}]-(%(?.${fg_lgreen}.${fg_lred})%~${fg_dgray})${fg_lgray}%# ${att_normal}"
   #PS1="[%(t.${blink}%{${bg[red]}${fg_no_bold[white]}%}DING!${normal}.%(30t.${blink}%{${bg[red]}${fg_no_bold[white]}%}DONG!${normal}.%{$fg_bold[yellow]%}%D{%H:%M}))${normal}] "
   #PS1='[%h]-($modPWD)$ '
-  RPS1=" [%h]"
+  # RPS1=" [%h]"
 }
 
 
@@ -171,150 +154,145 @@ shopt -s checkwinsize
 _setprompt_sjlmod_() {
 
   # This has to be placed first
-  local cmd_exit="$?"
+  local _exit_status="$?"
 
   # We use this instead of $COLUMNS as when a shell is starting, the $COLUMNS variable is not set
   local columns=$(tput cols)
 
   # Colors
   # NOTE: Non-printable sequences should be enclosed in \[ and \] else it'll cause long commands to not wrap correctly
-  local prc_norm='\[$(tput sgr0)\]'
-  # local prc_grey='\[$(tput setaf 250)\]'
-  # local prc_white='\[$(tput setaf 7)\]'
-  # local prc_red='\[$(tput setaf 160)\]'
-  # local prc_green='\[$(tput setaf 154)\]'
-  # local prc_bright_red='\[$(tput setaf 161)\]'
-  # local prc_yellow='\[$(tput setaf 221)\]'
-  # local prc_orange='\[$(tput setaf 214)\]'
-
-  local prc_grey="\[\033[1;30m\]"
-  local prc_red="\[\033[0;31m\]"
-  local prc_green="\[\033[1;32m\]"
-  local prc_bright_red=${prc_red}
-  local prc_yellow="\[\033[0;33m\]"
-  local prc_orange=${prc_yellow}
+  local _reset="\[$(tput sgr0)\]"
+  local _bold="\[$(tput bold)\]"
+  local _fg_black="\[$(tput setaf 0)\]"
+  local _fg_light_black="\[$(tput setaf 8)\]"
+  local _fg_red="\[$(tput setaf 1)\]"
+  local _fg_yellow="\[$(tput setaf 3)\]"
+  local _fg_green="\[$(tput setaf 2)\]"
 
   # Set line graphics
-  local pr_dash="─"
-  #local pr_dash="━"
-  local pr_ulcorner="┌"
-  # local pr_ulcorner="╭"
-  local pr_llcorner="└"
-  # local pr_llcorner="╰"
-  #local pr_urcorner="┐"
-  #local pr_lrcorner="┘"
-
-  #local pr_dash="-"
-  #local pr_ulcorner=""
-  #local pr_llcorner=""
+  local _dash="─"
+  local _ulcorner="┌"
+  # local _ulcorner="╭"
+  local _llcorner="└"
+  # local _llcorner="╰"
 
   # If root user then colour the arrow red.
-  if [ "${UID}" = 0 ]; then
-    local prc_user_symbol=${prc_red}
-    #local pr_user_symbol=" \$"
+  if (( "${UID}" == 0 )); then
+    local _fg_user_symbol=${_fg_red}
   else
-    local prc_user_symbol=${prc_grey}
-    #local pr_user_symbol=" #"
+    local _fg_user_symbol=${_bold}${_fg_light_black}
   fi
 
   # The info variables
-  local pr_pwd=$(_get_compact_pwd_)
+  local _pwd=$(_get_compact_pwd_)
 
   #for k in "${!dir_alias[@]}"; do
     #echo "$k => ${dir_alias[$k]}"
-    #echo ${pr_pwd/#$k/${dir_alias[$k]}}
+    #echo ${_pwd/#$k/${dir_alias[$k]}}
   #done
   #for i in ${!dir_alias[@]}; do
-  #  [ -n "$i" ] && pr_pwd=${pr_pwd/#$i/${dir_alias[$i]}}
+  #  [ -n "$i" ] && _pwd=${_pwd/#$i/${dir_alias[$i]}}
   #done
 
   # Force time to US Mountain Time (we do this here as well as in .bashrc as sourcing some env files overwrites this)
-  local pr_time="$(TZ=US/Mountain date +%I:%M%P\ %b\ %d,\ %a) "
-  #local pr_time="$( date +%I:%M%P\ %b\ %d,\ %a) "
-  local pr_user="$(whoami) "
-  local pr_user_host_sep="@ "
-  local pr_pwd_sep="in "
-  local pr_host="$(hostname) "
+  local _time="$(TZ=US/Mountain date +%I:%M%P) "
+  local _user="$(whoami) "
+  local _user_host_sep="@ "
+  local _pwd_sep="in "
+  local _host="$(hostname) "
 
   # VCS specific
-  local pr_vcs_type=$(_get_vcs_type_)
-  local pr_vcs_branch=$(_get_vcs_branch_)
-  local pr_vcs_sep=" on "
-  local prc_vcs_branch=${prc_norm}
+  local _vcs_type=$(_get_vcs_type_)
+  local _vcs_branch=$(_get_vcs_branch_ ${_vcs_type})
+  local _vcs_sep=" on "
 
-  if [[ $pr_vcs_type == "git" ]]; then
-    local pr_user_symbol=" ±"
+  if [[ $_vcs_type == "git" ]]; then
+    local _user_symbol=" ±"
 
-    if $(echo "$(git log origin/$pr_vcs_branch..HEAD 2> /dev/null)" | grep '^commit' &> /dev/null); then
-      local prc_vcs_branch=${prc_orange}
-    elif [[ -n $(git status -s --ignore-submodules=dirty  2> /dev/null) ]]; then
-      local prc_vcs_branch=${prc_bright_red}
-    else
-      local prc_vcs_branch=${prc_green}
-    fi
-
-  elif [[ $pr_vcs_type == "hg" ]]; then
-    local pr_user_symbol=" ☿"
+  elif [[ $_vcs_type == "hg" ]]; then
+    local _user_symbol=" ☿"
   else
-    #local pr_user_symbol=" ○"
-    #local pr_user_symbol=" ➤"
-    local pr_user_symbol=" $"
-    local pr_vcs_sep=""
+    #local _user_symbol=" ○"
+    #local _user_symbol=" ➤"
+    local _user_symbol=" $"
+    local _vcs_sep=""
   fi
 
   # Set length of info
-  local pr_info="${pr_ulcorner} ${pr_user}${pr_user_host_sep}${pr_host}${pr_pwd_sep}${pr_pwd}${pr_vcs_sep}${pr_vcs_branch} ${pr_time}"
+  _info="${_ulcorner} ${_user}${_user_host_sep}${_host}${_pwd_sep}${_pwd}${_vcs_sep}${_vcs_branch} ${_time}"
 
-  # If info is wider than the screen, drop the time display
-  if (( $columns < ${#pr_info} )); then
-    pr_time=""
-    pr_info="${pr_ulcorner} ${pr_user}${pr_user_host_sep}${pr_host}${pr_pwd_sep}${pr_pwd}${pr_vcs_sep}${pr_vcs_branch} "
+  # If info is wider than the screen, drop the time
+  if (( $columns < ${#_info} )); then
+    _time=""
+    _info="${_ulcorner} ${_user}${_user_host_sep}${_host}${_pwd_sep}${_pwd}${_vcs_sep}${_vcs_branch} "
   fi
+  _pwd_sep="${_fg_light_black}${_pwd_sep}${_reset}"
 
   # If the info still can't fit, drop user and domain info
-  if (( $columns < ${#pr_info} )); then
-    pr_user=""
-    pr_user_host_sep=""
-    pr_host=""
-    pr_info="${pr_ulcorner} ${pr_pwd_sep}${pr_pwd}${pr_vcs_sep}${pr_vcs_branch} "
+  if (( $columns < ${#_info} )); then
+    _user=""
+    _user_host_sep=""
+    _host=""
+    _pwd_sep=""
+    _info="${_ulcorner} ${_pwd}${_vcs_sep}${_vcs_branch} "
   fi
-  pr_pwd_sep="${prc_grey}${pr_pwd_sep}"
 
   # If the info still can't fit, drop vcs branch
-  if (( $columns < ${#pr_info} )); then
-    pr_vcs_sep=""
-    pr_vcs_branch=""
-    pr_info="${pr_ulcorner} ${pr_pwd_sep}${pr_pwd} "
+  if (( $columns < ${#_info} )); then
+    _vcs_sep=""
+    _vcs_branch=""
+    _info="${_ulcorner} ${_pwd} "
   fi
-  pr_pwd_sep="${prc_grey}${pr_pwd_sep}"
 
   # If the info still can't fit, truncate PWD
-  if (( $columns < ${#pr_info} )); then
-    pr_pwd_sep="..."
-    while (( $columns < ${#pr_info} )); do
-      pr_pwd=`echo $pr_pwd | sed 's|^/\?[^/]*/||'`
-      pr_info="${pr_ulcorner} ${pr_pwd_sep}${pr_pwd} "
+  if (( $columns < ${#_info} )); then
+    _pwd_sep="..."
+    while (( $columns < ${#_info} )); do
+      _pwd=`echo $_pwd | sed 's|^/\?[^/]*/||'`
+      _info="${_ulcorner} ${_pwd_sep}${_pwd} "
     done
-    pr_pwd_sep="${prc_green}${pr_pwd_sep}"
+    _pwd_sep="${_bold}${_fg_green}${_pwd_sep}${_reset}"
   fi
-  pr_pwd="${prc_green}${pr_pwd}${pr_norm}"
 
-  local pr_fillsize=$(( $columns - ${#pr_info} - 1 ))
-  local pr_fill=$(printf "${pr_dash}%.0s" $(seq 1 $pr_fillsize))" "
+  local _fillsize=$(( $columns - ${#_info} - 1 ))
+  local _fill=$(printf "${_dash}%.0s" $(seq 1 $_fillsize))" "
 
-  # Color pr_pwd based upon exit status of last command
-  if [ "$cmd_exit" = "0" ]; then
-    local pr_cmd_exit="${prc_green} (^_^)${prc_norm}"
+  # Colorize vcs:
+  if [[ $_vcs_type == "git" ]]; then
+    local _vcs_status=$(_get_vcs_status_ ${_vcs_type} ${_vcs_branch})
+    if [[ "${_vcs_status}" == "staged" ]]; then
+      _vcs_branch="${_fg_yellow}${_vcs_branch}${_reset}"
+    elif [[ "${_vcs_status}" == "modified" ]]; then
+      _vcs_branch="${_fg_red}${_vcs_branch}${_reset}"
+    elif [[ "${_vcs_status}" == "committed" ]]; then
+      _vcs_branch="${_bold}${_fg_green}${_vcs_branch}${_reset}"
+    fi
+  fi
+
+  # Create exit status indicator based on exit status of last command
+  if (( "$_exit_status" == 0 )); then
+    _exit_status="${_bold}${_fg_green} (^_^)"
   else
-    local pr_cmd_exit="${prc_red} (@_@)${prc_norm}"
+    _exit_status="${_fg_red} (@_@)"
   fi
 
-  PS1="\n${prc_norm}${prc_grey}${pr_ulcorner} ${prc_bright_red}${pr_user}${prc_grey}${pr_user_host_sep}${prc_orange}${pr_host}"
-  PS1+="${pr_pwd_sep}${pr_pwd}${prc_grey}${pr_vcs_sep}${prc_vcs_branch}${pr_vcs_branch} "
-  PS1+="${prc_grey}${pr_fill}${prc_orange}${pr_time}"
-  PS1+="\n${prc_grey}${pr_llcorner}${pr_cmd_exit}${prc_user_symbol}${pr_user_symbol}${prc_norm} "
+  PS1="\n${_reset}"
+  PS1+="${_fg_light_black}${_ulcorner}${_reset} "
+  PS1+="${_fg_red}${_user}${_reset}"
+  PS1+="${_fg_light_black}${_user_host_sep}${_reset}"
+  PS1+="${_fg_yellow}${_host}${_reset}"
+  PS1+="${_pwd_sep}"
+  PS1+="${_bold}${_fg_green}${_pwd}${_reset}"
+  PS1+="${_fg_light_black}${_vcs_sep}${_reset}"
+  PS1+="${_vcs_branch} "
+  PS1+="${_fg_light_black}${_fill}${_reset}"
+  PS1+="${_fg_yellow}${_time}${_reset}"
+  PS1+="\n"
+  PS1+="${_fg_light_black}${_llcorner}${_reset}"
+  PS1+="${_exit_status}${_reset}"
+  PS1+="${_fg_user_symbol}${_user_symbol}${_reset} "
 
-  PS2="      ${prc_user_symbol}...${prc_norm}   "
+  PS2="      ${_fg_user_symbol}...${_reset}   "
 
   # Evaluate dynamic variables only if dyn_vars is defined (Not required for prompt)
   declare -F dyn_vars &> /dev/null && dyn_vars
@@ -362,18 +340,34 @@ _get_vcs_branch_() {                                                            
   # Description: If PWD is under a VCS, return the branch. If not, return an empty string
   # Arguments: 1 - The variable into which the branch name must be written
 
-  # Get VCS type
-  vcs_type=$(_get_vcs_type_)
+  local _vcs_type=${1}
 
-  if [[ $vcs_type == "git" ]]; then
+  if [[ $_vcs_type == "git" ]]; then
     #echo "Detected git versioning scheme"
     local ref=$(git symbolic-ref HEAD 2> /dev/null) || return
     echo "${ref#refs/heads/}"
-  elif [[ $vcs_type == "hg" ]]; then
+  elif [[ $_vcs_type == "hg" ]]; then
     #echo "Detected mercurial versioning scheme"
     echo "$(hg branch 2> /dev/null)"
   else
     echo ""
+  fi
+}
+
+
+_get_vcs_status_() {
+  # Description: Get the status of the VCS - works only for git at the moment
+  local _vcs_type=${1}
+  local _vcs_branch=${2}
+
+  if [[ "${_vcs_type}" == "git" ]]; then
+    if $(echo "$(git log origin/$_vcs_branch..HEAD 2> /dev/null)" | grep '^commit' &> /dev/null); then
+      echo "staged"
+    elif [[ -n $(git status -s --ignore-submodules=dirty  2> /dev/null) ]]; then
+      echo "modified"
+    else
+      echo "committed"
+    fi
   fi
 }
 

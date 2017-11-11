@@ -16,8 +16,11 @@ fi
 
 # Key bindings
 # ------------
-source ~/.dotfiles/fzf/key-bindings.bash
+# Note the order is important because some functions get overridden
+. ~/install/fzf/shell/key-bindings.bash
+. ~/.dotfiles/fzf/key-bindings.bash
 
 # Customisations
 # --------------
 export FZF_DEFAULT_OPTS='--ansi'
+# export FZF_CTRL_T_OPTS='--expect=alt-v,alt-e,alt-c'

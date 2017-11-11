@@ -2,6 +2,7 @@
 *conflicted*
 *unison.tmp
 .nfs*
+*sync.ffs_db
 bash/history
 compiz/
 emacs.d/abbrev_defs
