@@ -1,7 +1,6 @@
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args :results output silent
 
-
 * Init
 :PROPERTIES:
 :header-args: :tangle yes
@@ -689,7 +688,7 @@ We redefine /helm-command-prefix/ here
   :bind* (("M-x"   . helm-M-x)
           ("C-h a" . helm-apropos))
 
-  :bind (("C-c j" . helm-command-prefix)
+  :bind (("C-c f" . helm-command-prefix)
          :map       helm-command-map
          ("b"     . helm-buffers-list)
          ("f"     . helm-find-files)         ; Find files in the current directory
@@ -998,12 +997,12 @@ This is because, the entire tag string is treated as a single value and Helm tri
 **** org-babel
 ***** Set default options
 #+BEGIN_SRC emacs-lisp
-  (unless (string-equal (system-name) "ubuntu")
-    (setq org-babel-C++-compiler "clang++"))
+  (setq org-babel-default-header-args
+        '((:results . "verbatim")))
 
-  (setq org-babel-default-header-args:C
-        '((:results . "verbatim")
-          (:flags   . "-std=c++14")))
+  (setq org-babel-C++-compiler "clang++")
+  (setq org-babel-default-header-args:C++
+        '((:flags   . "-std=c++14 -Wall -Wextra -Werror ${BOOST_HOME:+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -Wl,${BOOST_HOME:+-rpath ${BOOST_HOME}/lib}")))
 #+END_SRC
 
 ***** Display errors and warnings in an org-babel code block
@@ -1580,12 +1579,12 @@ Load theme first and then override the colors
           evil-emacs-state-cursor    '("white"   box)))
 #+END_SRC
 
-** tomorrow-theme
+** base16-theme
 #+BEGIN_SRC emacs-lisp
-  (use-package color-theme-sanityinc-tomorrow
+  (use-package base16-theme
     :disabled
     :config
-    (load-theme 'sanityinc-tomorrow-night t))
+    (load-theme 'base16-solarized-light t))
 #+END_SRC
 
 ** TODO hydra
