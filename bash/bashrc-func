@@ -49,8 +49,8 @@ unset -f duh
 duh() { du -h "$@" | sort -rh; }
 
 # Silent push and popd. Use dirs -v for vertical dirstack                                                           {{{1
-pushd() { command pushd $@ > /dev/null ; }
-popd()  { command popd  $@ > /dev/null ; }
+pushd() { command pushd "$@" > /dev/null ; }
+popd()  { command popd  "$@" > /dev/null ; }
 
 # Intelligent ..                                                                                                    {{{1
 ..() {

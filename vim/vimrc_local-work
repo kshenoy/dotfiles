@@ -22,6 +22,8 @@ set isfname-==
 
 if ($STEM != "")
   set path=.,$STEM/build/latest/generated/ch,$STEM/build/latest/fake_c_incl/**,$STEM/ch/**,$STEM/import/avf/**,/usr/local/include,/usr/include,**;
+  let g:ale_cpp_clang_options  = get(g:, 'ale_cpp_clang_options', "")
+  let g:ale_cpp_clang_options .= " -I $STEM/build/latest/generated/ch -I $STEM/build/latest/fake_c_incl"
 endif
 
 
@@ -32,3 +34,8 @@ augroup AMD
   autocmd BufNewFile,BufRead *_if.h        let b:fswitchfnames='/_if$//'
   autocmd BufNewFile,BufRead *_provider.cc let b:fswitchfnames='/_provider$//'
 augroup END
+
+
+" Fat finger forgiveness
+abbrev resposne response
+abbrev Resposne Response

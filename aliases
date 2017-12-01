@@ -200,7 +200,8 @@ gvim_func() {
   fi
   gvim "$@" 2> /dev/null
 }
-alias v="gvim_func"
+alias v='gvim_func'
+alias vq="v -q <($(fc -nl -1))"
 
 # Using -f keeps the window in the foreground and prevents a whole bunch of diffs opening at the same time
 unset -f gvim_diff

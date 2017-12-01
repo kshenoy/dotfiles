@@ -70,73 +70,74 @@ function! s:SetupMergeLayout(...)                                               
   let l:merge  = argv(3)
 
   " Init
-  tabonly|wincmd o
+  silent! tabonly|silent! wincmd o
 
   " Main merging tab
-  exec "b " . l:merge
+  silent! exec "b " . l:merge
   setlocal noreadonly modifiable
   let b:bufname=toupper(l:merge_str)
-  wincmd s
-  wincmd t
-  exec "b " . l:base
+  silent! wincmd s
+  silent! wincmd t
+  silent! exec "b " . l:base
   let b:bufname=toupper(l:base_str)
-  wincmd v
-  exec "b " . l:remote
+  silent! wincmd v
+  silent! exec "b " . l:remote
   let b:bufname=toupper(l:remote_str)
-  wincmd v
-  exec "b " . l:local
+  silent! wincmd v
+  silent! exec "b " . l:local
   let b:bufname=toupper(l:local_str)
   setlocal readonly
-  windo diffthis
+  silent! windo diffthis
   let t:guitablabel='Main'
 
   " Merge - Remote v/s Merge v/s Local
-  exec "tabe " . l:remote
-  wincmd v
-  exec "b " . l:merge
-  wincmd v
-  exec "b " . l:local
-  windo diffthis
+  silent! exec "tabe " . l:remote
+  silent! wincmd v
+  silent! exec "b " . l:merge
+  silent! wincmd v
+  silent! exec "b " . l:local
+  silent! windo diffthis
+  silent! wincmd h
   let t:guitablabel = l:remote_str . ' v/s ' . l:merge_str . ' v/s ' . l:local_str
 
   " Diff - Base vs Remote
-  exec "tabe " . l:base
-  wincmd v
-  exec "b " . l:remote
-  windo diffthis
+  silent! exec "tabe " . l:base
+  silent! wincmd v
+  silent! exec "b " . l:remote
+  silent! windo diffthis
   let t:guitablabel = l:base_str . ' v/s ' . l:remote_str
 
   " Diff - Base vs Local
-  exec "tabe " . l:base
-  wincmd v
-  exec "b " . l:local
-  windo diffthis
+  silent! exec "tabe " . l:base
+  silent! wincmd v
+  silent! exec "b " . l:local
+  silent! windo diffthis
   let t:guitablabel = l:base_str . ' v/s ' . l:local_str
 
   " Diff - Remote vs Local
-  exec "tabe " . l:remote
-  wincmd v
-  exec "b " . l:local
-  windo diffthis
+  silent! exec "tabe " . l:remote
+  silent! wincmd v
+  silent! exec "b " . l:local
+  silent! windo diffthis
   let t:guitablabel = l:remote_str . ' v/s ' . l:local_str
 
   " Diff - Remote vs Merge
-  exec "tabe " . l:remote
-  wincmd v
-  exec "b " . l:merge
-  windo diffthis
+  silent! exec "tabe " . l:remote
+  silent! wincmd v
+  silent! exec "b " . l:merge
+  silent! windo diffthis
   let t:guitablabel = l:remote_str . ' v/s Merge'
 
   " Diff - Local vs Merge
-  exec "tabe " . l:local
-  wincmd v
-  exec "b " . l:merge
-  windo diffthis
+  silent! exec "tabe " . l:local
+  silent! wincmd v
+  silent! exec "b " . l:merge
+  silent! windo diffthis
   let t:guitablabel = l:local_str . ' v/s Merge'
 
   set columns=400
-  tabdo wincmd =
-  tabfirst
+  silent! tabdo wincmd =
+  silent! tabfirst
 endfunction
 
 
@@ -331,7 +332,7 @@ function! perforce#DiffCurrentFile()                                            
   setl autoread
 
   " Execute command
-  silent execute "!p4 diff " . expand('%:p')
+  silent execute '!p4 diff "%"'
 
   " Restore settings
   let &l:autoread=l:autoread

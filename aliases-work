@@ -20,23 +20,26 @@ fi
 # EDITOR                                                                                                            {{{1
 #=======================================================================================================================
 alias v="gvim_func -geometry 273x66+0+0 ${STEM:+--servername $STEM}"
-alias vlog="v -p *ChkL3.log *Seq.log dsp_ch.txt sim.out -c 'set autoread'"
 alias vc='v --remote-silent'
+unset -f vlog
+vlog() {
+  local _comp=$(command grep -Po -m1 '(?<=component\=)\S+' summary.rj)
+  if [[ $_comp == "sim.out" ]] || [[ ${_comp}.log == *AggL3.log ]] || [[ ${_comp}.log == *L3Seq.log ]]; then
+    _comp=""
+  fi
+  vim -p sim.out *AggL3.log *L3Seq.log ${_comp:+${_comp}.log} "$@" -c 'set autoread' -c 'silent! /error:\|Backtrace:' -c 'silent! "norm zt"'
+}
 
 alias e="emacs_func ${STEM+--socket-name=${STEM//\//_}}"
 
 
 # Project Aliases
 # alias as_bsub="lsf_bsub -Is -R 'rusage[mem=2000]' -q high -P aspen-ver"
-#alias amdfind='find $REPO_PATH -path "$REPO_PATH/simenv/build" -prune -or -path "$REPO_PATH/.ccache" -prune -or -path "$REPO_PATH/.autoio_cache" -prune -or -path "$REPO_PATH/release_gate_run" -prune -or -print'
-# Use p4 have
-alias amdfind="find $REPO_PATH -type d \( -name _env -o -name dfx -o -name emu -o -name fp -o -name powerPro -o -name build -o -name sim -o -name release_gate_tmp -o -wholename '*/ch/tc' -o -wholename '*/ch/tb' -o -wholename '*/ch/verif/dft' -o -wholename '*/txn/gen' -o -wholename '*/generated' \) -prune -o -type f ! \( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' -o -iname '*.cc.o' -o -iname '*tags*' \) -print 2> /dev/null"
-alias amdgrep='find $REPO_PATH -path "$REPO_PATH/simenv/build" -prune -or -path "$REPO_PATH/.ccache" -prune -or -path "$REPO_PATH/.autoio_cache" -prune -or -path "$REPO_PATH/release_gate_run" -prune -or -print | xargs grep'
-
 
 # Building and Compiling
 alias sbi='. /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash'
-alias mkv='mkverdi -nolsf $(grep -Po "\-model\s*\S+" sim.out) -rc ~/novas.rc -guiConf ~/novas.conf -tkName "verdi_$(tmux display-message -p "#S:#I.#P")" &'
+unset -f mkv
+mkv() { mkverdi $(grep -Po '\-model\s*\S+' sim.out) -rc ~/novas.rc -guiConf ~/novas.conf -tkName "verdi_$(tmux display-message -p '#S:#I.#P')" "$@" & }
 alias findFirstError='findFirstError --tkName "verdi_$(tmux display-message -p "#S:#I.#P")"'
 alias cid='cat ${REPO_PATH+$REPO_PATH/}configuration_id'
 alias bj='lsf_bjobs -w'
@@ -63,7 +66,7 @@ alias bca='build -clean_all'
 alias rrrbr='rr --recompile-all --build'
 alias rrbr='rr --build'
 alias rrcr='rr --clean'
-alias rrdbg=$'rr --add \'-avf "--/L3.Debug.*Graph/ --/L3.Debug.*Resources/"\' --dsp'
+alias rrdbg=$'rr --add \'-avf "--/L3.Debug.*Graph/ --/L3.Debug.*Resources/ --/L3.Debug.*Quiesce/"\' --dsp'
 
 alias rg='release_gate'
 alias rgd='release_gate -donate'
@@ -148,7 +151,7 @@ pf_list() {                                                                     
   fi
 
   [[ -z $STEM ]] && return 1
-  cat <(p4 have) <(cd import/avf; p4 have ...) | awk {'print $3'} >| $STEM/.filelist
+  cat <(p4 have) <(cd $STEM/import/avf; p4 have ...) | awk {'print $3'} >| $STEM/.filelist
 }
 
 # Find a file
@@ -425,12 +428,12 @@ BUGS
 
 
 g++() {
-  /tool/pandora64/.package/gcc-6.3.0/bin/g++ -std=c++14 \
-    ${BOOST_HOME:+-L ${BOOST_HOME}/lib} -I ${BOOST_HOME}/include -Wl,-rpath ${BOOST_HOME}/lib "$@"
+  /tool/pandora64/.package/gcc-6.3.0/bin/g++ -Wall -Wextra -Werror -std=c++14 \
+    ${BOOST_HOME:+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -Wl,${BOOST_HOME:+-rpath ${BOOST_HOME}/lib} "$@"
 }
 clang++() {
-  /tool/pandora64/.package/llvm-4.0.0-gcc630/bin/clang++ -std=c++14 \
-    ${BOOST_HOME:+-L ${BOOST_HOME}/lib} -I ${BOOST_HOME}/include -Wl,-rpath ${BOOST_HOME}/lib "$@"
+  /tool/pandora64/.package/llvm-4.0.0-gcc630/bin/clang++ -Wall -Wextra -Werror -std=c++14 \
+    ${BOOST_HOME:+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -Wl,${BOOST_HOME:+-rpath ${BOOST_HOME}/lib} "$@"
 }
 
 unset -f psig
@@ -468,12 +471,14 @@ plastlock() {
 
 unset -f vsig
 vsig() {
-  file_lnum=$(\grep -Po -m1 '(?<=source\=)[^:]+:\d+' summary.rj)
+  file_lnum=$(command grep -Po -m1 '(?<=source\=)[^:]+:\d+' summary.rj)
   file=${file_lnum%:*}
   lnum=${file_lnum#*:}
 
   file=$(pff ${file})
-  v +$lnum $file -c "norm! zv"
+
+  # echo "File=${file} Line=${lnum}"
+  vc +$lnum $file
 }
 
 unset -f tel

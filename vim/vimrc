@@ -275,7 +275,7 @@ set foldnestmax=2                                      " Maximum fold depth for 
 "
 if DISABLE_FROM == 17 | finish | endif
 
-"set diffopt+=iwhite                                                                                 " Ignore whitespace
+set diffopt+=iwhite                                                                                  " Ignore whitespace
 
 
 "
