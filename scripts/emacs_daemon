@@ -93,7 +93,7 @@ while (( $# > 0 )); do
 
     *)
       echo "ERROR: Invalid option: ${1}" >&2; echo
-      print_help
+      _print_help_
       exit 1
       ;;
   esac

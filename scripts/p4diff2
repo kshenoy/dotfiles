@@ -8,15 +8,27 @@ _cmd=${P4DIFF2:-${P4DIFF}}
 
 if [[ -n "${_cmd}" ]]; then
   _file1="$1"
-  if [[ "$1" =~ "#" ]]; then
+  if [[ "$_file1" =~ "#" ]]; then
+    _ifile=${_file1%%#*}
+    _rev=${_file1##*#}
+    if [[ $_rev == -* ]]; then
+      _rev=$(( $(command p4 fstat $_ifile | command grep -Po '(?<=headRev )\d+') + $_rev ))
+    fi
+
     _file1="/tmp/$$_1"
-    p4 print -q "$1" >| "$_file1"
+    p4 print -q "$_ifile#$_rev" >| "$_file1"
   fi
 
   _file2="$2"
-  if [[ "$2" =~ "#" ]]; then
+  if [[ "$_file2" =~ "#" ]]; then
+    _ifile=${_file2%%#*}
+    _rev=${_file2##*#}
+    if [[ $_rev == -* ]]; then
+      _rev=$(( $(command p4 fstat $_ifile | command grep -Po '(?<=headRev )\d+') + $_rev ))
+    fi
+
     _file2="/tmp/$$_2"
-    p4 print -q "$2" >| "$_file2"
+    p4 print -q "$_ifile#$_rev" >| "$_file2"
   fi
 
   echo $_cmd "$_file1" "$_file2"
@@ -25,5 +37,3 @@ else
   echo p4 diff2 "$@"
   p4 diff2 "$@"
 fi
-
-unset -v _cmd _file1 _file2

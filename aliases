@@ -1,4 +1,18 @@
 #!/bin/bash
+#=======================================================================================================================
+# Aliases v/s Functions
+# A big limitation of aliases is that they are only expanded as the first argument,
+# or after another alias with a trailing space on the end of the command.
+#
+# eg. let's say I have the following aliases set up
+# alias g=grep
+# alias vq='v -q <(!!)'
+# Now, if I run 'g SOMETHING' followed by 'vq' then 'vq' doesn't run as expected because '!!' expands to 'g SOMETHING'.
+# However, 'g' doesn't get expanded to grep because of the afore-mentioned limitation.
+#
+# To avoid this, I use functions for my most commonly used aliases so that they work everywhere and,
+# aliases only if I'm sure that they won't be used in the middle of a command.
+
 #=========
 # Aliases
 #=========
@@ -62,13 +76,12 @@ alias l1='ls -1'
 alias ll='ls -lh'
 alias la='ls -A'
 alias lla='ll -A'
-alias all=lla
-alias lal=lla
-alias ltr='ll -tr'
+alias llt='ll -tr'
+alias llS='ll -Sr'
 if [[ $MYSHELL =~ "zsh" ]]; then
   alias ld='ls -d *(-/DN)'
 elif [[ $MYSHELL =~ "bash" ]]; then
-  alias ld='\ls -F | grep "/"'
+  alias ld='\ls -F | command grep "/"'
 fi
 
 
@@ -134,7 +147,6 @@ alias f.='find . -maxdepth 1'
 alias f.n='f. -name'
 alias fgrep='fgrep --color=always'
 alias egrep='egrep --color=always'
-unset -f pgrep
 pgrep() {
   # Bloody hack to make ps ignore this grep
   local _i='['${1:0:1}']'${1:1}
@@ -142,27 +154,27 @@ pgrep() {
   #echo ps aux \| command grep -e "[P]ID" -e $_i
 }
 
-alias grep='grep -sP --color=always'
+grep() { command grep -sP --color=always "$@"; }
 
 # If Ag/Pt/Ack exists, use it!!
 if hash ag 2> /dev/null; then
-  alias g='ag'
-  alias gtc='ag --cpp'
-  alias gtch='ag -G "\.(h|hh|hpp|tpp)$"'
-  alias gtcc='ag -G "\.(c|cc|cpp|C|CC)$"'
-  alias gtsv='ag -G "\.(sv|svh)$"'
-  alias gtv='ag -G "\.(v|x)$"'
-  alias gtsbs='ag -G "\.sbs$"'
+  g()     { ag -z "$@"; }
+  gtc()   { ag --cpp; }
+  gtch()  { ag -G "\.(h|hh|hpp|tpp)$"; }
+  gtcc()  { ag -G "\.(c|cc|cpp|C|CC)$"; }
+  gtsv()  { ag -G "\.(sv|svh)$"; }
+  gtv()   { ag -G "\.(v|x)$"; }
+  gtsbs() { ag -G "\.sbs$"; }
 elif hash pt 2> /dev/null; then
-  alias g='pt'
+  g()     { pt "$@"; }
 elif hash ack 2> /dev/null; then
-  alias g='ack --color'
-  alias gtc='a --type=cpp'
-  alias gtcc='a --type=cpp --nohh'
-  alias gtch='a --type=hh'
+  g()     { ack --color "$@"; }
+  gtc()   { a --type=cpp "$@"; }
+  gtcc()  { a --type=cpp --nohh "$@"; }
+  gtch()  { a --type=hh "$@"; }
 fi
-alias gi='g -i'
-alias gv='g -v'
+gi() { g -i "$@"; }
+gv() { g -v "$@"; }
 
 alias C=cat
 alias P=$PAGER
@@ -192,6 +204,7 @@ alias k9='kill -9'
 #=================
 # Editor aliases
 #
+alias vq='vim -q <($(fc -nl -1))'
 unset -f gvim_func
 gvim_func() {
   # If tmux is being used, check that DISPLAY is set correctly
@@ -200,7 +213,7 @@ gvim_func() {
   fi
   gvim "$@" 2> /dev/null
 }
-alias v="gvim_func"
+alias v='gvim_func'
 
 # Using -f keeps the window in the foreground and prevents a whole bunch of diffs opening at the same time
 unset -f gvim_diff
@@ -220,7 +233,7 @@ gvim_diff() {
   done
 
   # Run vimdiff only if there are differences and all files are present
-  gvim_func -df "$@"
+  gvim_func -df -c 'set nobackup' "$@"
 }
 alias vd=gvim_diff
 

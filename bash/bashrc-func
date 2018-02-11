@@ -49,8 +49,8 @@ unset -f duh
 duh() { du -h "$@" | sort -rh; }
 
 # Silent push and popd. Use dirs -v for vertical dirstack                                                           {{{1
-pushd() { command pushd $@ > /dev/null ; }
-popd()  { command popd  $@ > /dev/null ; }
+pushd() { command pushd "$@" > /dev/null ; }
+popd()  { command popd  "$@" > /dev/null ; }
 
 # Intelligent ..                                                                                                    {{{1
 ..() {
@@ -82,11 +82,6 @@ mcd() {
 #}
 
 
-# Case conversion                                                                                                   {{{1
-lc() { echo $@ | tr "[A-Z]" "[a-z]"; }
-uc() { echo $@ | tr "[a-z]" "[A-Z]"; }
-
-
 # @: Simpler/faster alternative to globstar                                                                         {{{1
 unset -f @
 function @ {
@@ -97,8 +92,8 @@ function @ {
   local _cmd=()
   for i in "$@"; do
     if [[ $i =~ '**' ]]; then
-      _cmd+=('$(find'     $(command awk 'BEGIN {FS="**"} {print $1}' <<< "$i"))
-      _cmd+=('-path'  "'*"$(command awk 'BEGIN {FS="**"} {print $2}' <<< "$i")"')")
+      _cmd+=('$(find'    $(command awk 'BEGIN {FS="**"} {print $1}' <<< "$i"))
+      _cmd+=('-path' "'*"$(command awk 'BEGIN {FS="**"} {print $2}' <<< "$i")"')")
     else
       _cmd+=("$i")
     fi

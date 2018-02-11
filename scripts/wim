@@ -96,11 +96,11 @@ my $u_set = grep(/^-u$/, @ARGV);
 my $U_set = grep(/^-U$/, @ARGV);
 
 if ($opts{'config'} eq "NONE") {
-  # -u NONE prevents loading of system plugins too. Thus, we use NORC instead
   push @args, qw(-N --cmd), 'set rtp=$VIM,$VIMRUNTIME,$VIM/after';
-  push @args, qw(-u NORC) if !$u_set;
+  push @args, qw(-u NONE) if !$u_set;
   push @args, qw(-U NORC) if !$U_set;
-  push @args, qw(--noplugins) if !grep(/^--noplugins$/, @ARGV);
+  # -u NONE prevents loading of system plugins too. Thus --noplugins is required only if the user has specified -u
+  push @args, qw(--noplugins) if (!grep(/^--noplugins$/, @ARGV) && $u_set);
 } elsif ($opts{'config'} ne "") {
   push @args, qw(-N --cmd), sprintf("set rtp=%s,\$VIM,\$VIMRUNTIME,\$VIM/after,%s/after", $opts{'config'}, $opts{'config'});
   push @args, '-u', "$opts{'config'}/vimrc"  if (!$u_set && (-f "$opts{'config'}/vimrc"));

@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
 # DirStack - Emulate Zsh's behavior of pushd lifting the directory to tos instead of cycling the stack
-# 'cd ='      Lists the contents of the stack.
-# 'cd +n'     Exchanges the current directory with the directory stored in 'n'. 'cd +0' is a NOP.
-# 'cd -'      Is the same as 'cd +1'
-# 'cd +'      Pops the current directory off the stack and cd's to the next directory on the stack (equivalent to popd).
-# 'cd'        Goes to $REPO_PATH if it's set else goes to $HOME
-# 'cd ,targ'  Jump to a directory in the path that starts with targ. Case-insensitive and also supports fuzzy matching
-unset -f super_cd
-super_cd() {
+# cd =      Lists the contents of the stack.
+# cd +N     Exchanges the current directory with the directory stored in 'N'. 'cd +0' is a NOP.
+# cd -      Is the same as 'cd +1'
+# cd +      Pops the current directory off the stack and cd's to the next directory on the stack (equivalent to popd).
+# cd        Goes to $REPO_PATH if it's set else goes to $HOME
+# cd ,TARG  Jump to a directory in the path that starts with TARG. Case-insensitive and also supports fuzzy matching
+unset -f cdpp
+cdpp() {
   local _dir
   if (( $#==0 )); then
     _dir=${REPO_PATH-${HOME/%\//}}
@@ -47,8 +47,8 @@ super_cd() {
     *\*\**)
       local _src=${1%%\*\**}; _src=${_src:-.}
       local _dst=${1##*\*\*}
-      # echo find ${_src} -type d -path *${_dst}
-      _dir=$(find ${_src} -type d -path *${_dst} | head -n 1)
+      # echo find ${_src} -type d -path "*${_dst}" -print -quit
+      _dir=$(find ${_src} -type d -path "*${_dst}" -print -quit)
       if [[ -z ${_dir} ]]; then
         # find was unable to find a matching directory
         echo "ERROR: Unable to find ${_dst#/} under ${_src}"
@@ -81,4 +81,4 @@ super_cd() {
   esac
 }
 
-alias cd=super_cd
+alias cd=cdpp

@@ -20,60 +20,69 @@ fi
 # EDITOR                                                                                                            {{{1
 #=======================================================================================================================
 alias v="gvim_func -geometry 273x66+0+0 ${STEM:+--servername $STEM}"
-alias vlog="v -p *ChkL3.log *Seq.log dsp_ch.txt sim.out -c 'set autoread'"
 alias vc='v --remote-silent'
+unset -f vlog
+vlog() {
+  local _comp=$(command grep -o 'error.*component=\S\+' sim.out | sed 's/.*=//')
+  if [[ $_comp == "sim.out" ]] || [[ ${_comp}.log == *AggL3.log ]] || [[ ${_comp}.log == *L3Seq.log ]]; then
+    _comp=""
+  else
+    _comp=${_comp:+${_comp}.log}
+  fi
+  local _files=()
+  for i in sim.out *AggL3.log *AggL3Seq.log ${_comp}; do
+    if [[ -f "$i" ]]; then
+      _files=("${_files[@]}" "$i")
+    fi
+  done
+  vim -p "${_files[@]}" "$@" -c 'set nobackup' -c 'set autoread' -c 'silent! /error:\|Backtrace:' -c 'silent! "norm zt"'
+}
 
 alias e="emacs_func ${STEM+--socket-name=${STEM//\//_}}"
 
 
 # Project Aliases
 # alias as_bsub="lsf_bsub -Is -R 'rusage[mem=2000]' -q high -P aspen-ver"
-#alias amdfind='find $REPO_PATH -path "$REPO_PATH/simenv/build" -prune -or -path "$REPO_PATH/.ccache" -prune -or -path "$REPO_PATH/.autoio_cache" -prune -or -path "$REPO_PATH/release_gate_run" -prune -or -print'
-# Use p4 have
-alias amdfind="find $REPO_PATH -type d \( -name _env -o -name dfx -o -name emu -o -name fp -o -name powerPro -o -name build -o -name sim -o -name release_gate_tmp -o -wholename '*/ch/tc' -o -wholename '*/ch/tb' -o -wholename '*/ch/verif/dft' -o -wholename '*/txn/gen' -o -wholename '*/generated' \) -prune -o -type f ! \( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' -o -iname '*.cc.o' -o -iname '*tags*' \) -print 2> /dev/null"
-alias amdgrep='find $REPO_PATH -path "$REPO_PATH/simenv/build" -prune -or -path "$REPO_PATH/.ccache" -prune -or -path "$REPO_PATH/.autoio_cache" -prune -or -path "$REPO_PATH/release_gate_run" -prune -or -print | xargs grep'
-
 
 # Building and Compiling
 alias sbi='. /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash'
-alias mkv='mkverdi -nolsf $(grep -Po "\-model\s*\S+" sim.out) -rc ~/novas.rc -guiConf ~/novas.conf -tkName "verdi_$(tmux display-message -p "#S:#I.#P")" &'
+unset -f mkv
+mkv() { mkverdi $(command grep -Po '\-model\s*\S+' sim.out) -rc ~/novas.rc -guiConf ~/novas.conf -tkName "verdi_$(tmux display-message -p '#S:#I.#P')" "$@" & }
 alias findFirstError='findFirstError --tkName "verdi_$(tmux display-message -p "#S:#I.#P")"'
 alias cid='cat ${REPO_PATH+$REPO_PATH/}configuration_id'
-alias bj='lsf_bjobs -w'
-alias bjj='lsf_bjobs -w | command grep "JOBID\|$$"'
+bj() {
+  lsf_bjobs -w | perl -aF"\s+" -lne 'printf("%-7s  %-8s  %-4s  %-9s  %-14s  %-10s  %-12s  %s\n", ($. == 1 ? @F[0..5,7,6] : @F[0..5],"@F[$#F-2..$#F]","@F[6..$#F-3]"))'
+}
+bjg() { bj | command grep "${1:-$$:}"; }
 alias bk='lsf_bkill'
 alias bq='lsf_bqueues'
 
-unset -f bjg
-bjg() { bj | \grep "${1:-$$:}"; }
-
 alias wtf='WhyTheFail'
 alias lmn='ljd -nomail -l'
-alias rgf_l3='regenerate_fail.bash -log mine -r \"-avf \'"'-/ChkL3.Debug/ 1\'"'\"'
-alias rgf_ras='regenerate_fail.bash -log ras -forceBuild'
+alias rcf='recreate_fail -a $br0ks/amdmsg_config.yaml'
 alias trapbug='P4DIFF= s_trapbug -bug'
 
 
 # Misc
 alias rr='~/bin/rerun'
-alias rrb='rr --norun --build'
+alias rrb='rr --norun --build --recompile'
 alias rrc='rr --norun --clean'
-alias rrcb='rr --norun --clean --build'
+alias rrcb='rr --norun --clean --build --recompile'
 alias bca='build -clean_all'
-alias rrrbr='rr --recompile-all --build'
-alias rrbr='rr --build'
-alias rrcr='rr --clean'
-alias rrdbg=$'rr --add \'-avf "--/L3.Debug.*Graph/ --/L3.Debug.*Resources/"\' --dsp'
+alias rrbr='rr --build --recompile'
+alias rrcr='rr --clean --recompile'
+alias rrdbg=$'rr --add \'-avf "--/L3.Debug.*Graph/ --/L3.Debug.*Resources/ --/L3.Debug.*Quiesce/"\' --dsp'
 
 alias rg='release_gate'
 alias rgd='release_gate -donate'
 alias rgg='release_gate_gui'
 alias perr="perl -ne 'print if /error:/../:error/;exit if /:error/'"
-alias bu='bucket'
-alias bus='bucket -s'
-alias bus1='bucket -n 1'
-alias bus3='bucket -n 3'
-alias busw='watch -n15 "bucket -n 1"'
+bu()   { bucket "$@"; }
+bus()  { bucket -s "$@"; }
+bu1()  { bucket -n 1 "$@"; }
+bu3()  { bucket -n 3 "$@"; }
+bu1w() { watch --no-title -n 60 "bucket -n 1 $@"; }
+busw() { watch --no-title -n 60 "bucket -s $@"; }
 alias toclippy="sed -e 's/$/
 /' | tee ~/clippy.txt"
 
@@ -148,7 +157,7 @@ pf_list() {                                                                     
   fi
 
   [[ -z $STEM ]] && return 1
-  cat <(p4 have) <(cd import/avf; p4 have ...) | awk {'print $3'} >| $STEM/.filelist
+  cat <(p4 have) <(cd $STEM/import/avf; p4 have ...) | awk {'print $3'} >| $STEM/.filelist
 }
 
 # Find a file
@@ -340,15 +349,15 @@ wa_list() {                                                                     
   local _proj _ch _wa _path
   for _ch in {0..1}; do
     for _proj in as ah br; do
-      local _proj_ucase=$(tr 'a-z' 'A-Z' <<< ${_proj})
+      local _proj_long=$(sed -e 's/as/ASPEN/' -e 's/ah/ASPEN_HIGHLANDS/' -e 's/br/BRECKENRIDGE/' <<< $_proj)
       for _wa in {1..6}; do
-        _path="/proj/ch_func_dev${_ch}/${_proj_ucase}/kshenoy/${_proj}${_ch}${_wa}"
+        _path="/proj/ch_func_dev${_ch}/${_proj_long}/kshenoy/${_proj}${_ch}${_wa}"
         if [[ -d ${_path} ]] && [[ "$(ls -A ${_path})" ]]; then
           if [[ -t 1 ]]; then
             echo ${_path}:
-            ls ${_path} | sed 's/^/  /'
+            ls ${_path} | command grep '/$' | sed 's/^/  /'
           else
-            find ${_path}  -maxdepth 1 -type d -not -name '\.*'
+            find ${_path} -mindepth 1 -maxdepth 1 -type d -not -name '\.*'
           fi
         fi
       done
@@ -363,13 +372,21 @@ lenv() {                                                                        
   local _env_tmux=$TMUX
   local _env_tmux_pane=$TMUX_PANE
   local _old_pwd=$PWD
+
   local _workarea=${1:-$PWD}
+  if [[ -L ${_workarea} ]]; then
+    _workarea=$(readlink ${_workarea})
+  fi
+  if [[ -f ${_workarea} ]]; then
+    _workarea=$(dirname ${_workarea})
+  fi
+  echo "loadenv into ${_workarea}"
 
   # Start emacs daemon if one isn't present
   # [[ -n "${_workarea}" ]] && ~kshenoy/bin/emacs_daemon -s ${workarea//\//_} &> /dev/null &
 
   command pushd "${_workarea}" > /dev/null
-  sbi && loadenv
+  . /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash && loadenv
   local ret=$?
 
   # Restore ENV variables
@@ -379,7 +396,6 @@ lenv() {                                                                        
   if [[ $ret != 0 ]]; then return; fi
 
   # Source aliases etc.
-  lv=$STEM
   sosa; sosf
   [[ -f ~/.fzf.bash ]] && . ~/.fzf.bash
 
@@ -425,12 +441,12 @@ BUGS
 
 
 g++() {
-  /tool/pandora64/.package/gcc-6.3.0/bin/g++ -std=c++14 \
-    ${BOOST_HOME:+-L ${BOOST_HOME}/lib} -I ${BOOST_HOME}/include -Wl,-rpath ${BOOST_HOME}/lib "$@"
+  /tool/pandora64/.package/gcc-6.3.0/bin/g++ -Wall -Wextra -std=c++14 \
+    ${BOOST_HOME:+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -Wl,${BOOST_HOME:+-rpath ${BOOST_HOME}/lib} "$@"
 }
 clang++() {
-  /tool/pandora64/.package/llvm-4.0.0-gcc630/bin/clang++ -std=c++14 \
-    ${BOOST_HOME:+-L ${BOOST_HOME}/lib} -I ${BOOST_HOME}/include -Wl,-rpath ${BOOST_HOME}/lib "$@"
+  /tool/pandora64/.package/llvm-4.0.0-gcc630/bin/clang++ -Wall -Wextra -std=c++14 \
+    ${BOOST_HOME:+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -Wl,${BOOST_HOME:+-rpath ${BOOST_HOME}/lib} "$@"
 }
 
 unset -f psig
@@ -440,7 +456,7 @@ psig() {
 
 unset -f rgsig
 rgsig() {
-  for i in $(grep FAIL ${REPO_PATH+$REPO_PATH/}release_gate_tmp/release_gate.log | colm -1); do
+  for i in $(command grep FAIL ${REPO_PATH+$REPO_PATH/}release_gate_tmp/release_gate.log | colm -1); do
     local _sim=${i##*release_gate_tmp/}
     _sim=${_sim%%/*}
     echo -e "\n${_sim}";
@@ -468,12 +484,14 @@ plastlock() {
 
 unset -f vsig
 vsig() {
-  file_lnum=$(\grep -Po -m1 '(?<=source\=)[^:]+:\d+' summary.rj)
+  file_lnum=$(command grep -Po -m1 '(?<=source\=)[^:]+:\d+' summary.rj)
   file=${file_lnum%:*}
   lnum=${file_lnum#*:}
 
   file=$(pff ${file})
-  v +$lnum $file -c "norm! zv"
+
+  # echo "File=${file} Line=${lnum}"
+  vc +$lnum $file
 }
 
 unset -f tel

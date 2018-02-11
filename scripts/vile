@@ -3,8 +3,8 @@
 if [[ -n "${STEM}" ]]; then
   # ~/bin/vim -R --config NONE -u ~/.vim/vimrc_pager -c 'silent! /error:\|Backtrace:' -c 'set path=$STEM/build/latest,$STEM/build/latest/generated/ch,$STEM/build/latest/fake_c_incl/**,$STEM/ch/**,$STEM/import/avf/**' "$@"
   # FIXME: gf and find don't work when supplied with a relative path
-  ~/bin/vim -R --config NONE -u ~/.vim/vimrc_pager -c 'silent! /error:\|Stack Trace' -c 'silent! cd $STEM/build/latest' -c 'silent! set path=,,generated/ch,fake_c_incl/**,$STEM/ch/**,$STEM/import/avf/**' "$@"
+  ~/bin/vim -R -u ~/.vim/vimrc_pager -U NORC --noplugins -c 'silent! /error:\|Stack Trace' -c 'silent! cd $STEM/build/latest' -c 'silent! set path=,,generated/ch,fake_c_incl/**,$STEM/ch/**,$STEM/import/avf/**' "$@"
   exit 0
 fi
 
-~/bin/vim -R --config NONE -u ~/.vim/vimrc_pager "$@"
+~/bin/vim -R -u ~/.vim/vimrc_pager -U NORC --noplugins "$@"

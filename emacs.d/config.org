@@ -20,7 +20,7 @@
   (package-initialize)
 #+END_SRC
 
-** use-package
+** Bootstrap use-package
 [[https://www.youtube.com/watch?v%3D2TSKxxYEbII][use-package video tutorial]]
 
 Install and load use-package
@@ -33,7 +33,6 @@ Install and load use-package
     (defvar use-package-verbose t)
     (require 'use-package)
     (require 'bind-key)
-    (require 'diminish)
     (setq use-package-always-ensure t)
     (if (daemonp)
         (setq use-package-always-demand t)))
@@ -91,6 +90,37 @@ Thus, once the prefixes and maps are defined, we have to use /bind-keys/ only to
   (bind-keys :prefix-map my-s-bindings-map
              :prefix-docstring "This map is used to group together all s-mnemonic bindings such as substitution, sizing etc."
              :prefix "C-c s")
+#+END_SRC
+
+*** Intelligent narrowing and widening
+From [[http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html][endless parentheses]]
+
+#+BEGIN_SRC emacs-lisp
+  (defun narrow-or-widen-dwim (p)
+    "Widen if buffer is narrowed, narrow-dwim otherwise.
+  Dwim means: region, org-src-block, org-subtree, or defun, whichever applies first.
+  Narrowing to org-src-block actually calls `org-edit-src-code'.
+
+  With prefix P, don't widen, just narrow even if buffer is already narrowed."
+    (interactive "P")
+    (declare (interactive-only))
+    (cond ((and (buffer-narrowed-p) (not p)) (widen))
+          ((region-active-p)
+           (narrow-to-region (region-beginning)
+                             (region-end)))
+          ((derived-mode-p 'org-mode)
+           ;; `org-edit-src-code' is not a real narrowing command.
+           ;; Remove this first conditional if you don't want it.
+           (cond ((ignore-errors (org-edit-src-code) t)
+                  (delete-other-windows))
+                 ((ignore-errors (org-narrow-to-block) t))
+                 (t (org-narrow-to-subtree))))
+          ((derived-mode-p 'latex-mode)
+           (LaTeX-narrow-to-environment))
+          (t (narrow-to-defun))))
+
+  ;; This line actually replaces Emacs' entire narrowing keymap.
+  (bind-key "n" 'narrow-or-widen-dwim ctl-x-map)
 #+END_SRC
 
 ** Custom file
@@ -193,7 +223,7 @@ However, the downside to this is that if I have multiple such hooks (like in pri
     (my/select-and-set-font))
 #+END_SRC
 
-Fall back to DejaVu Sans when the font lacks support for some glyphs. Taken from [[https://github.com/joodie/emacs-literal-config/blob/c66e30ce961b140dd3e84116f4d45cbc19d0d944/emacs.org#font][github:joodie]]
+Fallback to DejaVu Sans when the font lacks support for some glyphs. Taken from [[https://github.com/joodie/emacs-literal-config/blob/c66e30ce961b140dd3e84116f4d45cbc19d0d944/emacs.org#font][github:joodie]]
 How does this work? What is it supposed to do?
 #+BEGIN_SRC emacs-lisp :tangle no
   (when (functionp 'set-fontset-font)
@@ -205,6 +235,9 @@ How does this work? What is it supposed to do?
 #+END_SRC
 
 ** Tabs, Indentation and Spacing
+:PROPERTIES:
+:ID:       8d72d9c2-5b52-454f-892a-107b009563fa
+:END:
 Use only spaces and no tabs
 #+BEGIN_SRC emacs-lisp
   (setq-default indent-tabs-mode nil)
@@ -279,7 +312,6 @@ Use =C-c s SPC= to delete trailing whitespace manually
 
   ;; Enable editing by visual lines
   (global-visual-line-mode t)
-  (diminish 'visual-line-mode)
 
   ;; Let emacs react faster to keystrokes
   (setq echo-keystrokes 0.1)
@@ -452,6 +484,14 @@ We can also put something like this into =~/.Xresources= to enable/disable certa
 :PROPERTIES:
 :header-args: :tangle yes
 :END:
+** diminish
+Placing at top since it'll be used by most of the other packages
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :config
+    (diminish 'visual-line-mode))
+#+END_SRC
+
 ** ace-window
 When more than 2 windows are open, show a home-row character in each window to jump directly to.
 Similar to Tmux's =<prefix> C-g=
@@ -900,7 +940,9 @@ From [[http://stackoverflow.com/a/6309985/734153][StackOverflow]]
 
   (add-to-list 'org-structure-template-alist '("sl" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
 
-  (add-to-list 'org-structure-template-alist '("sd" "#+BEGIN_SRC dot :file /tmp/out.png\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
+  (add-to-list 'org-structure-template-alist '("sp" "#+BEGIN_SRC python\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
+
+  ;; (add-to-list 'org-structure-template-alist '("sd" "#+BEGIN_SRC dot :file /tmp/out.png\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
 
   (add-to-list 'org-structure-template-alist '("ss" "#+BEGIN_SRC bash\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
 #+END_SRC
@@ -994,15 +1036,95 @@ This is because, the entire tag string is treated as a single value and Helm tri
   ;;            ("C-c M-q" . org-set-tags-command))
 #+END_SRC
 
+**** Use ! to toggle timestamp type
+:PROPERTIES:
+:ID:       d4634d95-be37-4bdf-987e-22da5778e958
+:END:
+[[https://orgmode.org/manual/Creating-timestamps.html][By default]], org-mode uses =C-c .= and =C-c != to create active and inactive timestamps respectively.
+However, I also have flycheck installed which uses the C-c ! binding.
+
+Thus, this allows me to use =C-c .= to insert a timestamp and when prompted to enter the date+time in the minibuffer,
+use =!= to toggle between active and inactive timestamps. Also see [[Custom timestamp keymap]].
+From [[http://emacs.stackexchange.com/questions/38062/configure-key-to-toggle-between-active-and-inactive-timestamps#38065][Emacs StackExchange]]
+
+#+BEGIN_SRC emacs-lisp
+  (defun org-toggle-time-stamp-activity ()
+    "Toggle activity of time stamp or range at point."
+    (interactive)
+    (let ((pt (point)))
+      (when (org-at-timestamp-p t)
+        (goto-char (match-beginning 0))
+        (when-let ((el (org-element-timestamp-parser))
+                   (type (org-element-property :type el))
+                   (type-str (symbol-name type))
+                   (begin (org-element-property :begin el))
+                   (end (org-element-property :end el)))
+          (setq type-str
+                (if (string-match "inactive" type-str)
+                    (replace-regexp-in-string "inactive" "active" type-str)
+                  (replace-regexp-in-string "active" "inactive" type-str)))
+          (org-element-put-property el :type (intern type-str))
+          (goto-char end)
+          (skip-syntax-backward "-")
+          (delete-region begin (point))
+          (insert (org-element-timestamp-interpreter el nil))
+          (goto-char pt)))))
+
+  (defvar-local calendar-previous-buffer nil
+    "Buffer been active when `calendar' was called.")
+
+  (defun calendar-save-previous-buffer (oldfun &rest args)
+    "Save buffer been active at `calendar' in `calendar-previous-buffer'."
+    (let ((buf (current-buffer)))
+      (apply oldfun args)
+      (setq calendar-previous-buffer buf)))
+
+  (advice-add #'calendar :around #'calendar-save-previous-buffer)
+
+  (defvar-local my-org-time-stamp-toggle nil
+    "Make time inserted time stamp inactive after inserting with `my-org-time-stamp'.")
+
+  (defun org-time-stamp-toggle ()
+    "Make time stamp active at the end of `my-org-time-stamp'."
+    (interactive)
+    (when-let ((win (minibuffer-selected-window))
+               (buf (window-buffer win)))
+      (when (buffer-live-p buf)
+        (with-current-buffer buf
+          (when (buffer-live-p calendar-previous-buffer)
+            (set-buffer calendar-previous-buffer))
+          (setq my-org-time-stamp-toggle (null my-org-time-stamp-toggle))
+          (setq org-read-date-inactive my-org-time-stamp-toggle)))))
+
+  (define-key org-read-date-minibuffer-local-map "!" #'org-time-stamp-toggle)
+
+  (defun my-org-time-stamp (arg)
+    "Like `org-time-stamp' with ARG but toggle activity with character ?!."
+    (interactive "P")
+    (setq my-org-time-stamp-toggle nil)
+    (org-time-stamp arg)
+    (when my-org-time-stamp-toggle
+      (backward-char)
+      (org-toggle-time-stamp-activity)
+      (forward-char)))
+
+  ;; (org-defkey org-mode-map (kbd "C-c .") #'my-org-time-stamp)
+#+END_SRC
+
 **** org-babel
 ***** Set default options
 #+BEGIN_SRC emacs-lisp
   (setq org-babel-default-header-args
-        '((:results . "verbatim")))
+        '((:results . "verbatim replace")))
 
   (setq org-babel-C++-compiler "clang++")
   (setq org-babel-default-header-args:C++
         '((:flags   . "-std=c++14 -Wall -Wextra -Werror ${BOOST_HOME:+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -Wl,${BOOST_HOME:+-rpath ${BOOST_HOME}/lib}")))
+
+  (setq org-babel-default-header-args:perl
+        '((:results . "output")))
+
+  (setq org-babel-python-command "python3")
 #+END_SRC
 
 ***** Display errors and warnings in an org-babel code block
@@ -1065,7 +1187,8 @@ A good way to find more characters is to use =M-x insert-char=
   (setq org-agenda-tags-column            -120) ; Monitors are wide, might as well use it :/
   (setq org-agenda-skip-scheduled-if-done t)    ; Why isn't this default?
   (setq org-agenda-skip-deadline-if-done  t)
-
+  (setq org-agenda-window-setup 'only-window)
+  (setq org-agenda-restore-windows-after-quit t)
 #+END_SRC
 
 ***** org-agenda custom commands
@@ -1094,7 +1217,7 @@ Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mod
            ((tags "PRIORITY=\"A\""
                   ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                    (org-agenda-overriding-header "High-priority unfinished tasks:")))
-            (agenda "" ((org-agenda-span 3)))
+            (agenda "" ((org-agenda-span 7)))
             (alltodo ""
                      ((org-agenda-skip-function '(or (my/org-skip-subtree-if-habit)
                                                      (my/org-skip-subtree-if-priority ?A)
@@ -1226,36 +1349,41 @@ From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 -
         '(("t" "TODO" entry
            (file+headline org-default-notes-file "Inbox")
            "* TODO %^{Task}\n\n%?"
+           :jump-to-captured t :empty-lines 1)
+
+          ("c" "Misc" entry
+           (file+headline org-default-notes-file "Inbox")
+           "* %^{Task}\n\n%?"
+           :jump-to-captured t :empty-lines 1)
+
+          ;; ("l"  "Spanish")
+
+          ;; ("ls" "Item" entry
+          ;;  (file+headline (concat org-directory "Personal/Spanish.org") "Misc")
+          ;;  "\n* %?%(setq my-spanish-capture (read-string \"Spanish: \")) :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"hide1_firstmore\")\n\nSpanish: [%(message my-spanish-capture)]\nEnglish: [%^{English}]"
+          ;;  :jump-to-captured t :empty-lines 1)
+
+          ;; ("ln" "Noun" entry
+          ;;  (file+headline (concat org-directory "Personal/Spanish.org") "Nouns")
+          ;;  "\n* %?[%(setq my-spanish-capture (read-string \"Spanish: \"))] :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"twosided\")\n\nTranslate this noun.\n\n** Spanish\n/%(message my-spanish-capture)/\n\n** English\n%^{English}"
+          ;;  :jump-to-captured t :empty-lines 1)
+
+          ;; ("lv" "Verb" entry
+          ;;  (file+headline (concat org-directory "Personal/Spanish.org") "Verbs")
+          ;;  "\n* %(setq my-spanish-capture (read-string \"Spanish: \")) :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"hide1cloze\")%(org-set-property \"VERB_INFINITIVE\" (concat \"\\\"\" my-spanish-capture \"\\\"\"))%(org-set-property \"VERB_TRANSLATION\" (concat \"\\\"to \" (setq my-english-capture (read-from-minibuffer \"English: to \")) \"\\\"\"))%(org-set-property \"VERB_INFINITIVE_HINT\" (concat \"\\\"\" (substring my-spanish-capture 0 1) \"...\\\"\"))\n\nSpanish: [%(message my-spanish-capture)]\nEnglish: [to %(message my-english-capture)]\n\n** Notes\n** Examples\n** Simple Present Tense :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"conjugate\")%(org-set-property \"VERB_TENSE\" \"\\\"simple present\\\"\")\n\n| yo               | %?  |\n| tú               |   |\n| él/ella/Ud.      |   |\n| nosotros         |   |\n| vosotros         |   |\n| ellos/ellas/Uds. |   |"
+          ;;  :jump-to-captured t :empty-lines 1)
+
+          ("s"  "Code snippets")
+
+          ("se" "Emacs" entry
+           (file "~/Notes/Software/emacs.org")
            :jump-to-captured t)
 
-          ("s"  "Spanish")
-
-          ("ss" "Item" entry
-           (file+headline (concat org-directory "Personal/Spanish.org") "Misc")
-           "\n* %?%(setq my-spanish-capture (read-string \"Spanish: \")) :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"hide1_firstmore\")\n\nSpanish: [%(message my-spanish-capture)]\nEnglish: [%^{English}]"
-           :jump-to-captured t :empty-lines 1)
-
-          ("sn" "Noun" entry
-           (file+headline (concat org-directory "Personal/Spanish.org") "Nouns")
-           "\n* %?[%(setq my-spanish-capture (read-string \"Spanish: \"))] :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"twosided\")\n\nTranslate this noun.\n\n** Spanish\n/%(message my-spanish-capture)/\n\n** English\n%^{English}"
-           :jump-to-captured t :empty-lines 1)
-
-          ("sv" "Verb" entry
-           (file+headline (concat org-directory "Personal/Spanish.org") "Verbs")
-           "\n* %(setq my-spanish-capture (read-string \"Spanish: \")) :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"hide1cloze\")%(org-set-property \"VERB_INFINITIVE\" (concat \"\\\"\" my-spanish-capture \"\\\"\"))%(org-set-property \"VERB_TRANSLATION\" (concat \"\\\"to \" (setq my-english-capture (read-from-minibuffer \"English: to \")) \"\\\"\"))%(org-set-property \"VERB_INFINITIVE_HINT\" (concat \"\\\"\" (substring my-spanish-capture 0 1) \"...\\\"\"))\n\nSpanish: [%(message my-spanish-capture)]\nEnglish: [to %(message my-english-capture)]\n\n** Notes\n** Examples\n** Simple Present Tense :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"conjugate\")%(org-set-property \"VERB_TENSE\" \"\\\"simple present\\\"\")\n\n| yo               | %?  |\n| tú               |   |\n| él/ella/Ud.      |   |\n| nosotros         |   |\n| vosotros         |   |\n| ellos/ellas/Uds. |   |"
-           :jump-to-captured t :empty-lines 1)
-
-          ("c"  "Code snippets")
-
-          ("ce" "Emacs" entry
-           (file (concat org-directory "Software/emacs.org"))
-           :jump-to-captured t)
-
-          ("cs" "Shell" entry
+          ("ss" "Shell" entry
            (file (concat org-directory "Software/shell.org"))
            :jump-to-captured t)
 
-          ("cv" "Vim" entry
+          ("sv" "Vim" entry
            (file (concat org-directory "Software/vim.org"))
            :jump-to-captured t)))
 #+END_SRC
@@ -1297,12 +1425,18 @@ saving it to a variable and printing it out later in the capture template.
 I grab the /org-plus-contrib/ version of org-id to match org
 #+BEGIN_SRC emacs-lisp
   (use-package org-id
+    :disabled
     :ensure org-plus-contrib
+    :pin repo-org
     :init
     (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
 
     :config
 #+END_SRC
+
+To effectively use custom ID, refer [[https://writequit.org/articles/emacs-org-mode-generate-ids.html#update-2016-09-07][this]].
+Note that =org-id= has been updated since then and now supports a method =org-id-get-create= which creates an ID if one is not present.
+Also, it uses the identifier /ID/ instead of /CUSTOM_ID/
 
 ***** TODO Use org-id globally across all files
 :LOGBOOK:
@@ -1318,8 +1452,9 @@ Example on [[http://stackoverflow.com/a/27158715/734153][Emacs StackExchange]]
 :PROPERTIES:
 :ID:       be086bdd-ffcf-4f4e-beb2-a948191895eb
 :END:
-To use completion, insert link using =C-c C-l= and select =id:= as type and completion should trigger
-More details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
+To use completion, insert link using =C-c C-l= and select =id:= as type and completion should trigger.
+=org-id-get-with-outline-path-completion= returns the ID of the selected heading and creates it if it doesn't have one already.
+Details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
 #+BEGIN_SRC emacs-lisp
   (defun org-id-complete-link (&optional arg)
     "Create an id: link using completion"
@@ -1347,6 +1482,7 @@ More details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchan
     (setq org-drill-hide-item-headings-p t)
 
     (use-package org-drill-table
+      :disabled
       :load-path "bundle/org-drill-table"))
 #+END_SRC
 
@@ -1380,6 +1516,22 @@ Note that these are still part of the /:config/ block
 #+end_src
 
 **** Rebinding
+<<Custom timestamp keymap>>. Also see [[id:d4634d95-be37-4bdf-987e-22da5778e958][Using ! to toggle timestamp type]]
+#+BEGIN_SRC emacs-lisp :tangle no
+  (unbind-key "C-c ." org-mode-map)
+  (unbind-key "C-c <" org-mode-map)
+  (unbind-key "C-c >" org-mode-map)
+
+  (bind-keys :prefix-map my-org-timestamp-bindings-map
+             :prefix-docstring "This map is used to group together all timestamp related bindings"
+             :prefix "C-c ."
+             ("." . my-org-time-stamp)
+             ("!" . org-time-stamp-inactive)
+             ("<" . org-date-from-calendar)
+             (">" . org-goto-calendar)
+             ("C-o" . org-open-at-point))
+#+END_SRC
+
 Note that org-mode usually has the same command mapped to both =<Prefix> [a-z]= and =<Prefix> C-[a-z]=.
 In such cases, I can use =<Prefix> [a-z]= to bind to something else and leave =<Prefix> C-[a-z]= alone.
 The mnemonic is that Org leaves =C-c [a-z]= free for the user. Thus, I'm using =[a-z]= in other places too.

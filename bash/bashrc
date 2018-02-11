@@ -215,7 +215,7 @@ HOSTNAME="$(hostname)"
 ## TERMINAL
 # Set terminal to mimic titeInhibit = true
 MANPAGER=less
-PAGER=vile
+PAGER=less
 EDITOR=vim
 VISUAL=gvim
 
