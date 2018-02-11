@@ -116,7 +116,7 @@ __fzf_p4_opened__() {
 }
 
 
-# __fzf_bookmarks__() {                                                                                             # {{{1
+# __fzf_bookmarks__() {                                                                                           # {{{1
 #   local _cmd="cat <(command find -L ~/Notes -type f -name '*.org' 2> /dev/null) ~/bookmarks"
 
 #   local _out=($(eval "$_cmd | sed "s:${HOME}:~:g" | fzf -m --expect=alt-v,alt-e"))

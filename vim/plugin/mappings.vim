@@ -333,7 +333,7 @@ nnoremap <silent> <leader>g/ :call utils#FindAndList('global', 'normal')<CR>
 vnoremap <silent> <leader>g/ :<C-U>call utils#FindAndList('global', 'visual')<CR>
 
 """ Grep
-command! -nargs=+ -complete=file -bar Grep silent grep! <args>|botright cwindow 12|redraw!
+command! -nargs=+ -complete=file -bar Grep silent grep! <args>|botright cwindow 20|redraw!
 nnoremap g/ :Grep<Space>
 
 """ Keep searches in middle of screen

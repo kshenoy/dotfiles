@@ -65,13 +65,13 @@ alias trapbug='P4DIFF= s_trapbug -bug'
 
 # Misc
 alias rr='~/bin/rerun'
-alias rrb='rr --norun --build --recompile'
+alias rrb='rr --norun --build'
+alias rrbr='rr --build'
 alias rrc='rr --norun --clean'
+alias rrca='build -clean_all'
 alias rrcb='rr --norun --clean --build --recompile'
-alias bca='build -clean_all'
-alias rrbr='rr --build --recompile'
-alias rrcr='rr --clean --recompile'
-alias rrdbg=$'rr --add \'-avf "--/L3.Debug.*Graph/ --/L3.Debug.*Resources/ --/L3.Debug.*Quiesce/"\' --dsp'
+alias rrcr='rr --clean'
+alias rrdbg=$'rr --add \'-avf "--/L3.Debug.*Graph/ --/L3.Debug.*Resources/"\' --dsp'
 
 alias rg='release_gate'
 alias rgd='release_gate -donate'
