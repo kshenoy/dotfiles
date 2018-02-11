@@ -23,7 +23,7 @@ endglobal
 snippet inc "#include <>" b
 #include ${2/>/</}$1`!p
 opts = ['algorithm', 'array', 'cassert', 'cstdint', 'cstdio', 'cstdlib', 'cstring', 'fstream', 'iostream', 'list', 'map', 'memory',
-        'set', 'sstream', 'string', 'unordered_map', 'unordered_set', 'vector']
+        'set', 'sstream', 'string', 'unordered_map', 'unordered_set', 'utility', 'vector']
 opts.sort()
 if snip.basename:
   opts.insert(0, snip.basename + '.h')
@@ -174,17 +174,12 @@ endsnippet
 #=======================================================================================================================
 # STL                                                                                                               {{{1
 #
-snippet be "<STL>.begin(), <STL>.end()" w
-${1:${VISUAL:v}}${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}begin(), $1${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}end()
+snippet be "std::begin(param), std::end(param)" w
+std::begin(${1:${VISUAL:container}}${1/^.*?(-)?(>)?$/(?2::(?1:>:))/}), std::end($1${1/^.*?(-)?(>)?$/(?2::(?1:>:))/})
 endsnippet
 
-snippet forbe "Iterate over STL container" b
-for (${1:::std::vector<int>}::const_iterator ${3:it}=${2:v}.begin(), ${4:it_last}=$2.end();
-     $3 != $4; ++$3) {
-  ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
-}
-endsnippet
 
+# Containers -------------------------------------------------------------------------------------------------------{{{2
 snippet map "std::map" w
 std::map<${1:key}, ${2:value}>$0
 endsnippet
@@ -197,13 +192,151 @@ snippet list "std::list" w
 std::list<${1:${VISUAL:T}}>$0
 endsnippet
 
-snippet 'vec(tor)?' "std::vector" rw
+snippet vec "std::vector" w
 std::vector<${1:${VISUAL:T}}>$0
 endsnippet
 
-snippet 'arr(ay)?' "std::array" rw
+snippet arr "std::array" w
 std::array<${1:${VISUAL:T}}, ${2:N}>$0
 endsnippet
+
+
+# Idioms -----------------------------------------------------------------------------------------------------------{{{2
+snippet erm ".erase(std::remove(...))"
+${1:${VISUAL:container}}.erase(std::remove(std::begin($1), std::end($1), ${2:value}), std::end($1));
+endsnippet
+
+
+# Non-modifying sequence operations --------------------------------------------------------------------------------{{{2
+snippet alo "std::all_of"
+if (std::all_of(std::begin(${1:${VISUAL:container}}), std::end($1),
+      [](auto const& ${2:i}) {
+        $0
+      })
+   ) {
+}
+endsnippet
+
+snippet ano "std::any_of"
+if (std::any_of(std::begin(${1:${VISUAL:container}}), std::end($1),
+      [](auto const& ${2:i}) {
+        $0
+      })
+   ) {
+}
+endsnippet
+
+snippet nno "std::none_of"
+if (std::none_of(std::begin(${1:${VISUAL:container}}), std::end($1),
+      [](auto const& ${2:i}) {
+        $0
+      })
+   ) {
+endsnippet
+
+snippet fre "std::for_each"
+std::for_each(std::begin(${1:${VISUAL:container}}), std::end($1),
+  [](auto const& ${2:i}) {
+    $0
+  });
+endsnippet
+
+snippet cnt "std::count"
+auto count = std::count(std::begin(${1:${VISUAL:container}}), std::end($1), ${2:value});
+endsnippet
+
+snippet cni "std::count_if"
+auto count = std::count_if(std::begin(${1:${VISUAL:container}}), std::end($1),
+  [](auto const& ${2:i}) {
+    $0
+  });
+endsnippet
+
+snippet fnd "std::find"
+auto searchIt = std::find(std::begin(${1:${VISUAL:container}}), std::end($1), $0);
+if (searchIt != std::end($1)) {
+}
+endsnippet
+
+snippet fni "std::find_if"
+auto searchIt = std::find_if(std::begin(${1:${VISUAL:container}}), std::end($1),
+  [](auto const& ${2:i}) {
+    $0
+  });
+if (searchIt != std::end($1)) {
+}
+endsnippet
+
+snippet fin "std::find_if_not"
+auto searchIt = std::find_if_not(std::begin(${1:${VISUAL:container}}), std::end($1),
+  [](auto const& ${2:i}) {
+    $0
+  });
+if (searchIt != std::end($1)) {
+}
+endsnippet
+
+
+# Modifying sequence operations ------------------------------------------------------------------------------------{{{2
+snippet cpy "std::copy"
+std::copy(std::begin(${1:${VISUAL:src}}), std::end($1), std::back_inserter(${2:dest}));
+endsnippet
+
+snippet cpi "std::copy_if"
+std::copy_if(std::begin(${1:${VISUAL:src}}), std::end($1), std::back_inserter(${2:dest}),
+  [](auto const& ${3:i}) {
+    $0
+  });
+endsnippet
+
+snippet fil "std::fill"
+std::fill(std::begin(${1:${VISUAL:container}}), std::end($1), ${2:value});
+endsnippet
+
+
+# Minimum/maximum operations ---------------------------------------------------------------------------------------{{{2
+snippet mne "std::min_element"
+std::min_element(std::begin(${1:${VISUAL:container}}), std::end($1));
+endsnippet
+
+snippet mxe "std::max_element"
+std::max_element(std::begin(${1:${VISUAL:container}}), std::end($1));
+endsnippet
+
+snippet mme "std::minmax_element"
+std::minmax_element(std::begin(${1:${VISUAL:container}}), std::end($1));
+endsnippet
+
+
+# String/Streams ---------------------------------------------------------------------------------------------------{{{2
+snippet sti "std::cin"
+std::cin >> $0
+endsnippet
+
+snippet sto "std::cout"
+std::cout << $0
+endsnippet
+
+snippet sso "std::ostringstream"
+std::ostringstream ${1:oss};
+oss << ${VISUAL}$0
+endsnippet
+
+
+
+#=======================================================================================================================
+# Skeleton                                                                                                          {{{1
+##
+snippet _skel "Template for new files" b
+#include <iostream>
+
+using namespace std;
+
+int main(${1: int argc, const char *argv[] }){
+$0
+}
+endsnippet
+
 
 
 # vim:ft=snippets:

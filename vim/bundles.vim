@@ -37,10 +37,12 @@ call plug#('glts/vim-textobj-comment',         {'on': '<Plug>(textobj-comment'})
 call plug#('kana/vim-textobj-entire',          {'on': '<Plug>(textobj-entire'})
 call plug#('kana/vim-textobj-function',        {'on': '<Plug>(textobj-function'})
 call plug#('kana/vim-textobj-indent',          {'on': '<Plug>(textobj-indent'})
+call plug#('kana/vim-textobj-line',            {'on': '<Plug>(textobj-line'})
 call plug#('saihoooooooo/vim-textobj-space',   {'on': '<Plug>(textobj-space'})
-call plug#('tommcdo/vim-express')
+" call plug#('tommcdo/vim-express')
 
 " Completion/Text insertion --------------------------------------------------------------------------------------------
+call plug#('dawikur/algorithm-mnemonics.vim',  {'for': 'cpp'})
 call plug#('lifepillar/vim-mucomplete')
 call plug#('Raimondi/delimitMate')
 call plug#('tpope/vim-endwise')
@@ -71,6 +73,7 @@ call plug#('kshenoy/vim-signature')
 call plug#('tpope/vim-surround')
 call plug#('tpope/vim-unimpaired')
 call plug#('tpope/vim-vinegar')
+call plug#('octol/vim-cpp-enhanced-highlight', {'for': 'cpp'})
 
 " FileTypes ------------------------------------------------------------------------------------------------------------
 call plug#('WeiChungWu/vim-SystemVerilog',     {'for': 'systemverilog'})
@@ -86,22 +89,40 @@ call plug#end()
 " Plugins - Settings ===================================================================================================
 " ale ------------------------------------------------------------------------------------------------------------- {{{1
 let g:ale_lint_on_enter=0
+" let g:ale_open_list='never'
+" let g:ale_set_quickfix=0
+
 let g:ale_sign_error='✗ '
 let g:ale_sign_style_error='✠ '
+" let g:ale_sign_warning='⚠ '
 let g:ale_sign_warning='! '
 " let g:syntastic_error_symbol='✗✗'
 " let g:syntastic_style_error_symbol='✠✠'
 " let g:syntastic_warning_symbol='∆∆'
 " let g:syntastic_style_warning_symbol='≈≈'
 
+let g:ale_echo_msg_format = '%linter%: %s'
+
+let g:ale_cpp_clang_options = '-std=c++14'
+
 " Initialize list if it doesn't exist
 let g:ale_cpp_clangtidy_checks = get(g:, 'ale_cpp_clangtidy_checks', [])
 call add(g:ale_cpp_clangtidy_checks, '-google-build-using-namespace')
-call add(g:ale_cpp_clangtidy_checks, '-llvm-header-guard')
+call add(g:ale_cpp_clangtidy_checks, 'llvm-header-guard')
+call add(g:ale_cpp_clangtidy_checks, 'modernize-*')
+call add(g:ale_cpp_clangtidy_checks, 'cpp-core-guidelines-*')
 
-nmap <leader>cp <Plug>my(ale_previous_wrap)
-nmap <leader>cn <Plug>my(ale_next_wrap)
-nmap <leader>cd <Plug>my(ale_detail)
+let g:ale_linters = {
+\ 'cpp': ['clang']
+\ }
+
+nnoremap [s  :ALEPreviousWrap<CR>
+nnoremap ]s  :ALENextWrap<CR>
+nnoremap [S  :ALEFirst<CR>
+nnoremap ]S  :ALENext<CR>
+nnoremap =s  :ALELint<CR>
+nnoremap =S  :ALEDetail<CR>
+nnoremap coS :ALEToggle<CR>
 
 
 " AutoComplPop ---------------------------------------------------------------------------------------------------- {{{1
@@ -119,6 +140,17 @@ nmap gcc <Plug>CommentaryLine
 augroup Commentary
   autocmd FileType xdefaults let &commentstring='!%s'
 augroup END
+
+
+" vim-cpp-enhanced-highlight -------------------------------------------------------------------------------------- {{{1
+let g:cpp_class_scope_highlight           = 1
+let g:cpp_member_variable_highlight       = 1
+let g:cpp_class_decl_highlight            = 1
+let g:cpp_experimental_template_highlight = 0
+
+highlight link cCustomFunc   cppStatement
+highlight link cCustomMemvar cppStructure
+highlight link cCustomClass  cCustomClassName
 
 
 " CtrlP ----------------------------------------------------------------------------------------------------------- {{{1
@@ -147,7 +179,7 @@ if has('unix')
       \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
       \ 3: ['P4CONFIG', 'echo %s; cd $STEM; cat ' .
              \ '<(p4 have ... | \grep -v "$STEM/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|' .
-             \   'ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)") ' .
+             \   'ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\|meta/\(build_time\|drop2cad\|upf\)\)") ' .
              \ '<(p4 opened ... 2> /dev/null | \grep add | \sed "s/#.*//" | \xargs -I{} -n1 p4 where {}) ' .
              \ '<(cd $STEM/import/avf; p4 have ... | \grep -v "$STEM/import/avf/\(_env\)") ' .
              \ '| \awk "{print \$3}" | sed "s:$STEM/::"'
@@ -200,12 +232,12 @@ let g:ctrlp_prompt_mappings = {
   \ 'PrtCurRight()':      ['<Right>'],
   \ }
 
-map      <leader>j <Plug>my(CtrlP)
+map      <leader>f <Plug>my(CtrlP)
 nnoremap <silent>  <Plug>my(CtrlP)b :CtrlPBuffer<CR>
 nnoremap <silent>  <Plug>my(CtrlP)a :CtrlPSwitchBasic<CR>
 nnoremap <silent>  <Plug>my(CtrlP)e :CtrlPCurWD<CR>
 nnoremap <silent>  <Plug>my(CtrlP)f :CtrlP<CR>
-nnoremap <silent>  <Plug>my(CtrlP)j :CtrlPMixed<CR>
+nnoremap <silent>  <Plug>my(CtrlP)x :CtrlPMixed<CR>
 nnoremap <silent>  <Plug>my(CtrlP)r :CtrlPMRU<CR>
 nnoremap <silent>  <Plug>my(CtrlP)t :CtrlPTag<CR>
 nnoremap <silent>  <Plug>my(CtrlP)o :CtrlPFunky<CR>
@@ -261,15 +293,15 @@ xmap X   <Plug>(Exchange)
 
 
 " vim-express ----------------------------------------------------------------------------------------------------- {{{1
-function! s:InitVimExpress()
-  " Description: Creates operators upon startup as the plugin might not have beeen loaded at this point
-  MapExpress gs join(sort(split(v:val, '\n')), '')
-endfunction
-
-augroup BundleInit
-  autocmd!
-  autocmd VimEnter * call s:InitVimExpress()
-augroup END
+" function! s:InitVimExpress()
+"   " Description: Creates operators upon startup as the plugin might not have beeen loaded at this point
+"   MapExpress gs join(sort(split(v:val, '\n')), '')
+" endfunction
+"
+" augroup BundleInit
+"   autocmd!
+"   autocmd VimEnter * call s:InitVimExpress()
+" augroup END
 
 
 " FSwitch --------------------------------------------------------------------------------------------------------- {{{1
@@ -306,7 +338,7 @@ let g:indentLine_char = "┊"
 
 " ListToggle ------------------------------------------------------------------------------------------------------ {{{1
 nnoremap coL :LToggle<CR>
-nnoremap coC :QToggle<CR>
+nnoremap coQ :QToggle<CR>
 
 
 " vim-mark -------------------------------------------------------------------------------------------------------- {{{1
@@ -329,6 +361,7 @@ let g:mucomplete#chains = {
   \ 'cpp':     ['path', 'omni', 'keyn', 'dict', 'c-n', 'user', 'ulti', 'tags']
   \ }
 let g:mucomplete#enable_auto_at_startup = 1
+let g:mucomplete#no_popup_mappings = 0
 
 
 " Origami --------------------------------------------------------------------------------------------------------- {{{1

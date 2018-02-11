@@ -104,6 +104,11 @@ augroup Help
   autocmd BufEnter option-window nnoremap <buffer> q :q<CR>
 augroup END
 
+""" g; goes to older position in change list. 
+""" Hence it makes sense to use `; to jump to position of last change instead of `.
+nnoremap `; `.
+nnoremap '; '.
+
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -328,7 +333,7 @@ nnoremap <silent> <leader>g/ :call utils#FindAndList('global', 'normal')<CR>
 vnoremap <silent> <leader>g/ :<C-U>call utils#FindAndList('global', 'visual')<CR>
 
 """ Grep
-command! -nargs=+ -complete=file -bar Grep silent grep! <args>|botright cwindow 20|redraw!
+command! -nargs=+ -complete=file -bar Grep silent grep! <args>|botright cwindow 12|redraw!
 nnoremap g/ :Grep<Space>
 
 """ Keep searches in middle of screen
@@ -377,7 +382,7 @@ vnoremap <silent> <A-d> "_d
 nnoremap <F12> :call utils#UpdateTags()<CR>
 
 """ Execute selection as vimscript
-" vnoremap g: <Esc>:@*<CR>
+vnoremap g: <Esc>:@*<CR>
 
 """ Run perforce diff on current file
 nnoremap <silent> <leader>pd :call perforce#DiffCurrentFile()<CR>

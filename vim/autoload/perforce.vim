@@ -1,5 +1,6 @@
-function! perforce#Checkout(filename)                                                                             " {{{1
+function! perforce#Checkout(force,  ...)                                                                         "{{{1
   " Description: Confirm with the user, then checkout a file from perforce.
+  " Arguments: force - Don't prompt user to confirm if they want to check the file out
 
   " Check that we're not in a regression work-area (not fool-proof)
   if (  ($STEM == "")
@@ -9,22 +10,25 @@ function! perforce#Checkout(filename)                                           
     return
   endif
 
+  let l:filename = (a:0 ? a:1 : expand('%:p'))
   " Filter out if we get any errors while running p4 files eg. opening a file from p4v
-  let l:p4path = substitute(system("p4 files " . a:filename), '#.*$', '', '')
+  let l:p4path = substitute(system("p4 files " . l:filename), '#.*$', '', '')
 
-  if (  ( l:p4path =~ '^//depot' )
-  \  && ( confirm("Checkout from Perforce?", "&Yes\n&No", 1) == 1 )
-  \  )
-    call system("p4 edit " . l:p4path . " > /dev/null")
-    if (v:shell_error == 0)
-      setlocal noreadonly
-      return
+  if (l:p4path =~ '^//depot')
+    if (  a:force
+     \ || (confirm("Checkout from Perforce?", "&Yes\n&No", 1) == 1)
+     \ )
+      call system("p4 edit " . l:p4path . " > /dev/null")
+      if (v:shell_error == 0)
+        setlocal noreadonly
+        return
+      endif
     endif
   endif
 endfunction
 
 
-function! perforce#MergeInit()                                                                                    " {{{1
+function! perforce#MergeInit()                                                                                     "{{{1
   " Description: Sets up merge layout and creates keybindings
   call s:SetupMergeLayout('Original', 'Theirs', 'Yours', 'Merge')
   call s:CreateMergeMaps()
@@ -39,7 +43,7 @@ let s:conflict_END='^<<<<'
 let s:conflict_ANY=s:conflict_ORIGINAL . '\|' . s:conflict_THEIRS . '\|' . s:conflict_YOURS . '\|' . s:conflict_END
 
 
-function! s:SetupMergeLayout(...)                                                                                 " {{{1
+function! s:SetupMergeLayout(...)                                                                                  "{{{1
   " Description: Setup layout for merges
   "              Tab 1: Main window with all 4 panes (Clockwise from top-left)
   "                - Base (Original), Remote (Theirs), Local (Yours) and Merge
@@ -70,77 +74,78 @@ function! s:SetupMergeLayout(...)                                               
   let l:merge  = argv(3)
 
   " Init
-  tabonly|wincmd o
+  silent! tabonly|silent! wincmd o
 
   " Main merging tab
-  exec "b " . l:merge
+  silent! exec "b " . l:merge
   setlocal noreadonly modifiable
   let b:bufname=toupper(l:merge_str)
-  wincmd s
-  wincmd t
-  exec "b " . l:base
+  silent! wincmd s
+  silent! wincmd t
+  silent! exec "b " . l:base
   let b:bufname=toupper(l:base_str)
-  wincmd v
-  exec "b " . l:remote
+  silent! wincmd v
+  silent! exec "b " . l:remote
   let b:bufname=toupper(l:remote_str)
-  wincmd v
-  exec "b " . l:local
+  silent! wincmd v
+  silent! exec "b " . l:local
   let b:bufname=toupper(l:local_str)
   setlocal readonly
-  windo diffthis
+  silent! windo diffthis
   let t:guitablabel='Main'
 
   " Merge - Remote v/s Merge v/s Local
-  exec "tabe " . l:remote
-  wincmd v
-  exec "b " . l:merge
-  wincmd v
-  exec "b " . l:local
-  windo diffthis
+  silent! exec "tabe " . l:remote
+  silent! wincmd v
+  silent! exec "b " . l:merge
+  silent! wincmd v
+  silent! exec "b " . l:local
+  silent! windo diffthis
+  silent! wincmd h
   let t:guitablabel = l:remote_str . ' v/s ' . l:merge_str . ' v/s ' . l:local_str
 
   " Diff - Base vs Remote
-  exec "tabe " . l:base
-  wincmd v
-  exec "b " . l:remote
-  windo diffthis
+  silent! exec "tabe " . l:base
+  silent! wincmd v
+  silent! exec "b " . l:remote
+  silent! windo diffthis
   let t:guitablabel = l:base_str . ' v/s ' . l:remote_str
 
   " Diff - Base vs Local
-  exec "tabe " . l:base
-  wincmd v
-  exec "b " . l:local
-  windo diffthis
+  silent! exec "tabe " . l:base
+  silent! wincmd v
+  silent! exec "b " . l:local
+  silent! windo diffthis
   let t:guitablabel = l:base_str . ' v/s ' . l:local_str
 
   " Diff - Remote vs Local
-  exec "tabe " . l:remote
-  wincmd v
-  exec "b " . l:local
-  windo diffthis
+  silent! exec "tabe " . l:remote
+  silent! wincmd v
+  silent! exec "b " . l:local
+  silent! windo diffthis
   let t:guitablabel = l:remote_str . ' v/s ' . l:local_str
 
   " Diff - Remote vs Merge
-  exec "tabe " . l:remote
-  wincmd v
-  exec "b " . l:merge
-  windo diffthis
+  silent! exec "tabe " . l:remote
+  silent! wincmd v
+  silent! exec "b " . l:merge
+  silent! windo diffthis
   let t:guitablabel = l:remote_str . ' v/s Merge'
 
   " Diff - Local vs Merge
-  exec "tabe " . l:local
-  wincmd v
-  exec "b " . l:merge
-  windo diffthis
+  silent! exec "tabe " . l:local
+  silent! wincmd v
+  silent! exec "b " . l:merge
+  silent! windo diffthis
   let t:guitablabel = l:local_str . ' v/s Merge'
 
   set columns=400
-  tabdo wincmd =
-  tabfirst
+  silent! tabdo wincmd =
+  silent! tabfirst
 endfunction
 
 
-function! s:ConflictMotion(fwd, ...)                                                                              " {{{1
+function! s:ConflictMotion(fwd, ...)                                                                               "{{{1
   " Description: Jump to the next/previous conflict marker.
   "              The optional argument can be used to specify any additional flags
   let l:flags = 'W' . (a:fwd ? '' : 'b') . get(a:000, 0, '')
@@ -148,7 +153,7 @@ function! s:ConflictMotion(fwd, ...)                                            
 endfunction
 
 
-function! s:ConflictInnerMotion(ai, ...)                                                                          " {{{1
+function! s:ConflictInnerMotion(ai, ...)                                                                           "{{{1
   " Save cursor position in case we're unable to act
   let l:curpos = getcurpos()
   let l:block  = get(a:000, 0, '')
@@ -216,7 +221,7 @@ function! s:ConflictInnerMotion(ai, ...)                                        
 endfunction
 
 
-function! s:DiffGet(block)                                                                                        " {{{1
+function! s:DiffGet(block)                                                                                         "{{{1
   " Save cursor position in case we're unable to act
   let l:curpos  = getcurpos()
   let l:curline = line('.')
@@ -278,7 +283,7 @@ function! s:DiffGet(block)                                                      
 endfunction
 
 
-function! s:DiffGetOriginal()                                                                                     " {{{1
+function! s:DiffGetOriginal()                                                                                      "{{{1
   normal! _d:call s:ConflictInnerMotion('a', 'THEIRS')
   normal! _d:call s:ConflictInnerMotion('a', 'YOURS')
   " Move up to '>>>> ORIGINAL' and delete it
@@ -286,14 +291,14 @@ function! s:DiffGetOriginal()                                                   
   delete _
 endfunction
 
-function! s:DiffGetTheirs()                                                                                       " {{{1
+function! s:DiffGetTheirs()                                                                                        "{{{1
   normal! _d:call s:ConflictInnerMotion('a', 'ORIGINAL')
   " Delete '==== THEIRS'
   delete _
   normal! _d:call s:ConflictInnerMotion('a', 'YOURS')
 endfunction
 
-function! s:DiffGetYours()                                                                                        " {{{1
+function! s:DiffGetYours()                                                                                         "{{{1
   normal! _d:call s:ConflictInnerMotion('a', 'ORIGINAL')
   normal! _d:call s:ConflictInnerMotion('a', 'THEIRS')
   " Delete '==== YOURS'
@@ -304,7 +309,7 @@ function! s:DiffGetYours()                                                      
 endfunction
 
 
-function! s:CreateMergeMaps()                                                                                     " {{{1
+function! s:CreateMergeMaps()                                                                                      "{{{1
   noremap <silent> [C :call <SID>ConflictMotion(0)<CR>
   noremap <silent> ]C :call <SID>ConflictMotion(1)<CR>
 
@@ -323,7 +328,7 @@ function! s:CreateMergeMaps()                                                   
 endfunction
 
 
-function! perforce#DiffCurrentFile()                                                                              " {{{1
+function! perforce#DiffCurrentFile()                                                                               "{{{1
   " Save current settings
   let l:autoread=&l:autoread
 
@@ -331,7 +336,7 @@ function! perforce#DiffCurrentFile()                                            
   setl autoread
 
   " Execute command
-  silent execute "!p4 diff " . expand('%:p')
+  silent execute '!p4 diff "%"'
 
   " Restore settings
   let &l:autoread=l:autoread
