@@ -1,6 +1,7 @@
-function! perforce#Checkout(force,  ...)                                                                         "{{{1
+function! perforce#Checkout(...)                                                                                  " {{{1
   " Description: Confirm with the user, then checkout a file from perforce.
-  " Arguments: force - Don't prompt user to confirm if they want to check the file out
+  " Arguments: "-prompt"  - Optional. Prompt the user to confirm if they want to check the file out
+  "            <filename> - Optional. If not provided, checkout the current file
 
   " Check that we're not in a regression work-area (not fool-proof)
   if (  ($STEM == "")
@@ -10,19 +11,35 @@ function! perforce#Checkout(force,  ...)                                        
     return
   endif
 
-  let l:filename = (a:0 ? a:1 : expand('%:p'))
+  let l:prompt = 0
+
+  let l:opts = copy(a:000)
+  let l:idx = 0
+  for opt in l:opts
+    if opt == "-prompt"
+      let l:prompt = 1
+      call remove(l:opts, idx)
+      break
+    endif
+    let l:idx = l:idx + 1
+  endfor
+
+  let l:filename = (len(l:opts) > 0 ? l:opts[0] : expand('%:p'))
   " Filter out if we get any errors while running p4 files eg. opening a file from p4v
   let l:p4path = substitute(system("p4 files " . l:filename), '#.*$', '', '')
 
   if (l:p4path =~ '^//depot')
-    if (  a:force
-     \ || (confirm("Checkout from Perforce?", "&Yes\n&No", 1) == 1)
+    if (  l:prompt
+     \ && (confirm("Checkout from Perforce?", "&Yes\n&No", 1) == 0)
      \ )
-      call system("p4 edit " . l:p4path . " > /dev/null")
-      if (v:shell_error == 0)
-        setlocal noreadonly
-        return
-      endif
+      setlocal nomodifiable
+      return
+    endif
+
+    call system("p4 edit " . l:p4path . " > /dev/null")
+    if (v:shell_error == 0)
+      setlocal noreadonly
+      return
     endif
   endif
 endfunction
