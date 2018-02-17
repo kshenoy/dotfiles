@@ -418,7 +418,7 @@ if has('autocmd')
   " Perforce related
   augroup Perforce
     autocmd!
-    autocmd FileChangedRO * call perforce#Checkout(0, expand('<afile>:p'))
+    autocmd FileChangedRO * call perforce#Checkout("-prompt", expand('<afile>:p'))
   augroup END
 
   " Diff related
