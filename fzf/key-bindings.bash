@@ -1,4 +1,4 @@
-# __fzf_select__() {                                                                                              # {{{1
+# __fzf_select__() {                                                                                               #{{{1
 #   local _cmd=""
 #   if [[ -n "${STEM}" ]] && [[ $PWD =~ ^${STEM} ]]; then
 #     _cmd='cat <(p4 have $STEM/... | \
@@ -37,7 +37,7 @@
 
 
 unset -f __fzf_select__
-__fzf_select__() {                                                                                                # {{{1
+__fzf_select__() {                                                                                                 #{{{1
   local cmd=""
   if [[ -n "${STEM}" ]]; then
     cmd='cat <(p4 have $STEM/... | \
@@ -64,7 +64,7 @@ __fzf_select__() {                                                              
 
 
 unset -f __fzf_cd__
-__fzf_cd__() {                                                                                                    # {{{1
+__fzf_cd__() {                                                                                                     #{{{1
   local cmd dir
   if [[ -n "${STEM}" ]] && [[ $PWD =~ ^${STEM} ]]; then
     cmd='command find $STEM -mindepth 1 \
@@ -81,7 +81,7 @@ __fzf_cd__() {                                                                  
 }
 
 
-unset -f __fzf_lsf_bjobs__                                                                                        # {{{1
+unset -f __fzf_lsf_bjobs__                                                                                         #{{{1
 __fzf_lsf_bjobs__() {
   local selected=$(lsf_bjobs -w | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m --header-lines=1 "$@" | cut -d ' ' -f1 | while read -r item; do
     printf '%q ' "$item"
@@ -93,7 +93,7 @@ __fzf_lsf_bjobs__() {
 
 
 unset -f __fzf_p4_walist__
-__fzf_p4_walist__() {                                                                                             # {{{1
+__fzf_p4_walist__() {                                                                                              #{{{1
   local cmd=wa_list
   local dir=$(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m)
 
@@ -103,7 +103,7 @@ __fzf_p4_walist__() {                                                           
 }
 
 
-unset -f __fzf_p4_opened__                                                                                        # {{{1
+unset -f __fzf_p4_opened__                                                                                         #{{{1
 __fzf_p4_opened__() {
   cmd='p4 opened | sed -r -e "s/#.*$//" -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::"'
 
@@ -116,7 +116,36 @@ __fzf_p4_opened__() {
 }
 
 
-# __fzf_bookmarks__() {                                                                                           # {{{1
+unset -f __fzf_cmd_opts__                                                                                          #{{{1
+__fzf_cmd_opts__() {
+  cmd=$(awk '{print $NF}' <<< "${READLINE_LINE:0:$READLINE_POINT}")
+  # echo "Cmd=$cmd"
+  if [[ ! -x $(which $cmd) ]]; then
+    return
+  fi
+
+  local selected=$(eval "${cmd} -h" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" | while read -r item; do
+  printf '%q ' $(echo "$item" | awk '{print $1}')
+  done; echo)
+
+  if [[ "${READLINE_LINE:$(($READLINE_POINT-1)):1}" != " " ]]; then
+    # If cursor doesn't have a space before it, add one
+    # echo "Needs space before cursor"
+    selected=" ${selected}"
+  fi
+
+  if [[ "${READLINE_LINE:$READLINE_POINT:1}" == " " ]]; then
+    # If cursor has a space after it, remove last space from selected
+    # echo "Removing space after cursor"
+    selected="${selected% }"
+  fi
+
+  READLINE_LINE="${READLINE_LINE:0:READLINE_POINT}${selected}${READLINE_LINE:$READLINE_POINT}"
+  READLINE_POINT=$((READLINE_POINT + ${#selected}))
+}
+
+
+# __fzf_bookmarks__() {                                                                                            #{{{1
 #   local _cmd="cat <(command find -L ~/Notes -type f -name '*.org' 2> /dev/null) ~/bookmarks"
 
 #   local _out=($(eval "$_cmd | sed "s:${HOME}:~:g" | fzf -m --expect=alt-v,alt-e"))
@@ -157,11 +186,15 @@ else
   # Alt+C: cd into the selected directory
   bind '"\C-t\ec": " \C-e\C-u`__fzf_cd__`\e\C-e\er\C-m"'
   # Alt+W: List all perforce workareas
-  bind '"\C-t\ew": " \C-e\C-u`__fzf_p4_walist__`\e\C-e\er\C-m"'
+  bind '"\C-t\C-g\ew": " \C-e\C-u`__fzf_p4_walist__`\e\C-e\er\C-m"'
   # Ctrl+O: Show list of opened files in current perforce workarea
-  bind -x '"\C-t\C-o": "__fzf_p4_opened__"'
+  bind -x '"\C-t\C-g\C-o": "__fzf_p4_opened__"'
   # Ctrl+L: Show list of LSF jobs
-  bind -x '"\C-t\C-l": "__fzf_lsf_bjobs__"'
+  bind -x '"\C-t\C-g\C-l": "__fzf_lsf_bjobs__"'
+  # Ctrl+H: Show list of options of the command before the cursor using '<cmd> -h'
+  bind -x '"\C-t\C-o": "__fzf_cmd_opts__"'
+  # Ctrl+G Ctrl+E: Experimental
+  # bind -x '"\C-t\C-g\C-e": "__fzf_expt__"'
 
   # Alt+/: From http://brettterpstra.com/2015/07/09/shell-tricks-inputrc-binding-fun/
   bind '"\C-t\e/": "$(!!|FZF_DEFAULT_OPTS=\"--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS\" fzf -m)\C-a \C-m\C-m"'
