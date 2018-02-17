@@ -205,7 +205,7 @@ HISTFILESIZE=65535
 HISTTIMEFORMAT="%F %T  "
 HISTCONTROL=ignoreboth #same as export HISTCONTROL=ignoredups:ignorespace
 # Ignore duplicates and trivial one- and two-char commands
-HISTIGNORE='?:??:history*:sosa:sosc:sosf:sosp:cd:que*:lla*:=*'
+HISTIGNORE='?:??:history*:sosa:sosc:sosf:sosp:cd:que*:lla*'
 HOSTNAME="$(hostname)"
 # Keeps history forever. Requires PROMPT_COMMAND='history -a; history -r'
 # Moving this to PROMPT_COMMAND to keep the HISTFILE current when sessions span multiple days

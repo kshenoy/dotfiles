@@ -159,12 +159,12 @@ grep() { command grep -sP --color=always "$@"; }
 # If Ag/Pt/Ack exists, use it!!
 if hash ag 2> /dev/null; then
   g()     { ag -z "$@"; }
-  gtc()   { ag --cpp; }
-  gtch()  { ag -G "\.(h|hh|hpp|tpp)$"; }
-  gtcc()  { ag -G "\.(c|cc|cpp|C|CC)$"; }
-  gtsv()  { ag -G "\.(sv|svh)$"; }
-  gtv()   { ag -G "\.(v|x)$"; }
-  gtsbs() { ag -G "\.sbs$"; }
+  gtc()   { ag --cpp "$@"; }
+  gtch()  { ag -G "\.(h|hh|hpp|tpp)$" "$@"; }
+  gtcc()  { ag -G "\.(c|cc|cpp|C|CC)$" "$@"; }
+  gtsv()  { ag -G "\.(sv|svh)$" "$@"; }
+  gtv()   { ag -G "\.(v|x)$" "$@"; }
+  gtsbs() { ag -G "\.sbs$" "$@"; }
 elif hash pt 2> /dev/null; then
   g()     { pt "$@"; }
 elif hash ack 2> /dev/null; then

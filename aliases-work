@@ -65,8 +65,8 @@ alias trapbug='P4DIFF= s_trapbug -bug'
 
 # Misc
 alias rr='~/bin/rerun'
-alias rrb='rr --norun --build'
-alias rrbr='rr --build'
+alias rrb='rr --norun --build --recompile'
+alias rrbr='rr --build --recompile'
 alias rrc='rr --norun --clean'
 alias rrca='build -clean_all'
 alias rrcb='rr --norun --clean --build --recompile'
@@ -466,11 +466,11 @@ rgsig() {
 
 unset -f rgww
 rgww() {
-  for i in `g FAIL ${REPO_PATH+$REPO_PATH/}release_gate_tmp/release_gate.log | colm -1`; do
+  for i in $(command grep FAIL ${REPO_PATH+$REPO_PATH/}release_gate_tmp/release_gate.log | colm -1); do
     local _sim=${i##*release_gate_tmp/}
     _sim=${_sim%%/*}
     echo -e "\n${_sim}";
-    pww $i;
+    pww $i | sed 's:/.*/\(release_gate_tmp/\):$STEM/\1:'
   done
 }
 
