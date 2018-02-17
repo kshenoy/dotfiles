@@ -260,17 +260,21 @@ for i in \
   ~/.dotfiles/bash/bashrc-prompt        \
   ~/.bashrc_local                       \
   ~/.dotfiles/aliases                   \
-  ~/.fzf.bash                           \
+  ~/.dotfiles/fzf/fzf.bash              \
   ~/.dotfiles/tmux/tmux_completion_bash \
-  ; do
+; do
   if [[ -f ${i} ]]; then
   # echo "  Sourcing ${i} ..."
   . ${i}
   # echo "  ... done"
   fi
 done
-# }}}1
 
+# thefuck: https://github.com/nvbn/thefuck
+if [[ -x $(command which thefuck 2> /dev/null) ]]; then
+  eval $(thefuck --alias fk)
+fi
+# }}}1
 
 # Base16 Color scheme for terminal
 BASE16_SHELL=$HOME/.config/base16-shell
@@ -280,19 +284,21 @@ BASE16_SHELL=$HOME/.config/base16-shell
 #=======================================================================================================================
 # PATH                                                                                                              {{{1
 #=======================================================================================================================
-# Keep PATH customizations at the end
-# Ruby gem path
 if ((which ruby &> /dev/null) && (which gem &> /dev/null)); then
-  PATH="$(ruby -rubygems -e 'puts Gem.user_dir')/bin":$PATH
+  rubyGemPath="$(ruby -rubygems -e 'puts Gem.user_dir')/bin"
 fi
-PATH=${HOME}/bin:$PATH
-
-for dir in /usr/man /usr/share/man; do
-  if [[ -d $dir ]]; then
-    MANPATH=$MANPATH:$dir
+for path in "$rubyGemPath" "${HOME}/.local/bin" "${HOME}/bin"; do
+  if [[ -d "$path" ]] && [[ ! "$PATH" == *$path* ]]; then
+    export PATH=$path:$PATH
   fi
 done
+unset rubyGemPath
 
+for path in /usr/man /usr/share/man ${HOME}/.local/man; do
+  if [[ -d "$path" ]] && [[ ! "$MANPATH" == *$path* ]]; then
+    MANPATH=$path:$MANPATH
+  fi
+done
 
 # Automatically add completion for all aliases to commands having completion functions. Should be called at the end
 alias_completion

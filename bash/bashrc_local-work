@@ -4,10 +4,16 @@
 #
 # This file is used only for local settings
 export TZ="US/Mountain"
-[[ -d $HOME/install/fzf ]] && export FZF_PATH="$HOME/install/fzf"
+
+# fzf: https://github.com/junegunn/fzf
+[[ -d $HOME/.local/install/fzf ]] && export FZF_PATH="$HOME/.local/install/fzf"
 
 # Putting this before ruby because ruby binary is in pandora
-PATH=/tool/pandora64/bin:/tool/pandora/bin:$PATH
+for path in /tool/pandora64/bin /tool/pandora/bin; do
+  if [[ -d "$path" ]] && [[ ! "$PATH" == *$path* ]]; then
+    export PATH=$path:$PATH
+  fi
+done
 
 complete -f -o default -X '!*.xml' ljd
 complete -f -o default -X '!*.vv' vv
