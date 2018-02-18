@@ -1,6 +1,7 @@
-function! perforce#Checkout(force,  ...)                                                                         "{{{1
+function! perforce#Checkout(...)                                                                                   "{{{1
   " Description: Confirm with the user, then checkout a file from perforce.
-  " Arguments: force - Don't prompt user to confirm if they want to check the file out
+  " Arguments: -force   - Prompt user to confirm if they want to check the file out
+  "            filename - If not specified, checkout the current file
 
   " Check that we're not in a regression work-area (not fool-proof)
   if (  ($STEM == "")
@@ -10,21 +11,38 @@ function! perforce#Checkout(force,  ...)                                        
     return
   endif
 
-  let l:filename = (a:0 ? a:1 : expand('%:p'))
-  " Filter out if we get any errors while running p4 files eg. opening a file from p4v
-  let l:p4path = substitute(system("p4 files " . l:filename), '#.*$', '', '')
-
-  if (l:p4path =~ '^//depot')
-    if (  a:force
-     \ || (confirm("Checkout from Perforce?", "&Yes\n&No", 1) == 1)
-     \ )
-      call system("p4 edit " . l:p4path . " > /dev/null")
-      if (v:shell_error == 0)
-        setlocal noreadonly
-        return
-      endif
+  let l:prompt=0
+  let l:args = copy(a:000)
+  for i in range(len(l:args))
+    if (l:args[i] == "-force")
+      let l:prompt=1
+      remove(l:args, i)
+      break
     endif
+  endfor
+
+  if (len(l:args) == 0)
+    call add(l:args, expand('%:p'))
   endif
+
+  " Filter out if we get any errors while running p4 files eg. opening a file from p4v
+  for l:filename in l:args
+    let l:p4path = substitute(system("p4 files " . l:filename), '#.*$', '', '')
+
+    if (  l:p4path !~ '^//depot')
+     \ || (  l:prompt
+       \  && (confirm("Checkout from Perforce?", "&Yes\n&No", 1) == 0)
+       \  )
+      setlocal nomodifiable
+      return
+    endif
+
+    call system("p4 edit " . l:p4path . " > /dev/null")
+    if (v:shell_error == 0)
+      setlocal noreadonly
+      return
+    endif
+  endfor
 endfunction
 
 
