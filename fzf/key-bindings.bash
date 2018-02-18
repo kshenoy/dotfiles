@@ -36,62 +36,12 @@
 # }
 
 
-unset -f __fzf_select__
-__fzf_select() {                                                                                                   #{{{1
-  local cmd=""
-  if [[ -n "${STEM}" ]]; then
-    cmd='cat <(p4 have $STEM/... | \
-                 command grep -v "$STEM/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)") \
-             <(p4 opened $STEM/... 2> /dev/null | command grep add | command sed "s/#.*//" | command xargs -I{} -n1 p4 where {}) \
-             <(cd $STEM/import/avf; p4 have ... | command grep -v "$STEM/import/avf/\(_env\)") \
-         | command awk "{print \$3}" | command sed "s:$STEM/::"'
-
-    eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" | while read -r item; do
-      printf '$STEM/%q ' "$item"
-    done
-  else
-    cmd="${FZF_CTRL_T_COMMAND:-"command find -L . -mindepth 1 \\( -path '*/\\.*' -o -fstype 'sysfs' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
-     -o -type f -print \
-     -o -type d -print \
-     -o -type l -print 2> /dev/null | cut -b3-"}"
-
-    eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" | while read -r item; do
-      printf '%q ' "$item"
-    done
-  fi
-  echo
+fzf-lsf-bjobs() {                                                                                                  #{{{1
+  FZF_CTRL_T_COMMAND='lsf_bjobs -w' fzf-file-widget
 }
 
 
-unset -f __fzf_cd__
-__fzf_cd() {                                                                                                       #{{{1
-  local cmd dir
-  if [[ -n "${STEM}" ]] && [[ $PWD =~ ^${STEM} ]]; then
-    cmd='command find $STEM -mindepth 1 \
-      -type d \( -path $STEM/_env -o -path $STEM/emu -o -path $STEM/env_squash -o -path $STEM/import -o \
-        -path $STEM/powerPro -o -path $STEM/sdpx \) -prune \
-      -o -type d -print 2> /dev/null | sed "s:$STEM/::"'
-    dir="$STEM/"$(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m)
-  else
-    cmd="${FZF_ALT_C_COMMAND:-"command find -L . -mindepth 1 \\( -path '*/\\.*' -o -fstype 'sysfs' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
-      -o -type d -print 2> /dev/null | cut -b3-"}"
-    dir=$(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m)
-  fi
-  printf 'cd %q' "$dir"
-}
-
-
-__fzf_lsf_bjobs() {                                                                                                #{{{1
-  local selected=$(lsf_bjobs -w | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m --header-lines=1 "$@" | cut -d ' ' -f1 | while read -r item; do
-    printf '%q ' "$item"
-  done; echo)
-
-  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
-  READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
-}
-
-
-__fzf_cmd_opts() {                                                                                               #{{{1
+__fzf_cmd_opts__() {                                                                                               #{{{1
   # echo ">>>${READLINE_LINE}<<< Point=${READLINE_POINT}"
 
   cmd=$(awk '{print $NF}' <<< "${READLINE_LINE:0:$READLINE_POINT}")
@@ -156,6 +106,10 @@ __fzf_cmd_opts() {                                                              
 # }}}1
 
 
+# Info on bind usage: https://stackoverflow.com/a/47878915/734153
+# bind -X : List all key sequences bound to shell commands (using -x)
+#      -S : Display readline key sequences bound to macros and the strings they output
+#
 # Unbind the default key used by FZF
 bind '"\C-t": nop'
 bind '"\ec":  nop'
@@ -166,23 +120,26 @@ if [[ -o vi ]]; then
   fi
 else
   if (( $BASH_VERSINFO > 3 )); then
-    bind -x '"\C-t\C-t": "fzf-file-widget"'
+    # bind -x '"\C-t\C-t": "fzf-file-widget"'
+    bind -x '"\C-t\C-t": "fzf-vcs-files"'
   fi
 
   # Alt+C: cd into the selected directory
-  bind '"\C-t\ec": " \C-e\C-u`__fzf_cd`\e\C-e\er\C-m"'
+  bind '"\C-t\C-d": " \C-e\C-u`__fzf_cd__`\e\C-e\er\C-m"'
 
-  bind -x '"\C-t\C-g\C-l": "__fzf_lsf_bjobs"'
+  bind -x '"\C-t\C-l": "fzf-lsf-bjobs"'
 
   # Ctrl+O: Show list of options of the command before the cursor using '<cmd> -h'
-  bind -x '"\C-t\C-o": "__fzf_cmd_opts"'
+  bind -x '"\C-t\C-o": "__fzf_cmd_opts__"'
 
   # Ctrl+G Ctrl+E: Experimental
-  # bind -x '"\C-t\C-g\C-e": "__fzf_expt"'
+  # bind -x '"\C-t\C-g\C-e": "__fzf_expt__"'
 
   # Version-control
-  bind -x '"\C-t\C-p\C-o": "__fzf_p4_opened"'
-  bind '"\C-t\C-p\C-w": " \C-e\C-u`__fzf_p4_walist`\e\C-e\er\C-m"'
+  bind -x '"\C-t\C-p\C-f": "fzf-vcs-files"'
+  bind -x '"\C-t\C-p\C-o": "fzf-p4-opened"'
+  bind '"\C-t\C-p\C-d": " \C-e\C-u`__fzf_vcs_cd__`\e\C-e\er\C-m"'
+  bind '"\C-t\C-p\C-w": " \C-e\C-u`__fzf_p4_walist__`\e\C-e\er\C-m"'
 
   bind '"\er": redraw-current-line'
   bind '"\C-t\C-p\C-d": "$(fzf-git-diffs)\e\C-e\er"'

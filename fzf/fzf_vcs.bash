@@ -1,7 +1,10 @@
 #!/usr/bin/env sh
 
 is_in_git_repo() {                                                                                                 #{{{1
-  git rev-parse HEAD > /dev/null 2>&1
+  git rev-parse HEAD &> /dev/null
+}
+is_in_perforce_repo() {                                                                                            #{{{1
+  p4 info &> /dev/null
 }
 
 
@@ -56,23 +59,43 @@ fzf-git-remotes() {                                                             
 }
 
 
-__fzf_p4_opened() {                                                                                                #{{{1
-  cmd='p4 opened | sed -r -e "s/#.*$//" -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::"'
-
-  local selected=$(eval "$cmd" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" | while read -r item; do
-    printf '$STEM/%q ' "$item"
-  done; echo)
-
-  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
-  READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
+fzf-p4-opened() {                                                                                                  #{{{1
+  FZF_CTRL_T_COMMAND='p4 opened | sed -r -e "s/#.*$//" -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::"' \
+    fzf-file-widget
 }
 
 
-__fzf_p4_walist() {                                                                                                #{{{1
-  local cmd=wa_list
-  local dir=$(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m)
+__fzf_p4_walist__() {                                                                                              #{{{1
+  FZF_ALT_C_COMMAND='wa_list' __fzf_cd__
+}
 
-  if [[ -n $dir ]]; then
-    printf 'cd %q' "$dir"
+
+__fzf_vcs_cd__() {                                                                                                 #{{{1
+  if is_in_perforce_repo; then
+    FZF_ALT_C_COMMAND='command find $STEM -mindepth 1 \
+      -type d \( -path $STEM/_env -o -path $STEM/emu -o -path $STEM/env_squash -o -path $STEM/import -o \
+        -path $STEM/powerPro -o -path $STEM/sdpx \) -prune \
+      -o -type d -print 2> /dev/null | sed "s:$STEM/::"' __fzf_cd__
   fi
+
+  __fzf_cd__
+}
+
+
+fzf-vcs-files() {                                                                                                  #{{{1
+  if is_in_git_repo; then
+    FZF_CTRL_T_COMMAND='{ git ls-tree -r --name-only HEAD || \
+      find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//; } 2> /dev/null' \
+      fzf-file-widget
+  elif is_in_perforce_repo; then
+    FZF_CTRL_T_COMMAND='cat \
+      <(cd $STEM; p4 have ... | command grep -v "$STEM/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)") \
+      <(cd $STEM; p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" | command xargs -I{} -n1 p4 where {}) \
+      <(cd $STEM/import/avf; p4 have ... | command grep -v "$STEM/import/avf/\(_env\)") \
+      | command awk "{print \$3}" | command sed "s:$STEM/::"' \
+      fzf-file-widget
+  else
+    fzf-file-widget
+  fi
+  echo
 }
