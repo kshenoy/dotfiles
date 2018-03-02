@@ -606,117 +606,42 @@ From /u/xah on reddit
                                        (setq flycheck-clang-language-standard "c++14"))))
 #+END_SRC
 
-** helm
-[[http://tuhdo.github.io/helm-intro.html][Introduction to Helm by reddit:/u/tuhdo]]
-
+** ivy
 #+BEGIN_SRC emacs-lisp
-  (use-package helm
-    ;; :disabled
-    :diminish helm-mode
+  (use-package ivy
+    :diminish (ivy-mode . "")
+    :config
+    (ivy-mode 1)
+    (setq ivy-count-format "%d/%d "
+          ivy-height 12
+          ivy-extra-directories nil
+          ivy-use-virtual-buffers t)
 #+END_SRC
 
-*** :init
+From [[https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-ivy.el][kaushalmodi's repo]]
 #+BEGIN_SRC emacs-lisp
-  :init
-  (require 'helm-config)
+  (defun my/ivy-set-prompt-text-properties (prompt std-props)
+    "Add a different face for the \"<..>\" string in `counsel-set-variable'."
+    (ivy--set-match-props prompt "<\\(.*\\)>"
+                          `(face font-lock-string-face ,@std-props) 1)
+    (ivy-set-prompt-text-properties-default prompt std-props))
 
-  (setq helm-quick-update                     t   )
-  (setq helm-idle-delay                       0.0 )
-  (setq helm-input-idle-delay                 0.01)
-  (setq helm-split-window-in-side-p           t   )  ; open helm buffer inside current window, not occupy whole other window
-  (setq helm-move-to-line-cycle-in-source     t   )  ; move to end or beginning of source when reaching top or bottom of source
-  (setq helm-display-header-line              nil )  ; Disable the header
-
-  (setq helm-M-x-fuzzy-match                  t   )
-  (setq helm-apropos-fuzzy-match              t   )
-  (setq helm-buffers-fuzzy-matching           t   )
-  (setq helm-completion-in-region-fuzzy-match t   )
-  (setq helm-imenu-fuzzy-match                t   )
-  (setq helm-lisp-fuzzy-completion            t   )
-  (setq helm-locate-fuzzy-match               t   )
-  (setq helm-mode-fuzzy-match                 t   )
-  (setq helm-recentf-fuzzy-match              t   )
-  (setq helm-semantic-fuzzy-match             t   )
-
-  (helm-mode t)
-  (helm-autoresize-mode t)
-  (semantic-mode t)
+  (setq ivy-set-prompt-text-properties-function 'my/ivy-set-prompt-text-properties)
 #+END_SRC
 
-*** :config
-#+BEGIN_SRC emacs-lisp
-  :config
-#+END_SRC
-
-**** Remove sub-headers line if only a single source; keep them for multiple sources
-#+BEGIN_SRC emacs-lisp
-  (defvar helm-source-header-default-background (face-attribute 'helm-source-header :background))
-  (defvar helm-source-header-default-foreground (face-attribute 'helm-source-header :foreground))
-  (defvar helm-source-header-default-box        (face-attribute 'helm-source-header :box))
-
-  (defun helm-toggle-header-line ()
-    (if (> (length helm-sources) 1)
-        (set-face-attribute 'helm-source-header nil
-                            :foreground helm-source-header-default-foreground
-                            :background helm-source-header-default-background
-                            :box helm-source-header-default-box
-                            :height 1.0)
-      (set-face-attribute 'helm-source-header nil
-                          :foreground (face-attribute 'helm-selection :background)
-                          :background (face-attribute 'helm-selection :background)
-                          :box nil
-                          :height 0.1)))
-  (add-hook 'helm-before-initialize-hook 'helm-toggle-header-line)
-#+END_SRC
-
-**** helm-descbinds
-#+BEGIN_SRC emacs-lisp
-  (use-package helm-descbinds
-    :init (helm-descbinds-mode t))
-#+END_SRC
-
-Note that helm-descbinds will replace the default /describe-bindings/.
-Thus =C-h b= can be used for it; no need to create a new binding.
-
-*** Keybinds
-Remove the default prefix =C-x c=. Note this is still a part of :config
-#+BEGIN_SRC emacs-lisp
-  (unbind-key "C-x c")
-#+END_SRC
-
-This allows us to create new custom bindings within helm's default map thereby allowing us to use the default keybindings as well
-We redefine /helm-command-prefix/ here
-#+BEGIN_SRC emacs-lisp
-  :bind* (("M-x"   . helm-M-x)
-          ("C-h a" . helm-apropos))
-
-  :bind (("C-c f" . helm-command-prefix)
-         :map       helm-command-map
-         ("b"     . helm-buffers-list)
-         ("f"     . helm-find-files)         ; Find files in the current directory
-         ("i"     . helm-imenu)              ; i - imenu. This is mapped to helm-semantic-or-imenu by default
-                                             ;            This makes more sense though as 'I' is mapped to helm-imenu-in-all-buffers
-         ("m"     . helm-mini)               ; m - mixed
-         ("o"     . helm-semantic-or-imenu)  ; o - outline as helm-semantic-or-imenu provides an outline view
-         ("p"     . helm-projectile)
-         ("/"     . helm-occur))             ; search in all open buffers
-#+END_SRC
-
-=C-x C-s= can be used after =helm-occur= to save the results to a buffer.
-
-Other useful default keybinds:
-|--------------+-----------------------------+-----------------------------------------------------------|
-| <prefix> a   | helm-apropos                | Combination of describe-function, variable, commands etc. |
-| <prefix> i   | helm-semantic-or-imenu      | Similar to outline mode (in vim)                          |
-| <prefix> o   | helm-org-in-buffer-headings | Jump to org section heading                               |
-| <prefix> r   | helm-regexp                 | Construct a regexp                                        |
-| <prefix> C-, | helm-calcul-expression      | Interface to calc command                                 |
-| C-x r b      | helm-filtered-bookmarks     |                                                           |
-|--------------+-----------------------------+-----------------------------------------------------------|
-
-*** use-package END
 #+BEGIN_SRC emacs-lisp
   )
+#+END_SRC
+
+** swiper
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+    :bind* (("C-s"   . swiper)))
+#+END_SRC
+
+** counsel
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel)
 #+END_SRC
 
 ** org
@@ -1588,7 +1513,7 @@ From [[https://www.reddit.com/r/emacs/comments/60nb8b/favorite_builtin_emacs_com
 [[https://github.com/fniessen/emacs-leuven-theme][Github Link]]
 #+BEGIN_SRC emacs-lisp
   (use-package leuven-theme
-    ;; :disabled
+    :disabled
     :config
     (load-theme 'leuven t)
 
@@ -1610,7 +1535,7 @@ Load theme first and then override the colors
 ** base16-theme
 #+BEGIN_SRC emacs-lisp
   (use-package base16-theme
-    :disabled
+    ;; :disabled
     :config
     (load-theme 'base16-solarized-light t)
     (setq evil-normal-state-cursor   '("#719e07" box)
