@@ -253,7 +253,7 @@ auto count = std::count_if(std::begin(${1:${VISUAL:container}}), std::end($1),
 endsnippet
 
 snippet fnd "std::find"
-auto searchIt = std::find(std::begin(${1:${VISUAL:container}}), std::end($1), $0);
+auto searchIt = std::find(std::begin(${1:${VISUAL:container}}), std::end($1), ${0:<value>});
 if (searchIt != std::end($1)) {
 }
 endsnippet

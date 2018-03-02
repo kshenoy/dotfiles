@@ -37,7 +37,7 @@
 
 
 fzf-lsf-bjobs() {                                                                                                  #{{{1
-  FZF_CTRL_T_COMMAND='lsf_bjobs -w' fzf-file-widget
+  FZF_CTRL_T_COMMAND='lsf_bjobs -w' FZF_CTRL_T_OPTS="$FZF_CTRL_T_OPTS --header-lines=1" fzf-file-widget
 }
 
 
@@ -50,7 +50,7 @@ __fzf_cmd_opts__() {                                                            
     return
   fi
 
-  local selected=$(eval "${cmd} --help || ${cmd} -h || ${cmd} -help" | \
+  local selected=$(eval "${cmd} --help || ${cmd} -h || ${cmd} -help || ${cmd} help" | \
     FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf +x -m "$@" | \
     while read -r item; do
       local opts=($item)

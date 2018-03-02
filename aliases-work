@@ -285,21 +285,18 @@ mkwa() {                                                                        
   # echo $_temp
 
   case ${_proj} in
-    as)
-      _proj="aspen"
-      ;;&
-    ah)
-      _proj="aspen_highlands"
-      ;;&
-    br)
-      _proj="breckenridge"
-      ;;&
-    vh)
-      _proj="valhalla"
-      ;;&
-    zn)
-      _proj="zen"
-      ;;&
+    as) _proj="aspen"
+    ;;&
+    ah) _proj="aspen_highlands"
+    ;;&
+    br) _proj="breckenridge"
+    ;;&
+    cb)
+    ;;&
+    vh) _proj="valhalla"
+    ;;&
+    zn) _proj="zen"
+    ;;&
     *)
       if [[ -z "${_proj}" ]]; then
         echo -e "${_fg_red}ERROR${_reset}: Project not specified\n"; _help

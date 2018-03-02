@@ -4,6 +4,7 @@
 #
 # This file is used only for local settings
 export TZ="US/Mountain"
+export BOOST_HOME="/tool/pandora64/.package/boost-1.62.0-gcc620-vg3120"
 
 # fzf: https://github.com/junegunn/fzf
 [[ -d $HOME/.local/install/fzf ]] && export FZF_PATH="$HOME/.local/install/fzf"

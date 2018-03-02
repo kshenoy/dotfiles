@@ -1,28 +1,27 @@
 function! perforce#Checkout(...)                                                                                   "{{{1
   " Description: Confirm with the user, then checkout a file from perforce.
-  " Arguments: -force   - Prompt user to confirm if they want to check the file out
+  " Arguments: -prompt  - Prompt user to confirm if they want to check the file out
   "            filename - If not specified, checkout the current file
 
   " Check that we're not in a regression work-area (not fool-proof)
   if (  ($STEM == "")
    \ || ($STEM =~ 'regr_build\|regrplatform')
    \ )
-    setlocal nomodifiable
     return
   endif
 
   let l:prompt=0
   let l:args = copy(a:000)
   for i in range(len(l:args))
-    if (l:args[i] == "-force")
+    if (l:args[i] == "-prompt")
       let l:prompt=1
-      remove(l:args, i)
+      call remove(l:args, i)
       break
     endif
   endfor
 
   if (len(l:args) == 0)
-    call add(l:args, expand('%:p'))
+    let l:args=add(l:args, expand('%:p'))
   endif
 
   " Filter out if we get any errors while running p4 files eg. opening a file from p4v
@@ -33,7 +32,6 @@ function! perforce#Checkout(...)                                                
      \ || (  l:prompt
        \  && (confirm("Checkout from Perforce?", "&Yes\n&No", 1) == 0)
        \  )
-      setlocal nomodifiable
       return
     endif
 

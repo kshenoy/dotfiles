@@ -10,7 +10,7 @@ alert() {
 #   Use like so: sleep 10 && alert
 
   # Pick up display message if provided as argument. If not show the last command that was run
-  local _msg=${1:-$(fc -nl -1 | sed -e 's/^\s*[0-9]\+\s*//' -e 's/[;&|]\+\s*alert$//')}
+  local _msg=${1:-"'$(fc -nl -1 | sed -e 's/^\s*//' -e 's/\s*[;&|]\+\s*alert$//')' has completed"}
 
   # Add TMUX information if available
   if [[ -n $TMUX ]]; then

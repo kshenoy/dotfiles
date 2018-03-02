@@ -91,7 +91,7 @@ call plug#end()
 let g:ale_lint_on_enter=0
 " let g:ale_open_list='never'
 " let g:ale_set_quickfix=0
-
+let g:ale_set_balloons=0
 let g:ale_sign_error='✗ '
 let g:ale_sign_style_error='✠ '
 " let g:ale_sign_warning='⚠ '
@@ -178,9 +178,9 @@ if has('unix')
       \ 1: ['.git', 'cd %s && git ls-files --cached --exclude-standard --others'],
       \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
       \ 3: ['P4CONFIG', 'echo %s; cd $STEM; cat ' .
-             \ '<(p4 have ... | \grep -v "$STEM/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|' .
+             \ '<(cd $STEM; p4 have ... | \grep -v "$STEM/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|' .
              \   'ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\|meta/\(build_time\|drop2cad\|upf\)\)") ' .
-             \ '<(p4 opened ... 2> /dev/null | \grep add | \sed "s/#.*//" | \xargs -I{} -n1 p4 where {}) ' .
+             \ '<(cd $STEM; p4 opened ... 2> /dev/null | \grep add | \sed "s/#.*//" | \xargs -I{} -n1 p4 where {}) ' .
              \ '<(cd $STEM/import/avf; p4 have ... | \grep -v "$STEM/import/avf/\(_env\)") ' .
              \ '| \awk "{print \$3}" | sed "s:$STEM/::"'
          \ ]

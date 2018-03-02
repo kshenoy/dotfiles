@@ -17,6 +17,7 @@
  spin [OPTIONS]
 
  spin --model <model>
+ spin --job <lsf_job_id>
 
  spin -h|--help|--man
 
@@ -34,6 +35,9 @@
                        By default, the check is performed once every 5mins to prevent loading the lsf_server
 
  Optional Arguments:
+ -a, --alert[=MSG]     Show a notification when the condition succeeds.
+                       If a string is also provided, it'll will be displayed as well.
+ -A, --noalert         Don't show any notifications upon completion
  -i, --interval=I      Wait I seconds before checking again. [Default=60s]
  -n, --num-tries=N     Try N times before giving up. [Default=infinite].
      --while           Spin while the input predicate is true. Runs the provided command when the predicate fails
@@ -88,6 +92,7 @@ sub Alert;
 ## Option Handling =====================================================================================================
 my %opts = (                                                                                                      # {{{1
   'alert'         => 1,
+  'alert_msg_set' => 0,
   'alert_msg'     => "\'Okidoki, job done!\'",
   'interval'      => 60,
   'num_tries'     => -1,
@@ -99,17 +104,24 @@ my %opts = (                                                                    
 
 GetOptions(                                                                                                       # {{{1
   \%opts,
-  'alert|a:s',      => sub { $opts{'alert_msg'} = $_[1] if ($_[1] ne ""); },
+  'alert|a:s',      => sub {
+                             if ($_[1] ne "") {
+                               $opts{'alert_msg'} = $_[1];
+                               $opts{'alert_msg_set'} = 1;
+                             }
+                           },
   'noalert|A',      => sub { $opts{'alert'} = 0; },
-  'interval|i=i'    => sub { $opts{'interval'}      = $_[1];
-                             $opts{'interval_set'}  = 1; },
+  'interval|i=i'    => sub { $opts{'interval'} = $_[1];
+                             $opts{'interval_set'} = 1; },
   'job|j=s'         => sub { pod2usage(
                                -message => "ERROR: Multiple uses of predicate detected."
                                -verbose => 0, -exitval => 1) if $opts{predicate_set};
                              if ($_[1] =~ /^\d+$/) {
-                               $opts{'predicate'}    .= "[[ -z \$(lsf_bjobs 2> /dev/null | command grep $_[1]) ]]";
+                               $opts{'predicate'} .= "[[ -z \$(lsf_bjobs 2> /dev/null | command grep $_[1]) ]]";
+                               $opts{'alert_msg'}  = "LSF job $_[1] has finished" if (!$opts{'alert_msg_set'});
                              } else {
-                               $opts{'predicate'}    .= "[[ -z \$(lsf_bjobs -u $_[1] 2> /dev/null) ]]";
+                               $opts{'predicate'} .= "[[ -z \$(lsf_bjobs -u $_[1] 2> /dev/null) ]]";
+                               $opts{'alert_msg'}  = "All LSF jobs by $_[1] have finished" if (!$opts{'alert_msg_set'});
                              }
                              $opts{'predicate_set'} = 1;
                              $opts{'interval'}      = 60 if (!$opts{'interval_set'});
@@ -120,6 +132,7 @@ GetOptions(                                                                     
                              $opts{'predicate'}    .= '[[ -f $STEM/build/' . $_[1] . '/BUILD_SUCCEEDED ]]';
                              $opts{'predicate_set'} = 1;
                              $opts{'interval'}      = 60 if (!$opts{'interval_set'});
+                             $opts{'alert_msg'}     = "Model $_[1] was built successfully" if (!$opts{'alert_msg_set'});
                        },
   'num-tries|n=i',
   'predicate|p=s'   => sub { pod2usage(
@@ -146,8 +159,11 @@ print Dumper(\%opts) if $opts{'verbose'};
 
 my $n=0;
 do {
-  my $ret = system($opts{'predicate'});
-  Alert(0) if ($ret == 0);
+  if (  (system($opts{'predicate'}) == 0)
+     && $opts{'alert'}
+     ) {
+    # Alert(0);
+  }
 
   $n++;
   sleep $opts{'interval'};
@@ -165,6 +181,6 @@ sub Alert {
   $cmd   .= ($status == 0 ? "terminal" : "error" );
   $cmd   .= " $opts{'alert_msg'}";
 
-  # exec($cmd);
+  exec($cmd);
   exit $status;
 }

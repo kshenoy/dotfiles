@@ -83,7 +83,8 @@ shopt -s dotglob
 
 # If set, the pattern ‘**’ used in a filename expansion context will match all files and zero or more directories and
 # subdirectories. If the pattern is followed by a ‘/’, only directories and subdirectories match.
-shopt -s globstar
+# shopt -s globstar
+# Too slow! - Use the home-grown @ instead (defined in bashrc-func)
 
 # If set, shell error messages are written in the standard GNU error message format.
 # shopt -s gnu_errfmt

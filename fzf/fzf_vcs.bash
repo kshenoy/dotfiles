@@ -60,8 +60,7 @@ fzf-git-remotes() {                                                             
 
 
 fzf-p4-opened() {                                                                                                  #{{{1
-  FZF_CTRL_T_COMMAND='p4 opened | sed -r -e "s/#.*$//" -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::"' \
-    fzf-file-widget
+  FZF_CTRL_T_COMMAND='p4 opened | sed -r -e "s/#.*$//" -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::"' fzf-file-widget
 }
 
 
@@ -94,6 +93,14 @@ fzf-vcs-files() {                                                               
       <(cd $STEM/import/avf; p4 have ... | command grep -v "$STEM/import/avf/\(_env\)") \
       | command awk "{print \$3}" | command sed "s:$STEM/::"' \
       fzf-file-widget
+    # local cmd='cat \
+    #   <(cd $STEM; p4 have ... | command grep -v "$STEM/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)") \
+    #   <(cd $STEM; p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" | command xargs -I{} -n1 p4 where {}) \
+    #   <(cd $STEM/import/avf; p4 have ... | command grep -v "$STEM/import/avf/\(_env\)") \
+    #   | command awk "{print \$3}" | command sed "s:$STEM/::"'
+    # eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" | while read -r item; do
+    #   printf '$STEM/%q ' "$item"
+    # done
   else
     fzf-file-widget
   fi

@@ -130,11 +130,6 @@ alias rm='rm -vi'
 alias rd='rm -rvf'
 alias ln='ln -svi'
 alias df='df -h'
-alias du1='duh 1'
-alias du2='duh 2'
-alias du3='duh 3'
-alias space='du1 .'
-alias spc=space
 alias pppath='tr ":" "\n" <<< $PATH'
 alias clnpath='export PATH=$(tr ":" "\n" <<< $PATH | perl -ne "print unless \$seen{\$_}++" | paste -s -d":")'
 

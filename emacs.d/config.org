@@ -209,7 +209,7 @@ However, the downside to this is that if I have multiple such hooks (like in pri
     (cond ((string-equal (system-name) "ubuntu")
            (when (my/set-font-if-exists "Pragmata Pro Mono-10")
              (setq line-spacing 3)))
-          ((my/set-font-if-exists "Hack-10"))
+          ((my/set-font-if-exists "Iosevka-normal-10"))
           ((eq system-type 'gnu/linux)
            (my/set-font-if-exists "DejaVu Sans Mono-11"))
           ((eq system-type 'windows-nt)
@@ -1217,26 +1217,26 @@ Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mod
            ((tags "PRIORITY=\"A\""
                   ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                    (org-agenda-overriding-header "High-priority unfinished tasks:")))
-            (agenda "" ((org-agenda-span 7)))
+            (agenda "" ((org-agenda-span 14)))
             (alltodo ""
                      ((org-agenda-skip-function '(or (my/org-skip-subtree-if-habit)
                                                      (my/org-skip-subtree-if-priority ?A)
                                                      (org-agenda-skip-if nil '(scheduled deadline))))
                       (org-agenda-overriding-header "ALL normal priority tasks:"))))
+           ((org-agenda-compact-blocks t)))
+          ("w" "Daily agenda and all TODOs for Work"
+           ((tags "PRIORITY=\"A\""
+                  ((org-agenda-tag-filter-preset '("+Work"))
+                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                   (org-agenda-overriding-header "High-priority unfinished tasks:")))
+            (agenda "" ((org-agenda-span 14)))
+            (alltodo ""
+                     ((org-agenda-tag-filter-preset '("+Work"))
+                      (org-agenda-skip-function '(or (my/org-skip-subtree-if-habit)
+                                                     (my/org-skip-subtree-if-priority ?A)
+                                                     (org-agenda-skip-if nil '(scheduled deadline))))
+                      (org-agenda-overriding-header "ALL normal priority tasks:"))))
            ((org-agenda-compact-blocks t)))))
-
-  ;; (org-add-agenda-custom-command
-  ;;  '("w" "Work agenda"
-  ;;    ((tags "PRIORITY=\"A\""
-  ;;           ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-  ;;            (org-agenda-overriding-header "High-priority unfinished tasks:")))
-  ;;     (agenda "" ((org-agenda-span 3)))
-  ;;     (alltodo ""
-  ;;              ((org-agenda-skip-function '(or (my/org-skip-subtree-if-habit)
-  ;;                                              (my/org-skip-subtree-if-priority ?A)
-  ;;                                              (org-agenda-skip-if nil '(scheduled deadline))))
-  ;;               (org-agenda-overriding-header "ALL normal priority tasks:"))))
-  ;;    ((org-agenda-compact-blocks t))))
 #+END_SRC
 
 ***** Keybinds
@@ -1252,10 +1252,10 @@ Use j/k in org-agenda
 
 Open the custom "Daily agenda and all TODOs" directly. From [[http://emacs.stackexchange.com/a/868/9690][Emacs StackExchange]].
 #+BEGIN_SRC emacs-lisp
-  (defun my/org-agenda-show-daily-todos (&optional arg)
+  (defun my/org-agenda-show-work-agenda (&optional arg)
     (interactive "P")
-    (org-agenda arg "d"))
-  (bind-key* "<f12>" 'my/org-agenda-show-daily-todos)
+    (org-agenda arg "w"))
+  (bind-key* "<f12>" 'my/org-agenda-show-work-agenda)
 #+END_SRC
 
 ***** org-agenda END
