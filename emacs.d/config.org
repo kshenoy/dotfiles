@@ -49,7 +49,7 @@ Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/
 :header-args: :tangle yes
 :END:
 ** Keybinds
-By default =C-x == is bound to /what-cursor-position/ but evil maps both =ga= and =g8= to that as well so might as well use it to show something useful.
+By default C-x = is bound to /what-cursor-position/ but evil maps both =ga= and =g8= to that as well so might as well use it to show something useful.
 #+BEGIN_SRC emacs-lisp
   (bind-key* "C-x =" 'describe-char)
 #+end_src
@@ -62,6 +62,8 @@ By default =C-x == is bound to /what-cursor-position/ but evil maps both =ga= an
 
   (bind-key* "<f5>" 'my/revert-buffer-no-confirm)
 #+END_SRC
+
+Use ~key-translation-map~ to /map/ one set of keys to another [[id:f42c3dc8-c2f6-4f22-9f47-0c578479ef67][eg.]]
 
 *** Enable/Disable/Toggle ala vim-unimpaired
 I think the following would be handy
@@ -492,44 +494,12 @@ Placing at top since it'll be used by most of the other packages
     (diminish 'visual-line-mode))
 #+END_SRC
 
-** ace-window
-When more than 2 windows are open, show a home-row character in each window to jump directly to.
-Similar to Tmux's =<prefix> C-g=
-#+BEGIN_SRC emacs-lisp
-  (use-package ace-window
-    :init
-    (setq aw-background t)
-    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j? ?k? ?l))
-    :config
-    (set-face-attribute 'aw-leading-char-face nil :foreground "red" :height 2.5)
-    :bind ("C-x o" . ace-window))
-#+END_SRC
-
-Note that we're rebinding =C-x o=
-
 ** aggressive-indent
 #+BEGIN_SRC emacs-lisp
   (use-package aggressive-indent
     :config
     (global-aggressive-indent-mode t))
 #+END_SRC
-
-** auto-complete
-[[https://github.com/auto-complete/auto-complete/blob/master/doc/manual.md][auto-complete wiki]]
-
-#+BEGIN_SRC emacs-lisp
-  (use-package auto-complete
-    :init
-    (ac-config-default)
-    (global-auto-complete-mode t)
-    :config
-    (setq ac-use-menu-map t)
-    (bind-keys :map ac-menu-map
-               ("C-n" . 'ac-next)
-               ("C-p" . 'ac-previous)))
-#+END_SRC
-
-Use =M-n/C-n= and =M-p/C-p= to move up and down the menu and =M-s= to filter within the completion menu
 
 ** evil
 evil can be toggled using =C-z=
@@ -581,6 +551,9 @@ evil can be toggled using =C-z=
 #+END_SRC
 
 **** Keybinds
+:PROPERTIES:
+:ID:       f42c3dc8-c2f6-4f22-9f47-0c578479ef67
+:END:
 Make /Escape/ quit everything. From [[http://stackoverflow.com/a/10166400/734153][StackOverflow]].
 #+BEGIN_SRC emacs-lisp :tangle no
   (defun my/minibuffer-keyboard-quit ()
@@ -604,7 +577,11 @@ Make /Escape/ quit everything. From [[http://stackoverflow.com/a/10166400/734153
 
 From /u/xah on reddit
 #+BEGIN_SRC emacs-lisp
-  (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
+  (define-key key-translation-map (kbd "ESC")     (kbd "C-g"))
+  (define-key key-translation-map (kbd "C-w C-h") (kbd "C-w h"))
+  (define-key key-translation-map (kbd "C-w C-j") (kbd "C-w j"))
+  (define-key key-translation-map (kbd "C-w C-k") (kbd "C-w k"))
+  (define-key key-translation-map (kbd "C-w C-l") (kbd "C-w l"))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -617,14 +594,6 @@ From /u/xah on reddit
 *** END
 #+BEGIN_SRC emacs-lisp
   )
-#+END_SRC
-
-** avy
-Similar to vim's easy-motion plugin
-#+BEGIN_SRC emacs-lisp
-  (use-package avy
-    :bind (:map evil-normal-state-map
-                ("g s" . avy-goto-char)))
 #+END_SRC
 
 ** flycheck
@@ -708,13 +677,6 @@ Similar to vim's easy-motion plugin
 
 Note that helm-descbinds will replace the default /describe-bindings/.
 Thus =C-h b= can be used for it; no need to create a new binding.
-
-**** helm-projectile
-#+BEGIN_SRC emacs-lisp
-  (use-package helm-projectile
-    :config
-    (helm-projectile-on))
-#+END_SRC
 
 *** Keybinds
 Remove the default prefix =C-x c=. Note this is still a part of :config
@@ -1250,12 +1212,9 @@ Use j/k in org-agenda
              ("k" . org-agenda-previous-item))  ;; Bound to 'org-capture' by default
 #+END_SRC
 
-Open the custom "Daily agenda and all TODOs" directly. From [[http://emacs.stackexchange.com/a/868/9690][Emacs StackExchange]].
+Open the custom "Daily agenda and all TODOs" directly. Based on [[http://emacs.stackexchange.com/a/868/9690][Emacs StackExchange]].
 #+BEGIN_SRC emacs-lisp
-  (defun my/org-agenda-show-work-agenda (&optional arg)
-    (interactive "P")
-    (org-agenda arg "w"))
-  (bind-key* "<f12>" 'my/org-agenda-show-work-agenda)
+  (bind-key* "<f12>" '(lambda (&optional arg) (interactive "P")(org-agenda arg "w")))
 #+END_SRC
 
 ***** org-agenda END
@@ -1312,26 +1271,6 @@ eg. implementation by abo-abo: [[https://github.com/abo-abo/worf/blob/master/wor
       (org-refile)))
 
   (bind-key* "C-c C-w" 'my/org-refile-targets)
-#+END_SRC
-
-**** org-wunderlist
-#+BEGIN_SRC emacs-lisp
-  (use-package org-wunderlist
-    :disabled
-    :init (setq org-wunderlist-file (concat org-directory "Personal/Wunderlist.org")
-                org-wunderlist-dir  (concat user-emacs-directory "tmp/org-wunderlist/")))
-#+END_SRC
-
-Client-ID and Token stored in private.el
-
-**** org-ac
-Autocomplete sources for org mode
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org-ac
-    :init
-    (require 'org-ac)
-    (org-ac/config-default))
 #+END_SRC
 
 **** org-capture
@@ -1515,7 +1454,6 @@ Note that these are still part of the /:config/ block
              ("h" . helm-info-org))
 #+end_src
 
-**** Rebinding
 <<Custom timestamp keymap>>. Also see [[id:d4634d95-be37-4bdf-987e-22da5778e958][Using ! to toggle timestamp type]]
 #+BEGIN_SRC emacs-lisp :tangle no
   (unbind-key "C-c ." org-mode-map)
@@ -1538,8 +1476,7 @@ The mnemonic is that Org leaves =C-c [a-z]= free for the user. Thus, I'm using =
 
 Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
 #+begin_src emacs-lisp
-  :bind (:map org-babel-map
-              ("C-k" . org-babel-remove-result))
+  :bind (:map org-babel-map ("C-k" . org-babel-remove-result))
 #+end_src
 
 *** use-package END
@@ -1548,43 +1485,6 @@ Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-ke
 #+END_SRC
 
 *** TODO Diminish org-indent-mode
-
-** projectile
-#+BEGIN_SRC emacs-lisp
-  (use-package projectile
-    :diminish projectile-mode
-    :init
-    (setq projectile-enable-caching t)
-    (setq projectile-completion-system 'helm)
-    :config
-    (add-to-list 'projectile-other-file-alist '("cc" "h")) ; .cc -> .h
-    (add-to-list 'projectile-other-file-alist '("h" "cc")) ; .h -> .cc
-    (projectile-global-mode)
-#+END_SRC
-
-*** Keybinds
-:PROPERTIES:
-:header-args: :tangle no
-:END:
-
-Unbind the default prefix. Explained [[https://github.com/bbatsov/projectile/issues/991#issuecomment-248026667][here.]]
-#+BEGIN_SRC emacs-lisp
-  (define-key projectile-mode-map projectile-keymap-prefix nil)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-  :bind (("C-x p" . projectile-keymap-prefix)
-         :map       projectile-command-map)
-#+END_SRC
-
-*** use-package END
-#+BEGIN_SRC emacs-lisp
-  )
-#+END_SRC
-
-*** TODO Set .x.v as other file for .x
-This requires including $STEM/build/lv/ch/rtl in .projectile and ignoring .x
-Might need to re-index every time a model is built?
 
 ** rainbow-delimiters
 Use brighter colors
@@ -1707,22 +1607,12 @@ From [[https://www.reddit.com/r/emacs/comments/60nb8b/favorite_builtin_emacs_com
 
 Load theme first and then override the colors
 
-** solarized-theme
+** base16-theme
 #+BEGIN_SRC emacs-lisp
-  (use-package solarized-theme
+  (use-package base16-theme
     :disabled
     :config
-    (load-theme 'solarized-light t)
-
-    ;; (setq solarized-use-variable-pitch nil
-    ;;       solarized-height-minus-1     1.0
-    ;;       solarized-height-plus-1      1.0
-    ;;       solarized-height-plus-2      1.0
-    ;;       solarized-height-plus-3      1.0
-    ;;       solarized-height-plus-4      1.0)
-    (setq solarized-use-less-bold nil)
-    ;; (set-face-attribute 'linum-relative-current-face nil :foreground "#D33682")
-
+    (load-theme 'base16-solarized-light t)
     (setq evil-normal-state-cursor   '("#719e07" box)
           evil-visual-state-cursor   '("#b58900" box)
           evil-insert-state-cursor   '("#268bd2" bar)
@@ -1731,165 +1621,8 @@ Load theme first and then override the colors
           evil-emacs-state-cursor    '("white"   box)))
 #+END_SRC
 
-** base16-theme
-#+BEGIN_SRC emacs-lisp
-  (use-package base16-theme
-    :disabled
-    :config
-    (load-theme 'base16-solarized-light t))
-#+END_SRC
-
 ** TODO hydra
 Ideas in https::/github.com/kana/vim-submode
-
-** TODO linum-relative
-:PROPERTIES:
-:header-args: :tangle no
-:END:
-Relative line-numbers ala vim
-#+BEGIN_SRC emacs-lisp
-  (use-package linum-relative
-    :diminish linum-relative-mode
-    :init
-    (setq linum-relative-current-symbol "")
-    (linum-relative-global-mode t))
-#+END_SRC
-
-*** TODO Figure out why it's necessary to explicitly specify :background for 'linum-relative-current-face
-Shouldn't it inherit from 'linum?
-
-*** TODO Fix ugly gaps in linum-face when lines wrap. [[http://emacs.stackexchange.com/a/897/9690][StackExchange Discussion]]
-#+BEGIN_SRC emacs-lisp
-  (defvar my-linum-gapless-margin-display
-    `((margin left-margin) ,(propertize "     " 'face 'linum))
-    "String used on the margin.")
-
-  (defvar-local my-linum-gapless-margin-overlays nil
-    "List of overlays in current buffer.")
-
-  (defun my-linum-gapless-make-overlay-at (p)
-    "Create a margin overlay at position P."
-    (push (make-overlay p (1+ p)) my-linum-gapless-margin-overlays)
-    (overlay-put
-     (car my-linum-gapless-margin-overlays) 'before-string
-     (propertize " "  'display my-linum-gapless-margin-display)))
-
-  (defun my-linum-gapless-setup-margin-overlays ()
-    "Put overlays on each line which is visually wrapped."
-    (interactive)
-    (let ((ww (- (window-width)
-                 (if (= 0 (or (cdr fringe-mode) 1)) 1 0)))
-          ov)
-      (mapc #'delete-overlay my-linum-gapless-margin-overlays)
-      (save-excursion
-        (goto-char (point-min))
-        (while (null (eobp))
-          ;; On each logical line
-          (forward-line 1)
-          (save-excursion
-            (forward-char -1)
-            ;; Check if it has multiple visual lines.
-            (while (>= (current-column) ww)
-              (my-linum-gapless-make-overlay-at (point))
-              (forward-char (- ww))))))))
-
-  ;; (add-hook 'linum-before-numbering-hook #'my-linum-gapless-setup-margin-overlays)
-#+END_SRC
-
-** TODO macrostep
-Expand a macro and enter macrostep-mode by pressing /C-c m e/.
-Once in macrostep-mode, press /e/ to expand, /c/ to collapse and /q/ to quit
-
-#+BEGIN_SRC emacs-lisp
-  (use-package macrostep
-    :disabled
-    :bind ("C-c m e" . macrostep-expand))
-#+END_SRC
-
-** TODO SLIME
-** TODO evil-snipe
-Replaces avy
-
-** TODO company-mode
-:PROPERTIES:
-:header-args: :tangle no
-:END:
-Autocompletion
-Reduce delay and ensure that the popup shows up only if the last command has been an editing command.
-#+BEGIN_SRC emacs-lisp
-  (use-package company
-    :diminish company-mode
-    :init (setq company-idle-delay 0.25
-                company-begin-commands '(self-insert-command))
-#+end_src
-
-*** :config
-#+BEGIN_SRC emacs-lisp
-  :config (add-hook 'after-init-hook 'global-company-mode)
-#+END_SRC
-
-Enter by default triggers the completion. This is not what I want. Sometimes I just mean Enter.
-This will complete the selection only if I have explicitly interacted with Company. Taken from [[http://emacs.stackexchange.com/a/24800/9690][here]].
-#+BEGIN_SRC emacs-lisp
-  (defun my/company-active-return ()
-    "Complete the current selection, but only if the user has interacted explicitly with Company."
-    (interactive)
-    (if (company-explicit-action-p)
-        (company-complete)
-      (call-interactively
-       (or (key-binding (this-command-keys))
-           (key-binding (kbd "RET"))))))
-
-  (bind-key "<return>" #'my/company-active-return company-active-map)
-  (bind-key "RET"      #'my/company-active-return company-active-map)
-#+END_SRC
-
-**** TODO Completion for Org
-http://orgmode.org/manual/Completion.html
-http://emacs.stackexchange.com/a/21173/9690
-
-*** END
-#+BEGIN_SRC emacs-lisp
-  )
-#+END_SRC
-
-** TODO vimish-fold
-#+BEGIN_SRC emacs-lisp
-  (use-package vimish-fold
-    :disabled
-#+END_SRC
-
-*** :config
-#+BEGIN_SRC emacs-lisp
-  :config
-  (vimish-fold-global-mode 1)
-#+END_SRC
-
-**** evil-vimish-mode
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-vimish-fold
-    :config
-    (evil-vimish-fold-mode 1))
-#+END_SRC
-
-*** END
-#+BEGIN_SRC emacs-lisp
-  )
-#+END_SRC
-
-** TODO monokai-theme
-#+BEGIN_SRC emacs-lisp
-  (use-package monokai-theme
-    :disabled
-    :config
-    ;; (setq monokai-use-variable-pitch nil
-    ;;       monokai-height-minus-1     1.0
-    ;;       monokai-height-plus-1      1.0
-    ;;       monokai-height-plus-2      1.0
-    ;;       monokai-height-plus-3      1.0
-    ;;       monokai-height-plus-4      1.0)
-    )
-#+END_SRC
 
 * ProgLangEmacs
 :PROPERTIES:
@@ -2009,18 +1742,3 @@ http://emacs.stackexchange.com/a/21173/9690
 #+BEGIN_SRC emacs-lisp
   (load (concat user-emacs-directory "private.el") t)
 #+END_SRC
-
-** After theme
-Set the background of the line number column to match that of the modeline
-#+BEGIN_SRC emacs-lisp
-  ;; (set-face-attribute 'linum nil :font my-monospaced-font :background (face-attribute 'mode-line :background nil t) :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant 'normal :weight 'normal)
-  ;; (set-face-attribute 'linum-relative-current-face nil :inherit 'linum :weight 'bold :background (face-attribute 'linum :background nil t))
-#+END_SRC
-
-* ToDo Items
-** DONE Add CUSTOM_ID property to all headings
-:LOGBOOK:
-- State "DONE"       from "TODO"       [2017-01-05 Thu 19:21]
-:END:
-CUSTOM_ID value is the full hierarchical path to the section heading eg. =org*org-capture=
-[[https://writequit.org/articles/emacs-org-mode-generate-ids.html][Autogenerating CUSTOM_IDs]]
