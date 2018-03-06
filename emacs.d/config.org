@@ -1,5 +1,5 @@
 #+TITLE: Emacs Configuration
-#+PROPERTY: header-args :results output silent
+#+PROPERTY: header-args :results silent
 
 * Init
 :PROPERTIES:
@@ -49,6 +49,47 @@ Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/
 :header-args: :tangle yes
 :END:
 ** Keybinds
+#+BEGIN_SRC emacs-lisp
+  (bind-keys* :prefix-map my-leader-map
+              :prefix-docstring "Top-level map"
+              :prefix "C-c")
+
+  (bind-keys  :map my-leader-map
+              :prefix-map my-jumper-command-map
+              :prefix-docstring "This map is used to put all keybinds that I use to jump around eg. open files, buffers etc."
+              :prefix "j")
+
+  (bind-keys  :map my-leader-map
+              :prefix-map my-s-bindings-map
+              :prefix-docstring "This map is used to group together all s-mnemonic bindings such as substitution, sizing etc."
+              :prefix "s")
+#+END_SRC
+
+I think the following would be handy
+  =[= - Enable setting
+  =~= - Toggle setting
+  =]= - Disable setting
+Original use of =C-c [= and =C-c ]= is to manipulate =org-agenda-files= and =C-c ~= is used to =org-create-table-with-table.el=.
+Since I don't use any of these, might as well put them to better use.
+
+#+BEGIN_SRC emacs-lisp
+  (bind-keys  :map my-leader-map
+              :prefix-map my-unimpaired-enable-map
+              :prefix-docstring "This map is used to enable settings ala vim-unimpaired"
+              :prefix "[")
+
+  (bind-keys  :map my-leader-map
+              :prefix-map my-unimpaired-disable-map
+              :prefix-docstring "This map is used to disable settings ala vim-unimpaired"
+              :prefix "]")
+
+  (bind-keys  :map my-leader-map
+              :prefix-map my-unimpaired-toggle-map
+              :prefix-docstring "This map is used to toggle settings ala vim-unimpaired"
+              :prefix "~")
+#+END_SRC
+
+*** Misc
 By default C-x = is bound to /what-cursor-position/ but evil maps both =ga= and =g8= to that as well so might as well use it to show something useful.
 #+BEGIN_SRC emacs-lisp
   (bind-key* "C-x =" 'describe-char)
@@ -64,66 +105,6 @@ By default C-x = is bound to /what-cursor-position/ but evil maps both =ga= and 
 #+END_SRC
 
 Use ~key-translation-map~ to /map/ one set of keys to another [[id:f42c3dc8-c2f6-4f22-9f47-0c578479ef67][eg.]]
-
-*** Enable/Disable/Toggle ala vim-unimpaired
-I think the following would be handy
-  =[= - Enable setting
-  =~= - Toggle setting
-  =]= - Disable setting
-
-#+BEGIN_SRC emacs-lisp
-  (bind-keys* :prefix-map emacs-unimpaired-enable-map
-              :prefix-docstring "This map is used to enable settings ala vim-unimpaired"
-              :prefix "C-c [")
-  (bind-keys* :prefix-map emacs-unimpaired-disable-map
-              :prefix-docstring "This map is used to disable settings ala vim-unimpaired"
-              :prefix "C-c ]")
-  (bind-keys* :prefix-map emacs-unimpaired-toggle-map
-              :prefix-docstring "This map is used to toggle settings ala vim-unimpaired"
-              :prefix "C-c ~")
-#+END_SRC
-Note the use of /bind-keys*/. This is because /bind-keys*/ will override any maps that are defined by any modes.
-Since =C-c [=, =C-c ~= and  =C-c ]= are all defined by org-mode, I want to override those definitions and hence put mine in the /override-global-mode/
-Note that since /bind-keys*/ puts everything in the /override-global-mode/ map, it essentially ignores any =:map= that is passed to it.
-Thus, once the prefixes and maps are defined, we have to use /bind-keys/ only to create new keybinds inside them.
-
-*** Substitution map
-#+BEGIN_SRC emacs-lisp
-  (bind-keys :prefix-map my-s-bindings-map
-             :prefix-docstring "This map is used to group together all s-mnemonic bindings such as substitution, sizing etc."
-             :prefix "C-c s")
-#+END_SRC
-
-*** Intelligent narrowing and widening
-From [[http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html][endless parentheses]]
-
-#+BEGIN_SRC emacs-lisp
-  (defun narrow-or-widen-dwim (p)
-    "Widen if buffer is narrowed, narrow-dwim otherwise.
-  Dwim means: region, org-src-block, org-subtree, or defun, whichever applies first.
-  Narrowing to org-src-block actually calls `org-edit-src-code'.
-
-  With prefix P, don't widen, just narrow even if buffer is already narrowed."
-    (interactive "P")
-    (declare (interactive-only))
-    (cond ((and (buffer-narrowed-p) (not p)) (widen))
-          ((region-active-p)
-           (narrow-to-region (region-beginning)
-                             (region-end)))
-          ((derived-mode-p 'org-mode)
-           ;; `org-edit-src-code' is not a real narrowing command.
-           ;; Remove this first conditional if you don't want it.
-           (cond ((ignore-errors (org-edit-src-code) t)
-                  (delete-other-windows))
-                 ((ignore-errors (org-narrow-to-block) t))
-                 (t (org-narrow-to-subtree))))
-          ((derived-mode-p 'latex-mode)
-           (LaTeX-narrow-to-environment))
-          (t (narrow-to-defun))))
-
-  ;; This line actually replaces Emacs' entire narrowing keymap.
-  (bind-key "n" 'narrow-or-widen-dwim ctl-x-map)
-#+END_SRC
 
 ** Custom file
 #+BEGIN_SRC emacs-lisp
@@ -187,7 +168,7 @@ Scale font size using =C-x C-+= and =C-x C--=. =C-x C-0= resets it.
 =text-scale-mode-step= controls the scaling factor. For obvious reasons, don't set it to 1 else it won't change at all
 #+BEGIN_SRC emacs-lisp
   (setq text-scale-mode-step 1.1)
-  (setq line-spacing 2)
+  (setq-default line-spacing 1)
 #+END_SRC
 
 The reason for adding the hook is that if I try to create a daemon, it errors out with
@@ -204,25 +185,12 @@ However, the downside to this is that if I have multiple such hooks (like in pri
       (set-face-attribute 'fixed-pitch    nil :font font)
       t))  ; This is required so that we can use this function in a cond block below
 
-  (defun my/select-and-set-font ()
-    " Select the font based on OS, hostname etc."
-    ;; Try to set font to Hack-10 if available.
-    ;; If not, set to DejaVu Sans Mono if linux and Consolas if Windows
-    (cond ((string-equal (system-name) "ubuntu")
-           (when (my/set-font-if-exists "Pragmata Pro Mono-10")
-             (setq line-spacing 3)))
-          ((my/set-font-if-exists "Iosevka-normal-10"))
-          ((eq system-type 'gnu/linux)
-           (my/set-font-if-exists "DejaVu Sans Mono-11"))
-          ((eq system-type 'windows-nt)
-           (my/set-font-if-exists "Consolas-10"))))
-
   (if (daemonp)
       (add-hook 'after-make-frame-functions
                 (lambda (frame)
                   (select-frame frame)
                   (my/select-and-set-font)))
-    (my/select-and-set-font))
+    (my/set-font-if-exists "Iosevka-10"))
 #+END_SRC
 
 Fallback to DejaVu Sans when the font lacks support for some glyphs. Taken from [[https://github.com/joodie/emacs-literal-config/blob/c66e30ce961b140dd3e84116f4d45cbc19d0d944/emacs.org#font][github:joodie]]
@@ -258,11 +226,11 @@ Since these are buffer-local variables, I have to use =setq-default=
     (interactive)  ; Allows to be called as a command via M-x
     (setq-default show-trailing-whitespace (not show-trailing-whitespace)))
 
-  (bind-keys :map emacs-unimpaired-enable-map
+  (bind-keys :map my-unimpaired-enable-map
              ("SPC" . (lambda () (interactive)(setq-default show-trailing-whitespace t)))
-             :map emacs-unimpaired-disable-map
+             :map my-unimpaired-disable-map
              ("SPC" . (lambda () (interactive)(setq-default show-trailing-whitespace nil)))
-             :map emacs-unimpaired-toggle-map
+             :map my-unimpaired-toggle-map
              ("SPC" . my/toggle-trailing-whitespace))
 #+END_SRC
 
@@ -280,19 +248,50 @@ Use =C-c s SPC= to delete trailing whitespace manually
 
 *** Toggle wrap
 #+BEGIN_SRC emacs-lisp
-  (bind-key "w" 'toggle-truncate-lines emacs-unimpaired-toggle-map)
+  (bind-key "w" 'toggle-truncate-lines my-unimpaired-toggle-map)
+#+END_SRC
+
+** Intelligent narrowing and widening
+From [[http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html][endless parentheses]]
+
+#+BEGIN_SRC emacs-lisp
+  (defun narrow-or-widen-dwim (p)
+    "Widen if buffer is narrowed, narrow-dwim otherwise.
+  Dwim means: region, org-src-block, org-subtree, or defun, whichever applies first.
+  Narrowing to org-src-block actually calls `org-edit-src-code'.
+
+  With prefix P, don't widen, just narrow even if buffer is already narrowed."
+    (interactive "P")
+    (declare (interactive-only))
+    (cond ((and (buffer-narrowed-p) (not p)) (widen))
+          ((region-active-p)
+           (narrow-to-region (region-beginning)
+                             (region-end)))
+          ((derived-mode-p 'org-mode)
+           ;; `org-edit-src-code' is not a real narrowing command.
+           ;; Remove this first conditional if you don't want it.
+           (cond ((ignore-errors (org-edit-src-code) t)
+                  (delete-other-windows))
+                 ((ignore-errors (org-narrow-to-block) t))
+                 (t (org-narrow-to-subtree))))
+          ((derived-mode-p 'latex-mode)
+           (LaTeX-narrow-to-environment))
+          (t (narrow-to-defun))))
+
+  ;; This line actually replaces Emacs' entire narrowing keymap.
+  (bind-key "n" 'narrow-or-widen-dwim ctl-x-map)
 #+END_SRC
 
 ** Highlight current line
 #+BEGIN_SRC emacs-lisp
   ;; (global-hl-line-mode 1)
-  (bind-key "c" 'global-hl-line-mode emacs-unimpaired-toggle-map)
+  (bind-key "c" 'global-hl-line-mode my-unimpaired-toggle-map)
 #+END_SRC
 
 *** TODO FIXME
 #+BEGIN_SRC emacs-lisp
-  (bind-key "c" (global-hl-line-mode 1)  emacs-unimpaired-enable-map)
-  (bind-key "c" (global-hl-line-mode -1) emacs-unimpaired-disable-map)
+  (bind-key "c" (global-hl-line-mode 1)  my-unimpaired-enable-map)
+  (bind-key "c" (global-hl-line-mode -1) my-unimpaired-disable-map)
 #+END_SRC
 
 ** Simpler y/n answers
@@ -575,7 +574,6 @@ Make /Escape/ quit everything. From [[http://stackoverflow.com/a/10166400/734153
   (bind-key [escape] 'my/minibuffer-keyboard-quit minibuffer-local-isearch-map   )
 #+END_SRC
 
-From /u/xah on reddit
 #+BEGIN_SRC emacs-lisp
   (define-key key-translation-map (kbd "ESC")     (kbd "C-g"))
   (define-key key-translation-map (kbd "C-w C-h") (kbd "C-w h"))
@@ -585,10 +583,19 @@ From /u/xah on reddit
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-  ;; (bind-key "g a" 'describe-char evil-normal-state-map)
   (bind-key "U" 'redo evil-normal-state-map)
   (bind-key "] SPC" '(lambda () (interactive)(end-of-line)(newline))           evil-normal-state-map)
   (bind-key "[ SPC" '(lambda () (interactive)(beginning-of-line)(open-line 1)) evil-normal-state-map)
+#+END_SRC
+
+Move by visual lines. Note this is not a complete solution since it doesn't work when combined with operators (eg. =dj=)
+#+BEGIN_SRC emacs-lisp
+  (bind-key "j"  'evil-next-visual-line     evil-motion-state-map)
+  (bind-key "gj" 'evil-next-line            evil-motion-state-map)
+  (bind-key "k"  'evil-previous-visual-line evil-motion-state-map)
+  (bind-key "gk" 'evil-previous-line        evil-motion-state-map)
+  (bind-key "$"  'evil-end-of-line          evil-motion-state-map)
+  (bind-key "g$" 'evil-end-of-visual-line   evil-motion-state-map)
 #+END_SRC
 
 *** END
@@ -636,12 +643,24 @@ From [[https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-ivy
 ** swiper
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
-    :bind* (("C-s"   . swiper)))
+    :bind* (("C-s" . swiper)))
 #+END_SRC
 
 ** counsel
 #+BEGIN_SRC emacs-lisp
-  (use-package counsel)
+  (use-package counsel
+    :bind* ("C-h a" . counsel-apropos)
+#+END_SRC
+
+Use =C-c j= as prefix for all counsel-related keybinds
+#+BEGIN_SRC emacs-lisp
+    :bind (:map   my-jumper-command-map
+           ("o" . counsel-semantic-or-imenu)
+           ("/" . counsel-ag))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  )
 #+END_SRC
 
 ** org
@@ -652,6 +671,7 @@ This solution is by [[https://www.reddit.com/r/emacs/comments/5sx7j0/how_do_i_ge
     :pin repo-org
 #+END_SRC
 
+<<ensure_target>>
 Passing an argument to =:ensure= (other than t or nil) allows us to use a different package than the one named in use-package
 Also, using =:pin= allows us to prefer which package-archive we'd like to use to download the package from.
 I don't remember why we need to specifically grab =org-plus-contrib= from the org repository instead of from one of the other ones.
@@ -701,7 +721,6 @@ Languages which can be evaluated in Org-mode buffers.
                                        '((python     . t)
                                          (ruby       . t)
                                          (perl       . t)
-                                         (sh         . t)
                                          (dot        . t)
                                          (C          . t))))
 #+end_src
@@ -842,7 +861,6 @@ Variable pitch for non-code text taken from [[http://www.xiangji.me/2015/07/13/a
   (defun my/set-buffer-variable-pitch ()
     (interactive)
     (variable-pitch-mode t)
-    (setq line-spacing 3)
     (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
     (set-face-attribute 'org-code  nil :inherit 'fixed-pitch)
     (set-face-attribute 'org-block nil :inherit 'fixed-pitch))
@@ -1045,7 +1063,6 @@ From [[http://emacs.stackexchange.com/questions/2952/display-errors-and-warnings
 **** org-bullets
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
-    ;; :disable
     :init
     ;; (setq org-bullets-bullet-list '("●"))
     ;; (setq org-bullets-bullet-list '("○"))
@@ -1111,6 +1128,7 @@ Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mod
                                                      (org-agenda-skip-if nil '(scheduled deadline))))
                       (org-agenda-overriding-header "ALL normal priority tasks:"))))
            ((org-agenda-compact-blocks t)))
+
           ("w" "Daily agenda and all TODOs for Work"
            ((tags "PRIORITY=\"A\""
                   ((org-agenda-tag-filter-preset '("+Work"))
@@ -1286,10 +1304,9 @@ Hence, I'm using a hacky way of explicitly prompting for input (since I can spec
 saving it to a variable and printing it out later in the capture template.
 
 **** org-id
-I grab the /org-plus-contrib/ version of org-id to match org
+I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ensure_target]].
 #+BEGIN_SRC emacs-lisp
   (use-package org-id
-    :disabled
     :ensure org-plus-contrib
     :pin repo-org
     :init
@@ -1322,11 +1339,9 @@ Details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
 #+BEGIN_SRC emacs-lisp
   (defun org-id-complete-link (&optional arg)
     "Create an id: link using completion"
-    (concat "id:"
-            (org-id-get-with-outline-path-completion)))
+    (concat "id:" (org-id-get-with-outline-path-completion)))
 
-  (org-link-set-parameters "id"
-                           :complete 'org-id-complete-link)
+  (org-link-set-parameters "id" :complete 'org-id-complete-link)
 #+END_SRC
 
 ***** END
@@ -1335,8 +1350,10 @@ Details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
 #+END_SRC
 
 **** org-drill
+I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ensure_target]].
 #+BEGIN_SRC emacs-lisp
   (use-package org-drill
+    :disabled
     :ensure org-plus-contrib
     :init
     (setq org-drill-learn-fraction 0.4)
@@ -1361,33 +1378,23 @@ Syntax highlighting when exporting to HTML? Yes, please!
 :PROPERTIES:
 :ID:       ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7
 :END:
-
-Custom keymap for org-mode bindings
+Custom keymap for org-mode bindings.
 #+BEGIN_SRC emacs-lisp
-  (bind-keys :prefix-map my-org-bindings-map
+  (bind-keys :map my-leader-map
+             :prefix-map my-org-bindings-map
              :prefix-docstring "This map is used to group together all org-mode settings"
-             :prefix "C-c o"
+             :prefix "o"
              ("a" . org-agenda)
              ("c" . org-capture))
   ;; :bind (("c" . calendar))
 #+END_SRC
 
-Note that these are still part of the /:config/ block
-#+BEGIN_SRC emacs-lisp :tangle no
-  (bind-keys :map helm-command-map
-             ("o" . helm-org-in-buffer-headings)
-             ("h" . helm-info-org))
-#+end_src
-
 <<Custom timestamp keymap>>. Also see [[id:d4634d95-be37-4bdf-987e-22da5778e958][Using ! to toggle timestamp type]]
-#+BEGIN_SRC emacs-lisp :tangle no
-  (unbind-key "C-c ." org-mode-map)
-  (unbind-key "C-c <" org-mode-map)
-  (unbind-key "C-c >" org-mode-map)
-
-  (bind-keys :prefix-map my-org-timestamp-bindings-map
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :map my-leader-map
+             :prefix-map my-org-timestamp-bindings-map
              :prefix-docstring "This map is used to group together all timestamp related bindings"
-             :prefix "C-c ."
+             :prefix "."
              ("." . my-org-time-stamp)
              ("!" . org-time-stamp-inactive)
              ("<" . org-date-from-calendar)
@@ -1400,9 +1407,10 @@ In such cases, I can use =<Prefix> [a-z]= to bind to something else and leave =<
 The mnemonic is that Org leaves =C-c [a-z]= free for the user. Thus, I'm using =[a-z]= in other places too.
 
 Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
-#+begin_src emacs-lisp
-  :bind (:map org-babel-map ("C-k" . org-babel-remove-result))
-#+end_src
+#+BEGIN_SRC emacs-lisp
+  :bind (:map org-babel-map
+              ("C-k" . org-babel-remove-result))
+#+END_SRC
 
 *** use-package END
 #+BEGIN_SRC emacs-lisp
@@ -1426,7 +1434,7 @@ Use brighter colors
       (set-face-attribute 'rainbow-delimiters-depth-7-face nil :foreground "spring green")
       (set-face-attribute 'rainbow-delimiters-depth-8-face nil :foreground "sienna1"))
 
-    :bind (:map emacs-unimpaired-toggle-map ("r" . rainbow-delimiters-mode)))
+    :bind (:map my-unimpaired-toggle-map ("r" . rainbow-delimiters-mode)))
 #+END_SRC
 
 ** rainbow-mode
@@ -1509,7 +1517,8 @@ From [[https://www.reddit.com/r/emacs/comments/60nb8b/favorite_builtin_emacs_com
     (pcre-mode t))
 #+END_SRC
 
-** leuven-theme
+** Themes
+*** leuven
 [[https://github.com/fniessen/emacs-leuven-theme][Github Link]]
 #+BEGIN_SRC emacs-lisp
   (use-package leuven-theme
@@ -1532,12 +1541,27 @@ From [[https://www.reddit.com/r/emacs/comments/60nb8b/favorite_builtin_emacs_com
 
 Load theme first and then override the colors
 
-** base16-theme
+*** solarized
+https://github.com/bbatsov/solarized-emacs
 #+BEGIN_SRC emacs-lisp
-  (use-package base16-theme
+  (use-package solarized-theme
     ;; :disabled
     :config
-    (load-theme 'base16-solarized-light t)
+    (load-theme 'solarized-light t)
+    (setq evil-normal-state-cursor   '("#719e07" box)
+          evil-visual-state-cursor   '("#b58900" box)
+          evil-insert-state-cursor   '("#268bd2" bar)
+          evil-replace-state-cursor  '("#dc322f" bar)
+          evil-operator-state-cursor '("#dc322f" hollow)
+          evil-emacs-state-cursor    '("white"   box)))
+#+END_SRC
+
+*** base16
+#+BEGIN_SRC emacs-lisp
+  (use-package base16-theme
+    :disabled
+    :config
+    (load-theme 'base16-tomorrow-night t)
     (setq evil-normal-state-cursor   '("#719e07" box)
           evil-visual-state-cursor   '("#b58900" box)
           evil-insert-state-cursor   '("#268bd2" bar)

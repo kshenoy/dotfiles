@@ -86,9 +86,9 @@ busw() { watch --no-title -n 60 "bucket -s $@"; }
 alias toclippy="sed -e 's/$/
 /' | tee ~/clippy.txt"
 
-alias xt='xterm -geometry 273x60+1919+21 &'
-alias xtr='echo "resize -s 60 273"; resize -s 60 273'
-# alias xtr='wmctrl -i -r $(printf "0x0%x" $(xdotool getactivewindow)) -b add,maximized_vert; wmctrl -i -r $(printf "0x0%x" $(xdotool getactivewindow)) -e 0,1920,25,1915,1144'
+alias xt='xterm -geometry 273x62+1919+21 &'
+# alias xtr='echo "resize -s 62 273"; resize -s 62 273'
+alias xtr='wmctrl -i -r $(xdotool getactivewindow) -b add,maximized_vert; wmctrl -i -r $(xdotool getactivewindow) -e 0,1919,25,1915,1144'
 alias tmxvnc='tmux new-window -d -n "XVNC" "x11vnc"'
 
 

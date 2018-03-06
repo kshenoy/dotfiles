@@ -31,11 +31,9 @@ XTerm*metaSendsEscape: true
 XTerm*saveLines: 10000
 XTerm*cursorBlink: true
 
-! XTerm*faceName: FuraMonoForPowerline\ Nerd\ Font:style=Regular
-XTerm*faceName: mplus\ Nerd\ Font
-!XTerm*faceName: SauceCodePro\ Nerd\ Font
+XTerm*faceName: Iosevka
 XTerm*faceSize: 10
-XTerm*scaleHeight: 1.15
+XTerm*scaleHeight: 1.05
 
 XTerm*on3Clicks: regex ([[:alpha:]]+://)?([[:alnum:]!#+,./=?@_~-]|(%[[:xdigit:]][[:xdigit:]]))+
 XTerm*rightScrollBar: false
@@ -58,10 +56,9 @@ UXTerm*metaSendsEscape: true
 UXTerm*saveLines: 10000
 UXTerm*cursorBlink: true
 
-! UXTerm*faceName: FuraMonoForPowerline\ Nerd\ Font:style=Regular
-UXTerm*faceName: mplus\ Nerd\ Font
-UXTerm*faceSize: 13
-UXTerm*scaleHeight: 1.15
+UXTerm*faceName: Iosevka
+UXTerm*faceSize: 10
+UXTerm*scaleHeight: 1.05
 
 UXTerm*on3Clicks: regex ([[:alpha:]]+://)?([[:alnum:]!#+,./=?@_~-]|(%[[:xdigit:]][[:xdigit:]]))+
 UXTerm*rightScrollBar: false
@@ -80,9 +77,7 @@ UXTerm*scrollBar: false
 URxvt.cursorBlink:          true
 URxvt.externalBorder:       0
 URxvt.fading:               20
-! URxvt.font:                 xft:FuraMonoForPowerline\ Nerd\ Font:style=Regular:pixelsize=12
-! URxvt.font:                 xft:DejaVu\ Sans\ Mono:style=Book:size=10, xft:FreeSerif:style=Regular
-URxvt.font:                 xft:mplus\ Nerd\ Font:pixelsize=13
+URxvt.font:                 xft:Iosevka:pixelsize=10
 URxvt.geometry:             240x84
 URxvt.internalBorder:       2
 ! URxvt.jumpScroll:         boolean

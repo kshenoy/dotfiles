@@ -19,12 +19,12 @@
     set guifont+=Hack\ 9
     set guifont+=MesloLGLDZ\ Nerd\ Font\ 8
     set guifont+=Monospace\ 8
-    set linespace=3
+    set linespace=2
   elseif g:env ==? 'windows'
     set guifont=
     set guifont+=Hack:h9:cANSI:qDRAFT
     set guifont+=Consolas:h9:cANSI
-    set linespace=3
+    set linespace=2
   endif
 
   set guioptions-=b    " Disable horizontal scrollbar
@@ -41,20 +41,5 @@
   " Make 'File Open' use current directory
   set browsedir=buffer
 
-  " if &diff
-  "   set background=light
-  "   colorscheme solarized
-  " else
-  "   set background=dark
-  "   colorscheme base16-eighties
-  " endif
-
-  " Light colorschemes
   set background=light
-  " colorscheme sol
   colorscheme solarized
-
-  " Dark colorschemes
-  " set background=dark
-  " colorscheme base16-ocean
-  " colorscheme one

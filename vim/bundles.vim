@@ -232,7 +232,7 @@ let g:ctrlp_prompt_mappings = {
   \ 'PrtCurRight()':      ['<Right>'],
   \ }
 
-map      <leader>f <Plug>my(CtrlP)
+map      <leader>j <Plug>my(CtrlP)
 nnoremap <silent>  <Plug>my(CtrlP)b :CtrlPBuffer<CR>
 nnoremap <silent>  <Plug>my(CtrlP)a :CtrlPSwitchBasic<CR>
 nnoremap <silent>  <Plug>my(CtrlP)e :CtrlPCurWD<CR>
