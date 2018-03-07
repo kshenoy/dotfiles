@@ -91,7 +91,7 @@ UXTerm*scrollBar: false
 URxvt.cursorBlink:          true
 URxvt.externalBorder:       0
 URxvt.fading:               20
-URxvt.font:                 xft:Iosevka:pixelsize=10
+URxvt.font:                 xft:Iosevka:pixelsize=12
 URxvt.geometry:             240x84
 URxvt.internalBorder:       2
 ! URxvt.jumpScroll:         boolean
