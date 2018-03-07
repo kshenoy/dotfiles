@@ -162,7 +162,7 @@ do {
   if (  (system($opts{'predicate'}) == 0)
      && $opts{'alert'}
      ) {
-    # Alert(0);
+    Alert(0);
   }
 
   $n++;
@@ -181,6 +181,6 @@ sub Alert {
   $cmd   .= ($status == 0 ? "terminal" : "error" );
   $cmd   .= " $opts{'alert_msg'}";
 
-  exec($cmd);
+  system($cmd);
   exit $status;
 }

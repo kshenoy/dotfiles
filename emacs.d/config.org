@@ -185,12 +185,17 @@ However, the downside to this is that if I have multiple such hooks (like in pri
       (set-face-attribute 'fixed-pitch    nil :font font)
       t))  ; This is required so that we can use this function in a cond block below
 
+  (defun my/select-and-set-font ()
+    " Select the font based on OS, hostname etc."
+    (cond ((eq system-type 'windows-nt) (my/set-font-if-exists "Iosevka-10"))
+          ((eq system-type 'gnu/linux) (my/set-font-if-exists "Iosevka-9"))))
+
   (if (daemonp)
       (add-hook 'after-make-frame-functions
                 (lambda (frame)
                   (select-frame frame)
                   (my/select-and-set-font)))
-    (my/set-font-if-exists "Iosevka-10"))
+    (my/select-and-set-font))
 #+END_SRC
 
 Fallback to DejaVu Sans when the font lacks support for some glyphs. Taken from [[https://github.com/joodie/emacs-literal-config/blob/c66e30ce961b140dd3e84116f4d45cbc19d0d944/emacs.org#font][github:joodie]]
@@ -687,14 +692,15 @@ Org customization guide: http://orgmode.org/worg/org-configs/org-customization-g
 
   (setq org-M-RET-may-split-line '((item) (default . t)))
   (setq org-log-done 'time) ; 'time/'note
+  (setq org-log-redeadline 'note)
+  ;; (setq org-log-into-drawer nil)
   ;; (setq org-special-ctrl-a/e t)
   ;; (setq org-return-follows-link nil)
   (setq org-use-speed-commands nil)
   ;; (setq org-speed-commands-user nil)
   (setq org-startup-align-all-tables nil)
-  ;; (setq org-log-into-drawer nil)
   (setq org-use-property-inheritance t)
-  (setq org-tags-column -80)
+  (setq org-tags-column -100)
   (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
   (setq org-blank-before-new-entry '((heading . t) (plain-list-item . nil)))
   (setq org-link-search-must-match-exact-headline nil)
@@ -1546,14 +1552,15 @@ https://github.com/bbatsov/solarized-emacs
 #+BEGIN_SRC emacs-lisp
   (use-package solarized-theme
     ;; :disabled
-    :config
-    (load-theme 'solarized-light t)
+    :init
     (setq evil-normal-state-cursor   '("#719e07" box)
           evil-visual-state-cursor   '("#b58900" box)
           evil-insert-state-cursor   '("#268bd2" bar)
           evil-replace-state-cursor  '("#dc322f" bar)
           evil-operator-state-cursor '("#dc322f" hollow)
-          evil-emacs-state-cursor    '("white"   box)))
+          evil-emacs-state-cursor    '("white"   box))
+    :config
+    (load-theme 'solarized-light t))
 #+END_SRC
 
 *** base16
