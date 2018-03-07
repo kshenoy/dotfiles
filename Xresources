@@ -31,9 +31,23 @@ XTerm*metaSendsEscape: true
 XTerm*saveLines: 10000
 XTerm*cursorBlink: true
 
+!! From https://unix.stackexchange.com/a/332367/111534
 XTerm*faceName: Iosevka
+XTerm*fontdefault*Label: Size 10
 XTerm*faceSize: 10
-XTerm*scaleHeight: 1.05
+XTerm*font1*Label: Size 8
+XTerm*faceSize1: 8
+XTerm*font2*Label: Size 9
+XTerm*faceSize2: 9
+XTerm*font3*Label: Size 9.5
+XTerm*faceSize3: 9.5
+XTerm*font4*Label: Size 11
+XTerm*faceSize4: 11
+XTerm*font5*Label: Size 12
+XTerm*faceSize5: 12
+XTerm*font6*Label: Size 14
+XTerm*faceSize6: 14
+XTerm*scaleHeight: 1.1
 
 XTerm*on3Clicks: regex ([[:alpha:]]+://)?([[:alnum:]!#+,./=?@_~-]|(%[[:xdigit:]][[:xdigit:]]))+
 XTerm*rightScrollBar: false
@@ -58,7 +72,7 @@ UXTerm*cursorBlink: true
 
 UXTerm*faceName: Iosevka
 UXTerm*faceSize: 10
-UXTerm*scaleHeight: 1.05
+UXTerm*scaleHeight: 1.1
 
 UXTerm*on3Clicks: regex ([[:alpha:]]+://)?([[:alnum:]!#+,./=?@_~-]|(%[[:xdigit:]][[:xdigit:]]))+
 UXTerm*rightScrollBar: false
