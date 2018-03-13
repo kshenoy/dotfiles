@@ -22,8 +22,8 @@ endglobal
 #
 snippet inc "#include <>" b
 #include ${2/>/</}$1`!p
-opts = ['algorithm', 'array', 'cassert', 'cstdint', 'fstream', 'iostream', 'iterator',
-        'list', 'map', 'memory', 'set', 'sstream', 'string', 'unordered_map', 'unordered_set', 'utility', 'vector']
+opts = ['algorithm', 'array', 'cassert', 'cstdint', 'fstream', 'iostream', 'iterator', 'list', 'map', 'memory', 'set', 
+        'sstream', 'string', 'unordered_map', 'unordered_set', 'utility', 'vector']
 opts.sort()
 if snip.basename:
   opts.insert(0, snip.basename + '.h')
