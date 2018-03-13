@@ -2,6 +2,6 @@
 # name: scoped namespace
 # key: ns
 # --
-namespace ${1:Namespace} {
-  $0
-} // END namespace $1
+namespace ${1:Namespace}${1:$(when (not (string= yas-text "")) " ")}{
+  `yas-selected-text`$0
+} // END ${1:$(when (string= yas-text "") "anonymous ")}namespace${1:$(when (not (string= yas-text "")) " ")}$1

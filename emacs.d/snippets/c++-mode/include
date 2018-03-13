@@ -2,4 +2,4 @@
 # name: #include <...>
 # key: inc
 # --
-#include <${1:$$(yas-choose-value '("cassert" "cstdio" "cstdlib" "cstring" "iostream" "istream" "ostream" "sstream" "array" "vector" "map"))}>
+#include <${1:`(yas-choose-value '("algorithm" "array" "cassert" "cstdint" "fstream" "iostream" "iterator" "list" "map" "memory" "set" "sstream" "string" "unordered_map" "unordered_set" "utility" "vector"))`}>

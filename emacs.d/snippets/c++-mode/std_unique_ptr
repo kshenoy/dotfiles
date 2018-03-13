@@ -1,5 +1,6 @@
 # -*- mode: snippet -*-
 # name: std::unique_ptr
 # key: sup
+# group: Smart Pointers
 # --
-::std::unique_ptr< $1 > $0
+std::unique_ptr<${1:`yas-selected-text`}> $0

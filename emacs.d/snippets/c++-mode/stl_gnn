@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: generate_n
+# key: gnn
+# group: STL Algorithm Mnemonics
+# --
+std::generate_n(std::begin(${1:container}), $2, []($3) {
+  $4
+});
+$0

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# key: sca
+# group: Casting
+# --
+static_cast<$1>(`yas-selected-text`$0)

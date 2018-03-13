@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: transform
+# key: tfm
+# group: STL Algorithm Mnemonics
+# --
+std::transform(std::begin(${1:container}), std::end($1),
+  std::begin($1), []($2) {
+$3%
+});
+$0

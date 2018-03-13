@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: #if
+# key: #if
+# --
+#if ${1:MACRO}
+
+`yas-selected-text`$0
+
+#endif // $1

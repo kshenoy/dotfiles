@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: transform
+# key: lwr
+# group: STL Algorithm Mnemonics
+# --
+std::transform(std::begin(${1:container}), std::end($1), std::begin($1), [](char c) {
+return std::tolower(c);});
+$0

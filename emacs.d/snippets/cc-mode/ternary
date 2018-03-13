@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: ternary operator
+# key: ?:
+# group: Conditional
+# --
+(${1:cond}) ? ${2:then} : ${3:else};

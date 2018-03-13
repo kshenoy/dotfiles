@@ -1,5 +1,6 @@
 # -*- mode: snippet -*-
-# name: ::std::make_shared
+# name: std::make_shared
 # key: sms
+# group: Smart Pointers
 # --
-::std::make_shared< $1 >($0)
+std::make_shared<${1:`yas-selected-text`}>($0)

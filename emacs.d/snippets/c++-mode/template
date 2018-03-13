@@ -1,0 +1,4 @@
+# -*- mode: snippet -*-
+# key: tp
+# --
+template <typename ${1:T}>

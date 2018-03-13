@@ -106,16 +106,14 @@ By default C-x = is bound to /what-cursor-position/ but evil maps both =ga= and 
 
 Use ~key-translation-map~ to /map/ one set of keys to another [[id:f42c3dc8-c2f6-4f22-9f47-0c578479ef67][eg.]]
 
-** Custom file
-#+BEGIN_SRC emacs-lisp
-  (setq custom-file (concat user-emacs-directory "custom.el"))
-  (load custom-file)
-#+END_SRC
-
-** Backup
+** Autosave, Backup and History
+Change default location of backups to avoid littering PWD
 #+BEGIN_SRC emacs-lisp
   (defvar backup-directory (concat user-emacs-directory "/tmp/backups"))
   (if (not (file-exists-p backup-directory)) (make-directory backup-directory t))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
   (setq backup-directory-alist `(("." . ,backup-directory)))
   (setq make-backup-files         t)  ; backup of a file the first time it is saved.
   (setq backup-by-copying         t)  ; don't clobber symlinks
@@ -126,15 +124,17 @@ Use ~key-translation-map~ to /map/ one set of keys to another [[id:f42c3dc8-c2f6
   (setq kept-new-versions         9)  ; newest versions to keep when a new numbered backup is made (default: 2)
 #+END_SRC
 
-** Autosave
+Change default location of autosaves to avoid littering PWD
 #+BEGIN_SRC emacs-lisp
   (defvar autosave-directory (concat user-emacs-directory "tmp/autosaves/"))
   (if (not (file-exists-p autosave-directory)) (make-directory autosave-directory t))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
   ;; (setq auto-save-file-name-transforms `(("." ,autosave-directory t)))
   (setq auto-save-default t)  ; auto-save every buffer that visits a file
 #+END_SRC
 
-** History
 Delete identical history entries
 #+BEGIN_SRC emacs-lisp
 (setq history-delete-duplicates t)
@@ -150,15 +150,98 @@ Save mini-buffer history
     (savehist-mode t))
 #+END_SRC
 
-** UTF-8 Please
+** Clean-up & QoL
+Remove visual clutter
 #+BEGIN_SRC emacs-lisp
-  (setq locale-coding-system   'utf-8)
-  (set-terminal-coding-system  'utf-8)
-  (set-keyboard-coding-system  'utf-8)
-  (set-selection-coding-system 'utf-8)
-  (set-language-environment    "UTF-8")
-  (prefer-coding-system        'utf-8)
+  (setq inhibit-startup-message t)
+  (setq initial-scratch-message "")
+
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  ;; (tooltip-mode -1)
 #+END_SRC
+
+We can also put something like this into =~/.Xresources= to enable/disable certain things as soon as Emacs starts
+#+BEGIN_EXAMPLE
+  Emacs.verticalScrollBars: off
+  Emacs.toolBar: off
+#+END_EXAMPLE
+
+#+BEGIN_SRC emacs-lisp
+  ;; Enable editing by visual lines
+  (global-visual-line-mode t)
+
+  ;; Let emacs react faster to keystrokes
+  (setq echo-keystrokes 0.1)
+  (setq idle-update-delay 0.35)
+
+  ;; Jump to the help window when it's opened.
+  ;; Press q to close it and restore the view to the previous buffer
+  (setq help-window-select t)
+
+  ;; Confirm before quitting - sometimes I fat-finger and press both C-x C-c instead of just C-c
+  (setq confirm-kill-emacs 'y-or-n-p)
+
+  ;; Simpler y/n answers
+  (fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+*** Winner mode - Undo/redo window layouts
+Undo and Redo changes in window configuration. Use =C-c right= and =C-c left= to switch between different layouts.
+This is useful when I close a window by mistake to undo it and restore the window layout.
+#+BEGIN_SRC emacs-lisp
+  (winner-mode 1)
+#+END_SRC
+
+[[id:f42c3dc8-c2f6-4f22-9f47-0c578479ef67][More intuitive keybindings]] defined after evil is loaded
+
+** Custom file
+#+BEGIN_SRC emacs-lisp
+  (setq custom-file (concat user-emacs-directory "custom.el"))
+  (load custom-file)
+#+END_SRC
+
+** Diff
+From [[http://pragmaticemacs.com/emacs/visualise-and-copy-differences-between-files/][Pragmatic Emacs]]
+#+BEGIN_SRC emacs-lisp
+  (use-package ediff
+    :config
+
+    ;; Don't start another frame
+    (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+
+    ;; Put windows side by side
+    (setq ediff-split-window-function (quote split-window-horizontally))
+
+    ;; Revert windows on exit - needs winner mode
+    (add-hook 'ediff-after-quit-hook-internal 'winner-undo))
+#+END_SRC
+
+** Electric pairs
+#+BEGIN_SRC emacs-lisp
+  (electric-pair-mode t)
+#+END_SRC
+
+** Emacs server
+- Always start the emacs-server, except when run in daemon mode
+- Already Disable prompt asking you if you want to kill a buffer with a live process attached to it.
+  http://stackoverflow.com/questions/268088/how-to-remove-the-prompt-for-killing-emacsclient-buffers
+
+#+BEGIN_SRC emacs-lisp
+  (use-package server
+    :disabled
+    :config
+    (unless (or (daemonp) (server-running-p))
+      (server-mode 1))
+    (add-hook 'server-switch-hook 'raise-frame))
+#+END_SRC
+
+Alias for emacsclient:
+This will launch emacsclient if a server is already running and launch emacs if not
+#+BEGIN_EXAMPLE
+  alias e='emacsclient --alternate-editor="emacs" --create-frame --quiet'
+#+END_EXAMPLE
 
 ** Fonts
 :PROPERTIES:
@@ -171,11 +254,11 @@ Scale font size using =C-x C-+= and =C-x C--=. =C-x C-0= resets it.
   (setq-default line-spacing 1)
 #+END_SRC
 
-The reason for adding the hook is that if I try to create a daemon, it errors out with
-    /error: Window system is not in use or not initialized/
-This is because we try to set a face-attribute before a frame is created which is a no-no for some reason.
+After installing a new font refresh the font cache by running
+#+BEGIN_SRC bash
+  fc-cache -fv
+#+END_SRC
 
-However, the downside to this is that if I have multiple such hooks (like in private.el) we can't dictate the order in which they're applied.
 #+BEGIN_SRC emacs-lisp
   (defun my/set-font-if-exists (font)
     " Check if FONT exists and set if it does"
@@ -188,7 +271,7 @@ However, the downside to this is that if I have multiple such hooks (like in pri
   (defun my/select-and-set-font ()
     " Select the font based on OS, hostname etc."
     (cond ((eq system-type 'windows-nt) (my/set-font-if-exists "Iosevka-10"))
-          ((eq system-type 'gnu/linux) (my/set-font-if-exists "Iosevka-9"))))
+          ((eq system-type 'gnu/linux) (my/set-font-if-exists "Iosevka-10"))))
 
   (if (daemonp)
       (add-hook 'after-make-frame-functions
@@ -197,6 +280,11 @@ However, the downside to this is that if I have multiple such hooks (like in pri
                   (my/select-and-set-font)))
     (my/select-and-set-font))
 #+END_SRC
+The reason for adding the hook is that if I try to create a daemon, it errors out with
+    /error: Window system is not in use or not initialized/
+This is because we try to set a face-attribute before a frame is created which is a no-no for some reason.
+
+However, the downside to this is that if I have multiple such hooks (like in private.el) we can't dictate the order in which they're applied.
 
 Fallback to DejaVu Sans when the font lacks support for some glyphs. Taken from [[https://github.com/joodie/emacs-literal-config/blob/c66e30ce961b140dd3e84116f4d45cbc19d0d944/emacs.org#font][github:joodie]]
 How does this work? What is it supposed to do?
@@ -209,51 +297,14 @@ How does this work? What is it supposed to do?
                                  :weight 'normal)))
 #+END_SRC
 
-** Tabs, Indentation and Spacing
-:PROPERTIES:
-:ID:       8d72d9c2-5b52-454f-892a-107b009563fa
-:END:
-Use only spaces and no tabs
+*** UTF-8 Please
 #+BEGIN_SRC emacs-lisp
-  (setq-default indent-tabs-mode nil)
-  (setq-default tab-width 2)
-  (setq-default show-trailing-whitespace t)
-
-  (setq-default sh-basic-offset 2)
-  ;; (bind-key "RET" 'newline-and-indent)
-#+end_src
-Since these are buffer-local variables, I have to use =setq-default=
-
-*** Enable/Disable/Toggle Trailing whitespace
-#+BEGIN_SRC emacs-lisp
-  (defun my/toggle-trailing-whitespace ()
-    "Toggle trailing whitespace"
-    (interactive)  ; Allows to be called as a command via M-x
-    (setq-default show-trailing-whitespace (not show-trailing-whitespace)))
-
-  (bind-keys :map my-unimpaired-enable-map
-             ("SPC" . (lambda () (interactive)(setq-default show-trailing-whitespace t)))
-             :map my-unimpaired-disable-map
-             ("SPC" . (lambda () (interactive)(setq-default show-trailing-whitespace nil)))
-             :map my-unimpaired-toggle-map
-             ("SPC" . my/toggle-trailing-whitespace))
-#+END_SRC
-
-*** Delete trailing whitespace
-From [[https://www.emacswiki.org/emacs/DeletingWhitespace#toc3][emacswiki:]]
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'before-save-hook 'delete-trailing-whitespace)
-#+END_SRC
-
-Use =C-c s SPC= to delete trailing whitespace manually
-#+BEGIN_SRC emacs-lisp
-  (bind-keys :map my-s-bindings-map
-             ("SPC" . delete-trailing-whitespace))
-#+END_SRC
-
-*** Toggle wrap
-#+BEGIN_SRC emacs-lisp
-  (bind-key "w" 'toggle-truncate-lines my-unimpaired-toggle-map)
+  (setq locale-coding-system   'utf-8)
+  (set-terminal-coding-system  'utf-8)
+  (set-keyboard-coding-system  'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (set-language-environment    "UTF-8")
+  (prefer-coding-system        'utf-8)
 #+END_SRC
 
 ** Intelligent narrowing and widening
@@ -287,55 +338,105 @@ From [[http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html][endless pa
   (bind-key "n" 'narrow-or-widen-dwim ctl-x-map)
 #+END_SRC
 
-** Highlight current line
+** Mode line
 #+BEGIN_SRC emacs-lisp
-  ;; (global-hl-line-mode 1)
+  (column-number-mode t)
+#+END_SRC
+
+** Mouse
+Mouse-wheel acts on the hovered window rather than the one where the typing focus is
+#+BEGIN_SRC emacs-lisp
+  (setq mouse-wheel-follow-mouse t)
+#+END_SRC
+
+** Prettify
+*** Highlight current line
+#+BEGIN_SRC emacs-lisp
   (bind-key "c" 'global-hl-line-mode my-unimpaired-toggle-map)
 #+END_SRC
 
-*** TODO FIXME
+**** TODO FIXME
 #+BEGIN_SRC emacs-lisp
   (bind-key "c" (global-hl-line-mode 1)  my-unimpaired-enable-map)
   (bind-key "c" (global-hl-line-mode -1) my-unimpaired-disable-map)
 #+END_SRC
 
-** Simpler y/n answers
-#+BEGIN_SRC emacs-lisp
-  (fset 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
-
-** Matching Parens
+*** Show matching parens
 #+BEGIN_SRC emacs-lisp
   (show-paren-mode 1)
   (setq show-paren-delay 0)
   ;; (setq show-paren-style 'expression)
 #+END_SRC
 
-** Misc
+*** Use symbols
+eg. Replaces the text /lambda/ with λ. Full list of prettified symbols can be found in =prettify-symbols-alist=
 #+BEGIN_SRC emacs-lisp
-  ;; Count 1 space after a period as the end of a sentence, instead of 2
-  (setq sentence-end-double-space nil)
-
-  ;; Enable editing by visual lines
-  (global-visual-line-mode t)
-
-  ;; Let emacs react faster to keystrokes
-  (setq echo-keystrokes 0.1)
-  (setq idle-update-delay 0.35)
-
-  ;; Jump to the help window when it's opened.
-  ;; Press q to close it and restore the view to the previous buffer
-  (setq help-window-select t)
-
-  ;; Confirm before quitting - sometimes I fat-finger and press both C-x C-c instead of just C-c
-  (setq confirm-kill-emacs 'y-or-n-p)
+  (global-prettify-symbols-mode t)
 #+END_SRC
 
-** Winner mode
-Undo and Redo changes in window configuration. Use =C-c right= and =C-c left= to switch between different layouts.
-This is useful when I close a window by mistake to undo it and restore the window layout.
+** Tabs, Indentation and Spacing
+:PROPERTIES:
+:ID:       8d72d9c2-5b52-454f-892a-107b009563fa
+:END:
+Use only spaces and no tabs
 #+BEGIN_SRC emacs-lisp
-  (winner-mode 1)
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 2)
+  (setq-default show-trailing-whitespace t)
+
+  (setq-default sh-basic-offset 2)
+  ;; (bind-key "RET" 'newline-and-indent)
+
+  ;; Count 1 space after a period as the end of a sentence, instead of 2
+  (setq sentence-end-double-space nil)
+#+end_src
+Since these are buffer-local variables, I have to use =setq-default=
+
+*** Highlight trailing whitespace
+#+BEGIN_SRC emacs-lisp
+  (defun my/toggle-trailing-whitespace ()
+    "Toggle trailing whitespace"
+    (interactive)  ; Allows to be called as a command via M-x
+    (setq-default show-trailing-whitespace (not show-trailing-whitespace)))
+
+  (bind-key "SPC" '(lambda () (interactive)(setq-default show-trailing-whitespace t)) my-unimpaired-enable-map)
+  (bind-key "SPC" '(lambda () (interactive)(setq-default show-trailing-whitespace nil)) my-unimpaired-disable-map)
+  (bind-key "SPC" 'my/toggle-trailing-whitespace my-unimpaired-toggle-map)
+#+END_SRC
+
+*** Delete trailing whitespace
+Automatically while saving (from [[https://www.emacswiki.org/emacs/DeletingWhitespace#toc3][emacswiki]])
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
+#+END_SRC
+
+Use =C-c s SPC= to delete trailing whitespace manually
+#+BEGIN_SRC emacs-lisp
+  (bind-key "SPC" 'delete-trailing-whitespace my-s-bindings-map)
+#+END_SRC
+
+*** Toggle wrap
+#+BEGIN_SRC emacs-lisp
+  (bind-key "w" 'toggle-truncate-lines my-unimpaired-toggle-map)
+#+END_SRC
+
+** Terminal
+Specify the shell to use to avoid prompt. From [[https://youtu.be/L9vA7FHoQnk?list=PLX2044Ew-UVVv31a0-Qn3dA6Sd_-NyA1n&t=192][Uncle Dave's video]]
+#+BEGIN_SRC emacs-lisp
+  (defvar my-term-shell "/usr/bin/bash")
+  (defadvice ansi-term (before force-bash)
+    (interactive (list my-term-shell)))
+  (ad-activate 'ansi-term)
+#+END_SRC
+
+Disable trailing whitespace hightlighting
+#+BEGIN_SRC emacs-lisp
+  ;; (add-hook 'term-mode-hook '(lambda() (setq show-trailing-whitespace nil)))
+#+END_SRC
+
+Launch
+#+BEGIN_SRC emacs-lisp
+  (bind-key* "<s-return>" 'ansi-term)
 #+END_SRC
 
 ** Theme Directories
@@ -344,52 +445,7 @@ This is useful when I close a window by mistake to undo it and restore the windo
   (add-to-list 'load-path (concat user-emacs-directory "/themes"))
 #+END_SRC
 
-** Emacs server
-- Always start the emacs-server, except when run in daemon mode
-- Already Disable prompt asking you if you want to kill a buffer with a live process attached to it.
-  http://stackoverflow.com/questions/268088/how-to-remove-the-prompt-for-killing-emacsclient-buffers
-
-#+BEGIN_SRC emacs-lisp
-  (use-package server
-    :disabled
-    :config
-    (unless (or (daemonp) (server-running-p))
-      (server-mode 1))
-    (add-hook 'server-switch-hook 'raise-frame))
-#+END_SRC
-
-Alias for emacsclient:
-This will launch emacsclient if a server is already running and launch emacs if not
-#+BEGIN_EXAMPLE
-  alias e='emacsclient --alternate-editor="emacs" --create-frame --quiet'
-#+END_EXAMPLE
-
-** Mouse
-Mouse-wheel acts on the hovered window rather than the one where the typing focus is
-#+BEGIN_SRC emacs-lisp
-  (setq mouse-wheel-follow-mouse t)
-#+END_SRC
-
-** TODO Scratch
-Mode-specific scratch buffers?
-
-** Diff
-From [[http://pragmaticemacs.com/emacs/visualise-and-copy-differences-between-files/][Pragmatic Emacs]]
-#+BEGIN_SRC emacs-lisp
-  (use-package ediff
-    :config
-
-    ;; Don't start another frame
-    (setq ediff-window-setup-function 'ediff-setup-windows-plain)
-
-    ;; Put windows side by side
-    (setq ediff-split-window-function (quote split-window-horizontally))
-
-    ;; Revert windows on exit - needs winner mode
-    (add-hook 'ediff-after-quit-hook-internal 'winner-undo))
-#+END_SRC
-
-* Visual
+** Visual
 :PROPERTIES:
 :header-args: :tangle yes
 :END:
@@ -463,28 +519,8 @@ Avoid Emacs hanging for a while after changing default font:
   (modify-frame-parameters nil '((wait-for-wm . nil)))
 #+END_SRC
 
-** Clean-up
-#+BEGIN_SRC emacs-lisp
-  (setq inhibit-startup-message t)
-  (setq initial-scratch-message "")
-
-  (menu-bar-mode -1)
-  ;; (tooltip-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-#+END_SRC
-
-We can also put something like this into =~/.Xresources= to enable/disable certain things as soon as Emacs starts
-#+BEGIN_EXAMPLE
-  Emacs.verticalScrollBars: off
-  Emacs.toolBar: off
-#+END_EXAMPLE
-
-** Mode line
-#+BEGIN_SRC emacs-lisp
-  ;; Show column number in bottom bar
-  (setq column-number-mode t)
-#+END_SRC
+** TODO Scratch
+Mode-specific scratch buffers?
 
 * Packages
 :PROPERTIES:
@@ -498,6 +534,28 @@ Placing at top since it'll be used by most of the other packages
     (diminish 'visual-line-mode))
 #+END_SRC
 
+** beacon-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package beacon
+    :init
+    (setq beacon-blink-when-window-scrolls nil
+          beacon-color (face-attribute 'highlight :background))
+    :config
+    (beacon-mode 1)
+    (add-hook 'after-load-theme-hook
+              (lambda()
+                "Update beacon's background color once a theme is loaded"
+                (setq beacon-color (face-attribute 'highlight :background)))))
+#+END_SRC
+
+** company
+Provides auto-completion
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :init
+    (add-hook 'after-init-hook 'global-company-mode))
+#+END_SRC
+
 ** aggressive-indent
 #+BEGIN_SRC emacs-lisp
   (use-package aggressive-indent
@@ -507,15 +565,11 @@ Placing at top since it'll be used by most of the other packages
 
 ** evil
 evil can be toggled using =C-z=
-
 #+BEGIN_SRC emacs-lisp
   (use-package evil
-    ;; :disabled
     :init
-    ;; (setq evil-want-C-u-scroll t)
-    (setq evil-want-C-w-in-emacs-state t)
-    (setq evil-want-Y-yank-to-eol t)
-
+    (setq evil-want-C-w-in-emacs-state t
+          evil-want-Y-yank-to-eol t)
     (evil-mode t)
 #+END_SRC
 
@@ -523,12 +577,28 @@ evil can be toggled using =C-z=
 #+BEGIN_SRC emacs-lisp
   :config
 #+END_SRC
-
 **** evil-commentary
 #+BEGIN_SRC emacs-lisp
   (use-package evil-commentary
     :diminish evil-commentary-mode
     :config (evil-commentary-mode))
+#+END_SRC
+
+**** evil-exchange
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-exchange
+    :config (evil-exchange-cx-install))
+#+END_SRC
+
+**** evil-matchit
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-matchit)
+#+END_SRC
+
+**** TODO evil-string-inflection
+Provides =g~= operator to cycle between snake_case → SCREAMING_SNAKE_CASE → TitleCase → CamelCase → kebab-case
+#+BEGIN_SRC emacs-lisp :tangle no
+  (use-package evil-string-inflection)
 #+END_SRC
 
 **** evil-surround
@@ -541,17 +611,6 @@ evil can be toggled using =C-z=
 #+BEGIN_SRC emacs-lisp
   (use-package evil-visualstar
     :config (global-evil-visualstar-mode))
-#+END_SRC
-
-**** evil-exchange
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-exchange
-    :config (evil-exchange-cx-install))
-#+END_SRC
-
-**** evil-matchit
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-matchit)
 #+END_SRC
 
 **** Keybinds
@@ -587,20 +646,38 @@ Make /Escape/ quit everything. From [[http://stackoverflow.com/a/10166400/734153
   (define-key key-translation-map (kbd "C-w C-l") (kbd "C-w l"))
 #+END_SRC
 
+Follow newly created splits
 #+BEGIN_SRC emacs-lisp
-  (bind-key "U" 'redo evil-normal-state-map)
-  (bind-key "] SPC" '(lambda () (interactive)(end-of-line)(newline))           evil-normal-state-map)
-  (bind-key "[ SPC" '(lambda () (interactive)(beginning-of-line)(open-line 1)) evil-normal-state-map)
+  (bind-keys :map evil-motion-state-map
+             ("C-w s" . (lambda() (interactive) (evil-window-split)(other-window 1)))
+             ("C-w v" . (lambda() (interactive) (evil-window-vsplit)(other-window 1))))
+  (define-key key-translation-map (kbd "C-w C-s") (kbd "C-w s"))
+  (define-key key-translation-map (kbd "C-w C-v") (kbd "C-w v"))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :map evil-normal-state-map
+             ("U" . redo)
+             ("] SPC" . (lambda() (interactive) (end-of-line)(newline)))
+             ("[ SPC" . (lambda() (interactive) (beginning-of-line)(open-line 1))))
 #+END_SRC
 
 Move by visual lines. Note this is not a complete solution since it doesn't work when combined with operators (eg. =dj=)
 #+BEGIN_SRC emacs-lisp
-  (bind-key "j"  'evil-next-visual-line     evil-motion-state-map)
-  (bind-key "gj" 'evil-next-line            evil-motion-state-map)
-  (bind-key "k"  'evil-previous-visual-line evil-motion-state-map)
-  (bind-key "gk" 'evil-previous-line        evil-motion-state-map)
-  (bind-key "$"  'evil-end-of-line          evil-motion-state-map)
-  (bind-key "g$" 'evil-end-of-visual-line   evil-motion-state-map)
+  (bind-keys :map evil-motion-state-map
+             ("j"  . evil-next-visual-line)
+             ("gj" . evil-next-line)
+             ("k"  . evil-previous-visual-line)
+             ("gk" . evil-previous-line)
+             ("$"  . evil-end-of-line)
+             ("g$" . evil-end-of-visual-line))
+#+END_SRC
+
+More intuitive keybinds for winner-mode
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :map evil-motion-state-map
+             ("u" . winner-undo)
+             ("U" . winner-redo))
 #+END_SRC
 
 *** END
@@ -612,10 +689,10 @@ Move by visual lines. Note this is not a complete solution since it doesn't work
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :diminish flycheck-mode
-    :init (global-flycheck-mode t)
-    :config
-    (add-hook 'c++-mode-hook (lambda() (setq flycheck-gcc-language-standard   "c++14")
-                                       (setq flycheck-clang-language-standard "c++14"))))
+    :init
+    (global-flycheck-mode t)
+    (setq flycheck-gcc-language-standard "c++14"
+          flycheck-clang-language-standard "c++14"))
 #+END_SRC
 
 ** ivy
@@ -659,9 +736,11 @@ From [[https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-ivy
 
 Use =C-c j= as prefix for all counsel-related keybinds
 #+BEGIN_SRC emacs-lisp
-    :bind (:map   my-jumper-command-map
-           ("o" . counsel-semantic-or-imenu)
-           ("/" . counsel-ag))
+  :bind (:map my-jumper-command-map
+              ("o" . counsel-semantic-or-imenu)
+              ("/" . counsel-ag))
+  :bind (:map org-mode-map
+              ("C-c C-q" . counsel-org-tag))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -843,7 +922,7 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 From [[http://stackoverflow.com/a/6309985/734153][StackOverflow]]
 #+BEGIN_SRC emacs-lisp
   (setq browse-url-browser-function 'browse-url-generic
-        browse-url-generic-program  "google-chrome")
+        browse-url-generic-program "google-chrome")
 #+END_SRC
 
 **** Templates
@@ -1151,11 +1230,14 @@ Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mod
 #+END_SRC
 
 ***** Keybinds
-Keybinds for org [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][located here]]
+[[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][General org keybinds]]
 
-Use j/k in org-agenda
 #+BEGIN_SRC emacs-lisp
   :config
+#+END_SRC
+
+Use j/k in org-agenda
+#+BEGIN_SRC emacs-lisp :tangle no
   (bind-keys :map org-agenda-mode-map
              ("j" . org-agenda-next-item)       ;; Bound to 'goto-date' by default
              ("k" . org-agenda-previous-item))  ;; Bound to 'org-capture' by default
@@ -1484,26 +1566,29 @@ Default binding is =C-x u=
     :init
     (setq-default yas-snippet-dirs (list (concat user-emacs-directory "snippets")))
     (setq yas-wrap-around-region t)  ; Automatically insert selected text at $0, if any
-    (yas-global-mode t)
 
-    :config
-    (defun my/add-yasnippet-ac-sources ()
-      (add-to-list 'ac-sources 'ac-source-yasnippet))
-    (add-hook 'c++-mode-hook 'my/add-yasnippet-ac-sources)
+    ;; :config
+    ;; (defun my/add-yasnippet-ac-sources ()
+    ;;   (add-to-list 'ac-sources 'ac-source-yasnippet))
+    ;; (add-hook 'c++-mode-hook 'my/add-yasnippet-ac-sources)
 
     ;; Use S-Tab instead of Tab to avoid conflict with auto-complete. Unbind Tab
-    (define-key yas-minor-mode-map (kbd "TAB") nil)
-    (define-key yas-minor-mode-map (kbd "<tab>") nil)
-    ;; The reason we have to do this two separate ways:
-    ;; http://ergoemacs.org/emacs/emacs_key_notation_return_vs_RET.html
+    ;; We have to do this two separate ways: http://ergoemacs.org/emacs/emacs_key_notation_return_vs_RET.html
+    ;; (define-key yas-minor-mode-map (kbd "TAB") nil)
+    ;; (define-key yas-minor-mode-map (kbd "<tab>") nil)
 
-    (bind-keys :map yas-minor-mode-map
-               ("<backtab>" . yas-expand)
-               ("C-c & n"   . yas-new-snippet)
-               ("C-c & s"   . yas-insert-snippet)
-               ("C-c & v"   . yas-visit-snippet-file)
-               ("C-c & r"   . yas-reload-all)
-               ("C-c & &"   . yas-describe-tables)))
+    :bind (:map yas-minor-mode-map
+                ("C-c & n"   . yas-new-snippet)
+                ("C-c & s"   . yas-insert-snippet)
+                ("C-c & v"   . yas-visit-snippet-file)
+                ("C-c & r"   . yas-reload-all)
+                ("C-c & &"   . yas-describe-tables)))
+#+END_SRC
+
+Enable yasnippet only for certain modes
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-mode-hook 'yas-minor-mode)
+  (add-hook 'c++-mode-hook 'yas-minor-mode)
 #+END_SRC
 
 ** which-key
@@ -1524,6 +1609,21 @@ From [[https://www.reddit.com/r/emacs/comments/60nb8b/favorite_builtin_emacs_com
 #+END_SRC
 
 ** Themes
+*** load-theme hook
+Emacs doesn't have a native hook that is called after a theme has loaded. So we've to create one. (from [[https://www.reddit.com/r/emacs/comments/4v7tcj/does_emacs_have_a_hook_for_when_the_theme_changes/d5wyu1r/][reddit]])
+#+BEGIN_SRC emacs-lisp
+  (defvar after-load-theme-hook nil
+    "Hook run after a color theme is loaded using `load-theme'.")
+  (defadvice load-theme (after run-after-load-theme-hook activate)
+    "Run `after-load-theme-hook'."
+    (run-hooks 'after-load-theme-hook))
+#+END_SRC
+
+eg.
+#+BEGIN_SRC emacs-lisp :tangle no
+  (add-hook 'after-load-theme-hook (lambda() (message "Theme loaded")))
+#+END_SRC
+
 *** leuven
 [[https://github.com/fniessen/emacs-leuven-theme][Github Link]]
 #+BEGIN_SRC emacs-lisp
@@ -1696,5 +1796,6 @@ Ideas in https::/github.com/kana/vim-submode
 :END:
 ** Private config
 #+BEGIN_SRC emacs-lisp
-  (load (concat user-emacs-directory "private.el") t)
+  (when (string< "atlhen" system-name)
+    (load (concat user-emacs-directory "private_work.el") t))
 #+END_SRC

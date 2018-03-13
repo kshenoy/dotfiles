@@ -1,5 +1,6 @@
 # -*- mode: snippet -*-
-# name: ::boost::make_shared
+# name: boost::make_shared
 # key: bms
+# group: Smart Pointers
 # --
-::boost::make_shared< $1 >($0)
+boost::make_shared<${1:`yas-selected-text`}>($0)

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# key: spt
+# group: Smart Pointers
+# --
+${1:$$(yas-choose-value '("boost" "std"))}::${2:$$(yas-choose-value '("shared" "unique" "weak"))}_ptr<${3:`yas-selected-text`}> $0

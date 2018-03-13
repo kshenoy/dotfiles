@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# key: el
+# group: Conditional
+# --
+else ${1:{
+  $0
+}}

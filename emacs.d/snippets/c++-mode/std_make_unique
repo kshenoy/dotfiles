@@ -1,5 +1,6 @@
 # -*- mode: snippet -*-
-# name: ::std::make_unique
+# name: std::make_unique
 # key: smu
+# group: Smart Pointers
 # --
-::std::make_unique< $1 >($0)
+std::make_unique<${1:`yas-selected-text`}>($0)

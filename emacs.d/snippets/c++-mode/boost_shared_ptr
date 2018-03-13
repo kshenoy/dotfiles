@@ -1,5 +1,6 @@
 # -*- mode: snippet -*-
 # name: boost::shared_ptr
 # key: bsp
+# group: Smart Pointers
 # --
-::boost::shared_ptr< $1 > $0
+boost::shared_ptr<${1:`yas-selected-text`}> $0

@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: prev_permutation
+# key: prp
+# group: STL Algorithm Mnemonics
+# --
+if (std::prev_permutation(std::begin(${1:container}), std::end($1))) {
+  $2
+}
+$0

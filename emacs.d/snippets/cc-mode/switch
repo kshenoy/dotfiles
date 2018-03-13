@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# key: sw
+# group: Conditional
+# --
+switch (${1:`yas-selected-text`}) {
+  case ${2}:${3: \{}
+    $0
+    break;
+  ${3:$(if (string-match "\{" yas-text) "\}\n" "")}default:
+    break;
+}

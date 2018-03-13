@@ -1,5 +1,6 @@
 # -*- mode: snippet -*-
 # name: std::shared_ptr
 # key: ssp
+# group: Smart Pointers
 # --
-::std::shared_ptr< $1 > $0
+std::shared_ptr<${1:`yas-selected-text`}> $0

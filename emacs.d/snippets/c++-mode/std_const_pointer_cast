@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: std::const_pointer_cast
+# key: cpc
+# group: Casting
+# --
+std::const_pointer_cast<$1>(`yas-selected-text`$0)

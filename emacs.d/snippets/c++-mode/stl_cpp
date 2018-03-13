@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: cpp
+# key: cpp
+# group: STL Algorithm Mnemonics
+# --
+#include "`(file-name-nondirectory (file-name-sans-extension (buffer-file-name)))`.h"

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# key: wh
+# group: Looping
+# --
+while (${1:condition}) {
+  `yas-selected-text`$0
+}

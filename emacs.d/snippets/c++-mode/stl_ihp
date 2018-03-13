@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: is_heap
+# key: ihp
+# group: STL Algorithm Mnemonics
+# --
+if (std::is_heap(std::begin(${1:container}), std::end($1))) {
+  $2
+}
+$0

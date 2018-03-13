@@ -1,7 +1,8 @@
 # -*- mode: snippet -*-
-# name: for iterator
+# name: for: iterator-based
 # key: fori
+# group: Looping
 # --
-for (${1:auto }${2:it_begin} = ${3:var}.begin(), ${4:it_end} = $3.end(); $2 != $4; ++$2) {
-  $0
+for (auto ${2:it_begin} = std::begin(${1:var}), ${3:it_end} = std::end($1); $2 != $3; $2++) {
+  `yas-selected-text`$0
 }

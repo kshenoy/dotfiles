@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: is_sorted_until
+# key: isu
+# group: STL Algorithm Mnemonics
+# --
+auto pos = std::is_sorted_until(std::begin(${1:container}), std::end($1));
+if (pos != std::end($1)) {
+  $2
+}
+$0

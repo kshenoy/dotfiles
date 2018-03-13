@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: stable_sort
+# key: sts
+# group: STL Algorithm Mnemonics
+# --
+std::stable_sort(std::begin(${1:container}), std::end($1));
+$0

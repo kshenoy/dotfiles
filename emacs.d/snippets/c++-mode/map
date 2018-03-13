@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
-# name: map
 # key: map
+# group: STL
 # --
-std::map<${1:type1}$0> ${2:var};
+std::${1:unordered_}map<${2:key}, ${3:value}> ${0};

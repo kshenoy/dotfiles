@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: boost::const_pointer_cast
+# key: bspc
+# group: Casting
+# --
+boost::const_pointer_cast<$1>(`yas-selected-text`$0)

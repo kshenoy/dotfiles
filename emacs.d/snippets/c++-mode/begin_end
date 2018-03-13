@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: std::begin(.), std::end(.)
+# key: be
+# group: STL
+# --
+std::begin(${1:v}), std::end($1)

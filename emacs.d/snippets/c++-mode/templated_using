@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: template<T> using ...
+# key: tpus
+# --
+template <typename ${1:T}>
+using $2 = $0

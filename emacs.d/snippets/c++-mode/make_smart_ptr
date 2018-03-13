@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# key: msp
+# group: Smart Pointers
+# --
+${1:$$(yas-choose-value '("boost" "std"))}::make_${2:$$(yas-choose-value '("shared" "unique" "weak"))}<${3:`yas-selected-text`}>($0)

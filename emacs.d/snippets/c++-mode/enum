@@ -1,7 +1,5 @@
 # -*- mode: snippet -*-
-# name: enum
-# key: enum
+# key: en
+# uuid: cc-enum
 # --
-enum ${1:NAME} {
-  $0
-};
+enum ${1:class} e${2:NAME} { $0 };

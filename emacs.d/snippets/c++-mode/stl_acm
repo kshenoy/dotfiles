@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: accumulate
+# key: acm
+# group: STL Algorithm Mnemonics
+# --
+auto sum = std::accumulate(std::begin(${1:container}), std::end($1), 0);
+$0

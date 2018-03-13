@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: std::static_pointer_cast
+# key: spc
+# group: Casting
+# --
+std::static_pointer_cast<$1>(`yas-selected-text`$0)

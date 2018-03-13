@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: replace_copy
+# key: rpc
+# group: STL Algorithm Mnemonics
+# --
+std::replace_copy(std::begin(${1:container}), std::end($1), std::begin($1), $2, $3);
+$0

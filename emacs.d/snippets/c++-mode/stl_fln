@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: fill_n
+# key: fln
+# group: STL Algorithm Mnemonics
+# --
+std::fill_n(std::begin(${1:container}), $2, $3);
+$0

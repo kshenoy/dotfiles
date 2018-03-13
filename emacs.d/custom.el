@@ -6,7 +6,7 @@
  '(debug-on-error t)
  '(package-selected-packages
    (quote
-    (solarized-theme yasnippet which-key use-package rainbow-mode rainbow-delimiters pcre2el org-plus-contrib org-bullets noflet flycheck evil-visualstar evil-surround evil-matchit evil-exchange evil-commentary diminish counsel base16-theme aggressive-indent)))
+    (evil-string-inflection yasnippet which-key use-package string-inflection solarized-theme rainbow-mode rainbow-delimiters pcre2el org-plus-contrib org-bullets noflet flycheck evil-visualstar evil-surround evil-matchit evil-exchange evil-commentary diminish counsel company beacon aggressive-indent)))
  '(safe-local-variable-values (quote ((org-confirm-babel-evaluate)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

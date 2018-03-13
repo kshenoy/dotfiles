@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: sort
+# key: srt
+# group: STL Algorithm Mnemonics
+# --
+std::sort(std::begin(${1:container}), std::end($1));
+$0

@@ -1,7 +1,8 @@
 # -*- mode: snippet -*-
-# name: range-based for
+# name: for: range-based
 # key: forr
+# group: Looping
 # --
 for (auto& i: ${1:v}) {
-  $0
+  `yas-selected-text`$0
 }

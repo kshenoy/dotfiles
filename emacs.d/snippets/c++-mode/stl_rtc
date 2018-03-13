@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: rotate_copy
+# key: rtc
+# group: STL Algorithm Mnemonics
+# --
+std::rotate_copy(std::begin(${1:container}), std::begin($2), std::end($1),
+  std::begin($3));
+$0

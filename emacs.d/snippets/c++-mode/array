@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# key: arr
+# group: STL
+# --
+std::list<${1:T}, ${2:N}> $0;

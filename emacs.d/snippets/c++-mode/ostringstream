@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# key: sso
+# --
+std::ostringstream ${1:oss};
+oss << $0

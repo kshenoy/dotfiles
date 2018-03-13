@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: try
+# key: try
+# group: STL Algorithm Mnemonics
+# a bit too intrusive now still, not always I want to do this
+# --
+try {
+    $0
+} catch (${1:type}) {
+
+}

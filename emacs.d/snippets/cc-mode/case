@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# key: case
+# expand-env: ((yas-also-auto-indent-first-line t))
+# group: Conditional
+# --
+case ${1:`yas-selected-text`}:${2: \{}
+  $0
+  break;
+${2:$(if (string-match "\{" yas-text) "\}" "")}

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: fill
+# key: fil
+# group: STL Algorithm Mnemonics
+# --
+std::fill(std::begin(${1:container}), std::end($1), $2);
+$0
