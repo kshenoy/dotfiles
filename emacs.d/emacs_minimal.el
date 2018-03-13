@@ -1,27 +1,31 @@
 (require 'package)
 
-; List the packages you want
-(setq package-list '(evil
-                                           evil-leader))
-
-; Add Melpa as the default Emacs Package repository
-; only contains a very limited number of packages
-(add-to-list 'package-archives
-                          '("melpa" . "http://melpa.milkbox.net/packages/") t)
-
-; Activate all the packages (in particular autoloads)
+;; Activate all the packages (in particular autoloads)
 (package-initialize)
 
-; Update your local package index
-(unless package-archive-contents
-    (package-refresh-contents))
+;; Add Melpa as the default Emacs Package repository
+(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
-; Install all missing packages
-(dolist (package package-list)
-    (unless (package-installed-p package)
-          (package-install package)))
+;; Bootstrap use-package
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 
-(let ((default-directory  "~/.emacs.d/elpa/org-plus-contrib-20170210/"))
-    (normal-top-level-add-subdirs-to-load-path))
-(require 'org)
-(require 'org-id)
+(defvar use-package-verbose t)
+(setq use-package-always-ensure t)
+
+;; Install all packages
+(use-package solarized-theme
+  :config (load-theme 'solarized-light t))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages (quote (solarized-theme use-package))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
