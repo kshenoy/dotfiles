@@ -14,7 +14,7 @@ emacs.d/games/
 emacs.d/history
 emacs.d/org-wunderlist/
 emacs.d/network-security.data
-emacs.d/private.el
+emacs.d/private*.el
 emacs.d/projectile-bookmarks.eld
 emacs.d/projectile.cache
 emacs.d/recentf

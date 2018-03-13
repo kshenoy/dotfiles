@@ -48,11 +48,6 @@ ${VISUAL}${0}
 endsnippet
 
 
-snippet # "#define/#ifdef/#ifndef/#if/#endif" b
-#${1}`!p snip.rv = complete( t[1], ['define ', 'ifdef', 'ifndef', 'if', 'endif'] )`
-endsnippet
-
-
 snippet '#ifd(ef)?' "#ifdef...#define...#endif" br
 #ifdef ${1}
   ${VISUAL}${0:${VISUAL/(.*)/(?1::<code>)/}}
@@ -93,14 +88,6 @@ endsnippet
 snippet if "if..." b
 if (${1:<condition>}) {
   ${VISUAL}${0}
-}
-endsnippet
-
-
-snippet ife "if...else" w
-if (${1:<condition>}) {
-  ${0}
-} else {
 }
 endsnippet
 
@@ -170,15 +157,6 @@ snippet do "do...while loop"
 do {
   ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
 } while (${1:/* condition */});
-endsnippet
-
-
-
-#=======================================================================================================================
-# Typedefs                                                                                                          {{{1
-#
-snippet td "Typedef"
-typedef 
 endsnippet
 
 

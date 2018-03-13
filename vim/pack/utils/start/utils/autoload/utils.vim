@@ -74,6 +74,12 @@ endfunction
 command! -nargs=* Retab call utils#Retab(<args>)
 
 
+function! utils#UpdateTagsDone(...)
+  " Description: Dumb function that uses echom to notify that job is done
+  silent cs reset
+  echom "Tags successfully generated"
+endfunction
+
 function! utils#UpdateTags()                                                                                      " {{{1
   " Description: Generate tags (requires exuberant_ctags)
 
@@ -82,8 +88,14 @@ function! utils#UpdateTags()                                                    
     return
   endif
 
-  execute "!gentags --create -w $REPO_PATH &"
+  let l:cmd = "gentags --create -w $REPO_PATH"
+  if v:version >= 800
+    call job_start(l:cmd, {'close_cb': 'utils#UpdateTagsDone'})
+  else
+    execute "!" . l:cmd
+  endif
 endfunction
+
 
 function! utils#Preserve(expr, ...)                                                                               " {{{1
   " Description: Function to execute commands without modifying the original settings like cursor position, search string etc.

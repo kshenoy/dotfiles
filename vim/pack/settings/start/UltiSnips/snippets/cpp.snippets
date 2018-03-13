@@ -22,8 +22,8 @@ endglobal
 #
 snippet inc "#include <>" b
 #include ${2/>/</}$1`!p
-opts = ['algorithm', 'array', 'cassert', 'cstdint', 'cstdio', 'cstdlib', 'cstring', 'fstream', 'iostream', 'list', 'map', 'memory',
-        'set', 'sstream', 'string', 'unordered_map', 'unordered_set', 'utility', 'vector']
+opts = ['algorithm', 'array', 'cassert', 'cstdint', 'fstream', 'iostream', 'iterator',
+        'list', 'map', 'memory', 'set', 'sstream', 'string', 'unordered_map', 'unordered_set', 'utility', 'vector']
 opts.sort()
 if snip.basename:
   opts.insert(0, snip.basename + '.h')
@@ -57,7 +57,7 @@ endsnippet
 # Loops                                                                                                             {{{1
 #
 snippet for "C++ style for..." b
-for (auto ${1:i} = 0; $1 < ${2:count}; ++$1) {
+for (auto ${1:i} = 0; $1 < ${2:count}; $1++) {
   ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
 }
 endsnippet
@@ -309,14 +309,6 @@ endsnippet
 
 
 # String/Streams ---------------------------------------------------------------------------------------------------{{{2
-snippet sti "std::cin"
-std::cin >> $0
-endsnippet
-
-snippet sto "std::cout"
-std::cout << $0
-endsnippet
-
 snippet sso "std::ostringstream"
 std::ostringstream ${1:oss};
 oss << ${VISUAL}$0

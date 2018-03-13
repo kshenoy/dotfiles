@@ -31,6 +31,7 @@ runtime! macros/matchit.vim
 call plug#('PeterRincker/vim-argumentative')
 " call plug#('justinmk/vim-sneak')
 call plug#('chaoren/vim-wordmotion')
+call plug#('rhysd/vim-clang-format')
 call plug#('rhysd/vim-textobj-word-column',    {'on': '<Plug>(textobj-wordcolumn'})
 call plug#('kana/vim-textobj-user')
 call plug#('glts/vim-textobj-comment',         {'on': '<Plug>(textobj-comment'})
@@ -140,6 +141,11 @@ nmap gcc <Plug>CommentaryLine
 augroup Commentary
   autocmd FileType xdefaults let &commentstring='!%s'
 augroup END
+
+
+" clang-format ---------------------------------------------------------------------------------------------------- {{{1
+let g:clang_format#command = '/tool/pandora64/.package/llvm-4.0.0-gcc630/bin/clang-format'
+let g:clang_format#style_options = {}
 
 
 " vim-cpp-enhanced-highlight -------------------------------------------------------------------------------------- {{{1

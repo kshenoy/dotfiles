@@ -32,13 +32,11 @@
   default = matching
 
 [diff]
-  tool = meld
+  tool = vim
 [difftool]
   prompt = false
-[difftool "gvim"]
-  cmd = gvim -df -c 'set columns=260|set lines=62|wincmd =' $LOCAL $BASE 2> /dev/null
-[difftool "meld"]
-  cmd = meld --diff $LOCAL $BASE
+[difftool "vim"]
+  cmd = vim -df -c 'set columns=260|set lines=62|wincmd =' $LOCAL $BASE 2> /dev/null
 
 [merge]
   tool = gvim
