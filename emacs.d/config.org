@@ -1,23 +1,15 @@
+# -*- org-log-into-drawer: nil; org-todo-keywords: (quote ((sequence "TODO" "DONE"))); -*-
+
 #+TITLE: Emacs Configuration
-#+PROPERTY: header-args :results silent
+#+PROPERTY: header-args :results output silent
 
 * Init
-:PROPERTIES:
-:header-args: :tangle yes
-:END:
 ** Archives
 /package-archives/ uses HTTP access to GNU by default. Replacing it with the https version instead
 #+BEGIN_SRC emacs-lisp
   (setq package-archives '(("repo-gnu"   . "https://elpa.gnu.org/packages/")
                            ("repo-melpa" . "https://melpa.milkbox.net/packages/")
                            ("repo-org"   . "http://orgmode.org/elpa/")))
-
-  (when (>= emacs-major-version 24)
-    (when (>= emacs-minor-version 4)
-      (setq load-prefer-newer t))
-    (require 'package))
-
-  (package-initialize)
 #+END_SRC
 
 ** Bootstrap use-package
@@ -29,15 +21,12 @@ Install and load use-package
     (package-refresh-contents)
     (package-install 'use-package))
 
-  (eval-and-compile
-    (defvar use-package-verbose t)
-    (require 'use-package)
-    (require 'bind-key)
-    (setq use-package-always-ensure t)
-    (if (daemonp)
-        (setq use-package-always-demand t)))
+  (defvar use-package-verbose t)
+  (setq use-package-always-ensure t)
 
-  (bind-key* "C-h B" 'describe-personal-keybindings)
+  ;; Disable lazy-loading if using a daemon
+  (if (daemonp)
+      (setq use-package-always-demand t))
 #+END_SRC
 
 ** TODO Check if there's a way to keep all the config in this file itself with init.el being empty
@@ -45,9 +34,6 @@ Sacha Chua seems to have something like that. Her init.el is simply a link.
 Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/shaving_time_on_emacs_startup_from_org_literate/][reddit thread]].
 
 * General
-:PROPERTIES:
-:header-args: :tangle yes
-:END:
 ** Keybinds
 #+BEGIN_SRC emacs-lisp
   (bind-keys* :prefix-map my-leader-map
@@ -90,6 +76,10 @@ Since I don't use any of these, might as well put them to better use.
 #+END_SRC
 
 *** Misc
+#+BEGIN_SRC emacs-lisp
+  (bind-key* "C-h B" 'describe-personal-keybindings)
+#+END_SRC
+
 By default C-x = is bound to /what-cursor-position/ but evil maps both =ga= and =g8= to that as well so might as well use it to show something useful.
 #+BEGIN_SRC emacs-lisp
   (bind-key* "C-x =" 'describe-char)
@@ -104,7 +94,7 @@ By default C-x = is bound to /what-cursor-position/ but evil maps both =ga= and 
   (bind-key* "<f5>" 'my/revert-buffer-no-confirm)
 #+END_SRC
 
-Use ~key-translation-map~ to /map/ one set of keys to another [[id:f42c3dc8-c2f6-4f22-9f47-0c578479ef67][eg.]]
+=key-translation-map= can be used to /map/ one set of keys to another [[id:f42c3dc8-c2f6-4f22-9f47-0c578479ef67][eg.]]
 
 ** Autosave, Backup and History
 Change default location of backups to avoid littering PWD
@@ -353,12 +343,8 @@ Mouse-wheel acts on the hovered window rather than the one where the typing focu
 *** Highlight current line
 #+BEGIN_SRC emacs-lisp
   (bind-key "c" 'global-hl-line-mode my-unimpaired-toggle-map)
-#+END_SRC
-
-**** TODO FIXME
-#+BEGIN_SRC emacs-lisp
-  (bind-key "c" (global-hl-line-mode 1)  my-unimpaired-enable-map)
-  (bind-key "c" (global-hl-line-mode -1) my-unimpaired-disable-map)
+  (bind-key "c" '(lambda() (interactive) (global-hl-line-mode 1))  my-unimpaired-enable-map)
+  (bind-key "c" '(lambda() (interactive) (global-hl-line-mode -1)) my-unimpaired-disable-map)
 #+END_SRC
 
 *** Show matching parens
@@ -446,9 +432,6 @@ Launch
 #+END_SRC
 
 ** Visual
-:PROPERTIES:
-:header-args: :tangle yes
-:END:
 #+BEGIN_SRC emacs-lisp
   ;; Disable anoying beep
   (setq ring-bell-function 'ignore)
@@ -461,9 +444,6 @@ Launch
 #+END_SRC
 
 ** TODO Frame related
-:LOGBOOK:
-- State "TODO"       from              [2017-03-28 Tue 23:02]
-:END:
 Specify /width/ and /height/ /pixel-wise/ in /default-frame-alist/
 #+BEGIN_SRC emacs-lisp
   ;; Set frame size pixelwise instead of characterwise
@@ -523,15 +503,19 @@ Avoid Emacs hanging for a while after changing default font:
 Mode-specific scratch buffers?
 
 * Packages
-:PROPERTIES:
-:header-args: :tangle yes
-:END:
 ** diminish
 Placing at top since it'll be used by most of the other packages
 #+BEGIN_SRC emacs-lisp
   (use-package diminish
     :config
     (diminish 'visual-line-mode))
+#+END_SRC
+
+** aggressive-indent
+#+BEGIN_SRC emacs-lisp
+  (use-package aggressive-indent
+    :config
+    (global-aggressive-indent-mode t))
 #+END_SRC
 
 ** beacon-mode
@@ -556,13 +540,6 @@ Provides auto-completion
     (add-hook 'after-init-hook 'global-company-mode))
 #+END_SRC
 
-** aggressive-indent
-#+BEGIN_SRC emacs-lisp
-  (use-package aggressive-indent
-    :config
-    (global-aggressive-indent-mode t))
-#+END_SRC
-
 ** evil
 evil can be toggled using =C-z=
 #+BEGIN_SRC emacs-lisp
@@ -577,6 +554,21 @@ evil can be toggled using =C-z=
 #+BEGIN_SRC emacs-lisp
   :config
 #+END_SRC
+**** evil-args
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-args
+    :commands (evil-inner-arg evil-outer-arg evil-forward-arg evil-backward-arg)
+    :init
+    (bind-key "," 'evil-inner-arg evil-inner-text-objects-map)
+    (bind-key "," 'evil-outer-arg evil-outer-text-objects-map)
+    (bind-keys :map evil-normal-state-map
+               ("] ," . evil-forward-arg)
+               ("[ ," . evil-backward-arg)
+               :map evil-motion-state-map
+               ("] ," . evil-forward-arg)
+               ("[ ," . evil-backward-arg)))
+#+END_SRC
+
 **** evil-commentary
 #+BEGIN_SRC emacs-lisp
   (use-package evil-commentary
@@ -595,10 +587,24 @@ evil can be toggled using =C-z=
   (use-package evil-matchit)
 #+END_SRC
 
-**** TODO evil-string-inflection
+**** evil-numbers
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-numbers
+    :commands (evil-numbers/inc-at-pt evil-numbers/dec-at-pt)
+    :init
+    (bind-keys :map evil-normal-state-map
+               ("C-c +" . evil-numbers/inc-at-pt)
+               ("C-c -" . evil-numbers/dec-at-pt)
+               :map evil-visual-state-map
+               ("C-c +" . evil-numbers/inc-at-pt)
+               ("C-c -" . evil-numbers/dec-at-pt)))
+#+END_SRC
+
+**** evil-string-inflection
 Provides =g~= operator to cycle between snake_case → SCREAMING_SNAKE_CASE → TitleCase → CamelCase → kebab-case
-#+BEGIN_SRC emacs-lisp :tangle no
-  (use-package evil-string-inflection)
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-string-inflection
+    :ensure t)
 #+END_SRC
 
 **** evil-surround
@@ -680,6 +686,13 @@ More intuitive keybinds for winner-mode
              ("U" . winner-redo))
 #+END_SRC
 
+**** TODO Set emacs-state-cursor face to the default used by the colorscheme
+#+BEGIN_SRC emacs-lisp
+  ;; (add-hook 'after-load-theme-hook
+  ;;           (lambda() (setq my-evil-emacs-state-cursor-color (face-attribute 'cursor :background)
+  ;;                      evil-emacs-state-cursor '(my-evil-emacs-state-cursor-color box))))
+#+END_SRC
+
 *** END
 #+BEGIN_SRC emacs-lisp
   )
@@ -695,12 +708,13 @@ More intuitive keybinds for winner-mode
           flycheck-clang-language-standard "c++14"))
 #+END_SRC
 
-** ivy
+** ivy, swiper, counsel
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
     :diminish (ivy-mode . "")
     :config
     (ivy-mode 1)
+    (bind-key "b" 'ivy-switch-buffer my-jumper-command-map)
     (setq ivy-count-format "%d/%d "
           ivy-height 12
           ivy-extra-directories nil
@@ -722,13 +736,13 @@ From [[https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-ivy
   )
 #+END_SRC
 
-** swiper
+*** swiper
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
     :bind* (("C-s" . swiper)))
 #+END_SRC
 
-** counsel
+*** counsel
 #+BEGIN_SRC emacs-lisp
   (use-package counsel
     :bind* ("C-h a" . counsel-apropos)
@@ -770,9 +784,6 @@ Org customization guide: http://orgmode.org/worg/org-configs/org-customization-g
   (setq org-default-notes-file (concat org-directory "Inbox.org"))
 
   (setq org-M-RET-may-split-line '((item) (default . t)))
-  (setq org-log-done 'time) ; 'time/'note
-  (setq org-log-redeadline 'note)
-  ;; (setq org-log-into-drawer nil)
   ;; (setq org-special-ctrl-a/e t)
   ;; (setq org-return-follows-link nil)
   (setq org-use-speed-commands nil)
@@ -832,14 +843,11 @@ A safer way to go about it is by enabling it on a file-by-file basis using the f
   (setq org-hide-leading-stars t)
   (setq org-odd-level-only nil)
 
-  ;; …▼•
-  ;; (setq org-ellipsis "▼") ; Use a fancy arrow to indicate a fold instead of '...'
+  ;; others: ▼, ↴, ⬎, ⤷, …, ⋱
+  (setq org-ellipsis " ▼")
 #+END_SRC
 
 ***** TODO Hide the < and > around targets
-:LOGBOOK:
-- State "TODO"       from              [2017-03-19 Sun 15:00]
-:END:
 From [[http://emacs.stackexchange.com/a/19239/9690][Emacs StackExchange]]
 At the moment, it hides not just the angle braces but also the text between them.
 #+BEGIN_SRC emacs-lisp :tangle no
@@ -880,13 +888,6 @@ At the moment, it hides not just the angle braces but also the text between them
 #+END_SRC
 
 **** ToDo States
-Add logging when task state changes
-#+BEGIN_SRC emacs-lisp
-  ;; (setq org-log-done nil)
-  (setq org-log-into-drawer t)  ; Save state changes into LOGBOOK drawer instead of in the body
-  (setq org-treat-insert-todo-heading-as-state-change t)
-#+END_SRC
-
 Custom keywords
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keywords '((sequence "TODO(t!)" "WAITING(w@/!)" "|" "DONE(d@)" "CANCEL(c@)")))
@@ -901,6 +902,14 @@ Custom keywords
 =x/y= - =x= takes affect when entering the state and
       =y= takes affect when exiting if the state being entered doesn't have any logging
 Refer [[http://orgmode.org/manual/Tracking-TODO-state-changes.html][Tracking-TODO-state-changes]] for details
+
+Add logging when task state changes
+#+BEGIN_SRC emacs-lisp
+  (setq org-log-done 'time) ; 'time/'note
+  (setq org-log-redeadline 'note)
+  (setq org-log-into-drawer t)  ; Save state changes into LOGBOOK drawer instead of in the body
+  (setq org-treat-insert-todo-heading-as-state-change t)
+#+END_SRC
 
 Change from any todo state to any other state using =C-c C-t KEY=
 #+BEGIN_SRC emacs-lisp
@@ -1146,11 +1155,13 @@ From [[http://emacs.stackexchange.com/questions/2952/display-errors-and-warnings
 #+END_SRC
 
 **** org-bullets
+Other bullets to consider:
+Default: "◉ ○ ✸ ✿"
+Large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
+Small: ► • ★ ▸
+
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
-    :init
-    ;; (setq org-bullets-bullet-list '("●"))
-    ;; (setq org-bullets-bullet-list '("○"))
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+END_SRC
@@ -1278,10 +1289,6 @@ Refile to top level
 #+END_SRC
 
 ***** TODO Show filename while refiling to headings in other files
-:LOGBOOK:
-- State "TODO"       from              [2017-10-13 Fri 17:45]
-:END:
-
 ***** TODO Set org-refile targets based on current file
 Why would I want to refile something work-related under Softwares etc.
 A way to do it is by writing a function that sets /org-refile-targets/ in a let binding making it local.
@@ -1408,9 +1415,6 @@ Note that =org-id= has been updated since then and now supports a method =org-id
 Also, it uses the identifier /ID/ instead of /CUSTOM_ID/
 
 ***** TODO Use org-id globally across all files
-:LOGBOOK:
-- State "TODO"       from              [2017-03-18 Sat 19:50]
-:END:
 Example on [[http://stackoverflow.com/a/27158715/734153][Emacs StackExchange]]
 #+BEGIN_SRC emacs-lisp
   (setq org-id-track-globally t)
@@ -1506,6 +1510,14 @@ Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-ke
 #+END_SRC
 
 *** TODO Diminish org-indent-mode
+** pcre2el
+From [[https://www.reddit.com/r/emacs/comments/60nb8b/favorite_builtin_emacs_commands/df8h8hm/][/u/Irkry on reddit]]
+#+BEGIN_SRC emacs-lisp
+  (use-package pcre2el
+    :diminish pcre-mode
+    :config
+    (pcre-mode t))
+#+END_SRC
 
 ** rainbow-delimiters
 Use brighter colors
@@ -1599,16 +1611,11 @@ Shows which keys can be pressed next. Eg. if you press =C-x= and wait a few seco
     :config  (which-key-mode))
 #+END_SRC
 
-** pcre2el
-From [[https://www.reddit.com/r/emacs/comments/60nb8b/favorite_builtin_emacs_commands/df8h8hm/][/u/Irkry on reddit]]
-#+BEGIN_SRC emacs-lisp
-  (use-package pcre2el
-    :diminish pcre-mode
-    :config
-    (pcre-mode t))
-#+END_SRC
-
 ** Themes
+Useful commands:
+=list-faces-display= - List all faces with colors and sample text
+=list-colors-display= - List all colors with their names
+
 *** load-theme hook
 Emacs doesn't have a native hook that is called after a theme has loaded. So we've to create one. (from [[https://www.reddit.com/r/emacs/comments/4v7tcj/does_emacs_have_a_hook_for_when_the_theme_changes/d5wyu1r/][reddit]])
 #+BEGIN_SRC emacs-lisp
@@ -1636,8 +1643,7 @@ eg.
           evil-visual-state-cursor   '("#006FE0" box)
           evil-insert-state-cursor   '("#0000FF" bar)
           evil-replace-state-cursor  '("#D0372D" bar)
-          evil-operator-state-cursor '("#D0372D" hollow)
-          evil-emacs-state-cursor    '("white"   box))
+          evil-operator-state-cursor '("#D0372D" hollow))
 
     (set-face-attribute 'org-agenda-date         nil :height 1.4)
     (set-face-attribute 'org-agenda-date-today   nil :height 1.4)
@@ -1652,15 +1658,14 @@ https://github.com/bbatsov/solarized-emacs
 #+BEGIN_SRC emacs-lisp
   (use-package solarized-theme
     ;; :disabled
-    :init
+    :config
+    (load-theme 'solarized-light t)
+
     (setq evil-normal-state-cursor   '("#719e07" box)
           evil-visual-state-cursor   '("#b58900" box)
           evil-insert-state-cursor   '("#268bd2" bar)
           evil-replace-state-cursor  '("#dc322f" bar)
-          evil-operator-state-cursor '("#dc322f" hollow)
-          evil-emacs-state-cursor    '("white"   box))
-    :config
-    (load-theme 'solarized-light t))
+          evil-operator-state-cursor '("#dc322f" hollow)))
 #+END_SRC
 
 *** base16
@@ -1673,8 +1678,7 @@ https://github.com/bbatsov/solarized-emacs
           evil-visual-state-cursor   '("#b58900" box)
           evil-insert-state-cursor   '("#268bd2" bar)
           evil-replace-state-cursor  '("#dc322f" bar)
-          evil-operator-state-cursor '("#dc322f" hollow)
-          evil-emacs-state-cursor    '("white"   box)))
+          evil-operator-state-cursor '("#dc322f" hollow)))
 #+END_SRC
 
 ** TODO hydra
@@ -1699,9 +1703,6 @@ Ideas in https::/github.com/kana/vim-submode
 #+END_SRC
 
 *** TODO Restart the SML REPL
-:LOGBOOK:
-- State "TODO"       from "TODO"       [2017-03-19 Sun 11:23]
-:END:
 #+BEGIN_SRC emacs-lisp :tangle no
   (defun my/restart-sml-repl ()
     "Restarts the SML REPL"
@@ -1776,10 +1777,6 @@ Ideas in https::/github.com/kana/vim-submode
 #+END_SRC
 
 **** TODO Launch sml-repl if not running when evaluating a code-block
-:LOGBOOK:
-- State "TODO"       from "TODO"       [2017-03-19 Sun 11:23]
-:END:
-
 **** END
 #+BEGIN_SRC emacs-lisp
   )
@@ -1791,9 +1788,6 @@ Ideas in https::/github.com/kana/vim-submode
 #+END_SRC
 
 * After
-:PROPERTIES:
-:header-args: :tangle yes
-:END:
 ** Private config
 #+BEGIN_SRC emacs-lisp
   (when (string< "atlhen" system-name)
