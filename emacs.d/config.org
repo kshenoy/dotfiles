@@ -1,7 +1,6 @@
-# -*- org-log-into-drawer: nil; org-todo-keywords: (quote ((sequence "TODO" "DONE"))); -*-
-
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args :results output silent
+#+TODO: TODO | DONE
 
 * Init
 ** Archives
@@ -29,11 +28,21 @@ Install and load use-package
       (setq use-package-always-demand t))
 #+END_SRC
 
-** TODO Check if there's a way to keep all the config in this file itself with init.el being empty
+** TODO Simplify init process
+Check if there's a way to keep all the config in this file itself with init.el being empty
 Sacha Chua seems to have something like that. Her init.el is simply a link.
 Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/shaving_time_on_emacs_startup_from_org_literate/][reddit thread]].
 
 * General
+** Convenience functions
+Loop over all hooks (from [[https://github.com/cofi/dotfiles/blob/master/emacs.d/config/cofi-util.el#L38][cofi@github]])
+#+BEGIN_SRC emacs-lisp
+  (defun my/add-hooks (hooks fun)
+    "Add function FUN to all HOOKS"
+    (dolist (hook hooks)
+      (add-hook hook fun)))
+#+END_SRC
+
 ** Keybinds
 #+BEGIN_SRC emacs-lisp
   (bind-keys* :prefix-map my-leader-map
@@ -74,6 +83,8 @@ Since I don't use any of these, might as well put them to better use.
               :prefix-docstring "This map is used to toggle settings ala vim-unimpaired"
               :prefix "~")
 #+END_SRC
+
+To delete existing bindings, use =(unbind-key ...)=
 
 *** Misc
 #+BEGIN_SRC emacs-lisp
@@ -146,10 +157,10 @@ Remove visual clutter
   (setq inhibit-startup-message t)
   (setq initial-scratch-message "")
 
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-  ;; (tooltip-mode -1)
+  (menu-bar-mode 0)
+  (tool-bar-mode 0)
+  (scroll-bar-mode 0)
+  ;; (tooltip-mode 0)
 #+END_SRC
 
 We can also put something like this into =~/.Xresources= to enable/disable certain things as soon as Emacs starts
@@ -390,6 +401,12 @@ Since these are buffer-local variables, I have to use =setq-default=
   (bind-key "SPC" 'my/toggle-trailing-whitespace my-unimpaired-toggle-map)
 #+END_SRC
 
+Disable it in some modes
+#+BEGIN_SRC emacs-lisp
+  (my/add-hooks '(term-mode-hook calendar-mode-hook help-mode-hook compilation-mode-hook)
+                (lambda() (setq show-trailing-whitespace nil)))
+#+END_SRC
+
 *** Delete trailing whitespace
 Automatically while saving (from [[https://www.emacswiki.org/emacs/DeletingWhitespace#toc3][emacswiki]])
 #+BEGIN_SRC emacs-lisp
@@ -409,15 +426,10 @@ Use =C-c s SPC= to delete trailing whitespace manually
 ** Terminal
 Specify the shell to use to avoid prompt. From [[https://youtu.be/L9vA7FHoQnk?list=PLX2044Ew-UVVv31a0-Qn3dA6Sd_-NyA1n&t=192][Uncle Dave's video]]
 #+BEGIN_SRC emacs-lisp
-  (defvar my-term-shell "/usr/bin/bash")
+  (defvar my-term-shell "/bin/bash")
   (defadvice ansi-term (before force-bash)
     (interactive (list my-term-shell)))
   (ad-activate 'ansi-term)
-#+END_SRC
-
-Disable trailing whitespace hightlighting
-#+BEGIN_SRC emacs-lisp
-  ;; (add-hook 'term-mode-hook '(lambda() (setq show-trailing-whitespace nil)))
 #+END_SRC
 
 Launch
@@ -470,35 +482,6 @@ Set frame size programatically
                       (set-frame-size     (selected-frame) 1902 1122 t))))
 #+END_SRC
 
-Start maximized
-#+BEGIN_SRC emacs-lisp :tangle no
-  ;; Open in fullscreen
-  (defun my/switch-fullscreen nil
-    "Switch to fullscreen. Works in OSX."
-    (interactive)
-    (let* ((modes '(nil fullboth fullwidth fullheight))
-           (cm (cdr (assoc 'fullscreen (frame-parameters))))
-           (next (cadr (member cm modes))))
-      (modify-frame-parameters
-       (selected-frame)
-       (list (cons 'fullscreen next)))))
-  (my/switch-fullscreen)
-
-  ;; Start maximized
-  (custom-set-variables '(initial-frame-alist (quote ((fullscreen . maximized)))))
-#+END_SRC
-
-Transparency
-#+BEGIN_SRC emacs-lisp :tangle no
-  (set-frame-parameter (selected-frame) 'alpha '(85 85))
-  (add-to-list 'default-frame-alist '(alpha 85 85))
-#+END_SRC
-
-Avoid Emacs hanging for a while after changing default font:
-#+BEGIN_SRC emacs-lisp :tangle no
-  (modify-frame-parameters nil '((wait-for-wm . nil)))
-#+END_SRC
-
 ** TODO Scratch
 Mode-specific scratch buffers?
 
@@ -516,13 +499,15 @@ Placing at top since it'll be used by most of the other packages
 ** aggressive-indent
 #+BEGIN_SRC emacs-lisp
   (use-package aggressive-indent
+    :diminish aggressive-indent-mode
     :config
     (global-aggressive-indent-mode t))
 #+END_SRC
 
-** beacon-mode
+** beacon
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
+    :diminish beacon-mode
     :init
     (setq beacon-blink-when-window-scrolls nil
           beacon-color (face-attribute 'highlight :background))
@@ -534,12 +519,57 @@ Placing at top since it'll be used by most of the other packages
                 (setq beacon-color (face-attribute 'highlight :background)))))
 #+END_SRC
 
-** company
+** auto-completion
+Entire section used from [[https://youtu.be/XeWZfruRu6k][Uncle Dave's video]]
+*** company
 Provides auto-completion
 #+BEGIN_SRC emacs-lisp
   (use-package company
+    :diminish company-mode
     :init
-    (add-hook 'after-init-hook 'global-company-mode))
+    (add-hook 'after-init-hook 'global-company-mode)
+
+    :config
+    (setq company-idle-delay 0
+          company-minimum-prefix-length 2)
+
+    (add-to-list 'company-backends 'company-yasnippet)
+
+    (add-hook 'c++-mode-hook 'company-mode)
+    (add-hook 'c-mode-hook 'company-mode)
+#+END_SRC
+
+Misc company-plugins
+#+BEGIN_SRC emacs-lisp
+  (use-package company-irony
+    :config
+    (add-to-list 'company-backends 'company-irony))
+#+END_SRC
+
+**** Keybindings
+Replace Meta bindings with Ctrl
+#+BEGIN_SRC emacs-lisp
+  (unbind-key "M-n" company-active-map)
+  (unbind-key "M-p" company-active-map)
+
+  (bind-keys :map company-active-map
+             ("C-n" . company-select-next)
+             ("C-p" . company-select-previous))
+#+END_SRC
+
+**** END
+#+BEGIN_SRC emacs-lisp
+)
+#+END_SRC
+
+*** irony
+#+BEGIN_SRC emacs-lisp
+  (use-package irony
+    :diminish irony-mode
+    :config
+    (add-hook 'c++-mode-hook 'irony-mode)
+    (add-hook 'c-mode-hook 'irony-mode)
+    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 #+END_SRC
 
 ** evil
@@ -721,7 +751,7 @@ Enable only for programming modes
 ** ivy, swiper, counsel
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
-    :diminish (ivy-mode . "")
+    :diminish ivy-mode
     :config
     (ivy-mode 1)
     (bind-key "b" 'ivy-switch-buffer my-jumper-command-map)
@@ -755,6 +785,7 @@ From [[https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-ivy
 *** counsel
 #+BEGIN_SRC emacs-lisp
   (use-package counsel
+    :commands counsel-org-tag
     :bind* ("C-h a" . counsel-apropos)
 #+END_SRC
 
@@ -762,14 +793,11 @@ Use =C-c j= as prefix for all counsel-related keybinds
 #+BEGIN_SRC emacs-lisp
   :bind (:map my-jumper-command-map
               ("o" . counsel-semantic-or-imenu)
-              ("/" . counsel-ag)
-         :map org-mode-map
-              ("C-c C-q" . counsel-org-tag))
+              ("/" . counsel-ag)))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  )
-#+END_SRC
+NOTE: I'm deferring loading by using the =commands= keyword for =counsel-org-tag= because the binding for it,
+=C-c C-q= is found in =org-mode-map= which hasn't been defined yet.
 
 ** org
 This solution is by [[https://www.reddit.com/r/emacs/comments/5sx7j0/how_do_i_get_usepackage_to_ignore_the_bundled/ddixpr9/][/u/Wolfer1ne on reddit]].
@@ -934,7 +962,7 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 *** :config
 #+BEGIN_SRC emacs-lisp
   :config
-  (eval-after-load 'org-indent '(diminish org-indent-mode))
+  (eval-after-load 'org-indent '(diminish 'org-indent-mode))
 #+END_SRC
 
 **** Make org-mode play nicely with Google Chrome
@@ -1504,14 +1532,17 @@ Custom keymap for org-mode bindings.
              ("C-o" . org-open-at-point))
 #+END_SRC
 
+#+BEGIN_SRC emacs-lisp
+  (bind-key "C-c C-q" 'counsel-org-tag org-mode-map)
+#+END_SRC
+
 Note that org-mode usually has the same command mapped to both =<Prefix> [a-z]= and =<Prefix> C-[a-z]=.
 In such cases, I can use =<Prefix> [a-z]= to bind to something else and leave =<Prefix> C-[a-z]= alone.
 The mnemonic is that Org leaves =C-c [a-z]= free for the user. Thus, I'm using =[a-z]= in other places too.
 
 Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
 #+BEGIN_SRC emacs-lisp
-  :bind (:map org-babel-map
-              ("C-k" . org-babel-remove-result))
+  (bind-key "C-k" 'org-babel-remove-result org-babel-map)
 #+END_SRC
 
 *** use-package END
@@ -1519,7 +1550,6 @@ Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-ke
   )
 #+END_SRC
 
-*** TODO Diminish org-indent-mode
 ** pcre2el
 From [[https://www.reddit.com/r/emacs/comments/60nb8b/favorite_builtin_emacs_commands/df8h8hm/][/u/Irkry on reddit]]
 #+BEGIN_SRC emacs-lisp
@@ -1527,6 +1557,13 @@ From [[https://www.reddit.com/r/emacs/comments/60nb8b/favorite_builtin_emacs_com
     :diminish pcre-mode
     :config
     (pcre-mode t))
+#+END_SRC
+
+** popup-kill-ring
+Use =M-y= to show a list of all killed/yanked text to paste at the cursor location
+#+BEGIN_SRC emacs-lisp
+  (use-package popup-kill-ring
+    :bind ("M-y" . popup-kill-ring))
 #+END_SRC
 
 ** rainbow-delimiters
@@ -1586,23 +1623,30 @@ Default binding is =C-x u=
 #+END_SRC
 
 ** yasnippet
+NOTE: I don't want to use =:bind= here because I'm adding bindings to a map which doesn't exist till the plugin is loaded.
+I've been using =:bind= as a means to defer loading the package; in this case, it doesn't do that. I could use =:bind= here,
+and while =use-package= does allow it, I want to avoid confusion when I read this 3 months later wondering how it works.
+
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :diminish yas-minor-mode
     :init
     (setq-default yas-snippet-dirs (list (concat user-emacs-directory "snippets")))
     (setq yas-wrap-around-region t)  ; Automatically insert selected text at $0, if any
-    :bind (:map yas-minor-mode-map
-                ("C-c & n" . yas-new-snippet)
-                ("C-c & s" . yas-insert-snippet)
-                ("C-c & v" . yas-visit-snippet-file)
-                ("C-c & r" . yas-reload-all)
-                ("C-c & &" . yas-describe-tables)))
+    :config
+    (bind-keys :map yas-minor-mode-map
+               ("C-c & n" . yas-new-snippet)
+               ("C-c & s" . yas-insert-snippet)
+               ("C-c & v" . yas-visit-snippet-file)
+               ("C-c & r" . yas-reload-all)
+               ("C-c & &" . yas-describe-tables))
+    (yas-global-mode 1))
+
 #+END_SRC
 
 Enable only for programming modes
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'yas-minor-mode)
+  (add-hook 'prog-mode-hook #'yas-minor-mode)
 #+END_SRC
 
 ** which-key
@@ -1792,6 +1836,11 @@ Ideas in https::/github.com/kana/vim-submode
 * After
 ** Private config
 #+BEGIN_SRC emacs-lisp
-  (when (string< "atlhen" system-name)
+  (when (string-match-p "atlhen" (system-name))
     (load (concat user-emacs-directory "private_work.el") t))
 #+END_SRC
+
+** File-local variables
+# Local Variables:
+# org-confirm-babel-evaluate: nil
+# End:

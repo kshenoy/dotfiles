@@ -11,6 +11,7 @@ emacs.d/bookmarks
 emacs.d/config.el*
 emacs.d/elpa/
 emacs.d/games/
+emacs.d/irony
 emacs.d/history
 emacs.d/org-wunderlist/
 emacs.d/network-security.data
