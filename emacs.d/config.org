@@ -503,6 +503,8 @@ Avoid Emacs hanging for a while after changing default font:
 Mode-specific scratch buffers?
 
 * Packages
+=(featurep 'PACKAGE)= can be used to determine if the package has been loaded or not
+
 ** diminish
 Placing at top since it'll be used by most of the other packages
 #+BEGIN_SRC emacs-lisp
@@ -557,23 +559,26 @@ evil can be toggled using =C-z=
 **** evil-args
 #+BEGIN_SRC emacs-lisp
   (use-package evil-args
-    :commands (evil-inner-arg evil-outer-arg evil-forward-arg evil-backward-arg)
-    :init
-    (bind-key "," 'evil-inner-arg evil-inner-text-objects-map)
-    (bind-key "," 'evil-outer-arg evil-outer-text-objects-map)
-    (bind-keys :map evil-normal-state-map
-               ("] ," . evil-forward-arg)
-               ("[ ," . evil-backward-arg)
-               :map evil-motion-state-map
-               ("] ," . evil-forward-arg)
-               ("[ ," . evil-backward-arg)))
+    :bind (:map evil-inner-text-objects-map
+                ("," . evil-inner-arg)
+           :map evil-outer-text-objects-map
+                ("," . evil-outer-arg)
+           :map evil-normal-state-map
+                ("] ," . evil-forward-arg)
+                ("[ ," . evil-backward-arg)
+           :map evil-motion-state-map
+                ("] ," . evil-forward-arg)
+                ("[ ," . evil-backward-arg)))
 #+END_SRC
 
 **** evil-commentary
 #+BEGIN_SRC emacs-lisp
   (use-package evil-commentary
     :diminish evil-commentary-mode
-    :config (evil-commentary-mode))
+    :bind (:map evil-normal-state-map
+                ("g c" . evil-commentary)
+                :map evil-visual-state-map
+                ("g c" . evil-commentary)))
 #+END_SRC
 
 **** evil-exchange
@@ -590,12 +595,10 @@ evil can be toggled using =C-z=
 **** evil-numbers
 #+BEGIN_SRC emacs-lisp
   (use-package evil-numbers
-    :commands (evil-numbers/inc-at-pt evil-numbers/dec-at-pt)
-    :init
-    (bind-keys :map evil-normal-state-map
+    :bind (:map evil-normal-state-map
                ("C-c +" . evil-numbers/inc-at-pt)
                ("C-c -" . evil-numbers/dec-at-pt)
-               :map evil-visual-state-map
+           :map evil-visual-state-map
                ("C-c +" . evil-numbers/inc-at-pt)
                ("C-c -" . evil-numbers/dec-at-pt)))
 #+END_SRC
@@ -604,7 +607,10 @@ evil can be toggled using =C-z=
 Provides =g~= operator to cycle between snake_case → SCREAMING_SNAKE_CASE → TitleCase → CamelCase → kebab-case
 #+BEGIN_SRC emacs-lisp
   (use-package evil-string-inflection
-    :ensure t)
+    :bind (:map evil-normal-state-map
+                ("g ~" . evil-operator-string-inflection)
+           :map evil-visual-state-map
+                ("g ~" . evil-operator-string-inflection)))
 #+END_SRC
 
 **** evil-surround
@@ -703,9 +709,13 @@ More intuitive keybinds for winner-mode
   (use-package flycheck
     :diminish flycheck-mode
     :init
-    (global-flycheck-mode t)
     (setq flycheck-gcc-language-standard "c++14"
           flycheck-clang-language-standard "c++14"))
+#+END_SRC
+
+Enable only for programming modes
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'c++-mode-hook 'flycheck-mode)
 #+END_SRC
 
 ** ivy, swiper, counsel
@@ -752,8 +762,8 @@ Use =C-c j= as prefix for all counsel-related keybinds
 #+BEGIN_SRC emacs-lisp
   :bind (:map my-jumper-command-map
               ("o" . counsel-semantic-or-imenu)
-              ("/" . counsel-ag))
-  :bind (:map org-mode-map
+              ("/" . counsel-ag)
+         :map org-mode-map
               ("C-c C-q" . counsel-org-tag))
 #+END_SRC
 
@@ -1534,7 +1544,8 @@ Use brighter colors
       (set-face-attribute 'rainbow-delimiters-depth-7-face nil :foreground "spring green")
       (set-face-attribute 'rainbow-delimiters-depth-8-face nil :foreground "sienna1"))
 
-    :bind (:map my-unimpaired-toggle-map ("r" . rainbow-delimiters-mode)))
+    :bind (:map my-unimpaired-toggle-map
+                ("r" . rainbow-delimiters-mode)))
 #+END_SRC
 
 ** rainbow-mode
@@ -1552,12 +1563,16 @@ Default binding is =C-x u=
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
     :diminish undo-tree-mode
-    :commands (undo-tree-visualize)
+    :bind (:map my-unimpaired-toggle-map
+                ("U" . undo-tree-visualize)
+           :map my-unimpaired-enable-map
+                ("U" . undo-tree-visualize))
     :config
-    (global-undo-tree-mode)
     (setq undo-tree-visualizer-timestamps t)
     (setq undo-tree-visualizer-diff t))
 #+END_SRC
+
+*** TODO Defer loading
 
 ** verilog-mode
 #+BEGIN_SRC emacs-lisp
@@ -1574,33 +1589,20 @@ Default binding is =C-x u=
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :diminish yas-minor-mode
-
     :init
     (setq-default yas-snippet-dirs (list (concat user-emacs-directory "snippets")))
     (setq yas-wrap-around-region t)  ; Automatically insert selected text at $0, if any
-
-    ;; :config
-    ;; (defun my/add-yasnippet-ac-sources ()
-    ;;   (add-to-list 'ac-sources 'ac-source-yasnippet))
-    ;; (add-hook 'c++-mode-hook 'my/add-yasnippet-ac-sources)
-
-    ;; Use S-Tab instead of Tab to avoid conflict with auto-complete. Unbind Tab
-    ;; We have to do this two separate ways: http://ergoemacs.org/emacs/emacs_key_notation_return_vs_RET.html
-    ;; (define-key yas-minor-mode-map (kbd "TAB") nil)
-    ;; (define-key yas-minor-mode-map (kbd "<tab>") nil)
-
     :bind (:map yas-minor-mode-map
-                ("C-c & n"   . yas-new-snippet)
-                ("C-c & s"   . yas-insert-snippet)
-                ("C-c & v"   . yas-visit-snippet-file)
-                ("C-c & r"   . yas-reload-all)
-                ("C-c & &"   . yas-describe-tables)))
+                ("C-c & n" . yas-new-snippet)
+                ("C-c & s" . yas-insert-snippet)
+                ("C-c & v" . yas-visit-snippet-file)
+                ("C-c & r" . yas-reload-all)
+                ("C-c & &" . yas-describe-tables)))
 #+END_SRC
 
-Enable yasnippet only for certain modes
+Enable only for programming modes
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'org-mode-hook 'yas-minor-mode)
-  (add-hook 'c++-mode-hook 'yas-minor-mode)
+  (add-hook 'prog-mode-hook 'yas-minor-mode)
 #+END_SRC
 
 ** which-key
@@ -1661,7 +1663,7 @@ https://github.com/bbatsov/solarized-emacs
     :config
     (load-theme 'solarized-light t)
 
-    (setq evil-normal-state-cursor   '("#719e07" box)
+    (setq evil-normal-state-cursor   '("#859900" box)
           evil-visual-state-cursor   '("#b58900" box)
           evil-insert-state-cursor   '("#268bd2" bar)
           evil-replace-state-cursor  '("#dc322f" bar)
