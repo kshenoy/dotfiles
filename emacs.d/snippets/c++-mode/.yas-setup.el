@@ -3,7 +3,7 @@
 (defun camelize (str)
   "Convert STR from snake_case to CamelCase"
   (mapconcat 'identity (mapcar
-                        '(lambda (word) (capitalize (downcase word)))
+                        #'(lambda (word) (capitalize (downcase word)))
                         (split-string str "_")) ""))
 
 (defun yas-c++-class-name ()

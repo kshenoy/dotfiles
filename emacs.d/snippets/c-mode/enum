@@ -1,5 +1,4 @@
 # -*- mode: snippet -*-
 # key: en
-# uuid: cc-enum
 # --
 enum ${1:name} { $0 };

@@ -8,7 +8,6 @@
 
 (custom-set-variables '(debug-on-error t))
 
-
 ;; Declare config.org as a global variable
 (defvar my-init-config (expand-file-name "config.org" user-emacs-directory)
   "Main configuration org file")
