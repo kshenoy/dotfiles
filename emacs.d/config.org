@@ -28,6 +28,9 @@ Install and load use-package
       (setq use-package-always-demand t))
 #+END_SRC
 
+*** TODO Use =:hook= to defer loading packages
+eg. flycheck, yasnippet, irony all of which should be enabled only in c/c++ mode
+
 ** TODO Simplify init process
 Check if there's a way to keep all the config in this file itself with init.el being empty
 Sacha Chua seems to have something like that. Her init.el is simply a link.
@@ -520,6 +523,14 @@ Placing at top since it'll be used by most of the other packages
 #+END_SRC
 
 ** auto-completion
+Create a keybinding map specifically for auto-completion
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :map my-leader-map
+             :prefix-map my-auto-completion-map
+             :prefix-docstring "This map is used to put all auto-completion related keybinds"
+             :prefix "c")
+#+END_SRC
+
 Entire section used from [[https://youtu.be/XeWZfruRu6k][Uncle Dave's video]]
 *** company
 Provides auto-completion
@@ -529,21 +540,59 @@ Provides auto-completion
     :init
     (add-hook 'after-init-hook 'global-company-mode)
 
+    :bind (:map my-auto-completion-map
+                ("y" . company-yasnippet))
+
     :config
     (setq company-idle-delay 0
-          company-minimum-prefix-length 2)
-
-    (add-to-list 'company-backends 'company-yasnippet)
+          company-minimum-prefix-length 2
+          company-show-numbers t)          ; Show numbers in the drop-down menu to simplify selection
 
     (add-hook 'c++-mode-hook 'company-mode)
     (add-hook 'c-mode-hook 'company-mode)
 #+END_SRC
 
-Misc company-plugins
+**** Misc plugins
 #+BEGIN_SRC emacs-lisp
   (use-package company-irony
     :config
     (add-to-list 'company-backends 'company-irony))
+#+END_SRC
+
+**** Don't get in the way of mah typing!
+Make =RET= and =TAB= trigger a completion only if I have explicitly interactived with Company ([[https://github.com/raxod502/radian/blob/223abc524f693504af6ebbc70ad2d84d9a6e2d1b/radian-emacs/radian-autocomplete.el#L6-L182][link]])
+(=<return>= and =<tab>= are for windowed emacs while =RET= and =TAB= are for terminal)
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :map company-active-map
+             :filter (company-explicit-action-p)
+             ("<return>" . company-complete-selection)
+             ("RET"      . company-complete-selection)
+             ("<tab>"    . company-complete-common)
+             ("TAB"      . company-complete-common))
+#+END_SRC
+
+When there's only one selection, by default company displays it in front of the cursor instead of as a drop-down list.
+This kinda messes with the whole 'complete only if explicitly interacted with' flow since it's not possible to define an
+interaction in this case, so disabling it and instead making company show the pop-up menu even for a single suggestion.
+#+BEGIN_SRC emacs-lisp
+  (setq company-auto-complete-chars nil
+        company-frontends '(company-pseudo-tooltip-frontend))
+#+END_SRC
+
+***** TODO Make company not automatically highlight the first entry
+**** Enable yasnippet for all backends
+Disabled to avoid clutter. If required, it can still be triggered using =C-c c y=
+
+(from [[https://emacs.stackexchange.com/a/10520/9690][emacs.stackexchange]])
+Keeping this at the end to be run after we've added all backends
+#+BEGIN_SRC emacs-lisp :tangle no
+  (defun company-mode/backend-with-yas (backend)
+    (if (and (listp backend) (member 'company-yasnippet backend))
+        backend
+      (append (if (consp backend) backend (list backend))
+              '(:with company-yasnippet))))
+
+  (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
 #+END_SRC
 
 **** Keybindings
@@ -557,7 +606,7 @@ Replace Meta bindings with Ctrl
              ("C-p" . company-select-previous))
 #+END_SRC
 
-**** END
+**** /fin/
 #+BEGIN_SRC emacs-lisp
 )
 #+END_SRC
@@ -729,7 +778,7 @@ More intuitive keybinds for winner-mode
   ;;                      evil-emacs-state-cursor '(my-evil-emacs-state-cursor-color box))))
 #+END_SRC
 
-*** END
+*** /fin/
 #+BEGIN_SRC emacs-lisp
   )
 #+END_SRC
@@ -748,7 +797,7 @@ Enable only for programming modes
   (add-hook 'c++-mode-hook 'flycheck-mode)
 #+END_SRC
 
-** ivy, swiper, counsel
+** ivy et al.
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
     :diminish ivy-mode
@@ -757,16 +806,27 @@ Enable only for programming modes
     (bind-key "b" 'ivy-switch-buffer my-jumper-command-map)
     (setq ivy-count-format "%d/%d "
           ivy-height 12
-          ivy-extra-directories nil
-          ivy-use-virtual-buffers t)
+          ivy-extra-directories nil)
+#+END_SRC
+
+Create binding to show buffers, recent files and bookmarks. There is a variable =ivy-use-virtual-buffers= that does this. However, it is static and when set, dumps everything in =ivy-switch-buffer=.
+As a result, by default I have to choose one or the other; I can't have both. This fixes that.
+#+BEGIN_SRC emacs-lisp
+  (defun my/ivy-switch-virtual-buffer ()
+    "Show recent files and bookmarks in the buffer list"
+    (interactive)
+    (let* ((ivy-use-virtual-buffers t))
+      (ivy-switch-buffer)))
+
+  (bind-key "j" 'my/ivy-switch-virtual-buffer my-jumper-command-map)
 #+END_SRC
 
 From [[https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-ivy.el][kaushalmodi's repo]]
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (defun my/ivy-set-prompt-text-properties (prompt std-props)
-    "Add a different face for the \"<..>\" string in `counsel-set-variable'."
+    "Add a different face for the current value in `counsel-set-variable'."
     (ivy--set-match-props prompt "<\\(.*\\)>"
-                          `(face font-lock-string-face ,@std-props) 1)
+                          `(face font-lock-constant-face ,@std-props) 1)
     (ivy-set-prompt-text-properties-default prompt std-props))
 
   (setq ivy-set-prompt-text-properties-function 'my/ivy-set-prompt-text-properties)
@@ -783,16 +843,25 @@ From [[https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-ivy
 #+END_SRC
 
 *** counsel
+NOTE: I'm deferring loading using =:commands= for those commands for which I cannot use =:bind= here
+=counsel-org-tag= binding is defined only after org is loaded so I'm defining it there instead.
+=counsel-org-goto= is set conditionally only if we're in org-mode
+
 #+BEGIN_SRC emacs-lisp
   (use-package counsel
-    :commands counsel-org-tag
+    :commands (counsel-org-tag counsel-org-goto counsel-semantic-or-imenu)
     :bind* ("C-h a" . counsel-apropos)
 #+END_SRC
 
 Use =C-c j= as prefix for all counsel-related keybinds
 #+BEGIN_SRC emacs-lisp
+  :init
+  (bind-key "o" '(lambda() (interactive) (if (string= major-mode "org-mode")
+                                        (counsel-org-goto)
+                                      (counsel-semantic-or-imenu)))
+            my-jumper-command-map)
+
   :bind (:map my-jumper-command-map
-              ("o" . counsel-semantic-or-imenu)
               ("/" . counsel-ag)))
 #+END_SRC
 
@@ -974,39 +1043,23 @@ From [[http://stackoverflow.com/a/6309985/734153][StackOverflow]]
 
 **** Templates
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'org-structure-template-alist '("sc" "#+BEGIN_SRC C++\n  #include <iostream>\n\n  using namespace std;\n\n  int main() {\n    ?cout << \"Hello World!\" << endl;\n  }\n#+END_SRC"))
+  (add-to-list 'org-structure-template-alist
+               '("sc" "#+BEGIN_SRC C++\n  #include <iostream>\n\n  using namespace std;\n\n  int main() {\n    ?cout << \"Hello World!\" << endl;\n  }\n#+END_SRC"))
 
-  (add-to-list 'org-structure-template-alist '("sl" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
+  (add-to-list 'org-structure-template-alist
+               '("sl" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
 
-  (add-to-list 'org-structure-template-alist '("sp" "#+BEGIN_SRC python\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
+  (add-to-list 'org-structure-template-alist
+               '("sp" "#+BEGIN_SRC python\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
 
-  ;; (add-to-list 'org-structure-template-alist '("sd" "#+BEGIN_SRC dot :file /tmp/out.png\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
+  ;; (add-to-list 'org-structure-template-alist
+  ;;              '("sd" "#+BEGIN_SRC dot :file /tmp/out.png\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
 
-  (add-to-list 'org-structure-template-alist '("ss" "#+BEGIN_SRC bash\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
+  (add-to-list 'org-structure-template-alist
+               '("ss" "#+BEGIN_SRC bash\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
 #+END_SRC
 
 =?= in each string controls where the point will be placed after expansion
-
-**** Fonts
-Variable pitch for non-code text taken from [[http://www.xiangji.me/2015/07/13/a-few-of-my-org-mode-customizations][here]].
-#+BEGIN_SRC emacs-lisp
-  (defun my/set-buffer-variable-pitch ()
-    (interactive)
-    (variable-pitch-mode t)
-    (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-code  nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-block nil :inherit 'fixed-pitch))
-
-  ;; (add-hook 'org-mode-hook      'my/set-buffer-variable-pitch)
-  ;; (add-hook 'eww-mode-hook      'my/set-buffer-variable-pitch)
-  ;; (add-hook 'markdown-mode-hook 'my/set-buffer-variable-pitch)
-  ;; (add-hook 'Info-mode-hook     'my/set-buffer-variable-pitch)
-#+END_SRC
-
-NOTE: =org-block-background= has been removed in Org 8.3.1 and from 9.0.0,
-has been completely deprecated and it inherits from =org-block=
-
-General configuration [[id:bd542328-7d1d-4806-936d-a50673beada6][here]]
 
 **** Delete links
 This is the counterpart to =org-insert-link=. From [[http://emacs.stackexchange.com/a/10714/9690][here]].
@@ -1213,14 +1266,16 @@ A good way to find more characters is to use =M-x insert-char=
 #+END_SRC
 
 ***** :init
+Don't add some files to the agenda
 #+BEGIN_SRC emacs-lisp
   :init
   (setq org-agenda-files
         (seq-filter (lambda (x)
                       (and 'file-exists-p
-                           (not (string= x "Spanish.org"))))
+                           (not (string= "Spanish.org" x))
+                           (not (string-match-p "Orgzly" x))))
                     (mapcar (lambda (x) (concat org-directory x))
-                            '("Inbox.org" "Software/" "Personal/"))))
+                            '("Inbox.org" "Software/" "Personal/" "Work/"))))
 
   (setq org-agenda-tags-column            -120) ; Monitors are wide, might as well use it :/
   (setq org-agenda-skip-scheduled-if-done t)    ; Why isn't this default?
@@ -1297,7 +1352,7 @@ Open the custom "Daily agenda and all TODOs" directly. Based on [[http://emacs.s
   (bind-key* "<f12>" '(lambda (&optional arg) (interactive "P")(org-agenda arg "w")))
 #+END_SRC
 
-***** org-agenda END
+***** /fin/
 #+BEGIN_SRC emacs-lisp
   )
 #+END_SRC
@@ -1474,7 +1529,7 @@ Details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
   (org-link-set-parameters "id" :complete 'org-id-complete-link)
 #+END_SRC
 
-***** END
+***** /fin/
 #+BEGIN_SRC emacs-lisp
   )
 #+END_SRC
@@ -1545,7 +1600,7 @@ Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-ke
   (bind-key "C-k" 'org-babel-remove-result org-babel-map)
 #+END_SRC
 
-*** use-package END
+*** /fin/
 #+BEGIN_SRC emacs-lisp
   )
 #+END_SRC
@@ -1623,9 +1678,7 @@ Default binding is =C-x u=
 #+END_SRC
 
 ** yasnippet
-NOTE: I don't want to use =:bind= here because I'm adding bindings to a map which doesn't exist till the plugin is loaded.
-I've been using =:bind= as a means to defer loading the package; in this case, it doesn't do that. I could use =:bind= here,
-and while =use-package= does allow it, I want to avoid confusion when I read this 3 months later wondering how it works.
+Use =C-d= to clear the field without accepting the default field name
 
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
@@ -1641,13 +1694,13 @@ and while =use-package= does allow it, I want to avoid confusion when I read thi
                ("C-c & r" . yas-reload-all)
                ("C-c & &" . yas-describe-tables))
     (yas-global-mode 1))
-
 #+END_SRC
 
-Enable only for programming modes
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook #'yas-minor-mode)
-#+END_SRC
+NOTE: I don't want to use =:bind= here because I'm adding bindings to a map which doesn't exist till the plugin is loaded.
+I've been using =:bind= as a means to defer loading the package; in this case, it doesn't do that. I could use =:bind= here,
+and while =use-package= does allow it, I want to avoid confusion when I read this 3 months later wondering how it works.
+
+*** TODO Enable only for select modes
 
 ** which-key
 Shows which keys can be pressed next. Eg. if you press =C-x= and wait a few seconds, a window pops up with all the key bindings following the currently entered incomplete command.
@@ -1823,14 +1876,9 @@ Ideas in https::/github.com/kana/vim-submode
 #+END_SRC
 
 **** TODO Launch sml-repl if not running when evaluating a code-block
-**** END
+*** /fin/
 #+BEGIN_SRC emacs-lisp
-  )
-#+END_SRC
-
-*** END
-#+BEGIN_SRC emacs-lisp
-  )
+  ))
 #+END_SRC
 
 * After
