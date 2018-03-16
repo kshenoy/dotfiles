@@ -575,10 +575,22 @@ Provides auto-completion
     :config
     (setq company-idle-delay 0
           company-minimum-prefix-length 2
-          company-show-numbers t)          ; Show numbers in the drop-down menu to simplify selection
+          company-show-numbers t           ; Show numbers in the drop-down menu to simplify selection
+          company-selection-wrap-around t)
 
     (add-hook 'c++-mode-hook 'company-mode)
     (add-hook 'c-mode-hook 'company-mode)
+#+END_SRC
+
+**** Keybindings
+Replace Meta bindings with Ctrl
+#+BEGIN_SRC emacs-lisp
+  (unbind-key "M-n" company-active-map)
+  (unbind-key "M-p" company-active-map)
+
+  (bind-keys :map company-active-map
+             ("C-n" . company-select-next)
+             ("C-p" . company-select-previous))
 #+END_SRC
 
 **** Misc plugins
@@ -589,26 +601,71 @@ Provides auto-completion
 #+END_SRC
 
 **** Don't get in the way of mah typing!
-Make =RET= and =TAB= trigger a completion only if I have explicitly interactived with Company ([[https://github.com/raxod502/radian/blob/223abc524f693504af6ebbc70ad2d84d9a6e2d1b/radian-emacs/radian-autocomplete.el#L6-L182][link]])
+The intent of this section is to make company as unobtrusive as possible; I want company to show me completions as I type
+but I want complete control over if I want to accept it or not.
+
+When the completion menu pops-up, the =company-active-map= is activated and it stays open while any key in it is pressed.
+To fix this, I'm going to use [[https://github.com/company-mode/company-mode/blob/master/company-tng.el][company-tng]] (/tab-n-go/) as the frontend which allows showing the menu with no entry selected.
+I'm going to call this as not having explicitly interacted with company and while in this state, I want to reduce the
+number of keys bound in =company-active-map= to minimize my chances of needing to kill it to just be able to continue typing.
+This also inserts the selected entry automatically and since there's no need to confirm, it frees up =RET= as well.
+#+BEGIN_SRC emacs-lisp
+  (use-package company-tng
+    :config
+    (setq company-frontends '(company-tng-frontend
+                              company-pseudo-tooltip-frontend
+                              company-echo-metadata-frontend)))
+#+END_SRC
+
+Unsetting =company-require-match= allows free typing at any point
+#+BEGIN_SRC emacs-lisp
+  (setq company-require-match nil)
+#+END_SRC
+
+Next I'm going to unbind keys that I don't use much so that I can use them for emacs' actions rather than for company's.
+#+BEGIN_SRC emacs-lisp
+  (unbind-key "C-w"      company-active-map)
+  (unbind-key "C-h"      company-active-map)
+  (unbind-key "<f1>"     company-active-map)
+  (unbind-key "<up>"     company-active-map)
+  (unbind-key "<down>"   company-active-map)
+  (unbind-key "<return>" company-active-map)
+  (unbind-key "RET"      company-active-map)
+  (unbind-key "<tab>"    company-active-map)
+  (unbind-key "TAB"      company-active-map)
+#+END_SRC
 (=<return>= and =<tab>= are for windowed emacs while =RET= and =TAB= are for terminal)
+
+Now that I've trimmed the fat, I'm going to work on stuff that I can't remove as I want to use them in the completion menu.
+Some of the keys defined in the keymap are =C-s=, =C-M-s=, =M-[0-9]= etc. are hijacked as soon as the completion menu opens and
+I can't use those for typing normally until I close it even if I haven't explicitly interacted with it.
+So, I'm going to bind these only if I have explicitly interacted with Company. (credit: [[https://github.com/raxod502/radian/blob/223abc524f693504af6ebbc70ad2d84d9a6e2d1b/radian-emacs/radian-autocomplete.el#L6-L182][link]])
 #+BEGIN_SRC emacs-lisp
   (bind-keys :map company-active-map
              :filter (company-explicit-action-p)
-             ("<return>" . company-complete-selection)
-             ("RET"      . company-complete-selection)
-             ("<tab>"    . company-complete-common)
-             ("TAB"      . company-complete-common))
+             ("C-s"   . company-search-candiates)
+             ("C-M-s" . company-filter-candidates)
+             ("M-0"   . company-complete-number)
+             ("M-1"   . company-complete-number)
+             ("M-2"   . company-complete-number)
+             ("M-3"   . company-complete-number)
+             ("M-4"   . company-complete-number)
+             ("M-5"   . company-complete-number)
+             ("M-6"   . company-complete-number)
+             ("M-7"   . company-complete-number)
+             ("M-8"   . company-complete-number)
+             ("M-9"   . company-complete-number))
 #+END_SRC
 
-When there's only one selection, by default company displays it in front of the cursor instead of as a drop-down list.
-This kinda messes with the whole 'complete only if explicitly interacted with' flow since it's not possible to define an
-interaction in this case, so disabling it and instead making company show the pop-up menu even for a single suggestion.
-#+BEGIN_SRC emacs-lisp
-  (setq company-auto-complete-chars nil
-        company-frontends '(company-pseudo-tooltip-frontend))
-#+END_SRC
+All done! Now, while I type, company shows me a list of completions but doesn't highlight any of them till I select one.
+Also, I can use almost all keys to continue typing with the exception of =C-n= and =C-p= which I use to interact with company.
+Pressing =C-n= or =C-p= selects the first or last entry from the completion menu and highlights it.
+Once I've explicitly interacted with the completion menu, I can cycle through the entries using =C-n= and =C-p= and use
+=C-s= or =C-M-s= to search or filter the entries
+Once I select an entry, it's automatically inserted and there's no need to confirm the selection.
+I can also use =M-[0-9]= to directly select and insert any specific entry.
+At any time I can abort the completion using =C-g= and it restores the text to its state before completion.
 
-***** TODO Make company not automatically highlight the first entry
 **** Enable yasnippet for all backends
 Disabled to avoid clutter. If required, it can still be triggered using =C-c c y=
 
@@ -622,17 +679,6 @@ Keeping this at the end to be run after we've added all backends
               '(:with company-yasnippet))))
 
   (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
-#+END_SRC
-
-**** Keybindings
-Replace Meta bindings with Ctrl
-#+BEGIN_SRC emacs-lisp
-  (unbind-key "M-n" company-active-map)
-  (unbind-key "M-p" company-active-map)
-
-  (bind-keys :map company-active-map
-             ("C-n" . company-select-next)
-             ("C-p" . company-select-previous))
 #+END_SRC
 
 **** /fin/
