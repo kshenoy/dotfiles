@@ -368,11 +368,39 @@ Mouse-wheel acts on the hovered window rather than the one where the typing focu
   ;; (setq show-paren-style 'expression)
 #+END_SRC
 
-*** Use symbols
-eg. Replaces the text /lambda/ with λ. Full list of prettified symbols can be found in =prettify-symbols-alist=
+*** Pretty symbols
+Replaces the text /lambda/ with λ. Full list of prettified symbols can be found in =prettify-symbols-alist=
+The =inhibit-compacting-font-caches= stops garbage collect from trying to handle font caches making things a lot faster
 #+BEGIN_SRC emacs-lisp
   (global-prettify-symbols-mode t)
+  (setq inhibit-compacting-font-caches t)
+  (setq prettify-symbols-unprettify-at-point 'right-edge)
 #+END_SRC
+
+Default symbols that must be applied to all modes
+#+BEGIN_SRC emacs-lisp
+  (defun my/pretty-symbols-default()
+    (mapc (lambda(pair) (push pair prettify-symbols-alist))
+          '(("!=" . ?≠)
+            ("<=" . ?≤)
+            (">=" . ?≥))))
+
+  (add-hook 'prog-mode-hook (lambda() (my/pretty-symbols-default)))
+#+END_SRC
+
+C/C++ specific symbols
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'c++-mode-hook
+            (lambda() (mapc (lambda(pair) (push pair prettify-symbols-alist))
+                       '(("->" . (?- (Br . Bc) ?- (Br . Bc) ?>))))))
+#+END_SRC
+
+
+NOTE: Some symbols occupy less space and may affect indendation. In order to avoid this,
+
+**** Using prettify-symbols without breaking indentation
+(From [[http://endlessparentheses.com/using-prettify-symbols-in-clojure-and-elisp-without-breaking-indentation.html][endlessparentheses]])
+Use ~(">=" . (?\s (Br . Bl) ?\s (Bc . Bc) ?≥))~ instead of =?≥=
 
 ** Tabs, Indentation and Spacing
 :PROPERTIES:
@@ -491,18 +519,19 @@ Mode-specific scratch buffers?
 * Packages
 =(featurep 'PACKAGE)= can be used to determine if the package has been loaded or not
 
-** diminish
+** delight
 Placing at top since it'll be used by most of the other packages
 #+BEGIN_SRC emacs-lisp
-  (use-package diminish
+  (use-package delight
     :config
-    (diminish 'visual-line-mode))
+    (delight '((visual-line-mode nil t)
+               (abbrev-mode nil t))))
 #+END_SRC
 
 ** aggressive-indent
 #+BEGIN_SRC emacs-lisp
   (use-package aggressive-indent
-    :diminish aggressive-indent-mode
+    :delight
     :config
     (global-aggressive-indent-mode t))
 #+END_SRC
@@ -510,7 +539,7 @@ Placing at top since it'll be used by most of the other packages
 ** beacon
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
-    :diminish beacon-mode
+    :delight
     :init
     (setq beacon-blink-when-window-scrolls nil
           beacon-color (face-attribute 'highlight :background))
@@ -536,7 +565,7 @@ Entire section used from [[https://youtu.be/XeWZfruRu6k][Uncle Dave's video]]
 Provides auto-completion
 #+BEGIN_SRC emacs-lisp
   (use-package company
-    :diminish company-mode
+    :delight
     :init
     (add-hook 'after-init-hook 'global-company-mode)
 
@@ -614,7 +643,7 @@ Replace Meta bindings with Ctrl
 *** irony
 #+BEGIN_SRC emacs-lisp
   (use-package irony
-    :diminish irony-mode
+    :delight
     :config
     (add-hook 'c++-mode-hook 'irony-mode)
     (add-hook 'c-mode-hook 'irony-mode)
@@ -628,6 +657,7 @@ evil can be toggled using =C-z=
     :init
     (setq evil-want-C-w-in-emacs-state t
           evil-want-Y-yank-to-eol t)
+    :config
     (evil-mode t)
 #+END_SRC
 
@@ -653,7 +683,7 @@ evil can be toggled using =C-z=
 **** evil-commentary
 #+BEGIN_SRC emacs-lisp
   (use-package evil-commentary
-    :diminish evil-commentary-mode
+    :delight
     :bind (:map evil-normal-state-map
                 ("g c" . evil-commentary)
                 :map evil-visual-state-map
@@ -786,7 +816,7 @@ More intuitive keybinds for winner-mode
 ** flycheck
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
-    :diminish flycheck-mode
+    :delight
     :init
     (setq flycheck-gcc-language-standard "c++14"
           flycheck-clang-language-standard "c++14"))
@@ -800,7 +830,7 @@ Enable only for programming modes
 ** ivy et al.
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
-    :diminish ivy-mode
+    :delight
     :config
     (ivy-mode 1)
     (bind-key "b" 'ivy-switch-buffer my-jumper-command-map)
@@ -1031,7 +1061,7 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 *** :config
 #+BEGIN_SRC emacs-lisp
   :config
-  (eval-after-load 'org-indent '(diminish 'org-indent-mode))
+  (delight 'org-indent-mode nil "org-indent")
 #+END_SRC
 
 **** Make org-mode play nicely with Google Chrome
@@ -1526,7 +1556,7 @@ Details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
     "Create an id: link using completion"
     (concat "id:" (org-id-get-with-outline-path-completion)))
 
-  (org-link-set-parameters "id" :complete 'org-id-complete-link)
+  (eval-after-load 'org '(org-link-set-parameters "id" :complete 'org-id-complete-link))
 #+END_SRC
 
 ***** /fin/
@@ -1609,7 +1639,7 @@ Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-ke
 From [[https://www.reddit.com/r/emacs/comments/60nb8b/favorite_builtin_emacs_commands/df8h8hm/][/u/Irkry on reddit]]
 #+BEGIN_SRC emacs-lisp
   (use-package pcre2el
-    :diminish pcre-mode
+    :delight pcre-mode
     :config
     (pcre-mode t))
 #+END_SRC
@@ -1654,7 +1684,7 @@ This lets us visually walk through the changes we've made, undo back to a certai
 Default binding is =C-x u=
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
-    :diminish undo-tree-mode
+    :delight
     :bind (:map my-unimpaired-toggle-map
                 ("U" . undo-tree-visualize)
            :map my-unimpaired-enable-map
@@ -1682,7 +1712,7 @@ Use =C-d= to clear the field without accepting the default field name
 
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
-    :diminish yas-minor-mode
+    :delight yas-minor-mode
     :init
     (setq-default yas-snippet-dirs (list (concat user-emacs-directory "snippets")))
     (setq yas-wrap-around-region t)  ; Automatically insert selected text at $0, if any
@@ -1706,7 +1736,7 @@ and while =use-package= does allow it, I want to avoid confusion when I read thi
 Shows which keys can be pressed next. Eg. if you press =C-x= and wait a few seconds, a window pops up with all the key bindings following the currently entered incomplete command.
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
-    :diminish which-key-mode
+    :delight
     :config  (which-key-mode))
 #+END_SRC
 
