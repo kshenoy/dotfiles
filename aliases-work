@@ -107,7 +107,14 @@ alias pfco='p4_mkwa -change_branch'
 alias pfres='p4 resolve'
 alias pfrev='p4 revert'
 alias pflog='p4 filelog -stl -m 5'
-pftop() { p4 changes -m ${1:-10} $STEM/...; }
+pftop() {
+  local num=10
+  if (( $# > 0 )) && [[ "$1" =~ ^[0-9]+$ ]]; then
+    num=$1
+    shift
+  fi
+  p4 changes -m $num "$@" $STEM/...
+}
 alias pfs='p4w submit'
 alias pful='pfu @latest'
 

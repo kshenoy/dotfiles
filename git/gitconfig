@@ -67,4 +67,4 @@
   br-rm-all    = !"f() { branch=${1-$(git branch-name)}; git push origin :$branch; git branch -D $branch; }; f"
   lg = log --color --graph --pretty=format:' %C(yellow)%h %C(bold blue)<%an>%C(reset) %s %C(green)(%cr)%C(reset)%C(red)%d%C(reset)' --abbrev-commit
   ls = log --oneline --decorate
-  sync = "!git stash && git pull && git stash pop"
+  sync = "pull --rebase"

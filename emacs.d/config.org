@@ -845,12 +845,8 @@ More intuitive keybinds for winner-mode
              ("U" . winner-redo))
 #+END_SRC
 
-**** TODO Set emacs-state-cursor face to the default used by the colorscheme
-#+BEGIN_SRC emacs-lisp
-  ;; (add-hook 'after-load-theme-hook
-  ;;           (lambda() (setq my-evil-emacs-state-cursor-color (face-attribute 'cursor :background)
-  ;;                      evil-emacs-state-cursor '(my-evil-emacs-state-cursor-color box))))
-#+END_SRC
+**** TODO Set evil-emacs-state-cursor based on the theme loaded
+Also set the cursor to a box if the buffer is not modifiable (eg. org-agenda view) or a bar if it is
 
 *** /fin/
 #+BEGIN_SRC emacs-lisp
@@ -1145,56 +1141,6 @@ This is the counterpart to =org-insert-link=. From [[http://emacs.stackexchange.
                              (org-match-string-no-properties 1))))
           (apply 'delete-region remove)
           (insert description))))
-#+END_SRC
-
-**** Complete multiple org tags
-From [[https://blog.aaronbieber.com/2016/03/05/playing-tag-in-org-mode.html][Aaron Bieber's blog]]
-
-Once the first tag is set (using helm), we don't get completion support after that.
-This is because, the entire tag string is treated as a single value and Helm tries to complete based only on the full value.
-#+BEGIN_SRC emacs-lisp
-  (defun my/org-set-tags (tag)
-    "Add TAG if it is not in the list of tags, remove it otherwise.
-
-  TAG is chosen interactively from the global tags completion table."
-    (interactive
-     (list (let ((org-last-tags-completion-table
-                  (if (derived-mode-p 'org-mode)
-                      (org-uniquify
-                       (delq nil (org-get-buffer-tags)))
-                    (org-global-tags-completion-table))))
-             (org-icompleting-read
-              "Tag: " 'org-tags-completion-function nil nil nil
-              'org-tags-history))))
-    (let* ((my/org-swap-tags (lambda (tags)
-                               "Replace any tags on the current headline with TAGS.
-
-  The assumption is that TAGS will be a string conforming to Org Mode's
-  tag format specifications, or nil to remove all tags."
-                               (let ((old-tags (org-get-tags-string))
-                                     (tags (if tags
-                                               (concat " " tags)
-                                             "")))
-                                 (save-excursion
-                                   (beginning-of-line)
-                                   (re-search-forward
-                                    (concat "[ \t]*" (regexp-quote old-tags) "[ \t]*$")
-                                    (line-end-position) t)
-                                   (replace-match tags)
-                                   (org-set-tags t)))))
-           (cur-list (org-get-tags))
-           (new-tags (mapconcat 'identity
-                                (if (member tag cur-list)
-                                    (delete tag cur-list)
-                                  (append cur-list (list tag)))
-                                ":"))
-           (new (if (> (length new-tags) 1) (concat " :" new-tags ":")
-                  nil)))
-      (funcall my/org-swap-tags new)))
-
-  ;; (bind-keys :map org-mode-map
-  ;;            ("C-c C-q" . my/org-set-tags)
-  ;;            ("C-c M-q" . org-set-tags-command))
 #+END_SRC
 
 **** Use ! to toggle timestamp type
@@ -1769,6 +1715,9 @@ I've been using =:bind= as a means to defer loading the package; in this case, i
 and while =use-package= does allow it, I want to avoid confusion when I read this 3 months later wondering how it works.
 
 *** TODO Enable only for select modes
+#+BEGIN_SRC emacs-lisp :tangle no
+   (add-hook 'c++-mode-hook (lambda() (yas-minor-mode-on)))
+#+END_SRC
 
 ** which-key
 Shows which keys can be pressed next. Eg. if you press =C-x= and wait a few seconds, a window pops up with all the key bindings following the currently entered incomplete command.
@@ -1831,7 +1780,8 @@ https://github.com/bbatsov/solarized-emacs
           evil-visual-state-cursor   '("#b58900" box)
           evil-insert-state-cursor   '("#268bd2" bar)
           evil-replace-state-cursor  '("#dc322f" bar)
-          evil-operator-state-cursor '("#dc322f" hollow)))
+          evil-operator-state-cursor '("#dc322f" hollow)
+          evil-emacs-state-cursor    '("#839496" bar)))
 #+END_SRC
 
 *** base16
@@ -1844,7 +1794,8 @@ https://github.com/bbatsov/solarized-emacs
           evil-visual-state-cursor   '("#b58900" box)
           evil-insert-state-cursor   '("#268bd2" bar)
           evil-replace-state-cursor  '("#dc322f" bar)
-          evil-operator-state-cursor '("#dc322f" hollow)))
+          evil-operator-state-cursor '("#dc322f" hollow)
+          evil-emacs-state-cursor    '("#839496" bar)))
 #+END_SRC
 
 ** TODO hydra

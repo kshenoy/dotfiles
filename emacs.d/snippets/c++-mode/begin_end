@@ -3,4 +3,4 @@
 # key: be
 # group: STL
 # --
-std::begin(${1:v}), std::end($1)
+std::begin(${1:v}), std::end($1),
