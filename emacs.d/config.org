@@ -28,9 +28,6 @@ Install and load use-package
       (setq use-package-always-demand t))
 #+END_SRC
 
-*** TODO Use =:hook= to defer loading packages
-eg. flycheck, yasnippet, irony all of which should be enabled only in c/c++ mode
-
 ** TODO Simplify init process
 Check if there's a way to keep all the config in this file itself with init.el being empty
 Sacha Chua seems to have something like that. Her init.el is simply a link.
@@ -691,6 +688,33 @@ Keeping this at the end to be run after we've added all backends
     (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 #+END_SRC
 
+*** yasnippet
+Use =C-d= to clear the field without accepting the default field name
+
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :commands (yas-reload-all yas-minor-mode)
+    :init
+    (add-hook 'c++-mode-hook (lambda() (yas-reload-all)(yas-minor-mode)))
+    (setq-default yas-snippet-dirs (list (concat user-emacs-directory "snippets")))
+    (setq yas-wrap-around-region t)  ; Automatically insert selected text at $0, if any
+    :config
+    (bind-keys :map yas-minor-mode-map
+               ("C-c & n" . yas-new-snippet)
+               ("C-c & s" . yas-insert-snippet)
+               ("C-c & v" . yas-visit-snippet-file)
+               ("C-c & r" . yas-reload-all)
+               ("C-c & &" . yas-describe-tables)))
+#+END_SRC
+
+NOTE:
+- Normally, I would've used =:hook= to defer loading. However, just running =yas-minor-mode= isn't sufficient and yasnippet
+  requires that I run =yas-reload-all= before it ()
+  As a result, I've to do it in a round-about manner by adding a hook.
+- I can't use =:bind= here to defer loading because I'm adding bindings to a map which doesn't exist till the plugin is loaded.
+  I could use =:bind-keymap= here instead but as explained above, I need to do =yas-reload-all= as well and I don't know how to do that with =:bind-keymap=.
+  Also, I want to avoid confusion when I read this 3 months later wondering how it works.
+
 ** evil
 evil can be toggled using =C-z=
 #+BEGIN_SRC emacs-lisp
@@ -852,14 +876,10 @@ Also set the cursor to a box if the buffer is not modifiable (eg. org-agenda vie
 ** flycheck
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
+    :hook c++-mode
     :init
     (setq flycheck-gcc-language-standard "c++14"
           flycheck-clang-language-standard "c++14"))
-#+END_SRC
-
-Enable only for programming modes
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'c++-mode-hook 'flycheck-mode)
 #+END_SRC
 
 ** ivy et al.
@@ -1279,7 +1299,7 @@ Small: ► • ★ ▸
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
     :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+    (add-hook 'org-mode-hook (lambda() (org-bullets-mode 1))))
 #+END_SRC
 
 A good way to find more characters is to use =M-x insert-char=
@@ -1698,33 +1718,6 @@ Default binding is =C-x u=
            ("\\.x\\'"    . verilog-mode))
     :config
     (font-lock-mode 1))
-#+END_SRC
-
-** yasnippet
-Use =C-d= to clear the field without accepting the default field name
-
-#+BEGIN_SRC emacs-lisp
-  (use-package yasnippet
-    :init
-    (setq-default yas-snippet-dirs (list (concat user-emacs-directory "snippets")))
-    (setq yas-wrap-around-region t)  ; Automatically insert selected text at $0, if any
-    :config
-    (bind-keys :map yas-minor-mode-map
-               ("C-c & n" . yas-new-snippet)
-               ("C-c & s" . yas-insert-snippet)
-               ("C-c & v" . yas-visit-snippet-file)
-               ("C-c & r" . yas-reload-all)
-               ("C-c & &" . yas-describe-tables))
-    (yas-global-mode 1))
-#+END_SRC
-
-NOTE: I don't want to use =:bind= here because I'm adding bindings to a map which doesn't exist till the plugin is loaded.
-I've been using =:bind= as a means to defer loading the package; in this case, it doesn't do that. I could use =:bind= here,
-and while =use-package= does allow it, I want to avoid confusion when I read this 3 months later wondering how it works.
-
-*** TODO Enable only for select modes
-#+BEGIN_SRC emacs-lisp :tangle no
-   (add-hook 'c++-mode-hook (lambda() (yas-minor-mode-on)))
 #+END_SRC
 
 ** which-key
