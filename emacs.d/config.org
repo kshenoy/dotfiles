@@ -192,7 +192,7 @@ We can also put something like this into =~/.Xresources= to enable/disable certa
 #+END_SRC
 
 *** Winner mode - Undo/redo window layouts
-Undo and Redo changes in window configuration. Use =C-c right= and =C-c left= to switch between different layouts.
+Undo and Redo changes in window configuration. Use =C-c right=, =C-c left= (default bindings) to switch between different layouts.
 This is useful when I close a window by mistake to undo it and restore the window layout.
 #+BEGIN_SRC emacs-lisp
   (winner-mode 1)
@@ -539,6 +539,13 @@ Other examples:
     (global-aggressive-indent-mode t))
 #+END_SRC
 
+** avy
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :bind (:map evil-normal-state-map
+                ("g s" . avy-goto-char)))
+#+END_SRC
+
 ** beacon
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
@@ -553,7 +560,7 @@ Other examples:
                 (setq beacon-color (face-attribute 'highlight :background)))))
 #+END_SRC
 
-** auto-completion
+** completion
 Create a keybinding map specifically for auto-completion
 #+BEGIN_SRC emacs-lisp
   (bind-keys :map my-leader-map
@@ -644,21 +651,11 @@ So, I'm going to bind these only if I have explicitly interacted with Company. (
   (bind-keys :map company-active-map
              :filter (company-explicit-action-p)
              ("C-s"   . company-search-candiates)
-             ("C-M-s" . company-filter-candidates)
-             ("M-0"   . company-complete-number)
-             ("M-1"   . company-complete-number)
-             ("M-2"   . company-complete-number)
-             ("M-3"   . company-complete-number)
-             ("M-4"   . company-complete-number)
-             ("M-5"   . company-complete-number)
-             ("M-6"   . company-complete-number)
-             ("M-7"   . company-complete-number)
-             ("M-8"   . company-complete-number)
-             ("M-9"   . company-complete-number))
+             ("C-M-s" . company-filter-candidates))
 #+END_SRC
 
 All done! Now, while I type, company shows me a list of completions but doesn't highlight any of them till I select one.
-Also, I can use almost all keys to continue typing with the exception of =C-n= and =C-p= which I use to interact with company.
+Also, I can use almost all keys to continue typing with the exception of =C-n=, =C-p= and =M-[0-9]= which I use to interact with company.
 Pressing =C-n= or =C-p= selects the first or last entry from the completion menu and highlights it.
 Once I've explicitly interacted with the completion menu, I can cycle through the entries using =C-n= and =C-p= and use
 =C-s= or =C-M-s= to search or filter the entries
@@ -935,6 +932,18 @@ Use =C-c j= as prefix for all counsel-related keybinds
 
 NOTE: I'm deferring loading by using the =commands= keyword for =counsel-org-tag= because the binding for it,
 =C-c C-q= is found in =org-mode-map= which hasn't been defined yet.
+
+** modern-c++-font-lock
+#+BEGIN_SRC emacs-lisp
+  (use-package modern-cpp-font-lock
+    :hook (c++-mode . modern-c++-font-lock-mode))
+#+END_SRC
+
+** nlinum-relative
+#+BEGIN_SRC emacs-lisp
+  (use-package nlinum-relative
+    :hook (prog-mode . nlinum-relative-mode))
+#+END_SRC
 
 ** org
 This solution is by [[https://www.reddit.com/r/emacs/comments/5sx7j0/how_do_i_get_usepackage_to_ignore_the_bundled/ddixpr9/][/u/Wolfer1ne on reddit]].
@@ -1748,9 +1757,8 @@ eg.
 
 *** leuven
 [[https://github.com/fniessen/emacs-leuven-theme][Github Link]]
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package leuven-theme
-    :disabled
     :config
     (load-theme 'leuven t)
 
@@ -1787,9 +1795,8 @@ https://github.com/bbatsov/solarized-emacs
 *** base16
 #+BEGIN_SRC emacs-lisp
   (use-package base16-theme
-    :disabled
     :config
-    (load-theme 'base16-tomorrow-night t)
+    ;; (load-theme 'base16-tomorrow-night t)
     (setq evil-normal-state-cursor   '("#719e07" box)
           evil-visual-state-cursor   '("#b58900" box)
           evil-insert-state-cursor   '("#268bd2" bar)
