@@ -535,8 +535,7 @@ Other examples:
 ** aggressive-indent
 #+BEGIN_SRC emacs-lisp
   (use-package aggressive-indent
-    :config
-    (global-aggressive-indent-mode t))
+    :hook emacs-lisp)
 #+END_SRC
 
 ** avy
