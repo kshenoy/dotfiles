@@ -179,8 +179,9 @@ sub Alert {
 
   my $cmd = "notify-send --urgency=low -i ";
   $cmd   .= ($status == 0 ? "terminal" : "error" );
-  $cmd   .= " $opts{'alert_msg'}";
+  $cmd   .= " '$opts{'alert_msg'}'";
 
+  # print "$cmd\n";
   system($cmd);
   exit $status;
 }

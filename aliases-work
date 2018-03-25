@@ -51,7 +51,7 @@ mkv() { mkverdi $(command grep -Po '\-model\s*\S+' sim.out) -rc ~/novas.rc -guiC
 alias findFirstError='findFirstError --tkName "verdi_$(tmux display-message -p "#S:#I.#P")"'
 alias cid='cat ${REPO_PATH+$REPO_PATH/}configuration_id'
 bj() {
-  lsf_bjobs -w | perl -aF"\s+" -lne 'printf("%-7s  %-8s  %-4s  %-9s  %-14s  %-10s  %-12s  %s\n", ($. == 1 ? @F[0..5,7,6] : @F[0..5],"@F[$#F-2..$#F]","@F[6..$#F-3]"))'
+  lsf_bjobs -w "$@" | perl -aF"\s+" -lne 'printf("%-7s  %-8s  %-4s  %-9s  %-14s  %-10s  %-12s  %s\n", ($. == 1 ? @F[0..5,7,6] : @F[0..5],"@F[$#F-2..$#F]","@F[6..$#F-3]"))'
 }
 bjg() { bj | command grep "${1:-$$:}"; }
 alias bk='lsf_bkill'

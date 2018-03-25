@@ -386,3 +386,4 @@ vnoremap g: <Esc>:@*<CR>
 
 """ Run perforce diff on current file
 nnoremap <silent> <leader>pd :call perforce#DiffCurrentFile()<CR>
+nnoremap <silent> <leader>pe :call perforce#Checkout()<CR>

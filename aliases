@@ -199,7 +199,6 @@ alias k9='kill -9'
 #=================
 # Editor aliases
 #
-alias vq='vim -q <($(fc -nl -1))'
 unset -f gvim_func
 gvim_func() {
   # If tmux is being used, check that DISPLAY is set correctly
@@ -209,7 +208,9 @@ gvim_func() {
   gvim "$@" 2> /dev/null
 }
 alias v='gvim_func'
-alias vq="v -q <($(fc -nl -1))"
+vq() {
+  v -q <($(fc -nl -1) "$@")
+}
 
 # Using -f keeps the window in the foreground and prevents a whole bunch of diffs opening at the same time
 unset -f gvim_diff
