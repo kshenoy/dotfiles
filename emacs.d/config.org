@@ -197,12 +197,6 @@ This is useful when I close a window by mistake to undo it and restore the windo
 
 [[id:f42c3dc8-c2f6-4f22-9f47-0c578479ef67][More intuitive keybindings]] defined after evil is loaded
 
-** Custom file
-#+BEGIN_SRC emacs-lisp
-  (setq custom-file (concat user-emacs-directory "custom.el"))
-  (load custom-file)
-#+END_SRC
-
 ** Diff
 From [[http://pragmaticemacs.com/emacs/visualise-and-copy-differences-between-files/][Pragmatic Emacs]]
 #+BEGIN_SRC emacs-lisp

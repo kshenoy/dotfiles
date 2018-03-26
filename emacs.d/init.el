@@ -8,6 +8,11 @@
 
 (custom-set-variables '(debug-on-error t))
 
+;; Load custom file to grab all variables that are marked as safe. This prevents emacs from asking me
+;; if I want to treat the file-local variables defined in config.org as safe upon every start-up!
+(setq custom-file (concat user-emacs-directory "custom.el"))
+(load custom-file)
+
 ;; Declare config.org as a global variable
 (defvar my-init-config (expand-file-name "config.org" user-emacs-directory)
   "Main configuration org file")
