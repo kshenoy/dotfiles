@@ -987,6 +987,72 @@ Use =C-c j= as prefix for all counsel-related keybindings
 NOTE: I'm deferring loading by using the =commands= keyword for =counsel-org-tag= because the binding for it,
 =C-c C-q= is found in =org-mode-map= which hasn't been defined yet.
 
+** ivy-hydra
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy-hydra
+    :after (ivy hydra)
+    :config
+#+END_SRC
+
+*** Customize the default ivy-hydra
+Provides some vim-ish movements and calling methods. From [[https://github.com/abo-abo/hydra/wiki/hydra-ivy-replacement][here]]
+eg. To kill multiple buffers
+- =C-x b= to open the buffer list
+- =C-o= to open the hydra menu
+- Select the 'kill' action by pressing =o k= or select it by cycling through the actions using =w= and =s=
+- Once the 'kill' action has been selected, select the buffer to kill using the movement keys and press =f= to execute the action
+- Pressing =f= keeps the hydra menu open to allow selecting other buffers to execute the selected action
+
+#+BEGIN_SRC emacs-lisp
+  (bind-key "\C-o"
+    (defhydra soo-ivy (:hint nil :color pink)
+      "
+   Move     ^^^^^^^^^^ | Call        ^^^^ | Cancel^^ | Options^^ | Action _w_/_s_ _o_: %s(ivy-action-name)
+  ----------^^^^^^^^^^-+-------------^^^^-+-------^^-+--------^^-+---------------------------------
+   _g_ ^ ^ _k_ ^ ^ _u_ | _f_ollow occu_r_ | _i_nsert | _c_alling: %-7s(if ivy-calling \"on\" \"off\") _C_ase-fold: %-10`ivy-case-fold-search
+   ^↕^ _h_ ^+^ _l_ ^↕^ | _RET_ done     ^^| _q_uit   | _m_atcher: %-7s(ivy--matcher-desc)^^^^^^^^^^^^ _t_runcate: %-11`truncate-lines
+   _G_ ^ ^ _j_ ^ ^ _d_ | _TAB_ alt-done ^^| ^ ^      | _<_/_>_: shrink/grow
+  "
+      ;; arrows
+      ("j" ivy-next-line)
+      ("k" ivy-previous-line)
+      ("l" ivy-alt-done)
+      ("h" ivy-backward-delete-char)
+      ("g" ivy-beginning-of-buffer)
+      ("G" ivy-end-of-buffer)
+      ("d" ivy-scroll-up-command)
+      ("u" ivy-scroll-down-command)
+      ("e" ivy-scroll-down-command)
+      ;; actions
+      ("q" keyboard-escape-quit :exit t)
+      ("C-g" keyboard-escape-quit :exit t)
+      ("<escape>" keyboard-escape-quit :exit t)
+      ("C-o" nil)
+      ("i" nil)
+      ("TAB" ivy-alt-done :exit nil)
+      ("C-j" ivy-alt-done :exit nil)
+      ;; ("d" ivy-done :exit t)
+      ("RET" ivy-done :exit t)
+      ("C-m" ivy-done :exit t)
+      ("f" ivy-call)
+      ("c" ivy-toggle-calling)
+      ("m" ivy-toggle-fuzzy)
+      (">" ivy-minibuffer-grow)
+      ("<" ivy-minibuffer-shrink)
+      ("w" ivy-prev-action)
+      ("s" ivy-next-action)
+      ("o" ivy-read-action)
+      ("t" (setq truncate-lines (not truncate-lines)))
+      ("C" ivy-toggle-case-fold)
+      ("r" ivy-occur :exit t))
+    ivy-minibuffer-map)
+#+END_SRC
+
+*** /fin/
+#+BEGIN_SRC emacs-lisp
+  )
+#+END_SRC
+
 ** modern-c++-font-lock
 #+BEGIN_SRC emacs-lisp
   (use-package modern-cpp-font-lock
@@ -1837,9 +1903,6 @@ https://github.com/bbatsov/solarized-emacs
           evil-operator-state-cursor '("#dc322f" hollow)
           evil-emacs-state-cursor    '("#839496" bar)))
 #+END_SRC
-
-** TODO hydra
-Ideas in https::/github.com/kana/vim-submode
 
 ** delight
 Placing at end to be called after all packages are loaded
