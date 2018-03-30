@@ -1584,8 +1584,12 @@ From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 -
            :jump-to-captured t :empty-lines 1)))
 #+END_SRC
 
+NOTE:
+- When using several keys, keys using the same prefix key must be sequential in the list and preceded by a 2-element entry explaining the prefix key.
+  [[http://orgmode.org/manual/Template-elements.html#Template-elements][Template elements]], [[http://orgmode.org/manual/Template-elements.html#Template-expansion][Template expansion]]
+- Quick-note related to current state can be taken using =C-c C-z= and get added to the =LOGBOOK=
 
-Capture template for learning Spanish
+***** Capture template for learning Spanish
 #+BEGIN_SRC emacs-lisp :tangle no
   (add-to-list 'org-capture-templates '(("l"  "Spanish")
 
@@ -1606,10 +1610,7 @@ Capture template for learning Spanish
                t)
 #+END_SRC
 
-NOTE: When using several keys, keys using the same prefix key must be sequential in the list and preceded by a 2-element entry explaining the prefix key.
-[[http://orgmode.org/manual/Template-elements.html#Template-elements][Template elements]], [[http://orgmode.org/manual/Template-elements.html#Template-expansion][Template expansion]]
-
-***** TODO Using %^{prompt} in org-capture template doesn't allow specifying accented characters with =C-x 8=
+****** TODO Using %^{prompt} in org-capture template doesn't allow specifying accented characters with =C-x 8=
 Hence, I'm using a hacky way of explicitly prompting for input (since I can specify accented characters that way),
 saving it to a variable and printing it out later in the capture template.
 
