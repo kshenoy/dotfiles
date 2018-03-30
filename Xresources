@@ -33,14 +33,14 @@ XTerm*cursorBlink: true
 
 !! From https://unix.stackexchange.com/a/332367/111534
 XTerm*faceName: Iosevka
-XTerm*fontdefault*Label: Size 10
-XTerm*faceSize: 10
+XTerm*fontdefault*Label: Size 9 (Default)
+XTerm*faceSize: 9
 XTerm*font1*Label: Size 8
 XTerm*faceSize1: 8
-XTerm*font2*Label: Size 9
-XTerm*faceSize2: 9
-XTerm*font3*Label: Size 9.5
-XTerm*faceSize3: 9.5
+XTerm*font2*Label: Size 9.5
+XTerm*faceSize2: 9.5
+XTerm*font3*Label: Size 10
+XTerm*faceSize3: 10
 XTerm*font4*Label: Size 11
 XTerm*faceSize4: 11
 XTerm*font5*Label: Size 12
@@ -119,12 +119,22 @@ URxvt.visualBell:           false
 !=======================================================================================================================
 ! Xft settings                                                                                                      {{{1
 !=======================================================================================================================
+! From https://wiki.archlinux.org/index.php/font_configuration#Applications_without_fontconfig_support
 Xft.dpi:        96
+Xft.lcdfilter:  lcddefault
 Xft.antialias:  true
 Xft.rgba:       rgb
 Xft.hinting:    true
 Xft.hintstyle:  hintslight
 
+!=======================================================================================================================
+! Emacs settings                                                                                                    {{{1
+!=======================================================================================================================
+Emacs.fontBackend: xft
+Emacs.font: Iosevka-9:weight=book
+Emacs.menuBar: off
+Emacs.toolBar: off
+Emacs.verticalScrollBars: off
 
 !=======================================================================================================================
 ! Colors                                                                                                            {{{1

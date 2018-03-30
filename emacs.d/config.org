@@ -257,7 +257,7 @@ After installing a new font refresh the font cache by running
 #+BEGIN_SRC emacs-lisp
   (defun my/set-font-if-exists (font)
     " Check if FONT exists and set if it does"
-    (when (x-list-fonts font)
+    (when (and (display-graphic-p)(x-list-fonts font))
       (set-face-attribute 'default        nil :font font)
       (set-face-attribute 'variable-pitch nil :font font)
       (set-face-attribute 'fixed-pitch    nil :font font)
@@ -266,7 +266,7 @@ After installing a new font refresh the font cache by running
   (defun my/select-and-set-font ()
     " Select the font based on OS, hostname etc."
     (cond ((eq system-type 'windows-nt) (my/set-font-if-exists "Iosevka-10"))
-          ((eq system-type 'gnu/linux) (my/set-font-if-exists "Iosevka-10"))))
+          ((eq system-type 'gnu/linux) (my/set-font-if-exists "Iosevka-9"))))
 
   (if (daemonp)
       (add-hook 'after-make-frame-functions
@@ -275,6 +275,12 @@ After installing a new font refresh the font cache by running
                   (my/select-and-set-font)))
     (my/select-and-set-font))
 #+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle no
+  (when (and (display-graphic-p) (x-list-fonts "Iosevka"))
+    (add-to-list 'default-frame-alist '(font . "Iosevka-10:weight=book"))
+    (set-face-attribute 'default t :font "Iosevka-10:weight=book"))
+#+END_SRC
+
 The reason for adding the hook is that if I try to create a daemon, it errors out with
     /error: Window system is not in use or not initialized/
 This is because we try to set a face-attribute before a frame is created which is a no-no for some reason.
@@ -487,8 +493,8 @@ Specify width and height /pixel-wise
   (setq default-frame-alist
         '((top    . 0)
           (left   . 0)
-          (width  . 237)
-          (height . 65)))
+          (width  . 319)
+          (height . 74)))
 #+END_SRC
 
 Set frame size programatically

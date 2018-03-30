@@ -19,7 +19,7 @@ fi
 #=======================================================================================================================
 # EDITOR                                                                                                            {{{1
 #=======================================================================================================================
-alias v="gvim_func -geometry 273x66+0+0 ${STEM:+--servername $STEM}"
+alias v="gvim_func -geometry 319x70+0+0 ${STEM:+--servername $STEM}"
 alias vc='v --remote-silent'
 unset -f vlog
 vlog() {
@@ -86,7 +86,7 @@ busw() { watch --no-title -n 60 "bucket -s $@"; }
 alias toclippy="sed -e 's/$/
 /' | tee ~/clippy.txt"
 
-alias xt='xterm -geometry 273x62+1919+21 &'
+alias xt='xterm -geometry 319x66+1919+21 &'
 # alias xtr='echo "resize -s 62 273"; resize -s 62 273'
 alias xtr='wmctrl -i -r $(xdotool getactivewindow) -b add,maximized_vert; wmctrl -i -r $(xdotool getactivewindow) -e 0,1919,25,1915,1144'
 alias tmxvnc='tmux new-window -d -n "XVNC" "x11vnc"'

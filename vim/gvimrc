@@ -15,7 +15,7 @@
   if g:env ==? 'linux'
     " Note that this doesn't include Cygwin or Mingw
     set guifont=
-    set guifont+=Iosevka\ Medium\ 10
+    set guifont+=Iosevka\ Medium\ 9
     set guifont+=Hack\ 9
     set guifont+=MesloLGLDZ\ Nerd\ Font\ 8
     set guifont+=Monospace\ 8
