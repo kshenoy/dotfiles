@@ -248,12 +248,12 @@ if [[ $(hostname) =~ loki ]]; then
   alias emacs='/usr/bin/env XLIB_SKIP_ARGB_VISUALS=1 emacs'
   unset -f emacs_func
   emacs_func() {
-    /usr/bin/env XLIB_SKIP_ARGB_VISUALS=1 emacsclient --alternate-editor="emacs" --create-frame --quiet "$@" &
+    /usr/bin/env XLIB_SKIP_ARGB_VISUALS=1 emacsclient --alternate-editor="" --create-frame --quiet "$@" &
   }
 else
   unset -f emacs_func
   emacs_func() {
-    emacsclient --alternate-editor="emacs" --no-wait --create-frame --quiet "$@" &
+    emacsclient --alternate-editor="" --no-wait --create-frame --quiet "$@" &
   }
 fi
 alias e="emacs_func"
