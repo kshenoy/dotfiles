@@ -69,7 +69,7 @@ alias rrb='rr --norun --build --recompile'
 alias rrbr='rr --build --recompile'
 alias rrc='rr --norun --clean'
 alias rrca='build -clean_all'
-alias rrcb='rr --norun --clean --build --recompile'
+alias rrcb='rr --norun --clean --build'
 alias rrcr='rr --clean'
 alias rrdbg=$'rr --add \'-avf "--/L3.Debug.*Graph/ --/L3.Debug.*Resources/"\' --dsp'
 
@@ -331,8 +331,8 @@ mkwa() {                                                                        
   p4 have | awk {'print $3'} >| .filelist
 
   # Start an emacs daemon
-  # echo "${_fg_green}[Starting emacs daemon...]${_reset}"
-  # ~kshenoy/bin/emacs_daemon -s &> /dev/null &
+  echo "${_fg_green}[Starting emacs daemon...]${_reset}"
+  ~kshenoy/bin/emacs_daemon -s &> /dev/null &
 
   # Source aliases...
   echo "${_fg_green}[Sourcing aliases...]${_reset}"

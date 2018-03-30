@@ -43,7 +43,7 @@ Loop over all hooks (from [[https://github.com/cofi/dotfiles/blob/master/emacs.d
       (add-hook hook fun)))
 #+END_SRC
 
-** Keybinds
+** Keybindings
 #+BEGIN_SRC emacs-lisp
   (bind-keys* :prefix-map my-leader-map
               :prefix-docstring "Top-level map"
@@ -51,7 +51,7 @@ Loop over all hooks (from [[https://github.com/cofi/dotfiles/blob/master/emacs.d
 
   (bind-keys  :map my-leader-map
               :prefix-map my-jumper-command-map
-              :prefix-docstring "This map is used to put all keybinds that I use to jump around eg. open files, buffers etc."
+              :prefix-docstring "This map is used to put all keybindings that I use to jump around eg. open files, buffers etc."
               :prefix "j")
 
   (bind-keys  :map my-leader-map
@@ -407,7 +407,7 @@ Use only spaces and no tabs
 #+BEGIN_SRC emacs-lisp
   (setq-default indent-tabs-mode nil)
   (setq-default tab-width 2)
-  (setq-default show-trailing-whitespace t)
+  (setq-default show-trailing-whitespace nil)
 
   (setq-default sh-basic-offset 2)
   ;; (bind-key "RET" 'newline-and-indent)
@@ -429,10 +429,9 @@ Since these are buffer-local variables, I have to use =setq-default=
   (bind-key "SPC" 'my/toggle-trailing-whitespace my-unimpaired-toggle-map)
 #+END_SRC
 
-Disable it in some modes
+Enable it only in some modes
 #+BEGIN_SRC emacs-lisp
-  (my/add-hooks '(term-mode-hook calendar-mode-hook help-mode-hook compilation-mode-hook)
-                (lambda() (setq show-trailing-whitespace nil)))
+  (my/add-hooks '(prog-mode-hook text-mode-hook) (lambda() (setq show-trailing-whitespace t)))
 #+END_SRC
 
 *** Delete trailing whitespace
@@ -532,12 +531,13 @@ Other examples:
 ** aggressive-indent
 #+BEGIN_SRC emacs-lisp
   (use-package aggressive-indent
-    :hook emacs-lisp)
+    :hook (emacs-lisp-mode . aggressive-indent-mode))
 #+END_SRC
 
 ** avy
 #+BEGIN_SRC emacs-lisp
   (use-package avy
+    :after evil
     :bind (:map evil-normal-state-map
                 ("g s" . avy-goto-char)))
 #+END_SRC
@@ -561,7 +561,7 @@ Create a keybinding map specifically for auto-completion
 #+BEGIN_SRC emacs-lisp
   (bind-keys :map my-leader-map
              :prefix-map my-auto-completion-map
-             :prefix-docstring "This map is used to put all auto-completion related keybinds"
+             :prefix-docstring "This map is used to put all auto-completion related keybindings"
              :prefix "c")
 #+END_SRC
 
@@ -798,11 +798,23 @@ Provides =g~= operator to cycle between snake_case → SCREAMING_SNAKE_CASE → 
     :config (global-evil-visualstar-mode))
 #+END_SRC
 
-**** Keybinds
+**** Keybindings
 :PROPERTIES:
 :ID:       f42c3dc8-c2f6-4f22-9f47-0c578479ef67
 :END:
-Make /Escape/ quit everything. From [[http://stackoverflow.com/a/10166400/734153][StackOverflow]].
+
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :map evil-normal-state-map
+             ("] SPC" . (lambda() (interactive) (end-of-line)(newline)))
+             ("[ SPC" . (lambda() (interactive) (beginning-of-line)(open-line 1))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-mode-hook (lambda() (bind-key "z v" 'org-reveal evil-normal-state-map)))
+#+END_SRC
+
+***** Make Escape quit everything
+From [[http://stackoverflow.com/a/10166400/734153][StackOverflow]].
 #+BEGIN_SRC emacs-lisp :tangle no
   (defun my/minibuffer-keyboard-quit ()
     "Abort recursive edit.
@@ -823,15 +835,25 @@ Make /Escape/ quit everything. From [[http://stackoverflow.com/a/10166400/734153
   (bind-key [escape] 'my/minibuffer-keyboard-quit minibuffer-local-isearch-map   )
 #+END_SRC
 
+***** Sensible rebindings
 #+BEGIN_SRC emacs-lisp
   (define-key key-translation-map (kbd "ESC")     (kbd "C-g"))
   (define-key key-translation-map (kbd "C-w C-h") (kbd "C-w h"))
   (define-key key-translation-map (kbd "C-w C-j") (kbd "C-w j"))
   (define-key key-translation-map (kbd "C-w C-k") (kbd "C-w k"))
   (define-key key-translation-map (kbd "C-w C-l") (kbd "C-w l"))
+
+  (bind-key "U" 'redo evil-normal-state-map)
 #+END_SRC
 
-Follow newly created splits
+More intuitive keybindings for winner-mode
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :map evil-motion-state-map
+             ("u" . winner-undo)
+             ("U" . winner-redo))
+#+END_SRC
+
+***** Follow newly created splits
 #+BEGIN_SRC emacs-lisp
   (bind-keys :map evil-motion-state-map
              ("C-w s" . (lambda() (interactive) (evil-window-split)(other-window 1)))
@@ -840,14 +862,8 @@ Follow newly created splits
   (define-key key-translation-map (kbd "C-w C-v") (kbd "C-w v"))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (bind-keys :map evil-normal-state-map
-             ("U" . redo)
-             ("] SPC" . (lambda() (interactive) (end-of-line)(newline)))
-             ("[ SPC" . (lambda() (interactive) (beginning-of-line)(open-line 1))))
-#+END_SRC
-
-Move by visual lines. Note this is not a complete solution since it doesn't work when combined with operators (eg. =dj=)
+***** Move by visual lines
+Note this is not a complete solution since it doesn't work when combined with operators (eg. =dj=)
 #+BEGIN_SRC emacs-lisp
   (bind-keys :map evil-motion-state-map
              ("j"  . evil-next-visual-line)
@@ -856,13 +872,6 @@ Move by visual lines. Note this is not a complete solution since it doesn't work
              ("gk" . evil-previous-line)
              ("$"  . evil-end-of-line)
              ("g$" . evil-end-of-visual-line))
-#+END_SRC
-
-More intuitive keybinds for winner-mode
-#+BEGIN_SRC emacs-lisp
-  (bind-keys :map evil-motion-state-map
-             ("u" . winner-undo)
-             ("U" . winner-redo))
 #+END_SRC
 
 **** TODO Set evil-emacs-state-cursor based on the theme loaded
@@ -876,37 +885,36 @@ Also set the cursor to a box if the buffer is not modifiable (eg. org-agenda vie
 ** flycheck
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
-    :hook c++-mode
+    :hook (prog-mode . flycheck-mode)
     :init
     (setq flycheck-gcc-language-standard "c++14"
           flycheck-clang-language-standard "c++14"))
 #+END_SRC
+
+** hydra
+#+BEGIN_SRC emacs-lisp
+  (use-package hydra)
+#+END_SRC
+
+Currently I'm using this only for =ivy-hydra=. More ideas in https::/github.com/kana/vim-submode
 
 ** ivy et al.
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
     :config
     (ivy-mode 1)
-    (bind-key "b" 'ivy-switch-buffer my-jumper-command-map)
     (setq ivy-count-format "%d/%d "
           ivy-height 12
           ivy-extra-directories nil)
 #+END_SRC
 
-Create binding to show buffers, recent files and bookmarks. There is a variable =ivy-use-virtual-buffers= that does this. However, it is static and when set, dumps everything in =ivy-switch-buffer=.
-As a result, by default I have to choose one or the other; I can't have both. This fixes that.
+Do not add a =^= (beginning of line anchor) while completing. Refer [[https://github.com/abo-abo/swiper/issues/140][this]] and [[https://github.com/abo-abo/swiper/issues/1126][this]].
 #+BEGIN_SRC emacs-lisp
-  (defun my/ivy-switch-virtual-buffer ()
-    "Show recent files and bookmarks in the buffer list"
-    (interactive)
-    (let* ((ivy-use-virtual-buffers t))
-      (ivy-switch-buffer)))
-
-  (bind-key "j" 'my/ivy-switch-virtual-buffer my-jumper-command-map)
+  (setq ivy-initial-inputs-alist nil)
 #+END_SRC
 
 From [[https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-ivy.el][kaushalmodi's repo]]
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (defun my/ivy-set-prompt-text-properties (prompt std-props)
     "Add a different face for the current value in `counsel-set-variable'."
     (ivy--set-match-props prompt "<\\(.*\\)>"
@@ -916,6 +924,32 @@ From [[https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-ivy
   (setq ivy-set-prompt-text-properties-function 'my/ivy-set-prompt-text-properties)
 #+END_SRC
 
+*** Keybindings
+By default =C-r= is bound to =isearch-backward=. Since I'm using swiper, it's no longer required and is way more useful this way.
+Also =C-h k= says that =C-r= is bound to =undo-tree-redo= found in =undo-tree-map= while it's really defined in =evil-normal-state-map= in evil_maps.el
+#+BEGIN_SRC emacs-lisp
+  (unbind-key "C-r" evil-normal-state-map)
+  (bind-key* "C-r" 'ivy-resume)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+#+END_SRC
+
+Create binding to show buffers, recent files and bookmarks. There is a variable =ivy-use-virtual-buffers= that does this. However, it is static and when set, dumps everything in =ivy-switch-buffer=.
+As a result, by default I have to choose one or the other; I can't have both. This fixes that.
+=C-c j j= will show buffers, recent files and bookmarks while =C-c j b= will only show buffers
+#+BEGIN_SRC emacs-lisp
+  (defun my/ivy-switch-virtual-buffer ()
+    "Show recent files and bookmarks in the buffer list"
+    (interactive)
+    (let* ((ivy-use-virtual-buffers t))
+      (ivy-switch-buffer)))
+
+  (bind-keys :map my-jumper-command-map
+             ("b" . ivy-switch-buffer)
+             ("j" . my/ivy-switch-virtual-buffer))
+#+END_SRC
+
 #+BEGIN_SRC emacs-lisp
   )
 #+END_SRC
@@ -923,7 +957,8 @@ From [[https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-ivy
 *** swiper
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
-    :bind* (("C-s" . swiper)))
+    :bind* (("C-s" . swiper)
+            ("C-M-s" . swiper-all)))
 #+END_SRC
 
 *** counsel
@@ -937,10 +972,10 @@ NOTE: I'm deferring loading using =:commands= for those commands for which I can
     :bind* ("C-h a" . counsel-apropos)
 #+END_SRC
 
-Use =C-c j= as prefix for all counsel-related keybinds
+Use =C-c j= as prefix for all counsel-related keybindings
 #+BEGIN_SRC emacs-lisp
   :init
-  (bind-key "o" '(lambda() (interactive) (if (string= major-mode "org-mode")
+  (bind-key "i" '(lambda() (interactive) (if (string= major-mode "org-mode")
                                         (counsel-org-goto)
                                       (counsel-semantic-or-imenu)))
             my-jumper-command-map)
@@ -961,7 +996,11 @@ NOTE: I'm deferring loading by using the =commands= keyword for =counsel-org-tag
 ** nlinum-relative
 #+BEGIN_SRC emacs-lisp
   (use-package nlinum-relative
-    :hook (prog-mode . nlinum-relative-mode))
+    :hook (prog-mode . nlinum-relative-mode)
+    :config
+    (setq nlinum-relative-redisplay-delay 0)
+    ;; Solarized colors
+    (set-face-attribute 'nlinum-relative-current-face nil :inherit 'linum :background nil :foreground "#d33682" :weight 'bold))
 #+END_SRC
 
 ** org
@@ -1378,8 +1417,8 @@ Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mod
            ((org-agenda-compact-blocks t)))))
 #+END_SRC
 
-***** Keybinds
-[[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][General org keybinds]]
+***** Keybindings
+[[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][General org keybindings]]
 
 #+BEGIN_SRC emacs-lisp
   :config
@@ -1466,15 +1505,15 @@ From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 -
 
           ("s"  "Code snippets")
 
-          ("se" "Emacs" entry (file "Software/emacs.org")
+          ("se" "Emacs snippets" entry (file "Software/emacs.org")
            "* %?%(org-set-property \"CAPTURED\" \"%U\")"
            :jump-to-captured t :empty-lines 1)
 
-          ("ss" "Shell" entry (file "Software/shell.org")
+          ("ss" "Shell snippets" entry (file "Software/shell.org")
            "* %?%(org-set-property \"CAPTURED\" \"%U\")"
            :jump-to-captured t :empty-lines 1)
 
-          ("sv" "Vim" entry (file "Software/vim.org")
+          ("sv" "Vim snippets" entry (file "Software/vim.org")
            "* %?%(org-set-property \"CAPTURED\" \"%U\")"
            :jump-to-captured t :empty-lines 1)))
 #+END_SRC
@@ -1521,7 +1560,7 @@ saving it to a variable and printing it out later in the capture template.
     (select-frame-by-name "capture")
     (delete-other-windows)
     (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
-      (org-capture)))
+      (counsel-org-capture)))
 
   (defadvice org-capture-finalize
       (after delete-capture-frame activate)
@@ -1604,7 +1643,7 @@ Syntax highlighting when exporting to HTML? Yes, please!
     :disabled)
 #+END_SRC
 
-*** Keybinds
+*** Keybindings
 :PROPERTIES:
 :ID:       ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7
 :END:
@@ -1615,7 +1654,7 @@ Custom keymap for org-mode bindings.
              :prefix-docstring "This map is used to group together all org-mode settings"
              :prefix "o"
              ("a" . org-agenda)
-             ("c" . org-capture))
+             ("c" . counsel-org-capture))
   ;; :bind (("c" . calendar))
 #+END_SRC
 
@@ -1698,10 +1737,10 @@ This lets us visually walk through the changes we've made, undo back to a certai
 Default binding is =C-x u=
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
-    :bind (:map my-unimpaired-toggle-map
+    :bind (:map my-unimpaired-enable-map
                 ("U" . undo-tree-visualize)
-           :map my-unimpaired-enable-map
-                ("U" . undo-tree-visualize))
+           :map my-unimpaired-disable-map
+                ("U" . undo-tree-visualizer-quit))
     :config
     (setq undo-tree-visualizer-timestamps t)
     (setq undo-tree-visualizer-diff t))
@@ -1773,6 +1812,8 @@ https://github.com/bbatsov/solarized-emacs
 #+BEGIN_SRC emacs-lisp
   (use-package solarized-theme
     ;; :disabled
+    :init
+    (setq solarized-distinct-fringe-background nil)
     :config
     (load-theme 'solarized-light t)
 
