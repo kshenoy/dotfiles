@@ -464,10 +464,33 @@ Launch
   (bind-key* "<s-return>" 'ansi-term)
 #+END_SRC
 
-** Theme Directories
+** Themes
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'custom-theme-load-path (concat user-emacs-directory "/themes"))
   (add-to-list 'load-path (concat user-emacs-directory "/themes"))
+#+END_SRC
+
+Misc info:
+=list-faces-display= - List all faces with colors and sample text
+=list-colors-display= - List all colors with their names
+
+*** Unload all loaded themes before loading new theme
+http://www.greghendershott.com/2017/02/emacs-themes.html
+By default emacs layers the new theme on top of all previously applied themes.
+
+*** load-theme hook
+Emacs doesn't have a native hook that is called after a theme has loaded. So we've to create one. (from [[https://www.reddit.com/r/emacs/comments/4v7tcj/does_emacs_have_a_hook_for_when_the_theme_changes/d5wyu1r/][reddit]])
+#+BEGIN_SRC emacs-lisp
+  (defvar after-load-theme-hook nil
+    "Hook run after a color theme is loaded using `load-theme'.")
+  (defadvice load-theme (after run-after-load-theme-hook activate)
+    "Run `after-load-theme-hook'."
+    (run-hooks 'after-load-theme-hook))
+#+END_SRC
+
+eg.
+#+BEGIN_SRC emacs-lisp :tangle no
+  (add-hook 'after-load-theme-hook (lambda() (message "Theme loaded")))
 #+END_SRC
 
 ** Visual
@@ -806,7 +829,10 @@ Provides =g~= operator to cycle between snake_case → SCREAMING_SNAKE_CASE → 
 #+BEGIN_SRC emacs-lisp
   (bind-keys :map evil-normal-state-map
              ("] SPC" . (lambda() (interactive) (end-of-line)(newline)))
-             ("[ SPC" . (lambda() (interactive) (beginning-of-line)(open-line 1))))
+             ("[ SPC" . (lambda() (interactive) (beginning-of-line)(open-line 1)))
+             ("] q"   . next-error)
+             ("[ q"   . previous-error)
+             ("[ Q"   . first-error))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -814,7 +840,7 @@ Provides =g~= operator to cycle between snake_case → SCREAMING_SNAKE_CASE → 
 #+END_SRC
 
 ***** Make Escape quit everything
-From [[http://stackoverflow.com/a/10166400/734153][StackOverflow]].
+From [[http://stackoverflow.com/a/10166400/734153][StackOverflow]]. I'm not using this anymore. Instead I'm using the key-translation-map method below
 #+BEGIN_SRC emacs-lisp :tangle no
   (defun my/minibuffer-keyboard-quit ()
     "Abort recursive edit.
@@ -835,9 +861,14 @@ From [[http://stackoverflow.com/a/10166400/734153][StackOverflow]].
   (bind-key [escape] 'my/minibuffer-keyboard-quit minibuffer-local-isearch-map   )
 #+END_SRC
 
+A downside of this could be that =ESC= is mapped everywhere which I may not want in all modes.
+The previous approach seems cleaner but this seems to work fine so I'm sticking with it for the moment.
+#+BEGIN_SRC emacs-lisp
+  (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
+#+END_SRC
+
 ***** Sensible rebindings
 #+BEGIN_SRC emacs-lisp
-  (define-key key-translation-map (kbd "ESC")     (kbd "C-g"))
   (define-key key-translation-map (kbd "C-w C-h") (kbd "C-w h"))
   (define-key key-translation-map (kbd "C-w C-j") (kbd "C-w j"))
   (define-key key-translation-map (kbd "C-w C-k") (kbd "C-w k"))
@@ -928,11 +959,8 @@ From [[https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-ivy
 By default =C-r= is bound to =isearch-backward=. Since I'm using swiper, it's no longer required and is way more useful this way.
 Also =C-h k= says that =C-r= is bound to =undo-tree-redo= found in =undo-tree-map= while it's really defined in =evil-normal-state-map= in evil_maps.el
 #+BEGIN_SRC emacs-lisp
-  (unbind-key "C-r" evil-normal-state-map)
-  (bind-key* "C-r" 'ivy-resume)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
+  ;; (unbind-key "C-r" evil-normal-state-map)
+  (bind-key* "C-c C-r" 'ivy-resume)
 #+END_SRC
 
 Create binding to show buffers, recent files and bookmarks. There is a variable =ivy-use-virtual-buffers= that does this. However, it is static and when set, dumps everything in =ivy-switch-buffer=.
@@ -987,14 +1015,14 @@ Use =C-c j= as prefix for all counsel-related keybindings
 NOTE: I'm deferring loading by using the =commands= keyword for =counsel-org-tag= because the binding for it,
 =C-c C-q= is found in =org-mode-map= which hasn't been defined yet.
 
-** ivy-hydra
+*** ivy-hydra
 #+BEGIN_SRC emacs-lisp
   (use-package ivy-hydra
     :after (ivy hydra)
     :config
 #+END_SRC
 
-*** Customize the default ivy-hydra
+**** Customize the default ivy-hydra
 Provides some vim-ish movements and calling methods. From [[https://github.com/abo-abo/hydra/wiki/hydra-ivy-replacement][here]]
 eg. To kill multiple buffers
 - =C-x b= to open the buffer list
@@ -1048,9 +1076,17 @@ eg. To kill multiple buffers
     ivy-minibuffer-map)
 #+END_SRC
 
-*** /fin/
+**** /fin/
 #+BEGIN_SRC emacs-lisp
   )
+#+END_SRC
+
+** magit
+https://emacsair.me/2017/09/01/magit-walk-through/
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :bind* ("C-x g" . magit-status))
 #+END_SRC
 
 ** modern-c++-font-lock
@@ -1755,6 +1791,11 @@ Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-ke
   )
 #+END_SRC
 
+*** TODO Archive subtrees hierarchically
+Archive subtrees under the same hierarchy as the original in the archive files
+https://gist.github.com/Fuco1/e86fb5e0a5bb71ceafccedb5ca22fcfb
+https://fuco1.github.io/2017-04-20-Archive-subtrees-under-the-same-hierarchy-as-original-in-the-archive-files.html
+
 ** pcre2el
 From [[https://www.reddit.com/r/emacs/comments/60nb8b/favorite_builtin_emacs_commands/df8h8hm/][/u/Irkry on reddit]]
 #+BEGIN_SRC emacs-lisp
@@ -1833,25 +1874,6 @@ Shows which keys can be pressed next. Eg. if you press =C-x= and wait a few seco
 #+END_SRC
 
 ** Themes
-Useful commands:
-=list-faces-display= - List all faces with colors and sample text
-=list-colors-display= - List all colors with their names
-
-*** load-theme hook
-Emacs doesn't have a native hook that is called after a theme has loaded. So we've to create one. (from [[https://www.reddit.com/r/emacs/comments/4v7tcj/does_emacs_have_a_hook_for_when_the_theme_changes/d5wyu1r/][reddit]])
-#+BEGIN_SRC emacs-lisp
-  (defvar after-load-theme-hook nil
-    "Hook run after a color theme is loaded using `load-theme'.")
-  (defadvice load-theme (after run-after-load-theme-hook activate)
-    "Run `after-load-theme-hook'."
-    (run-hooks 'after-load-theme-hook))
-#+END_SRC
-
-eg.
-#+BEGIN_SRC emacs-lisp :tangle no
-  (add-hook 'after-load-theme-hook (lambda() (message "Theme loaded")))
-#+END_SRC
-
 *** leuven
 [[https://github.com/fniessen/emacs-leuven-theme][Github Link]]
 #+BEGIN_SRC emacs-lisp :tangle no
