@@ -209,7 +209,7 @@ gvim_func() {
 }
 alias v='gvim_func'
 vq() {
-  v -q <($(fc -nl -1) "$@")
+  gvim_func -q <(eval "$(fc -nl -1) $@")
 }
 
 # Using -f keeps the window in the foreground and prevents a whole bunch of diffs opening at the same time

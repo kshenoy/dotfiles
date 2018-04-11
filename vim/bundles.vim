@@ -23,7 +23,11 @@ endfunction
 call plug#('ctrlpvim/ctrlp.vim')
 call plug#('tacahiroy/ctrlp-funky')
 call plug#('FelikZ/ctrlp-py-matcher',          s:PlugCond(has('python')||has('python3')))
-" call plug#('ivan-cukic/vim-ctrlp-switcher',    {'on': ['CtrlPSwitch', 'CtrlPSwitchBasic', 'CtrlPSwitchFull']})
+" Plug '/home/kshenoy/.local/install/fzf'
+" call plug#('junegunn/fzf.vim')
+if has('python3')
+  call plug#('ivan-cukic/vim-ctrlp-switcher',  {'on': ['CtrlPSwitch', 'CtrlPSwitchBasic', 'CtrlPSwitchFull']})
+endif
 
 " Motion/TextObjects ---------------------------------------------------------------------------------------------------
 runtime! macros/matchit.vim
@@ -239,12 +243,13 @@ let g:ctrlp_prompt_mappings = {
   \ }
 
 map      <leader>j <Plug>my(CtrlP)
-nnoremap <silent>  <Plug>my(CtrlP)b :CtrlPBuffer<CR>
 nnoremap <silent>  <Plug>my(CtrlP)a :CtrlPSwitchBasic<CR>
+nnoremap <silent>  <Plug>my(CtrlP)b :CtrlPBuffer<CR>
 nnoremap <silent>  <Plug>my(CtrlP)e :CtrlPCurWD<CR>
 nnoremap <silent>  <Plug>my(CtrlP)f :CtrlP<CR>
-nnoremap <silent>  <Plug>my(CtrlP)x :CtrlPMixed<CR>
+nnoremap <silent>  <Plug>my(CtrlP)j :CtrlPMixed<CR>
 nnoremap <silent>  <Plug>my(CtrlP)r :CtrlPMRU<CR>
+nnoremap <silent>  <Plug>my(CtrlP)q :CtrlPQuickfix<CR>
 nnoremap <silent>  <Plug>my(CtrlP)t :CtrlPTag<CR>
 nnoremap <silent>  <Plug>my(CtrlP)o :CtrlPFunky<CR>
 nnoremap <silent>  <Plug>my(CtrlP)] :CtrlPtjump<CR>
@@ -335,6 +340,7 @@ nnoremap <silent> <S-CR>             :FSHere<CR>
 
 
 " Gundo ----------------------------------------------------------------------------------------------------------- {{{1
+let g:gundo_preview_bottom=1
 nnoremap coU :GundoToggle<CR>
 
 

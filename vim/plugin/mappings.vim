@@ -164,7 +164,7 @@ nmap <A-%> g%
 "   'e'   egrep:    egrep search for the word under cursor
 "   'f'   file:     open the filename under cursor
 "   'i'   includes: find files that include the filename under cursor
-"   'd'   called:   find functions that function under cursor calls
+"   'd'   called:   find functions that the function under cursor calls
 nnoremap <silent>  <C-\> :call utils#CscopeMap('l', 0)<CR>
 nnoremap <silent> g<C-\> :call utils#CscopeMap('l', 1)<CR>
 

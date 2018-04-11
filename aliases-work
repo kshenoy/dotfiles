@@ -30,7 +30,7 @@ vlog() {
     _comp=${_comp:+${_comp}.log}
   fi
   local _files=()
-  for i in sim.out *AggL3.log *AggL3Seq.log ${_comp}; do
+  for i in sim.out ${_comp} *AggL3.log *AggL3Seq.log; do
     if [[ -f "$i" ]]; then
       _files=("${_files[@]}" "$i")
     fi
@@ -69,7 +69,7 @@ alias rrb='rr --norun --build --recompile'
 alias rrbr='rr --build --recompile'
 alias rrc='rr --norun --clean'
 alias rrca='build -clean_all'
-alias rrcb='rr --norun --clean --build'
+alias rrcb='rr --norun --clean --build --recompile'
 alias rrcr='rr --clean'
 alias rrdbg=$'rr --add \'-avf "--/L3.Debug.*Graph/ --/L3.Debug.*Resources/"\' --dsp'
 

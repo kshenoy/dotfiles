@@ -74,12 +74,6 @@ endfunction
 command! -nargs=* Retab call utils#Retab(<args>)
 
 
-function! utils#UpdateTagsDone(...)
-  " Description: Dumb function that uses echom to notify that job is done
-  silent cs reset
-  echom "Tags successfully generated"
-endfunction
-
 function! utils#UpdateTags()                                                                                      " {{{1
   " Description: Generate tags (requires exuberant_ctags)
 
@@ -94,6 +88,13 @@ function! utils#UpdateTags()                                                    
   else
     execute "!" . l:cmd
   endif
+endfunction
+
+
+function! utils#UpdateTagsDone(...)
+  " Description: Dumb function that uses echom to notify that job is done
+  silent cs reset
+  echom "Tags successfully generated"
 endfunction
 
 

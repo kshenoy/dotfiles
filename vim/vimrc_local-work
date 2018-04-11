@@ -2,6 +2,9 @@
 " LOCAL SETTINGS
 "
 function! s:SetLocalSettings(filename)
+  if (a:filename =~ '\v/ch/verif/l3/arch_l3')
+    return
+  endif
   if (a:filename =~ '/ch/rtl') && (a:filename !~ 'txl$')
     setlocal textwidth=80
     setlocal softtabstop=3
