@@ -488,9 +488,15 @@ Emacs doesn't have a native hook that is called after a theme has loaded. So we'
     (run-hooks 'after-load-theme-hook))
 #+END_SRC
 
-eg.
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_EXAMPLE
   (add-hook 'after-load-theme-hook (lambda() (message "Theme loaded")))
+#+END_EXAMPLE
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (add-hook 'after-load-theme-hook
+            (lambda()
+              "Update fringe background color once a theme is loaded"
+              (set-face-attribute 'fringe nil :background (face-attribute 'highlight :background))))
 #+END_SRC
 
 ** Visual
@@ -1102,7 +1108,8 @@ https://emacsair.me/2017/09/01/magit-walk-through/
     :config
     (setq nlinum-relative-redisplay-delay 0)
     ;; Solarized colors
-    (set-face-attribute 'nlinum-relative-current-face nil :inherit 'linum :background nil :foreground "#d33682" :weight 'bold))
+    (set-face-attribute 'nlinum-relative-current-face nil :background nil :foreground "#d33682" :weight 'bold)
+    (set-face-attribute 'linum nil :background (face-attribute 'highlight :background)))
 #+END_SRC
 
 ** org
