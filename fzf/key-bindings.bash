@@ -37,7 +37,15 @@
 
 
 fzf-lsf-bjobs() {                                                                                                  #{{{1
-  FZF_CTRL_T_COMMAND='lsf_bjobs -w' FZF_CTRL_T_OPTS="$FZF_CTRL_T_OPTS --header-lines=1" fzf-file-widget
+  local selected=$(lsf_bjobs -w |
+    FZF_DEFAULT_OPTS="--header-lines=1 --height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
+    cut -d' ' -f1 | while read -r item; do
+      printf '%q ' "$item"
+    done
+  )
+
+  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
+  READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
 }
 
 
@@ -124,7 +132,7 @@ else
     bind -x '"\C-t\C-t": "fzf-vcs-files"'
   fi
 
-  # Alt+C: cd into the selected directory
+  # cd into the selected directory
   bind '"\C-t\C-d": " \C-e\C-u`__fzf_cd__`\e\C-e\er\C-m"'
 
   bind -x '"\C-t\C-l": "fzf-lsf-bjobs"'
@@ -138,7 +146,7 @@ else
   # Version-control
   bind -x '"\C-t\C-p\C-f": "fzf-vcs-files"'
   bind -x '"\C-t\C-p\C-o": "fzf-p4-opened"'
-  bind '"\C-t\C-p\C-d": " \C-e\C-u`__fzf_vcs_cd__`\e\C-e\er\C-m"'
+  bind '"\C-t\C-p\C-g": " \C-e\C-u`__fzf_vcs_cd__`\e\C-e\er\C-m"'
   bind '"\C-t\C-p\C-w": " \C-e\C-u`__fzf_p4_walist__`\e\C-e\er\C-m"'
 
   bind '"\er": redraw-current-line'

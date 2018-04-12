@@ -71,13 +71,19 @@ __fzf_p4_walist__() {                                                           
 
 __fzf_vcs_cd__() {                                                                                                 #{{{1
   if is_in_perforce_repo; then
-    FZF_ALT_C_COMMAND='command find $STEM -mindepth 1 \
+    local cmd='command find $STEM -mindepth 1 \
       -type d \( -path $STEM/_env -o -path $STEM/emu -o -path $STEM/env_squash -o -path $STEM/import -o \
         -path $STEM/powerPro -o -path $STEM/sdpx \) -prune \
-      -o -type d -print 2> /dev/null | sed "s:$STEM/::"' __fzf_cd__
-  fi
+      -o -type d -print 2> /dev/null | sed "s:$STEM/::"'
 
-  __fzf_cd__
+    local dir=$(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m)
+
+    if [[ -n "$dir" ]]; then
+      printf 'cd $STEM/%q' "$dir"
+    fi
+  else
+    __fzf_cd__
+  fi
 }
 
 
@@ -86,21 +92,25 @@ fzf-vcs-files() {                                                               
     FZF_CTRL_T_COMMAND='{ git ls-tree -r --name-only HEAD || \
       find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//; } 2> /dev/null' \
       fzf-file-widget
+
   elif is_in_perforce_repo; then
-    FZF_CTRL_T_COMMAND='cat \
+    local cmd='cat \
       <(cd $STEM; p4 have ... | command grep -v "$STEM/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)") \
       <(cd $STEM; p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" | command xargs -I{} -n1 p4 where {}) \
       <(cd $STEM/import/avf; p4 have ... | command grep -v "$STEM/import/avf/\(_env\)") \
-      | command awk "{print \$3}" | command sed "s:$STEM/::"' \
-      fzf-file-widget
-    # local cmd='cat \
-    #   <(cd $STEM; p4 have ... | command grep -v "$STEM/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)") \
-    #   <(cd $STEM; p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" | command xargs -I{} -n1 p4 where {}) \
-    #   <(cd $STEM/import/avf; p4 have ... | command grep -v "$STEM/import/avf/\(_env\)") \
-    #   | command awk "{print \$3}" | command sed "s:$STEM/::"'
-    # eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" | while read -r item; do
-    #   printf '$STEM/%q ' "$item"
-    # done
+      | command awk "{print \$3}" | command sed "s:$STEM/::"'
+
+    local selected=$(eval "$cmd" |
+      FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
+      while read -r item; do
+        if [[ -n $item ]]; then
+          printf '$STEM/%q ' "$item";
+        fi;
+      done
+    )
+
+    READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
+    READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
   else
     fzf-file-widget
   fi
