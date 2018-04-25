@@ -50,42 +50,67 @@ fzf-lsf-bjobs() {                                                               
 
 
 __fzf_cmd_opts__() {                                                                                               #{{{1
-  # echo ">>>${READLINE_LINE}<<< Point=${READLINE_POINT}"
+  # echo "DEBUG: >>>${READLINE_LINE}<<< Point=${READLINE_POINT}, Char=${READLINE_LINE:$READLINE_POINT:0}"
+  local pos=$READLINE_POINT
 
-  cmd=$(awk '{print $NF}' <<< "${READLINE_LINE:0:$READLINE_POINT}")
-  # echo "Cmd=$cmd"
-  if [[ ! -x $(which $cmd) ]]; then
+  # If cursor is on a non-whitespace char assume it's on the cmd that needs to be parsed and move pos to its end
+  while [[ ${READLINE_LINE:$pos:0} != " " ]] && [[ $pos != ${#READLINE_LINE} ]]; do
+    pos=$(( pos + 1 ))
+  done
+
+  # Try to get the command behind all aliases
+  local cmd=$(awk '{print $NF}' <<< "${READLINE_LINE:0:$pos}")
+  # echo "DEBUG: Cmd=$cmd"
+
+  local sanityCount=1
+  for sanityCount in {1..20}; do
+    command alias | command which --read-alias $cmd | while read line; do
+      if [[ $line =~ ^alias ]]; then
+        cmd=$(cut -d"'" -f2 <<< "$line" | awk '{print $1}');
+      else
+        cmd=$(awk '{print $1}' <<< "$line")
+        echo "DEBUG: Cmd=$cmd"
+      fi
+    done
+    echo "DEBUG: Cmd=$cmd"
+    if [[ -x $cmd ]]; then
+      break
+    fi
+  done
+  # echo "DEBUG: Cmd=$cmd"
+  if [[ ! -x $cmd ]]; then
     return
   fi
 
   local selected=$(eval "${cmd} --help || ${cmd} -h || ${cmd} -help || ${cmd} help" | \
     FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf +x -m "$@" | \
     while read -r item; do
-      local opts=($item)
-      local opt=${opts[0]}
-      for i in ${opts[@]}; do
-        if [[ "$i" == --* ]]; then
-          opt="$i"
+      # Auto-split on whitespace
+      local words=($item)
+      for i in ${words[@]}; do
+        if [[ "$i" == -* ]]; then
+          local opt="$i"
           break
         fi
       done
       printf '%q ' $(awk '{print $1}' <<< "$opt" | sed 's/[,=].*$//')
     done; echo)
 
-  if [[ "${READLINE_LINE:$(($READLINE_POINT-1)):1}" != " " ]]; then
+  if [[ "${READLINE_LINE:$(($pos-1)):1}" != " " ]]; then
     # If cursor doesn't have a space before it, add one
     # echo "Needs space before cursor"
     selected=" ${selected}"
   fi
 
-  if [[ "${READLINE_LINE:$READLINE_POINT:1}" == " " ]]; then
+  if [[ "${READLINE_LINE:$pos:1}" == " " ]]; then
     # If cursor has a space after it, remove last space from selected
     # echo "Removing space after cursor"
     selected="${selected% }"
   fi
 
-  READLINE_LINE="${READLINE_LINE:0:READLINE_POINT}${selected}${READLINE_LINE:$READLINE_POINT}"
-  READLINE_POINT=$((READLINE_POINT + ${#selected}))
+  READLINE_LINE="${READLINE_LINE:0:pos}${selected}${READLINE_LINE:$pos}"
+  # Not moving the READLINE_POINT makes it easier to launch this again
+  # READLINE_POINT=$((READLINE_POINT + ${#selected}))
 }
 
 

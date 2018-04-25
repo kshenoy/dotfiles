@@ -60,7 +60,25 @@ fzf-git-remotes() {                                                             
 
 
 fzf-p4-opened() {                                                                                                  #{{{1
-  FZF_CTRL_T_COMMAND='p4 opened | sed -r -e "s/#.*$//" -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::"' fzf-file-widget
+  local cmd='p4 opened | sed -r -e "s/#.*$//" -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::"'
+  local selected=$(eval "$cmd" |
+    FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
+    while read -r item; do
+      if [[ -n $item ]]; then
+        if [[ "$STEM/$item" =~ "$PWD" ]]; then
+          # Remove any common ancestors from filename
+          item="$STEM/$item"
+          item=${item##$PWD/}
+          printf '%q ' "$item";
+        else
+          printf '$STEM/%q ' "$item";
+        fi
+      fi;
+    done
+  )
+
+  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
+  READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
 }
 
 
@@ -77,8 +95,16 @@ __fzf_vcs_cd__() {                                                              
       -o -type d -print 2> /dev/null | sed "s:$STEM/::"'
 
     local dir=$(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m)
+    if [[ -z "$dir" ]]; then
+      return
+    fi
 
-    if [[ -n "$dir" ]]; then
+    if [[ "$STEM/$dir" =~ "$PWD" ]]; then
+      # Remove any common ancestors from filename
+      dir="$STEM/$dir"
+      dir=${dir##$PWD/}
+      printf '%q ' "$dir";
+    else
       printf 'cd $STEM/%q' "$dir"
     fi
   else
@@ -104,7 +130,14 @@ fzf-vcs-files() {                                                               
       FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
       while read -r item; do
         if [[ -n $item ]]; then
-          printf '$STEM/%q ' "$item";
+          if [[ "$STEM/$item" =~ "$PWD" ]]; then
+            # Remove any common ancestors from filename
+            item="$STEM/$item"
+            item=${item##$PWD/}
+            printf '%q ' "$item";
+          else
+            printf '$STEM/%q ' "$item";
+          fi
         fi;
       done
     )
