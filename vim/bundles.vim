@@ -95,7 +95,7 @@ call plug#end()
 " ale ------------------------------------------------------------------------------------------------------------- {{{1
 let g:ale_lint_on_enter=0
 " let g:ale_open_list='never'
-" let g:ale_set_quickfix=0
+let g:ale_set_quickfix=0
 let g:ale_set_balloons=0
 let g:ale_sign_error='✗ '
 let g:ale_sign_style_error='✠ '
