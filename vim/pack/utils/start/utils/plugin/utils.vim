@@ -188,6 +188,6 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! utils#_RemoveAllErrInBut_(num)                                                                          " {{{1
   " Delete everything but the entry we're interested in just the ErrIn field
-  silent! execute '%g/L3ErrPkt/ .s/\v(ErrIn\w*)@<=\=\{[^}]{-}(\[' . a:num . '\]\s*\=\s*[^,]+)[^}]{-}\}/\2/g'
+  silent! execute '%g/cErrPkt/ .s/\vErrIn\=\[[^]]*\]/ErrIn=' . a:num . '/|.s/\v(ErrIn\w+\=)\[(\w+,\s*){' . a:num . '}(\w+)(,\s*\w+)*\]/\1\3/g'
 endfunction
 "nnoremap K :<C-U>call utils#TestFunc(v:count, v:count1)<CR>
