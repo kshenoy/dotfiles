@@ -1,4 +1,17 @@
 #!/usr/bin/env bash
+#
+# Examples:
+# * p4diff2 ch/verif/l3/arch_l3/arch_lci.cc
+#     This runs regular p4 diff
+#
+# * p4diff2 ch/verif/l3/arch_l3/arch_lci.cc#15 ch/verif/l3/arch_l3/arch_lci.cc
+#     This compares arch_lci.cc in the workarea (with all edits) with rev#15 in the trunk
+#
+# * p4diff2 ch/verif/l3/arch_l3/arch_lci.cc#15 ch/verif/l3/arch_l3/arch_lci.cc#14
+#     This compares rev#15 of arch_lci.cc with rev#14 in the trunk
+#
+# * p4diff2 ch/verif/l3/arch_l3/arch_lci.cc#-0 ch/verif/l3/arch_l3/arch_lci.cc#-1
+#     This compares the head revision (#-0) of arch_lci.cc with the previous revision in the trunk
 
 _cmd=${P4DIFF2:-${P4DIFF}}
 
@@ -6,7 +19,11 @@ _cmd=${P4DIFF2:-${P4DIFF}}
 # However, if the file is local to the workarea then using process substitution will prevent us from editing it.
 # Thus, I check if the file belongs to the local workarea or the depot and use process substitution accordingly.
 
-if [[ -n "${_cmd}" ]]; then
+if (( $# == 1)) && [[ ! "$1" =~ "#" ]]; then
+  # Since revision is not mentioned and only 1 filename is specified, execute normal p4diff
+  p4 diff "$@"
+  exit 0
+elif [[ -n "${_cmd}" ]]; then
   _file1="$1"
   if [[ "$_file1" =~ "#" ]]; then
     _ifile=${_file1%%#*}
@@ -20,7 +37,9 @@ if [[ -n "${_cmd}" ]]; then
   fi
 
   _file2="$2"
-  if [[ "$_file2" =~ "#" ]]; then
+  if (( $# == 1 )); then
+    _file2=${1%%#*}
+  elif [[ "$_file2" =~ "#" ]]; then
     _ifile=${_file2%%#*}
     _rev=${_file2##*#}
     if [[ $_rev == -* ]]; then
