@@ -3,6 +3,7 @@
 #+TODO: TODO | DONE
 
 Interesting configs:
+https://github.com/caisah/emacs.dz
 [[http://wolfecub.github.io/dotfiles/][Wolfe's Literate Emacs Config]]
 
 * Init
@@ -268,8 +269,8 @@ After installing a new font refresh the font cache by running
 
   (defun my/select-and-set-font ()
     " Select the font based on OS, hostname etc."
-    (cond ((eq system-type 'windows-nt) (my/set-font-if-exists "Iosevka-10"))
-          ((eq system-type 'gnu/linux) (my/set-font-if-exists "Iosevka-9"))))
+    (cond ((eq system-type 'gnu/linux) (my/set-font-if-exists "Iosevka-9"))
+          ((eq system-type 'windows-nt) (my/set-font-if-exists "Iosevka-9"))))
 
   (if (daemonp)
       (add-hook 'after-make-frame-functions
@@ -277,11 +278,6 @@ After installing a new font refresh the font cache by running
                   (select-frame frame)
                   (my/select-and-set-font)))
     (my/select-and-set-font))
-#+END_SRC
-#+BEGIN_SRC emacs-lisp :tangle no
-  (when (and (display-graphic-p) (x-list-fonts "Iosevka"))
-    (add-to-list 'default-frame-alist '(font . "Iosevka-10:weight=book"))
-    (set-face-attribute 'default t :font "Iosevka-10:weight=book"))
 #+END_SRC
 
 The reason for adding the hook is that if I try to create a daemon, it errors out with
@@ -542,11 +538,11 @@ Set frame size programatically
              ("l" . (lambda () "Set emacs frame size to fit the left desktop monitor"
                       (interactive)
                       (set-frame-position (selected-frame) 0    0)
-                      (set-frame-size     (selected-frame) 1901 1122 t)))
+                      (set-frame-size     (selected-frame) 1910 1122 t)))
              ("r" . (lambda () "Set emacs frame size to fit the right desktop monitor"
                       (interactive)
                       (set-frame-position (selected-frame) 1919 0)
-                      (set-frame-size     (selected-frame) 1902 1122 t))))
+                      (set-frame-size     (selected-frame) 1910 1122 t))))
 #+END_SRC
 
 For reasons I don't understand, when I start a server and create a frame it still shows scroll-bars.
@@ -762,14 +758,18 @@ evil can be toggled using =C-z=
     :init
     (setq evil-want-C-w-in-emacs-state t
           evil-want-Y-yank-to-eol t)
-    :config
-    (evil-mode t)
 #+END_SRC
 
 *** :config
 #+BEGIN_SRC emacs-lisp
   :config
+  (evil-mode t)
+  (dolist (mode '(git-rebase-mode
+                  term-mode
+                  org-toc-mode))
+    (add-to-list 'evil-emacs-state-modes mode))
 #+END_SRC
+
 **** evil-args
 #+BEGIN_SRC emacs-lisp
   (use-package evil-args
@@ -973,14 +973,24 @@ From [[https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-ivy
 #+END_SRC
 
 *** Keybindings
+|---------+---------------------------------------------------------------------------------------------------------------|
+| Binding | Description                                                                                                   |
+|---------+---------------------------------------------------------------------------------------------------------------|
+| M-n     | [[http://mbork.pl/2018-04-21_counsel-rg_and_symbol_at_point][Insert symbol at point]]. By default /M-p/ and /M-n/ go back and forward in history.                                |
+|         | However, starting with /M-n/ we move the minibuffer history into the future, which is a probably "dwim" choice. |
+|---------+---------------------------------------------------------------------------------------------------------------|
+
+**** Rebind =C-r= to ivy-resume
 By default =C-r= is bound to =isearch-backward=. Since I'm using swiper, it's no longer required and is way more useful this way.
 Also =C-h k= says that =C-r= is bound to =undo-tree-redo= found in =undo-tree-map= while it's really defined in =evil-normal-state-map= in evil_maps.el
 #+BEGIN_SRC emacs-lisp
-  ;; (unbind-key "C-r" evil-normal-state-map)
-  (bind-key* "C-c C-r" 'ivy-resume)
+  (unbind-key "C-r" evil-normal-state-map)
+  (bind-key* "C-r" 'ivy-resume)
+  ;; (bind-key* "C-c C-r" 'ivy-resume)
 #+END_SRC
 
-Create binding to show buffers, recent files and bookmarks. There is a variable =ivy-use-virtual-buffers= that does this. However, it is static and when set, dumps everything in =ivy-switch-buffer=.
+**** Binding to show mix of buffers, recent files and bookmarks
+There is a variable =ivy-use-virtual-buffers= that does this. However, it is static and when set, dumps everything in =ivy-switch-buffer=.
 As a result, by default I have to choose one or the other; I can't have both. This fixes that.
 =C-c j j= will show buffers, recent files and bookmarks while =C-c j b= will only show buffers
 #+BEGIN_SRC emacs-lisp
@@ -995,6 +1005,7 @@ As a result, by default I have to choose one or the other; I can't have both. Th
              ("j" . my/ivy-switch-virtual-buffer))
 #+END_SRC
 
+*** /fin/
 #+BEGIN_SRC emacs-lisp
   )
 #+END_SRC
@@ -1112,18 +1123,6 @@ https://emacsair.me/2017/09/01/magit-walk-through/
     :hook (c++-mode . modern-c++-font-lock-mode))
 #+END_SRC
 
-** nlinum-relative
-#+BEGIN_SRC emacs-lisp
-  (use-package nlinum-relative
-    :unless (eq window-system 'w32)
-    :hook (prog-mode . nlinum-relative-mode)
-    :config
-    (setq nlinum-relative-redisplay-delay 0)
-    ;; Solarized colors
-    (set-face-attribute 'nlinum-relative-current-face nil :background nil :foreground "#d33682" :weight 'bold)
-    (set-face-attribute 'linum nil :background (face-attribute 'highlight :background)))
-#+END_SRC
-
 ** org
 This solution is by [[https://www.reddit.com/r/emacs/comments/5sx7j0/how_do_i_get_usepackage_to_ignore_the_bundled/ddixpr9/][/u/Wolfer1ne on reddit]].
 #+BEGIN_SRC emacs-lisp
@@ -1138,6 +1137,8 @@ Also, using =:pin= allows us to prefer which package-archive we'd like to use to
 I don't remember why we need to specifically grab =org-plus-contrib= from the org repository instead of from one of the other ones.
 
 Org customization guide: http://orgmode.org/worg/org-configs/org-customization-guide.html
+Org extensions: https://www.reddit.com/r/emacs/comments/8nvnlu/extending_orgmode/dzz1el9
+
 *** :init
 #+BEGIN_SRC emacs-lisp
   :init
@@ -1407,6 +1408,8 @@ From [[http://emacs.stackexchange.com/questions/38062/configure-key-to-toggle-be
 #+END_SRC
 
 **** org-babel
+Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
+
 ***** Set default options
 #+BEGIN_SRC emacs-lisp
   (setq org-babel-default-header-args
@@ -1450,6 +1453,17 @@ From [[http://emacs.stackexchange.com/questions/2952/display-errors-and-warnings
   (setq org-babel-eval-verbose t)
 #+END_SRC
 
+***** Refresh inline images after evaluating org-babel code
+From https://emacs.stackexchange.com/a/9813/9690
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/fix-inline-images ()
+    (when org-inline-image-overlays
+      (org-redisplay-inline-images)))
+
+  (add-hook 'org-babel-after-execute-hook 'my/fix-inline-images)
+#+END_SRC
+
 **** org-bullets
 Other bullets to consider:
 Default: "◉ ○ ✸ ✿"
@@ -1481,12 +1495,24 @@ Don't add some files to the agenda
                            (not (string-match-p "Orgzly" x))))
                     (mapcar (lambda (x) (concat org-directory x))
                             '("Inbox.org" "Software/" "Personal/" "Work/"))))
+#+END_SRC
 
-  (setq org-agenda-tags-column            -120) ; Monitors are wide, might as well use it :/
+***** :config
+#+BEGIN_SRC emacs-lisp
+  :config
+  (setq org-agenda-tags-column -120) ; Monitors are wide, might as well use it :/
   (setq org-agenda-skip-scheduled-if-done t)    ; Why isn't this default?
-  (setq org-agenda-skip-deadline-if-done  t)
+  (setq org-agenda-skip-deadline-if-done t)
   (setq org-agenda-window-setup 'only-window)
   (setq org-agenda-restore-windows-after-quit t)
+#+END_SRC
+
+Show the previous 7 days as well in the agenda. Also, force agenda to start on a Monday.
+Hence, these two combined always show entries starting from the previous Monday.
+Source: https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-start-day "-7d")
+  (setq org-agenda-start-on-weekday 1)
 #+END_SRC
 
 ***** org-agenda custom commands
@@ -1601,7 +1627,8 @@ eg. implementation by abo-abo: [[https://github.com/abo-abo/worf/blob/master/wor
     (let* ((org-refile-targets '((nil . (:maxlevel . 9)))))
       (org-refile)))
 
-  (bind-key* "C-c C-w" 'my/org-refile-targets)
+  (bind-key* "C-c C-w" 'my/org-refile)
+  (bind-key "C-c C-w" 'my/org-refile org-mode-map)
 #+END_SRC
 
 ***** TODO Rice org-refile
@@ -1730,7 +1757,7 @@ Details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
 #+BEGIN_SRC emacs-lisp
   (defun org-id-complete-link (&optional arg)
     "Create an id: link using completion"
-    (concat "id:" (org-id-get-with-outline-path-completion)))
+    (concat "id:" (org-id-get-with-outline-path-completion org-refile-targets)))
 
   (eval-after-load 'org '(org-link-set-parameters "id" :complete 'org-id-complete-link))
 #+END_SRC
@@ -1923,7 +1950,7 @@ NOTE: I'm using =system-type= instead of =window-system= because when I start a 
 
 #+BEGIN_SRC emacs-lisp
   (use-package solarized-theme
-    :if (eq system-type 'gnu/linux)
+    ;; :if (eq system-type 'gnu/linux)
     :init
     (setq solarized-distinct-fringe-background nil)
     :config

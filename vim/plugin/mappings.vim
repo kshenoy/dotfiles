@@ -117,9 +117,11 @@ nnoremap '; '.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 """ Tab
-""" Preserve visual block after indenting
+""" Preserve visual block after indenting, increment/decrement
 vnoremap > >gv
 vnoremap < <gv
+vnoremap <C-A> <C-A>gv
+vnoremap <C-X> <C-X>gv
 
 """ Briefly show CursorLine and CursorColumn
 nnoremap <silent> <F5> :call utils#CursorBlind()<cr>

@@ -147,11 +147,6 @@ augroup Commentary
 augroup END
 
 
-" clang-format ---------------------------------------------------------------------------------------------------- {{{1
-let g:clang_format#command = '/tool/pandora64/.package/llvm-4.0.0-gcc630/bin/clang-format'
-let g:clang_format#style_options = {}
-
-
 " vim-cpp-enhanced-highlight -------------------------------------------------------------------------------------- {{{1
 let g:cpp_class_scope_highlight           = 1
 let g:cpp_member_variable_highlight       = 1
@@ -188,10 +183,10 @@ if has('unix')
       \ 1: ['.git', 'cd %s && git ls-files --cached --exclude-standard --others'],
       \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
       \ 3: ['P4CONFIG', 'echo %s; cd $STEM; cat ' .
-             \ '<(cd $STEM; p4 have ... | \grep -v "$STEM/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|' .
+             \ '<(cd $ANCHOR_ch/..; p4 have ... | \grep -v "$ANCHOR_ch/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|' .
              \   'ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\|meta/\(build_time\|drop2cad\|upf\)\)") ' .
              \ '<(cd $STEM; p4 opened ... 2> /dev/null | \grep add | \sed "s/#.*//" | \xargs -I{} -n1 p4 where {}) ' .
-             \ '<(cd $STEM/import/avf; p4 have ... | \grep -v "$STEM/import/avf/\(_env\)") ' .
+             \ '<(cd $ANCHOR_avf; p4 have ... | \grep -v "$ANCHOR_avf/\(_env\)") ' .
              \ '| \awk "{print \$3}" | sed "s:$STEM/::"'
          \ ]
     \ },
@@ -252,6 +247,7 @@ nnoremap <silent>  <Plug>my(CtrlP)r :CtrlPMRU<CR>
 nnoremap <silent>  <Plug>my(CtrlP)q :CtrlPQuickfix<CR>
 nnoremap <silent>  <Plug>my(CtrlP)t :CtrlPTag<CR>
 nnoremap <silent>  <Plug>my(CtrlP)o :CtrlPFunky<CR>
+xnoremap <silent>  <Plug>my(CtrlP)o :<C-U>CtrlPFunky <C-R>*<CR>
 nnoremap <silent>  <Plug>my(CtrlP)] :CtrlPtjump<CR>
 vnoremap <silent>  <Plug>my(CtrlP)] :CtrlPtjumpVisual<CR>
 nnoremap <silent>  <leader><leader> :CtrlPBuffer<CR>
@@ -368,11 +364,9 @@ nmap <unique> <silent> <Plug>my(Mark)<C-A-P> <Plug>MarkSearchAnyPrev
 
 " vim-mucomplete -------------------------------------------------------------------------------------------------- {{{1
 let g:mucomplete#chains = {
-  \ 'default': ['path', 'omni', 'keyn', 'dict', 'c-n', 'user', 'ulti'],
-  \ 'c':       ['path', 'omni', 'keyn', 'dict', 'c-n', 'user', 'ulti', 'tags'],
-  \ 'cpp':     ['path', 'omni', 'keyn', 'dict', 'c-n', 'user', 'ulti', 'tags']
+  \ 'default': ['path', 'omni', 'keyn', 'dict', 'c-n', 'user', 'ulti']
   \ }
-let g:mucomplete#enable_auto_at_startup = 1
+let g:mucomplete#enable_auto_at_startup = 0
 let g:mucomplete#no_popup_mappings = 0
 
 
@@ -512,12 +506,12 @@ let g:solarized_underline = 0
 " Switch ---------------------------------------------------------------------------------------------------------- {{{1
 nnoremap <BS> :Switch<CR>
 let g:switch_mapping = ''
-let g:switch_custom_definitions    = [
-                                   \   [ 'TRUE', 'FALSE' ],
-                                   \   [ 'pass', 'fail'  ],
-                                   \   [ 'Pass', 'Fail'  ],
-                                   \   [ 'PASS', 'FAIL'  ]
-                                   \ ]
+let g:switch_custom_definitions = [
+                                \   [ 'TRUE', 'FALSE' ],
+                                \   [ 'pass', 'fail'  ],
+                                \   [ 'Pass', 'Fail'  ],
+                                \   [ 'PASS', 'FAIL'  ]
+                                \ ]
 
 
 " TableMode ------------------------------------------------------------------------------------------------------- {{{1

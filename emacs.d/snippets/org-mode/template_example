@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: example
+# key: <e
+# group: Easy Templates
+# --
+#+BEGIN_EXAMPLE
+  `yas-selected-text`$0
+#+END_EXAMPLE

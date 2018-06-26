@@ -29,6 +29,7 @@ elif [[ -n "${_cmd}" ]]; then
     _ifile=${_file1%%#*}
     _rev=${_file1##*#}
     if [[ $_rev == -* ]]; then
+      echo $_ifile
       _rev=$(( $(command p4 fstat $_ifile | command grep -Po '(?<=headRev )\d+') + $_rev ))
     fi
 

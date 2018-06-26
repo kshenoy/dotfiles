@@ -47,19 +47,25 @@ alias e="emacs_func ${STEM+--socket-name=${STEM//\//_}}"
 # Building and Compiling
 alias sbi='. /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash'
 unset -f mkv
-mkv() { mkverdi $(command grep -Po '\-model\s*\S+' sim.out) -rc ~/novas.rc -guiConf ~/novas.conf -tkName "verdi_$(tmux display-message -p '#S:#I.#P')" "$@" & }
+mkv() { mkverdi -novericom $(command grep -Po '\-model\s*\S+' sim.out) -rc ~/novas.rc -guiConf ~/novas.conf -tkName "verdi_$(tmux display-message -p '#S:#I.#P')" "$@" & }
 alias findFirstError='findFirstError --tkName "verdi_$(tmux display-message -p "#S:#I.#P")"'
 alias cid='cat ${REPO_PATH+$REPO_PATH/}configuration_id'
 bj() {
   lsf_bjobs -w "$@" | perl -aF"\s+" -lne 'printf("%-7s  %-8s  %-4s  %-9s  %-14s  %-10s  %-12s  %s\n", ($. == 1 ? @F[0..5,7,6] : @F[0..5],"@F[$#F-2..$#F]","@F[6..$#F-3]"))'
 }
-bjg() { bj | command grep "${1:-$$:}"; }
+bjg() {
+  # bj | { command head -1; echo command grep "${1:-$$:}"; }
+  bj | command head -1
+  bj | command grep "${1:-$$:}"
+}
 alias bk='lsf_bkill'
 alias bq='lsf_bqueues'
 
+vv() { vv -tkName "verdi_$(tmux display-message -p '#S:#I.#P')" & }
+
 alias wtf='WhyTheFail'
 alias lmn='ljd -nomail -l'
-alias rcf='recreate_fail -a $br0ks/amdmsg_config.yaml'
+alias rcf=$'recreate_fail -a $br0ks/amdmsg_config.yaml -switches \'-avf "-TestCompressedLog 0 --agg_dump_on"\''
 alias trapbug='P4DIFF= s_trapbug -bug'
 
 
@@ -80,15 +86,14 @@ alias perr="perl -ne 'print if /error:/../:error/;exit if /:error/'"
 bu()   { bucket "$@"; }
 bus()  { bucket -s "$@"; }
 bu1()  { bucket -n 1 "$@"; }
-bu3()  { bucket -n 3 "$@"; }
 bu1w() { watch --no-title -n 60 "bucket -n 1 $@"; }
 busw() { watch --no-title -n 60 "bucket -s $@"; }
 alias toclippy="sed -e 's/$/
 /' | tee ~/clippy.txt"
 
-alias xt='xterm -geometry 319x66+1919+21 &'
+alias xt='xterm -geometry 318x66+1920+25 &'
 # alias xtr='echo "resize -s 62 273"; resize -s 62 273'
-alias xtr='wmctrl -i -r $(xdotool getactivewindow) -b add,maximized_vert; wmctrl -i -r $(xdotool getactivewindow) -e 0,1919,25,1915,1144'
+alias xtr='wmctrl -i -r $(xdotool getactivewindow) -b add,maximized_vert; wmctrl -i -r $(xdotool getactivewindow) -e 0,1920,25,1918,1144'
 alias tmxvnc='tmux new-window -d -n "XVNC" "x11vnc"'
 
 
@@ -116,7 +121,6 @@ pftop() {
   p4 changes -m $num "$@" $STEM/...
 }
 alias pfs='p4w submit'
-alias pful='pfu @latest'
 
 # unset -f pfop
 # pfop() {                                                                                                        # {{{2
@@ -154,6 +158,18 @@ pfu() {                                                                         
   ~kshenoy/bin/gentags --create
   sosa
   [[ -f ~/.fzf.bash ]] && . ~/.fzf.bash
+}
+
+pful() {
+  local _changelist="latest"
+
+  # If a valid username is provided then grab latest changelist by that user
+  if (( $# == 1 )) && id $1 > /dev/null; then
+    _changelist=$(p4 changes -m1 -u $1 | awk '{print $2}')
+  fi
+
+  echo p4w update_env "@$_changelist"
+  pfu "@$_changelist"
 }
 
 # Generate a list of files
@@ -443,14 +459,8 @@ BUGS
 
 
 
-g++() {
-  /tool/pandora64/.package/gcc-6.3.0/bin/g++ -Wall -Wextra -std=c++14 \
-    ${BOOST_HOME:+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -Wl,${BOOST_HOME:+-rpath ${BOOST_HOME}/lib} "$@"
-}
-clang++() {
-  /tool/pandora64/.package/llvm-4.0.0-gcc630/bin/clang++ -Wall -Wextra -std=c++14 \
-    ${BOOST_HOME:+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -Wl,${BOOST_HOME:+-rpath ${BOOST_HOME}/lib} "$@"
-}
+alias g++="g++ -Wall -Wextra -std=c++14 -L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include -Wl,-rpath ${BOOST_HOME}/lib"
+alias clang++="clang++ -Wall -Wextra -std=c++14 -L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include -Wl,-rpath ${BOOST_HOME}/lib"
 
 unset -f psig
 psig() {
@@ -499,7 +509,14 @@ vsig() {
 
 unset -f tel
 tel() {
-  perl -aF/,/ -lne 'print "\nName: $F[1], $F[2]\nCube: $F[0]\nExt : $F[3]" if /'$1'/i' ~/tel.csv;
+  while (( $# > 0 )); do
+    getent passwd $1 | \
+    perl -aF/[:,]/ -lne 'map(s/^\s+//,@F);print "ID:;$F[0]\nName:;$F[4]\nCube:;$F[5]\nExt:;$F[6]"' | \
+    /usr/bin/column -t -s \;
+
+    shift
+    if (( $# > 0 )); then echo "----"; fi
+  done
 }
 
 unset -f dotty

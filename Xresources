@@ -47,6 +47,7 @@ XTerm*font5*Label: Size 12
 XTerm*faceSize5: 12
 XTerm*font6*Label: Size 14
 XTerm*faceSize6: 14
+XTerm*internalBorder: 3
 XTerm*scaleHeight: 1.1
 
 XTerm*on3Clicks: regex ([[:alpha:]]+://)?([[:alnum:]!#+,./=?@_~-]|(%[[:xdigit:]][[:xdigit:]]))+
@@ -93,7 +94,7 @@ URxvt.externalBorder:       0
 URxvt.fading:               20
 URxvt.font:                 xft:Iosevka:pixelsize=12
 URxvt.geometry:             240x84
-URxvt.internalBorder:       2
+URxvt.internalBorder:       3
 ! URxvt.jumpScroll:         boolean
 URxvt.letterSpace:          -1
 URxvt.lineSpace:            3
@@ -149,4 +150,4 @@ Emacs.verticalScrollBars: off
 !! Color 7/15:  White
 
 !! Apply base16-colors using the command: color <scheme> <background>
-#include ".Xresources.d/base16_color"
+! #include ".Xresources.d/base16_color"

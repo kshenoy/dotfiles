@@ -8,7 +8,7 @@
 # alias g=grep
 # alias vq='v -q <(!!)'
 # Now, if I run 'g SOMETHING' followed by 'vq' then 'vq' doesn't run as expected because '!!' expands to 'g SOMETHING'.
-# However, 'g' doesn't get expanded to grep because of the afore-mentioned limitation.
+# However, in the expanded form, 'g' doesn't get replaced with grep because of the afore-mentioned limitation.
 #
 # To avoid this, I use functions for my most commonly used aliases so that they work everywhere and,
 # aliases only if I'm sure that they won't be used in the middle of a command.
@@ -153,7 +153,7 @@ grep() { command grep -sP --color=always "$@"; }
 
 # If Ag/Pt/Ack exists, use it!!
 if hash ag 2> /dev/null; then
-  g()     { ag -z "$@"; }
+  g()     { ag "$@"; }
   gtc()   { ag --cpp "$@"; }
   gtch()  { ag -G "\.(h|hh|hpp|tpp)$" "$@"; }
   gtcc()  { ag -G "\.(c|cc|cpp|C|CC)$" "$@"; }
@@ -230,7 +230,7 @@ gvim_diff() {
   done
 
   # Run vimdiff only if there are differences and all files are present
-  gvim_func -df -c 'set nobackup' "$@"
+  gvim_func -geometry 319x70+0+0 -df -c 'set nobackup' "$@"
 }
 alias vd=gvim_diff
 
@@ -355,6 +355,7 @@ alias gS='git status'
 alias tags='ctags --c-kinds=+p --c++-kinds=+p --fields=+Sail --extra=+q *'
 alias tmux='tmux_pp'
 alias tm='tmux'
+alias tmi=tmuxinator
 alias U='unison dotfiles -terse'
 
 

@@ -206,6 +206,14 @@ snippet erm ".erase(std::remove(...))"
 ${1:${VISUAL:container}}.erase(std::remove(std::begin($1), std::end($1), ${2:value}), std::end($1));
 endsnippet
 
+snippet rmi "std::remove_if"
+auto pos = std::remove_if(std::begin(${1:container}), std::end($1), []($2) {
+  $3
+});
+if (pos != std::end($1)) {
+  $4
+}
+endsnippet
 
 # Non-modifying sequence operations --------------------------------------------------------------------------------{{{2
 snippet alo "std::all_of"
@@ -282,6 +290,10 @@ snippet cpy "std::copy"
 std::copy(std::begin(${1:${VISUAL:src}}), std::end($1), std::back_inserter(${2:dest}));
 endsnippet
 
+snippet cpj "std::copy into std::make_ostream_joiner"
+std::copy(std::begin(${1:${VISUAL:src}}), std::end($1), std::experimental::make_ostream_joiner(${2:oss}, ','));
+endsnippet
+
 snippet cpi "std::copy_if"
 std::copy_if(std::begin(${1:${VISUAL:src}}), std::end($1), std::back_inserter(${2:dest}),
   [](auto const& ${3:i}) {
@@ -309,7 +321,7 @@ endsnippet
 
 
 # String/Streams ---------------------------------------------------------------------------------------------------{{{2
-snippet sso "std::ostringstream"
+snippet oss "std::ostringstream"
 std::ostringstream ${1:oss};
 oss << ${VISUAL}$0
 endsnippet
