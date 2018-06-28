@@ -1407,76 +1407,12 @@ From [[http://emacs.stackexchange.com/questions/38062/configure-key-to-toggle-be
   ;; (org-defkey org-mode-map (kbd "C-c .") #'my-org-time-stamp)
 #+END_SRC
 
-**** org-babel
-Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
-
-***** Set default options
+**** htmlize
+Syntax highlighting when exporting to HTML? Yes, please!
 #+BEGIN_SRC emacs-lisp
-  (setq org-babel-default-header-args
-        '((:results . "verbatim replace")))
-
-  (setq org-babel-C++-compiler "clang++")
-  (setq org-babel-default-header-args:C++
-        '((:flags   . "-std=c++14 -Wall -Wextra -Werror ${BOOST_HOME:+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -Wl,${BOOST_HOME:+-rpath ${BOOST_HOME}/lib}")))
-
-  (setq org-babel-default-header-args:perl
-        '((:results . "output")))
-
-  (setq org-babel-python-command "python3")
+  (use-package htmlize
+    :disabled)
 #+END_SRC
-
-***** Display errors and warnings in an org-babel code block
-From [[http://emacs.stackexchange.com/questions/2952/display-errors-and-warnings-in-an-org-mode-code-block][Emacs StackExchange]]
-#+BEGIN_SRC emacs-lisp :tangle no
-  (defvar org-babel-eval-verbose t
-    "A non-nil value makes `org-babel-eval' display")
-
-  (defun org-babel-eval (cmd body)
-    "Run CMD on BODY.
-  If CMD succeeds then return its results, otherwise display
-  STDERR with `org-babel-eval-error-notify'."
-    (let ((err-buff (get-buffer-create " *Org-Babel Error*")) exit-code)
-      (with-current-buffer err-buff (erase-buffer))
-      (with-temp-buffer
-        (insert body)
-        (setq exit-code
-              (org-babel--shell-command-on-region
-               (point-min) (point-max) cmd err-buff))
-        (if (or (not (numberp exit-code)) (> exit-code 0)
-                (and org-babel-eval-verbose (> (buffer-size err-buff) 0))) ; new condition
-            (progn
-              (with-current-buffer err-buff
-                (org-babel-eval-error-notify exit-code (buffer-string)))
-              nil)
-          (buffer-string)))))
-
-  (setq org-babel-eval-verbose t)
-#+END_SRC
-
-***** Refresh inline images after evaluating org-babel code
-From https://emacs.stackexchange.com/a/9813/9690
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/fix-inline-images ()
-    (when org-inline-image-overlays
-      (org-redisplay-inline-images)))
-
-  (add-hook 'org-babel-after-execute-hook 'my/fix-inline-images)
-#+END_SRC
-
-**** org-bullets
-Other bullets to consider:
-Default: "◉ ○ ✸ ✿"
-Large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
-Small: ► • ★ ▸
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :config
-    (add-hook 'org-mode-hook (lambda() (org-bullets-mode 1))))
-#+END_SRC
-
-A good way to find more characters is to use =M-x insert-char=
 
 **** org-agenda
 #+BEGIN_SRC emacs-lisp
@@ -1588,51 +1524,76 @@ Open the custom "Daily agenda and all TODOs" directly. Based on [[http://emacs.s
   )
 #+END_SRC
 
-**** org-refile
-By [[https://www.reddit.com/r/emacs/comments/4366f9/how_do_orgrefiletargets_work/czg008y/][/u/awalker4 on reddit]].
-Show upto 3 levels of headings from the current file and two levels of headings from all agenda files
-#+BEGIN_SRC emacs-lisp
-  (setq org-refile-targets
-        '((nil . (:maxlevel . 3))
-          (org-agenda-files . (:maxlevel . 2))))
-#+END_SRC
-Each element of the list generates a set of possible targets.
-/nil/ indicates that all the headings in the current buffer will be considered.
+**** org-babel
+Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
 
-Following are from Aaron Bieber's post [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Organizing Notes with Refile]]
-
-Creating new parents - To create new heading, add =/HeadingName= to the end when using refile (=C-c C-w=)
+***** Set default options
 #+BEGIN_SRC emacs-lisp
-  (setq org-refile-allow-creating-parent-nodes 'confirm)
-  (setq org-refile-use-outline-path 'file)
-  (setq org-outline-path-complete-in-steps nil)
+  (setq org-babel-default-header-args
+        '((:results . "verbatim replace")))
+
+  (setq org-babel-C++-compiler "clang++")
+  (setq org-babel-default-header-args:C++
+        '((:flags   . "-std=c++14 -Wall -Wextra -Werror ${BOOST_HOME:+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -Wl,${BOOST_HOME:+-rpath ${BOOST_HOME}/lib}")))
+
+  (setq org-babel-default-header-args:perl
+        '((:results . "output")))
+
+  (setq org-babel-python-command "python3")
 #+END_SRC
 
-***** TODO Set org-refile targets based on current file
-Why would I want to refile something work-related under Softwares etc.
-A way to do it is by writing a function that sets /org-refile-targets/ in a let binding making it local.
-eg. implementation by abo-abo: [[https://github.com/abo-abo/worf/blob/master/worf.el][worf-refile-other]]
-
+***** Display errors and warnings in an org-babel code block
+From [[http://emacs.stackexchange.com/questions/2952/display-errors-and-warnings-in-an-org-mode-code-block][Emacs StackExchange]]
 #+BEGIN_SRC emacs-lisp :tangle no
-  (load-library "find-lisp")
+  (defvar org-babel-eval-verbose t
+    "A non-nil value makes `org-babel-eval' display")
 
-  (defun my/org-refile-targets ()
-    "Refile the current heading to another heading.
-  The other heading can be in the current file or in a file that resides
-  anywhere below the directory the current file resides in.
+  (defun org-babel-eval (cmd body)
+    "Run CMD on BODY.
+  If CMD succeeds then return its results, otherwise display
+  STDERR with `org-babel-eval-error-notify'."
+    (let ((err-buff (get-buffer-create " *Org-Babel Error*")) exit-code)
+      (with-current-buffer err-buff (erase-buffer))
+      (with-temp-buffer
+        (insert body)
+        (setq exit-code
+              (org-babel--shell-command-on-region
+               (point-min) (point-max) cmd err-buff))
+        (if (or (not (numberp exit-code)) (> exit-code 0)
+                (and org-babel-eval-verbose (> (buffer-size err-buff) 0))) ; new condition
+            (progn
+              (with-current-buffer err-buff
+                (org-babel-eval-error-notify exit-code (buffer-string)))
+              nil)
+          (buffer-string)))))
 
-  The intent is to move to a similar file. If I'm in work-related file,
-  I almost never have to refile something to a personal file."
-    (interactive "p")
-    (let* ((org-refile-targets '((nil . (:maxlevel . 9)))))
-      (org-refile)))
-
-  (bind-key* "C-c C-w" 'my/org-refile)
-  (bind-key "C-c C-w" 'my/org-refile org-mode-map)
+  (setq org-babel-eval-verbose t)
 #+END_SRC
 
-***** TODO Rice org-refile
-eg. https://emacs-china.org/t/topic/3622
+***** Refresh inline images after evaluating org-babel code
+From https://emacs.stackexchange.com/a/9813/9690
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/fix-inline-images ()
+    (when org-inline-image-overlays
+      (org-redisplay-inline-images)))
+
+  (add-hook 'org-babel-after-execute-hook 'my/fix-inline-images)
+#+END_SRC
+
+**** org-bullets
+Other bullets to consider:
+Default: "◉ ○ ✸ ✿"
+Large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
+Small: ► • ★ ▸
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :config
+    (add-hook 'org-mode-hook (lambda() (org-bullets-mode 1))))
+#+END_SRC
+
+A good way to find more characters is to use =M-x insert-char=
 
 **** org-capture
 Show hierarchical headlines when refiling instead of flattening it out
@@ -1724,6 +1685,34 @@ saving it to a variable and printing it out later in the capture template.
         (delete-frame)))
 #+END_SRC
 
+**** org-drill
+I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ensure_target]].
+#+BEGIN_SRC emacs-lisp
+  (use-package org-drill
+    :disabled
+    :ensure org-plus-contrib
+    :init
+    (setq org-drill-learn-fraction 0.4)
+    :config
+    (add-to-list 'org-modules 'org-drill)
+    (setq org-drill-add-random-noise-to-intervals-p t)
+    (setq org-drill-hide-item-headings-p t)
+
+    (use-package org-drill-table
+      :disabled
+      :load-path "bundle/org-drill-table"))
+#+END_SRC
+
+**** org-expiry
+This allows me to add a =CREATED= property everytime I create a new org-heading
+#+BEGIN_SRC emacs-lisp
+  (use-package org-expiry
+    :ensure org-plus-contrib
+    :init
+    (org-expiry-insinuate)
+    (setq org-expiry-inactive-timestamps t)) ; Don't have everything in the agenda view
+#+END_SRC
+
 **** org-id
 I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ensure_target]].
 #+BEGIN_SRC emacs-lisp
@@ -1767,30 +1756,51 @@ Details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
   )
 #+END_SRC
 
-**** org-drill
-I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ensure_target]].
+**** org-refile
+By [[https://www.reddit.com/r/emacs/comments/4366f9/how_do_orgrefiletargets_work/czg008y/][/u/awalker4 on reddit]].
+Show upto 3 levels of headings from the current file and two levels of headings from all agenda files
 #+BEGIN_SRC emacs-lisp
-  (use-package org-drill
-    :disabled
-    :ensure org-plus-contrib
-    :init
-    (setq org-drill-learn-fraction 0.4)
-    :config
-    (add-to-list 'org-modules 'org-drill)
-    (setq org-drill-add-random-noise-to-intervals-p t)
-    (setq org-drill-hide-item-headings-p t)
+  (setq org-refile-targets
+        '((nil . (:maxlevel . 3))
+          (org-agenda-files . (:maxlevel . 2))))
+#+END_SRC
+Each element of the list generates a set of possible targets.
+/nil/ indicates that all the headings in the current buffer will be considered.
 
-    (use-package org-drill-table
-      :disabled
-      :load-path "bundle/org-drill-table"))
+Following are from Aaron Bieber's post [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Organizing Notes with Refile]]
+
+Creating new parents - To create new heading, add =/HeadingName= to the end when using refile (=C-c C-w=)
+#+BEGIN_SRC emacs-lisp
+  (setq org-refile-allow-creating-parent-nodes 'confirm)
+  (setq org-refile-use-outline-path 'file)
+  (setq org-outline-path-complete-in-steps nil)
 #+END_SRC
 
-**** htmlize
-Syntax highlighting when exporting to HTML? Yes, please!
-#+BEGIN_SRC emacs-lisp
-  (use-package htmlize
-    :disabled)
+***** TODO Set org-refile targets based on current file
+Why would I want to refile something work-related under Softwares etc.
+A way to do it is by writing a function that sets /org-refile-targets/ in a let binding making it local.
+eg. implementation by abo-abo: [[https://github.com/abo-abo/worf/blob/master/worf.el][worf-refile-other]]
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (load-library "find-lisp")
+
+  (defun my/org-refile-targets ()
+    "Refile the current heading to another heading.
+  The other heading can be in the current file or in a file that resides
+  anywhere below the directory the current file resides in.
+
+  The intent is to move to a similar file. If I'm in work-related file,
+  I almost never have to refile something to a personal file."
+    (interactive "p")
+    (let* ((org-refile-targets '((nil . (:maxlevel . 9)))))
+      (org-refile)))
+
+  (bind-key* "C-c C-w" 'my/org-refile)
+  (bind-key "C-c C-w" 'my/org-refile org-mode-map)
 #+END_SRC
+
+***** TODO Rice org-refile
+eg. https://emacs-china.org/t/topic/3622
 
 *** Keybindings
 :PROPERTIES:

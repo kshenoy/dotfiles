@@ -347,15 +347,15 @@ mkwa() {                                                                        
   p4 have | awk {'print $3'} >| .filelist
 
   # Start an emacs daemon
-  echo "${_fg_green}[Starting emacs daemon...]${_reset}"
-  ~kshenoy/bin/emacs_daemon -s &> /dev/null &
+  # echo "${_fg_green}[Starting emacs daemon...]${_reset}"
+  # ~kshenoy/bin/emacs_daemon -s &> /dev/null &
 
   # Source aliases...
   echo "${_fg_green}[Sourcing aliases...]${_reset}"
   [[ -f ~/.dotfiles/aliases ]] && . ~/.dotfiles/aliases
 
   # Set project root for emacs-projectile
-  command cp $as0ks/projectile $STEM/.projectile
+  # command cp $as0ks/projectile $STEM/.projectile
 
   # Create tags
   echo "${_fg_green}[Generating tags...]${_reset}"
