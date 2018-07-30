@@ -38,15 +38,6 @@ Sacha Chua seems to have something like that. Her init.el is simply a link.
 Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/shaving_time_on_emacs_startup_from_org_literate/][reddit thread]].
 
 * General
-** Convenience functions
-Loop over all hooks (from [[https://github.com/cofi/dotfiles/blob/master/emacs.d/config/cofi-util.el#L38][cofi@github]])
-#+BEGIN_SRC emacs-lisp
-  (defun my/add-hooks (hooks fun)
-    "Add function FUN to all HOOKS"
-    (dolist (hook hooks)
-      (add-hook hook fun)))
-#+END_SRC
-
 ** Keybindings
 #+BEGIN_SRC emacs-lisp
   (bind-keys* :prefix-map my-leader-map
@@ -311,7 +302,7 @@ How does this work? What is it supposed to do?
 From [[http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html][endless parentheses]]
 
 #+BEGIN_SRC emacs-lisp
-  (defun narrow-or-widen-dwim (p)
+  (defun my-narrow-or-widen-dwim (p)
     "Widen if buffer is narrowed, narrow-dwim otherwise.
   Dwim means: region, org-src-block, org-subtree, or defun, whichever applies first.
   Narrowing to org-src-block actually calls `org-edit-src-code'.
@@ -335,7 +326,7 @@ From [[http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html][endless pa
           (t (narrow-to-defun))))
 
   ;; This line actually replaces Emacs' entire narrowing keymap.
-  (bind-key "n" 'narrow-or-widen-dwim ctl-x-map)
+  (bind-key "n" 'my-narrow-or-widen-dwim ctl-x-map)
 #+END_SRC
 
 ** Mode line
@@ -430,7 +421,8 @@ Since these are buffer-local variables, I have to use =setq-default=
 
 Enable it only in some modes
 #+BEGIN_SRC emacs-lisp
-  (my/add-hooks '(prog-mode-hook text-mode-hook) (lambda() (setq show-trailing-whitespace t)))
+  (dolist (hook '(prog-mode-hook text-mode-hook))
+    (add-hook hook (lambda() (setq show-trailing-whitespace t))))
 #+END_SRC
 
 *** Delete trailing whitespace
@@ -538,11 +530,11 @@ Set frame size programatically
              ("l" . (lambda () "Set emacs frame size to fit the left desktop monitor"
                       (interactive)
                       (set-frame-position (selected-frame) 0    0)
-                      (set-frame-size     (selected-frame) 1910 1122 t)))
+                      (set-frame-size     (selected-frame) 1910 1150 t)))
              ("r" . (lambda () "Set emacs frame size to fit the right desktop monitor"
                       (interactive)
                       (set-frame-position (selected-frame) 1919 0)
-                      (set-frame-size     (selected-frame) 1910 1122 t))))
+                      (set-frame-size     (selected-frame) 1910 1150 t))))
 #+END_SRC
 
 For reasons I don't understand, when I start a server and create a frame it still shows scroll-bars.
@@ -573,7 +565,7 @@ Other examples:
 ** avy
 #+BEGIN_SRC emacs-lisp
   (use-package avy
-    :after evil
+    :after (evil)
     :bind (:map evil-normal-state-map
                 ("g s" . avy-goto-char)))
 #+END_SRC
@@ -605,20 +597,14 @@ Create a keybinding map specifically for auto-completion
 Provides auto-completion. Refer to [[https://youtu.be/XeWZfruRu6k][Uncle Dave's video]] for an introduction.
 #+BEGIN_SRC emacs-lisp
   (use-package company
-    :init
-    (add-hook 'after-init-hook 'global-company-mode)
-
+    :init (add-hook 'after-init-hook 'global-company-mode)
+    :hook (c-mode c++-mode)
     :bind (:map my-auto-completion-map
                 ("y" . company-yasnippet))
-
-    :config
-    (setq company-idle-delay 0
-          company-minimum-prefix-length 2
-          company-show-numbers t           ; Show numbers in the drop-down menu to simplify selection
-          company-selection-wrap-around t)
-
-    (add-hook 'c++-mode-hook 'company-mode)
-    (add-hook 'c-mode-hook 'company-mode)
+    :config (setq company-idle-delay 0
+                  company-minimum-prefix-length 2
+                  company-show-numbers t           ; Show numbers in the drop-down menu to simplify selection
+                  company-selection-wrap-around t)
 #+END_SRC
 
 **** Keybindings
@@ -718,10 +704,8 @@ Keeping this at the end to be run after we've added all backends
 *** irony
 #+BEGIN_SRC emacs-lisp
   (use-package irony
-    :config
-    (add-hook 'c++-mode-hook 'irony-mode)
-    (add-hook 'c-mode-hook 'irony-mode)
-    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
+    :hook (c-mode c++-mode)
+    :config (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 #+END_SRC
 
 *** yasnippet
@@ -768,74 +752,6 @@ evil can be toggled using =C-z=
                   term-mode
                   org-toc-mode))
     (add-to-list 'evil-emacs-state-modes mode))
-#+END_SRC
-
-**** evil-args
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-args
-    :bind (:map evil-inner-text-objects-map
-                ("," . evil-inner-arg)
-           :map evil-outer-text-objects-map
-                ("," . evil-outer-arg)
-           :map evil-normal-state-map
-                ("] ," . evil-forward-arg)
-                ("[ ," . evil-backward-arg)
-           :map evil-motion-state-map
-                ("] ," . evil-forward-arg)
-                ("[ ," . evil-backward-arg)))
-#+END_SRC
-
-**** evil-commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-commentary
-    :bind (:map evil-normal-state-map
-                ("g c" . evil-commentary)
-                :map evil-visual-state-map
-                ("g c" . evil-commentary)))
-#+END_SRC
-
-**** evil-exchange
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-exchange
-    :config (evil-exchange-cx-install))
-#+END_SRC
-
-**** evil-matchit
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-matchit)
-#+END_SRC
-
-**** evil-numbers
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-numbers
-    :bind (:map evil-normal-state-map
-               ("C-c +" . evil-numbers/inc-at-pt)
-               ("C-c -" . evil-numbers/dec-at-pt)
-           :map evil-visual-state-map
-               ("C-c +" . evil-numbers/inc-at-pt)
-               ("C-c -" . evil-numbers/dec-at-pt)))
-#+END_SRC
-
-**** evil-string-inflection
-Provides =g~= operator to cycle between snake_case → SCREAMING_SNAKE_CASE → TitleCase → CamelCase → kebab-case
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-string-inflection
-    :bind (:map evil-normal-state-map
-                ("g ~" . evil-operator-string-inflection)
-           :map evil-visual-state-map
-                ("g ~" . evil-operator-string-inflection)))
-#+END_SRC
-
-**** evil-surround
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-surround
-    :config (global-evil-surround-mode))
-#+END_SRC
-
-**** evil-visualstar
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-visualstar
-    :config (global-evil-visualstar-mode))
 #+END_SRC
 
 **** Keybindings
@@ -930,6 +846,82 @@ Also set the cursor to a box if the buffer is not modifiable (eg. org-agenda vie
   )
 #+END_SRC
 
+*** evil-args
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-args
+    :after (evil)
+    :bind (:map evil-inner-text-objects-map
+                ("," . evil-inner-arg)
+           :map evil-outer-text-objects-map
+                ("," . evil-outer-arg)
+           :map evil-normal-state-map
+                ("] ," . evil-forward-arg)
+                ("[ ," . evil-backward-arg)
+           :map evil-motion-state-map
+                ("] ," . evil-forward-arg)
+                ("[ ," . evil-backward-arg)))
+#+END_SRC
+
+*** evil-commentary
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-commentary
+    :after (evil)
+    :bind (:map evil-normal-state-map
+                ("g c" . evil-commentary)
+                :map evil-visual-state-map
+                ("g c" . evil-commentary)))
+#+END_SRC
+
+*** evil-exchange
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-exchange
+    :after (evil)
+    :config (evil-exchange-cx-install))
+#+END_SRC
+
+*** evil-matchit
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-matchit
+    :after (evil))
+#+END_SRC
+
+*** evil-numbers
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-numbers
+    :after (evil)
+    :bind (:map evil-normal-state-map
+               ("C-c +" . evil-numbers/inc-at-pt)
+               ("C-c -" . evil-numbers/dec-at-pt)
+           :map evil-visual-state-map
+               ("C-c +" . evil-numbers/inc-at-pt)
+               ("C-c -" . evil-numbers/dec-at-pt)))
+#+END_SRC
+
+*** evil-string-inflection
+Provides =g~= operator to cycle between snake_case → SCREAMING_SNAKE_CASE → TitleCase → CamelCase → kebab-case
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-string-inflection
+    :after (evil)
+    :bind (:map evil-normal-state-map
+                ("g ~" . evil-operator-string-inflection)
+           :map evil-visual-state-map
+                ("g ~" . evil-operator-string-inflection)))
+#+END_SRC
+
+*** evil-surround
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-surround
+    :after (evil)
+    :config (global-evil-surround-mode))
+#+END_SRC
+
+*** evil-visualstar
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-visualstar
+    :after (evil)
+    :config (global-evil-visualstar-mode))
+#+END_SRC
+
 ** flycheck
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
@@ -1010,39 +1002,6 @@ As a result, by default I have to choose one or the other; I can't have both. Th
   )
 #+END_SRC
 
-*** swiper
-#+BEGIN_SRC emacs-lisp
-  (use-package swiper
-    :bind* (("C-s" . swiper)
-            ("C-M-s" . swiper-all)))
-#+END_SRC
-
-*** counsel
-NOTE: I'm deferring loading using =:commands= for those commands for which I cannot use =:bind= here
-=counsel-org-tag= binding is defined only after org is loaded so I'm defining it there instead.
-=counsel-org-goto= is set conditionally only if we're in org-mode
-
-#+BEGIN_SRC emacs-lisp
-  (use-package counsel
-    :commands (counsel-org-tag counsel-org-goto counsel-semantic-or-imenu)
-    :bind* ("C-h a" . counsel-apropos)
-#+END_SRC
-
-Use =C-c j= as prefix for all counsel-related keybindings
-#+BEGIN_SRC emacs-lisp
-  :init
-  (bind-key "i" '(lambda() (interactive) (if (string= major-mode "org-mode")
-                                        (counsel-org-goto)
-                                      (counsel-semantic-or-imenu)))
-            my-jumper-command-map)
-
-  :bind (:map my-jumper-command-map
-              ("/" . counsel-ag)))
-#+END_SRC
-
-NOTE: I'm deferring loading by using the =commands= keyword for =counsel-org-tag= because the binding for it,
-=C-c C-q= is found in =org-mode-map= which hasn't been defined yet.
-
 *** ivy-hydra
 #+BEGIN_SRC emacs-lisp
   (use-package ivy-hydra
@@ -1107,6 +1066,63 @@ eg. To kill multiple buffers
 **** /fin/
 #+BEGIN_SRC emacs-lisp
   )
+#+END_SRC
+
+*** swiper
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+    :after (ivy)
+    :bind* (("C-s" . swiper)
+            ("C-M-s" . swiper-all)))
+#+END_SRC
+
+*** counsel
+NOTE: I'm deferring loading using =:commands= for those commands for which I cannot use =:bind= here
+=counsel-org-tag= binding is defined only after org is loaded so I'm defining it there instead.
+=counsel-org-goto= is set conditionally only if we're in org-mode
+
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel
+    :after (ivy)
+    :commands (counsel-org-tag counsel-org-goto counsel-semantic-or-imenu)
+    :bind* ("C-h a" . counsel-apropos)
+#+END_SRC
+
+Use =C-c j= as prefix for all counsel-related keybindings
+#+BEGIN_SRC emacs-lisp
+  :bind (:map my-jumper-command-map
+              ("/" . counsel-ag)))
+
+  :config
+  (defun my/counsel-imenu ()
+    "Use mode-specific commands if available else fallback to counsel-semantic-or-imenu"
+    (interactive)
+    (if (string= major-mode "org-mode")
+        (counsel-org-goto)
+      (counsel-semantic-or-imenu)))
+
+  (bind-key "i" 'my/counsel-imenu my-jumper-command-map)
+#+END_SRC
+
+NOTE: I'm deferring loading by using the =commands= keyword for =counsel-org-tag= because the binding for it,
+=C-c C-q= is found in =org-mode-map= which hasn't been defined yet.
+
+*** ivy-rich
+:PROPERTIES:
+:CREATED:  [2018-07-09 Mon 16:46]
+:END:
+https://github.com/Yevgnen/ivy-rich/
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy-rich
+    :after ivy
+    :custom
+    (ivy-virtual-abbreviate 'full
+                            ivy-rich-switch-buffer-align-virtual-buffer t
+                            ivy-rich-path-style 'abbrev)
+    :config
+    (ivy-set-display-transformer 'ivy-switch-buffer
+                                 'ivy-rich-switch-buffer-transformer))
 #+END_SRC
 
 ** magit
@@ -1288,6 +1304,7 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 *** :config
 #+BEGIN_SRC emacs-lisp
   :config
+  (setq org-clock-idle-time nil)
 #+END_SRC
 
 **** Make org-mode play nicely with Google Chrome
@@ -1407,122 +1424,51 @@ From [[http://emacs.stackexchange.com/questions/38062/configure-key-to-toggle-be
   ;; (org-defkey org-mode-map (kbd "C-c .") #'my-org-time-stamp)
 #+END_SRC
 
-**** htmlize
-Syntax highlighting when exporting to HTML? Yes, please!
+**** org-refile
+By [[https://www.reddit.com/r/emacs/comments/4366f9/how_do_orgrefiletargets_work/czg008y/][/u/awalker4 on reddit]].
+Show upto 3 levels of headings from the current file and two levels of headings from all agenda files
 #+BEGIN_SRC emacs-lisp
-  (use-package htmlize
-    :disabled)
+  (setq org-refile-targets
+        '((nil . (:maxlevel . 3))
+          (org-agenda-files . (:maxlevel . 2))))
+#+END_SRC
+Each element of the list generates a set of possible targets.
+/nil/ indicates that all the headings in the current buffer will be considered.
+
+Following are from Aaron Bieber's post [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Organizing Notes with Refile]]
+
+Creating new parents - To create new heading, add =/HeadingName= to the end when using refile (=C-c C-w=)
+#+BEGIN_SRC emacs-lisp
+  (setq org-refile-allow-creating-parent-nodes 'confirm)
+  (setq org-refile-use-outline-path 'file)
+  (setq org-outline-path-complete-in-steps nil)
 #+END_SRC
 
-**** org-agenda
-#+BEGIN_SRC emacs-lisp
-  (use-package org-agenda
-    :ensure nil
-#+END_SRC
+***** TODO Set org-refile targets based on current file
+Why would I want to refile something work-related under Softwares etc.
+A way to do it is by writing a function that sets /org-refile-targets/ in a let binding making it local.
+eg. implementation by abo-abo: [[https://github.com/abo-abo/worf/blob/master/worf.el][worf-refile-other]]
 
-***** :init
-Don't add some files to the agenda
-#+BEGIN_SRC emacs-lisp
-  :init
-  (setq org-agenda-files
-        (seq-filter (lambda (x)
-                      (and 'file-exists-p
-                           (not (string= "Spanish.org" x))
-                           (not (string-match-p "Orgzly" x))))
-                    (mapcar (lambda (x) (concat org-directory x))
-                            '("Inbox.org" "Software/" "Personal/" "Work/"))))
-#+END_SRC
-
-***** :config
-#+BEGIN_SRC emacs-lisp
-  :config
-  (setq org-agenda-tags-column -120) ; Monitors are wide, might as well use it :/
-  (setq org-agenda-skip-scheduled-if-done t)    ; Why isn't this default?
-  (setq org-agenda-skip-deadline-if-done t)
-  (setq org-agenda-window-setup 'only-window)
-  (setq org-agenda-restore-windows-after-quit t)
-#+END_SRC
-
-Show the previous 7 days as well in the agenda. Also, force agenda to start on a Monday.
-Hence, these two combined always show entries starting from the previous Monday.
-Source: https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-start-day "-7d")
-  (setq org-agenda-start-on-weekday 1)
-#+END_SRC
-
-***** org-agenda custom commands
-Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html
-#+BEGIN_SRC emacs-lisp
-  (defun my/org-skip-subtree-if-habit ()
-    "Skip an agenda entry if it has a STYLE property equal to \"habit\"."
-    (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-      (if (string= (org-entry-get nil "STYLE") "habit")
-          subtree-end
-        nil)))
-
-  (defun my/org-skip-subtree-if-priority (priority)
-    "Skip an agenda subtree if it has a priority of PRIORITY.
-
-  PRIORITY may be one of the characters ?A, ?B, or ?C."
-    (let ((subtree-end (save-excursion (org-end-of-subtree t)))
-          (pri-value (* 1000 (- org-lowest-priority priority)))
-          (pri-current (org-get-priority (thing-at-point 'line t))))
-      (if (= pri-value pri-current)
-          subtree-end
-        nil)))
-
-  (setq org-agenda-custom-commands
-        '(("d" "Daily agenda and all TODOs"
-           ((tags "PRIORITY=\"A\""
-                  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                   (org-agenda-overriding-header "High-priority unfinished tasks:")))
-            (agenda "" ((org-agenda-span 14)))
-            (alltodo ""
-                     ((org-agenda-skip-function '(or (my/org-skip-subtree-if-habit)
-                                                     (my/org-skip-subtree-if-priority ?A)
-                                                     (org-agenda-skip-if nil '(scheduled deadline))))
-                      (org-agenda-overriding-header "ALL normal priority tasks:"))))
-           ((org-agenda-compact-blocks t)))
-
-          ("w" "Daily agenda and all TODOs for Work"
-           ((tags "PRIORITY=\"A\""
-                  ((org-agenda-tag-filter-preset '("+Work"))
-                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                   (org-agenda-overriding-header "High-priority unfinished tasks:")))
-            (agenda "" ((org-agenda-span 14)))
-            (alltodo ""
-                     ((org-agenda-tag-filter-preset '("+Work"))
-                      (org-agenda-skip-function '(or (my/org-skip-subtree-if-habit)
-                                                     (my/org-skip-subtree-if-priority ?A)
-                                                     (org-agenda-skip-if nil '(scheduled deadline))))
-                      (org-agenda-overriding-header "ALL normal priority tasks:"))))
-           ((org-agenda-compact-blocks t)))))
-#+END_SRC
-
-***** Keybindings
-[[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][General org keybindings]]
-
-#+BEGIN_SRC emacs-lisp
-  :config
-#+END_SRC
-
-Use j/k in org-agenda
 #+BEGIN_SRC emacs-lisp :tangle no
-  (bind-keys :map org-agenda-mode-map
-             ("j" . org-agenda-next-item)       ;; Bound to 'goto-date' by default
-             ("k" . org-agenda-previous-item))  ;; Bound to 'org-capture' by default
+  (load-library "find-lisp")
+
+  (defun my/org-refile-targets ()
+    "Refile the current heading to another heading.
+  The other heading can be in the current file or in a file that resides
+  anywhere below the directory the current file resides in.
+
+  The intent is to move to a similar file. If I'm in work-related file,
+  I almost never have to refile something to a personal file."
+    (interactive "p")
+    (let* ((org-refile-targets '((nil . (:maxlevel . 9)))))
+      (org-refile)))
+
+  (bind-key* "C-c C-w" 'my/org-refile)
+  (bind-key "C-c C-w" 'my/org-refile org-mode-map)
 #+END_SRC
 
-Open the custom "Daily agenda and all TODOs" directly. Based on [[http://emacs.stackexchange.com/a/868/9690][Emacs StackExchange]].
-#+BEGIN_SRC emacs-lisp
-  (bind-key* "<f12>" '(lambda (&optional arg) (interactive "P")(org-agenda arg "w")))
-#+END_SRC
-
-***** /fin/
-#+BEGIN_SRC emacs-lisp
-  )
-#+END_SRC
+***** TODO Rice org-refile
+eg. https://emacs-china.org/t/topic/3622
 
 **** org-babel
 Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
@@ -1580,20 +1526,6 @@ From https://emacs.stackexchange.com/a/9813/9690
 
   (add-hook 'org-babel-after-execute-hook 'my/fix-inline-images)
 #+END_SRC
-
-**** org-bullets
-Other bullets to consider:
-Default: "◉ ○ ✸ ✿"
-Large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
-Small: ► • ★ ▸
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :config
-    (add-hook 'org-mode-hook (lambda() (org-bullets-mode 1))))
-#+END_SRC
-
-A good way to find more characters is to use =M-x insert-char=
 
 **** org-capture
 Show hierarchical headlines when refiling instead of flattening it out
@@ -1685,123 +1617,6 @@ saving it to a variable and printing it out later in the capture template.
         (delete-frame)))
 #+END_SRC
 
-**** org-drill
-I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ensure_target]].
-#+BEGIN_SRC emacs-lisp
-  (use-package org-drill
-    :disabled
-    :ensure org-plus-contrib
-    :init
-    (setq org-drill-learn-fraction 0.4)
-    :config
-    (add-to-list 'org-modules 'org-drill)
-    (setq org-drill-add-random-noise-to-intervals-p t)
-    (setq org-drill-hide-item-headings-p t)
-
-    (use-package org-drill-table
-      :disabled
-      :load-path "bundle/org-drill-table"))
-#+END_SRC
-
-**** org-expiry
-This allows me to add a =CREATED= property everytime I create a new org-heading
-#+BEGIN_SRC emacs-lisp
-  (use-package org-expiry
-    :ensure org-plus-contrib
-    :init
-    (org-expiry-insinuate)
-    (setq org-expiry-inactive-timestamps t)) ; Don't have everything in the agenda view
-#+END_SRC
-
-**** org-id
-I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ensure_target]].
-#+BEGIN_SRC emacs-lisp
-  (use-package org-id
-    :ensure org-plus-contrib
-    :pin repo-org
-    :init
-    (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
-
-    :config
-#+END_SRC
-
-To effectively use custom ID, refer [[https://writequit.org/articles/emacs-org-mode-generate-ids.html#update-2016-09-07][this]].
-Note that =org-id= has been updated since then and now supports a method =org-id-get-create= which creates an ID if one is not present.
-Also, it uses the identifier /ID/ instead of /CUSTOM_ID/
-
-***** TODO Use org-id globally across all files
-Example on [[http://stackoverflow.com/a/27158715/734153][Emacs StackExchange]]
-#+BEGIN_SRC emacs-lisp
-  (setq org-id-track-globally t)
-  (setq org-id-extra-files '("~/.emacs.d/config.org"))
-#+END_SRC
-
-***** Completion while inserting link
-:PROPERTIES:
-:ID:       be086bdd-ffcf-4f4e-beb2-a948191895eb
-:END:
-To use completion, insert link using =C-c C-l= and select =id:= as type and completion should trigger.
-=org-id-get-with-outline-path-completion= returns the ID of the selected heading and creates it if it doesn't have one already.
-Details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
-#+BEGIN_SRC emacs-lisp
-  (defun org-id-complete-link (&optional arg)
-    "Create an id: link using completion"
-    (concat "id:" (org-id-get-with-outline-path-completion org-refile-targets)))
-
-  (eval-after-load 'org '(org-link-set-parameters "id" :complete 'org-id-complete-link))
-#+END_SRC
-
-***** /fin/
-#+BEGIN_SRC emacs-lisp
-  )
-#+END_SRC
-
-**** org-refile
-By [[https://www.reddit.com/r/emacs/comments/4366f9/how_do_orgrefiletargets_work/czg008y/][/u/awalker4 on reddit]].
-Show upto 3 levels of headings from the current file and two levels of headings from all agenda files
-#+BEGIN_SRC emacs-lisp
-  (setq org-refile-targets
-        '((nil . (:maxlevel . 3))
-          (org-agenda-files . (:maxlevel . 2))))
-#+END_SRC
-Each element of the list generates a set of possible targets.
-/nil/ indicates that all the headings in the current buffer will be considered.
-
-Following are from Aaron Bieber's post [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Organizing Notes with Refile]]
-
-Creating new parents - To create new heading, add =/HeadingName= to the end when using refile (=C-c C-w=)
-#+BEGIN_SRC emacs-lisp
-  (setq org-refile-allow-creating-parent-nodes 'confirm)
-  (setq org-refile-use-outline-path 'file)
-  (setq org-outline-path-complete-in-steps nil)
-#+END_SRC
-
-***** TODO Set org-refile targets based on current file
-Why would I want to refile something work-related under Softwares etc.
-A way to do it is by writing a function that sets /org-refile-targets/ in a let binding making it local.
-eg. implementation by abo-abo: [[https://github.com/abo-abo/worf/blob/master/worf.el][worf-refile-other]]
-
-#+BEGIN_SRC emacs-lisp :tangle no
-  (load-library "find-lisp")
-
-  (defun my/org-refile-targets ()
-    "Refile the current heading to another heading.
-  The other heading can be in the current file or in a file that resides
-  anywhere below the directory the current file resides in.
-
-  The intent is to move to a similar file. If I'm in work-related file,
-  I almost never have to refile something to a personal file."
-    (interactive "p")
-    (let* ((org-refile-targets '((nil . (:maxlevel . 9)))))
-      (org-refile)))
-
-  (bind-key* "C-c C-w" 'my/org-refile)
-  (bind-key "C-c C-w" 'my/org-refile org-mode-map)
-#+END_SRC
-
-***** TODO Rice org-refile
-eg. https://emacs-china.org/t/topic/3622
-
 *** Keybindings
 :PROPERTIES:
 :ID:       ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7
@@ -1852,6 +1667,215 @@ Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-ke
 Archive subtrees under the same hierarchy as the original in the archive files
 https://gist.github.com/Fuco1/e86fb5e0a5bb71ceafccedb5ca22fcfb
 https://fuco1.github.io/2017-04-20-Archive-subtrees-under-the-same-hierarchy-as-original-in-the-archive-files.html
+
+*** htmlize
+Syntax highlighting when exporting to HTML? Yes, please!
+#+BEGIN_SRC emacs-lisp
+  (use-package htmlize
+    :disabled
+    :after (org))
+#+END_SRC
+
+*** org-agenda
+#+BEGIN_SRC emacs-lisp
+  (use-package org-agenda
+    :after (org)
+    :ensure nil
+#+END_SRC
+
+**** :init
+Don't add some files to the agenda
+#+BEGIN_SRC emacs-lisp
+  :init
+  (setq org-agenda-files
+        (seq-filter (lambda (x)
+                      (and 'file-exists-p
+                           (not (string= "Spanish.org" x))
+                           (not (string-match-p "Orgzly" x))))
+                    (mapcar (lambda (x) (concat org-directory x))
+                            '("Inbox.org" "Software/" "Personal/" "Work/"))))
+#+END_SRC
+
+**** :config
+#+BEGIN_SRC emacs-lisp
+  :config
+  (setq org-agenda-tags-column -120) ; Monitors are wide, might as well use it :/
+  (setq org-agenda-skip-scheduled-if-done t)    ; Why isn't this default?
+  (setq org-agenda-skip-deadline-if-done t)
+  (setq org-agenda-window-setup 'only-window)
+  (setq org-agenda-restore-windows-after-quit t)
+#+END_SRC
+
+Show the previous 7 days as well in the agenda. Also, force agenda to start on a Monday.
+Hence, these two combined always show entries starting from the previous Monday.
+Source: https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-start-day "-7d")
+  (setq org-agenda-start-on-weekday 1)
+#+END_SRC
+
+**** org-agenda custom commands
+Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html
+#+BEGIN_SRC emacs-lisp
+  (defun my/org-skip-subtree-if-habit ()
+    "Skip an agenda entry if it has a STYLE property equal to \"habit\"."
+    (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+      (if (string= (org-entry-get nil "STYLE") "habit")
+          subtree-end
+        nil)))
+
+  (defun my/org-skip-subtree-if-priority (priority)
+    "Skip an agenda subtree if it has a priority of PRIORITY.
+
+  PRIORITY may be one of the characters ?A, ?B, or ?C."
+    (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+          (pri-value (* 1000 (- org-lowest-priority priority)))
+          (pri-current (org-get-priority (thing-at-point 'line t))))
+      (if (= pri-value pri-current)
+          subtree-end
+        nil)))
+
+  (setq org-agenda-custom-commands
+        '(("d" "Daily agenda and all TODOs"
+           ((tags "PRIORITY=\"A\""
+                  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                   (org-agenda-overriding-header "High-priority unfinished tasks:")))
+            (agenda "" ((org-agenda-span 14)))
+            (alltodo ""
+                     ((org-agenda-skip-function '(or (my/org-skip-subtree-if-habit)
+                                                     (my/org-skip-subtree-if-priority ?A)
+                                                     (org-agenda-skip-if nil '(scheduled deadline))))
+                      (org-agenda-overriding-header "ALL normal priority tasks:"))))
+           ((org-agenda-compact-blocks t)))
+
+          ("w" "Daily agenda and all TODOs for Work"
+           ((tags "PRIORITY=\"A\""
+                  ((org-agenda-tag-filter-preset '("+Work"))
+                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                   (org-agenda-overriding-header "High-priority unfinished tasks:")))
+            (agenda "" ((org-agenda-span 14)))
+            (alltodo ""
+                     ((org-agenda-tag-filter-preset '("+Work"))
+                      (org-agenda-skip-function '(or (my/org-skip-subtree-if-habit)
+                                                     (my/org-skip-subtree-if-priority ?A)
+                                                     (org-agenda-skip-if nil '(scheduled deadline))))
+                      (org-agenda-overriding-header "ALL normal priority tasks:"))))
+           ((org-agenda-compact-blocks t)))))
+#+END_SRC
+
+**** Keybindings
+[[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][General org keybindings]]
+
+#+BEGIN_SRC emacs-lisp
+  :config
+#+END_SRC
+
+Use j/k in org-agenda
+#+BEGIN_SRC emacs-lisp :tangle no
+  (bind-keys :map org-agenda-mode-map
+             ("j" . org-agenda-next-item)       ;; Bound to 'goto-date' by default
+             ("k" . org-agenda-previous-item))  ;; Bound to 'org-capture' by default
+#+END_SRC
+
+Open the custom "Daily agenda and all TODOs" directly. Based on [[http://emacs.stackexchange.com/a/868/9690][Emacs StackExchange]].
+#+BEGIN_SRC emacs-lisp
+  (bind-key* "<f12>" '(lambda (&optional arg) (interactive "P")(org-agenda arg "w")))
+#+END_SRC
+
+**** /fin/
+#+BEGIN_SRC emacs-lisp
+  )
+#+END_SRC
+
+*** org-bullets
+Other bullets to consider:
+Default: "◉ ○ ✸ ✿"
+Large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
+Small: ► • ★ ▸
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :after (org)
+    :config
+    (add-hook 'org-mode-hook (lambda() (org-bullets-mode 1))))
+#+END_SRC
+
+A good way to find more characters is to use =M-x insert-char=
+
+*** org-drill
+I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ensure_target]].
+#+BEGIN_SRC emacs-lisp
+  (use-package org-drill
+    :disabled
+    :after (org)
+    :ensure org-plus-contrib
+    :init
+    (setq org-drill-learn-fraction 0.4)
+    :config
+    (add-to-list 'org-modules 'org-drill)
+    (setq org-drill-add-random-noise-to-intervals-p t)
+    (setq org-drill-hide-item-headings-p t)
+
+    (use-package org-drill-table
+      :disabled
+      :load-path "bundle/org-drill-table"))
+#+END_SRC
+
+*** org-expiry
+This allows me to add a =CREATED= property everytime I create a new org-heading
+#+BEGIN_SRC emacs-lisp
+  (use-package org-expiry
+    :after (org)
+    :ensure org-plus-contrib
+    :init
+    (setq org-expiry-inactive-timestamps t) ; Don't have everything in the agenda view
+    :config
+    (org-expiry-insinuate))
+#+END_SRC
+
+*** org-id
+I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ensure_target]].
+#+BEGIN_SRC emacs-lisp
+  (use-package org-id
+    :after (org)
+    :ensure org-plus-contrib
+    :pin repo-org
+    :init
+    (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
+
+    :config
+#+END_SRC
+
+To effectively use custom ID, refer [[https://writequit.org/articles/emacs-org-mode-generate-ids.html#update-2016-09-07][this]].
+Note that =org-id= has been updated since then and now supports a method =org-id-get-create= which creates an ID if one is not present.
+Also, it uses the identifier /ID/ instead of /CUSTOM_ID/
+
+**** TODO Use org-id globally across all files
+Example on [[http://stackoverflow.com/a/27158715/734153][Emacs StackExchange]]
+#+BEGIN_SRC emacs-lisp
+  (setq org-id-track-globally t)
+  (setq org-id-extra-files '("~/.emacs.d/config.org"))
+#+END_SRC
+
+**** Completion while inserting link
+:PROPERTIES:
+:ID:       be086bdd-ffcf-4f4e-beb2-a948191895eb
+:END:
+To use completion, insert link using =C-c C-l= and select =id:= as type and completion should trigger.
+=org-id-get-with-outline-path-completion= returns the ID of the selected heading and creates it if it doesn't have one already.
+Details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
+#+BEGIN_SRC emacs-lisp
+  (defun org-id-complete-link (&optional arg)
+    "Create an id: link using completion"
+    (concat "id:" (org-id-get-with-outline-path-completion org-refile-targets)))
+
+  (eval-after-load 'org '(org-link-set-parameters "id" :complete 'org-id-complete-link))
+#+END_SRC
+
+**** /fin/
+#+BEGIN_SRC emacs-lisp
+  )
+#+END_SRC
 
 ** pcre2el
 From [[https://www.reddit.com/r/emacs/comments/60nb8b/favorite_builtin_emacs_commands/df8h8hm/][/u/Irkry on reddit]]
