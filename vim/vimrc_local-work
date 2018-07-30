@@ -12,9 +12,6 @@ function! s:SetLocalSettings(filename)
   elseif (a:filename =~ '\v/ch/verif/(chk_)?l3/|\v/ch/tc/tb_l3')
     setlocal colorcolumn+=101
     let b:OrigamiFoldAtCol=96
-  elseif (a:filename =~ '\v/ch/verif/txn/\w*l3\w*\.txl') && (a:filename !~ 'txn_l2l3.txl')
-    setlocal colorcolumn+=101
-    let b:OrigamiFoldAtCol=96
   endif
 endfunction
 

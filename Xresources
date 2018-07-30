@@ -47,6 +47,7 @@ XTerm*font5*Label: Size 12
 XTerm*faceSize5: 12
 XTerm*font6*Label: Size 14
 XTerm*faceSize6: 14
+XTerm*ForceBoxChars: true
 XTerm*internalBorder: 3
 XTerm*scaleHeight: 1.1
 

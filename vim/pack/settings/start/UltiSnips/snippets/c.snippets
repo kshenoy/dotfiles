@@ -165,11 +165,10 @@ endsnippet
 # Structs/Enums                                                                                                     {{{1
 #
 snippet 'st(ruct)?' "Struct..." wr
-struct ${1:`!v Filename('$1_s', 'name')`}${1/.+/ /}{
+struct ${1:`!p snip.rv = "s" + (snip.basename or "Name")`} {
   ${0:/* data */}
-}${2/.+/ /}${2:/* optional variable list */};
+};
 endsnippet
-
 
 snippet 'en(um)?' "Enumeration" wr
 enum ${1:name} { $0 };

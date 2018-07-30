@@ -108,7 +108,7 @@ tmux_pp() {                                                                     
       ;;
 
     sk)
-      ~/bin/tmux send-keys "$@"
+      command tmux send-keys "$@"
       ;;
 
     send-keys-other-panes|skop)
