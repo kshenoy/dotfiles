@@ -5,7 +5,7 @@ function! s:SetLocalSettings(filename)
   if (a:filename =~ '\v/ch/verif/l3/arch_l3')
     return
   endif
-  if (a:filename =~ '/ch/rtl') && (a:filename !~ 'txl$')
+  if (a:filename =~ '/ch/rtl') && (a:filename !~ 'txl$') && (a:filename !~ 'l3s_ctl_attach')
     setlocal textwidth=80
     setlocal softtabstop=3
     setlocal shiftwidth=3

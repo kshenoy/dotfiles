@@ -12,6 +12,10 @@
  Kartik Shenoy
  (Based on Glenn Strunk's script try)
 
+=head1 DESCRIPTION
+
+ Keep looping until input predicate succeeds
+
 =head1 SYNOPSIS
 
  spin [OPTIONS]
@@ -20,10 +24,6 @@
  spin --job <lsf_job_id>
 
  spin -h|--help|--man
-
-=head1 DESCRIPTION
-
- Spin until input predicate succeeds and run the command if one was provided
 
 =head1 OPTIONS
 
@@ -38,7 +38,9 @@
  -a, --alert[=MSG]     Show a notification when the condition succeeds.
                        If a string is also provided, it'll will be displayed as well.
  -A, --noalert         Don't show any notifications upon completion
+ -h                    Brief help
  -i, --interval=I      Wait I seconds before checking again. [Default=60s]
+     --man             Show the manpage
  -n, --num-tries=N     Try N times before giving up. [Default=infinite].
      --while           Spin while the input predicate is true. Runs the provided command when the predicate fails
      --verbose         Verbose mode. Print values of all arguments
@@ -141,9 +143,10 @@ GetOptions(                                                                     
                              $opts{'predicate'}    .= $_[1];
                              $opts{'predicate_set'} = 1;
                        },
-  'while'           => sub { $opts{'predicate'}     = "! " .  $opts{'predicate'}; },
-  'help|h|?'        => sub { pod2usage( -verbose => 1, -exitval => 0 ); },
-  'man'             => sub { pod2usage( -verbose => 2, -exitval => 0 ); },
+  'while'           => sub { $opts{'predicate'} = "! " .  $opts{'predicate'}; },
+  'help|h|?'        => sub { pod2usage( -verbose => 99, -exitval => 0,
+                                        -sections => [ qw(DESCRIPTION SYNOPSIS OPTIONS EXAMPLES) ] ); },
+  'man'             => sub { pod2usage( -verbose => 2,  -exitval => 0 ); },
   'verbose!',
 ) or pod2usage(-verbose => 1);
 # }}}1
