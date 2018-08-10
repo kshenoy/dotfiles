@@ -57,10 +57,9 @@ Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/
 
 I think the following would be handy
   =[= - Enable setting
-  =~= - Toggle setting
+  =t= - Toggle setting
   =]= - Disable setting
-Original use of =C-c [= and =C-c ]= is to manipulate =org-agenda-files= and =C-c ~= is used to =org-create-table-with-table.el=.
-Since I don't use any of these, might as well put them to better use.
+Original use of =C-c [= and =C-c ]= is to manipulate =org-agenda-files=. Since I don't use either of these, might as well put them to better use.
 
 #+BEGIN_SRC emacs-lisp
   (bind-keys  :map my-leader-map
@@ -75,8 +74,13 @@ Since I don't use any of these, might as well put them to better use.
 
   (bind-keys  :map my-leader-map
               :prefix-map my-unimpaired-toggle-map
-              :prefix-docstring "This map is used to toggle settings ala vim-unimpaired"
-              :prefix "~")
+              :prefix-docstring "This map is used to toggle settings"
+              :prefix "t")
+
+  (bind-keys* :map ctl-x-map
+              :prefix-map my-global-toggle-map
+              :prefix-docstring "Global map containing all toggle settings"
+              :prefix "t")
 #+END_SRC
 
 To delete existing bindings, use =(unbind-key ...)=
@@ -343,9 +347,7 @@ Mouse-wheel acts on the hovered window rather than the one where the typing focu
 ** Prettify
 *** Highlight current line
 #+BEGIN_SRC emacs-lisp
-  (bind-key "c" 'global-hl-line-mode my-unimpaired-toggle-map)
-  (bind-key "c" '(lambda() (interactive) (global-hl-line-mode 1))  my-unimpaired-enable-map)
-  (bind-key "c" '(lambda() (interactive) (global-hl-line-mode -1)) my-unimpaired-disable-map)
+  (bind-key "c" 'global-hl-line-mode my-global-toggle-map)
 #+END_SRC
 
 *** Show matching parens
@@ -414,9 +416,7 @@ Since these are buffer-local variables, I have to use =setq-default=
     (interactive)  ; Allows to be called as a command via M-x
     (setq-default show-trailing-whitespace (not show-trailing-whitespace)))
 
-  (bind-key "SPC" '(lambda () (interactive)(setq-default show-trailing-whitespace t)) my-unimpaired-enable-map)
-  (bind-key "SPC" '(lambda () (interactive)(setq-default show-trailing-whitespace nil)) my-unimpaired-disable-map)
-  (bind-key "SPC" 'my/toggle-trailing-whitespace my-unimpaired-toggle-map)
+  (bind-key "SPC" 'my/toggle-trailing-whitespace my-global-toggle-map)
 #+END_SRC
 
 Enable it only in some modes
@@ -438,7 +438,7 @@ Use =C-c s SPC= to delete trailing whitespace manually
 
 *** Toggle wrap
 #+BEGIN_SRC emacs-lisp
-  (bind-key "w" 'toggle-truncate-lines my-unimpaired-toggle-map)
+  (bind-key "w" 'toggle-truncate-lines my-global-toggle-map)
 #+END_SRC
 
 ** Terminal
@@ -931,6 +931,25 @@ Provides =g~= operator to cycle between snake_case → SCREAMING_SNAKE_CASE → 
           flycheck-clang-language-standard "c++14"))
 #+END_SRC
 
+** hideshow
+:PROPERTIES:
+:CREATED:  [2018-08-03 Fri 14:09]
+:END:
+Code-folding. From https://github.com/mwfogleman/.emacs.d/blob/master/michael.org#cold-folding and [[https://www.reddit.com/r/emacs/comments/746cd0/which_code_folding_package_do_you_use/dnwi2x1/][reddit]]
+
+#+BEGIN_SRC emacs-lisp
+  (use-package hideshow
+    :hook ((prog-mode . hs-minor-mode))
+    :bind (:map my-global-toggle-map
+                ("f" . my-toggle-fold))
+    :config
+    (defun my-toggle-fold ()
+      (interactive)
+      (save-excursion
+        (end-of-line)
+        (hs-toggle-hiding))))
+#+END_SRC
+
 ** hydra
 #+BEGIN_SRC emacs-lisp
   (use-package hydra)
@@ -1101,7 +1120,7 @@ Use =C-c j= as prefix for all counsel-related keybindings
         (counsel-org-goto)
       (counsel-semantic-or-imenu)))
 
-  (bind-key "i" 'my/counsel-imenu my-jumper-command-map)
+  (bind-key "o" 'my/counsel-imenu my-jumper-command-map)
 #+END_SRC
 
 NOTE: I'm deferring loading by using the =commands= keyword for =counsel-org-tag= because the binding for it,
@@ -1897,17 +1916,16 @@ Use brighter colors
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
     :config
-    (progn
-      (set-face-attribute 'rainbow-delimiters-depth-1-face nil :foreground "dark orange")
-      (set-face-attribute 'rainbow-delimiters-depth-2-face nil :foreground "deep pink")
-      (set-face-attribute 'rainbow-delimiters-depth-3-face nil :foreground "chartreuse")
-      (set-face-attribute 'rainbow-delimiters-depth-4-face nil :foreground "deep sky blue")
-      (set-face-attribute 'rainbow-delimiters-depth-5-face nil :foreground "yellow")
-      (set-face-attribute 'rainbow-delimiters-depth-6-face nil :foreground "orchid")
-      (set-face-attribute 'rainbow-delimiters-depth-7-face nil :foreground "spring green")
-      (set-face-attribute 'rainbow-delimiters-depth-8-face nil :foreground "sienna1"))
+    (set-face-attribute 'rainbow-delimiters-depth-1-face nil :foreground "dark orange")
+    (set-face-attribute 'rainbow-delimiters-depth-2-face nil :foreground "deep pink")
+    (set-face-attribute 'rainbow-delimiters-depth-3-face nil :foreground "chartreuse")
+    (set-face-attribute 'rainbow-delimiters-depth-4-face nil :foreground "deep sky blue")
+    (set-face-attribute 'rainbow-delimiters-depth-5-face nil :foreground "yellow")
+    (set-face-attribute 'rainbow-delimiters-depth-6-face nil :foreground "orchid")
+    (set-face-attribute 'rainbow-delimiters-depth-7-face nil :foreground "spring green")
+    (set-face-attribute 'rainbow-delimiters-depth-8-face nil :foreground "sienna1")
 
-    :bind (:map my-unimpaired-toggle-map
+    :bind (:map my-global-toggle-map
                 ("r" . rainbow-delimiters-mode)))
 #+END_SRC
 
@@ -1986,7 +2004,7 @@ NOTE: I'm using =system-type= instead of =window-system= because when I start a 
   (use-package solarized-theme
     ;; :if (eq system-type 'gnu/linux)
     :init
-    (setq solarized-distinct-fringe-background nil)
+    (setq solarized-distinct-fringe-background t)
     :config
     (load-theme 'solarized-light t)
 
