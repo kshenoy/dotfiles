@@ -164,12 +164,12 @@ endfunction
 function! s:ConflictMotion(fwd, ...)                                                                               "{{{1
   " Description: Jump to the next/previous conflict marker.
   "              The optional argument can be used to specify any additional flags
-  let l:flags = 'W' . (a:fwd ? '' : 'b') . get(a:000, 0, '')
+  let l:flags = 'Wc' . (a:fwd ? '' : 'b') . get(a:000, 0, '')
   return search('\M'.s:conflict_ANY, l:flags)
 endfunction
 
 
-function! s:ConflictInnerMotion(ai, ...)                                                                           "{{{1
+function! ConflictTextObj(ai, ...)                                                                                 "{{{1
   " Save cursor position in case we're unable to act
   let l:curpos = getcurpos()
   let l:block  = get(a:000, 0, '')
@@ -300,23 +300,23 @@ endfunction
 
 
 function! s:DiffGetOriginal()                                                                                      "{{{1
-  normal! _d:call s:ConflictInnerMotion('a', 'THEIRS')
-  normal! _d:call s:ConflictInnerMotion('a', 'YOURS')
+  normal! _d:call ConflictTextObj('a', 'THEIRS')
+  normal! _d:call ConflictTextObj('a', 'YOURS')
   " Move up to '>>>> ORIGINAL' and delete it
   call s:ConflictMotion(0)
   delete _
 endfunction
 
 function! s:DiffGetTheirs()                                                                                        "{{{1
-  normal! _d:call s:ConflictInnerMotion('a', 'ORIGINAL')
+  normal! _d:call ConflictTextObj('a', 'ORIGINAL')
   " Delete '==== THEIRS'
   delete _
-  normal! _d:call s:ConflictInnerMotion('a', 'YOURS')
+  normal! _d:call ConflictTextObj('a', 'YOURS')
 endfunction
 
 function! s:DiffGetYours()                                                                                         "{{{1
-  normal! _d:call s:ConflictInnerMotion('a', 'ORIGINAL')
-  normal! _d:call s:ConflictInnerMotion('a', 'THEIRS')
+  normal! _d:call ConflictTextObj('a', 'ORIGINAL')
+  normal! _d:call ConflictTextObj('a', 'THEIRS')
   " Delete '==== YOURS'
   delete _
   " Move down to '<<<<' and delete it
@@ -331,10 +331,10 @@ function! s:CreateMergeMaps()                                                   
 
   for l:ai in ['i', 'a']
     for l:map in ['o', 'x']
-      execute l:map."noremap <silent> ".l:ai. "C :call s:ConflictInnerMotion('".l:ai."')<CR>"
-      execute l:map."noremap <silent> ".l:ai."oC :call s:ConflictInnerMotion('".l:ai."', 'ORIGINAL')<CR>"
-      execute l:map."noremap <silent> ".l:ai."tC :call s:ConflictInnerMotion('".l:ai."', 'THEIRS')<CR>"
-      execute l:map."noremap <silent> ".l:ai."yC :call s:ConflictInnerMotion('".l:ai."', 'YOURS')<CR>"
+      execute l:map."noremap <silent> ".l:ai. "C :call <SID>ConflictInnerMotion('".l:ai."')<CR>"
+      execute l:map."noremap <silent> ".l:ai."oC :call <SID>ConflictInnerMotion('".l:ai."', 'ORIGINAL')<CR>"
+      execute l:map."noremap <silent> ".l:ai."tC :call <SID>ConflictInnerMotion('".l:ai."', 'THEIRS')<CR>"
+      execute l:map."noremap <silent> ".l:ai."yC :call <SID>ConflictInnerMotion('".l:ai."', 'YOURS')<CR>"
     endfor
   endfor
 
@@ -352,7 +352,7 @@ function! perforce#DiffCurrentFile()                                            
   setl autoread
 
   " Execute command
-  silent execute '!p4 diff "%"'
+  silent execute '!p4 diff "%" &'
 
   " Restore settings
   let &l:autoread=l:autoread
