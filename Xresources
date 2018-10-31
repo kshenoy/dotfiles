@@ -122,7 +122,7 @@ URxvt.visualBell:           false
 ! Xft settings                                                                                                      {{{1
 !=======================================================================================================================
 ! From https://wiki.archlinux.org/index.php/font_configuration#Applications_without_fontconfig_support
-Xft.dpi:        96
+Xft.dpi:        94
 Xft.lcdfilter:  lcddefault
 Xft.antialias:  true
 Xft.rgba:       rgb

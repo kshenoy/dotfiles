@@ -6,7 +6,7 @@ set meta-flag on
 set convert-meta off
 set output-meta on
 
-# Rebind C-A-H to ignore hyphens and underscores while deleteing a filename
+# Rebind C-A-H to ignore hyphens and underscores while deleting a filename
 #$if mode=emacs
 #"\eC-h": unix-filename-rubout
 #$endif

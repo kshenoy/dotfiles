@@ -121,10 +121,10 @@ fzf-vcs-files() {                                                               
 
   elif is_in_perforce_repo; then
     local cmd='cat \
-      <(cd $ANCHOR_ch/..; p4 have ... | command grep -v "$ANCHOR_ch/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)") \
+      <(cd $ANCHOR_ch/..; p4 have ... 2> /dev/null | command grep -v "$ANCHOR_ch/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)") \
       <(cd $STEM; p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" | command xargs -I{} -n1 p4 where {}) \
-      <(cd $ANCHOR_avf; p4 have ... | command grep -v "$ANCHOR_avf/\(_env\)") \
-      | command awk "{print \$3}" | command sed "s:$STEM/::"'
+      <(cd $ANCHOR_avf; p4 have ... 2> /dev/null) \
+      | command grep -v "/_env/" | command awk "{print \$3}" | command sed "s:$STEM/::"'
 
     local selected=$(eval "$cmd" |
       FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |

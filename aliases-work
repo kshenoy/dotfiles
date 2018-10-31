@@ -19,8 +19,9 @@ fi
 #=======================================================================================================================
 # EDITOR                                                                                                            {{{1
 #=======================================================================================================================
-alias v="gvim_func -geometry 319x70+0+0 ${STEM:+--servername $STEM}"
+alias v="gvim_func -c 'set columns=319' ${STEM:+--servername $STEM}"
 alias vc='v --remote-silent'
+
 unset -f vlog
 vlog() {
   local _comp=$(command grep -o 'error.*component=\S\+' sim.out | sed 's/.*=//')
@@ -65,7 +66,7 @@ vv() { vv -tkName "verdi_$(tmux display-message -p '#S:#I.#P')" & }
 
 alias wtf='WhyTheFail'
 alias lmn='ljd -nomail -l'
-alias rcf=$'recreate_fail -a $br0ks/amdmsg_config.yaml -switches \'-avf "-TestCompressedLog 0 --agg_dump_on"\''
+alias rcf=$'recreate_fail -switches \'-avf "-TestCompressedLog 0 --agg_dump_on"\''
 alias trapbug='P4DIFF= s_trapbug -bug'
 
 
@@ -78,10 +79,23 @@ alias rrca='build -clean_all'
 alias rrcb='rr --norun --clean --build --recompile'
 alias rrcr='rr --clean'
 alias rrdbg=$'rr --add \'-avf "--/L3.Debug.*Graph/ --/L3.Debug.*Resources/"\' --dsp'
+alias rrr='rr --norun --recompile'
 
-alias rg='release_gate'
+alias rg='release_gate -gui'
 alias rgd='release_gate -donate'
 alias rgg='release_gate_gui'
+rgfq() {
+  command grep FAILED $STEM/release_gate_tmp/release_gate.log |
+  command awk '{print $1}' |
+  command sed -e 's/\(build\|sim\)_/-/' -e 's/_rg.[0-9]\+$/_rg/' |
+  command paste -s -d' '
+}
+
+rgre() {
+  # Because release_gate -redeploy doesn't work
+  eval $(command grep -Po "(?<=command line is ')[^']*" $STEM/release_gate_tmp/release_gate.log)
+}
+
 alias perr="perl -ne 'print if /error:/../:error/;exit if /:error/'"
 bu()   { bucket "$@"; }
 bus()  { bucket -s "$@"; }
@@ -91,9 +105,9 @@ busw() { watch --no-title -n 60 "bucket -s $@"; }
 alias toclippy="sed -e 's/$/
 /' | tee ~/clippy.txt"
 
-alias xt='xterm -geometry 318x66+1920+25 &'
+alias xt='xterm -geometry 318x66+1920+25 & wmctrl -i -r $! -b add,maximized_vert'
 # alias xtr='echo "resize -s 62 273"; resize -s 62 273'
-alias xtr='wmctrl -i -r $(xdotool getactivewindow) -b add,maximized_vert; wmctrl -i -r $(xdotool getactivewindow) -e 0,1920,25,1918,1144'
+alias xtr='wmctrl -i -r $(xdotool getactivewindow) -e 0,1920,25,1918,1144; wmctrl -i -r $(xdotool getactivewindow) -b add,maximized_vert'
 alias tmxvnc='tmux new-window -d -n "XVNC" "x11vnc"'
 
 
@@ -103,8 +117,10 @@ alias tmxvnc='tmux new-window -d -n "XVNC" "x11vnc"'
 #=======================================================================================================================
 alias pf='p4w'
 alias pfa='p4 add'
+alias pfchk='pf sanity_check 2> >(perl -pe "exit if m{^Sanity checking $STEM[^:]}")'
 alias pfd='p4 diff'
 alias pfd2='p4diff2'
+alias pfdg='P4DIFF= p4 diff -du | grepdiff --output-matching=hunk'
 alias pfe='p4 edit'
 alias pfh='pf help'
 alias pfo='p4 opened'
@@ -140,12 +156,20 @@ pfor() {
   fi
 }
 
-unset -f pfu
 pfu() {                                                                                                           # {{{2
   # Save ENV variables
   local _env_tmux=$TMUX
   local _env_tmux_pane=$TMUX_PANE
 
+  if [[ $(p4w opened 2> /dev/null) != "" ]] && \
+     [[ -f $STEM/pre-update/configuration_id ]] && \
+     [[ "$(head -n1 $STEM/configuration_id)" != "$(head -n1 $STEM/pre-update/configuration_id)" ]]; then
+    echo "Creating a patch of the changes before updating..."
+    patch_capture -r -p pre-update > /dev/null
+    command cp $STEM/configuration_id $STEM/pre-update
+  fi
+
+  echo p4w update_env "$@"
   p4w update_env "$@"
   local ret=$?
 
@@ -165,10 +189,10 @@ pful() {
 
   # If a valid username is provided then grab latest changelist by that user
   if (( $# == 1 )) && id $1 > /dev/null; then
+    # FIXME: Filter out pending changelists
     _changelist=$(p4 changes -m1 -u $1 | awk '{print $2}')
   fi
 
-  echo p4w update_env "@$_changelist"
   pfu "@$_changelist"
 }
 
@@ -204,15 +228,15 @@ pfg() {                                                                         
 
   # If $_filter is empty, it acts as cat
   echo "ag $@ \$(command grep -P $_filter ${STEM:+$STEM/}.filelist)"
-  ag $@ $(command grep -P $_filter ${STEM:+$STEM/}.filelist)
+  ag $@ $(command grep -P $_filter ${STEM:+$STEM/}.filelist) 2> /dev/null
 }
 # }}}2
 
 # -g switch was borrowed from ag
-alias pfgc='pfg --cpp'
-alias pfgch="pfg -g '\.(h|hh|hpp|tpp)$'"
-alias pfgcc="pfg -g '\.(c|cc|cpp|C|CC)$'"
-alias pfgsbs="pfg -g '\.sbs$'"
+alias pfgtc='pfg --cpp'
+alias pfgtch="pfg -g '\.(h|hh|hpp|tpp)$'"
+alias pfgtcc="pfg -g '\.(c|cc|cpp|C|CC)$'"
+alias pfgtsbs="pfg -g '\.sbs$'"
 
 
 
@@ -223,8 +247,13 @@ alias pfgsbs="pfg -g '\.sbs$'"
 unset -f make_wa_vars
 make_wa_vars() {                                                                                                  # {{{2
   local _proj _ch _wa _scr
-  for _proj in as ah br; do
-    local _proj_full=$(sed -e 's/as/ASPEN/i' -e 's/ah/ASPEN_HIGHLANDS/i' -e 's/br/BRECKENRIDGE/i' <<< $_proj)
+  for _proj in as ah br nv; do
+    case $_proj in
+      as) local _proj_full=ASPEN;;
+      ah) local _proj_full=ASPEN_HIGHLANDS;;
+      br) local _proj_full=BRECKENRIDGE;;
+      nv) local _proj_full=NV21_EL3;;
+    esac
 
     for _ch in {0..1}; do
       eval "export ${_proj}${_ch}='/proj/ch_func_dev${_ch}/${_proj_full}'"
@@ -418,7 +447,8 @@ lenv() {                                                                        
   sosa; sosf
   [[ -f ~/.fzf.bash ]] && . ~/.fzf.bash
 
-  command popd > /dev/null
+  local _new_wd=${_old_pwd/*${STEM//\//_}/$STEM}
+  [[ -d "$_new_wd" ]] && command pushd "${_new_wd}" > /dev/null
 }
 
 unset -f pfrem
@@ -458,9 +488,15 @@ BUGS
 # }}}1
 
 
-
-alias g++="g++ -Wall -Wextra -std=c++14 -L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include -Wl,-rpath ${BOOST_HOME}/lib"
-alias clang++="clang++ -Wall -Wextra -std=c++14 -L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include -Wl,-rpath ${BOOST_HOME}/lib"
+# Calling these as gpp/clangpp as I don't want it to interfere with my regular build flow
+gpp() {
+  g++ -Wall -Wextra -std=c++14 -L${GCC_HOME}/lib \
+    -L${BOOST_HOME}/lib -I${BOOST_HOME}/include -Wl,-rpath ${BOOST_HOME}/lib "$@"
+}
+clangpp() {
+  clang++ -Wall -Wextra -std=c++14 -L${GCC_HOME}/lib \
+    -L${BOOST_HOME}/lib -I${BOOST_HOME}/include -Wl,-rpath ${BOOST_HOME}/lib "$@"
+}
 
 unset -f psig
 psig() {

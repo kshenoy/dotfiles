@@ -16,13 +16,26 @@ function! s:SetLocalSettings(filename)
 endfunction
 
 
-set isfname+={,}                                          " This will allow vim to understand env vars with curly braces
+set isfname+={,}      " This will allow vim to understand env vars with curly braces that are used in bootenv.modulefile
 set isfname-==
 
 
 if ($STEM != "")
-  set path=.,$STEM/build/latest/generated/ch,$STEM/build/latest/fake_c_incl/,$STEM/ch/**,$STEM/import/avf/**,/usr/local/include,/usr/include,**;
-  let g:ale_cpp_clang_options  = get(g:, 'ale_cpp_clang_options', "")
+  set path=.
+  set path+=$STEM/build/latest/generated
+  set path+=$STEM/build/latest/fake_c_incl
+  set path+=$STEM/ch/**
+  set path+=$STEM/import/avf/**
+  set path+=/usr/local/include,/usr/include
+  set path+=**;
+
+  let g:ale_cpp_clang_options = get(g:, 'ale_cpp_clang_options', "")
+  if ($BOOST_HOME != "")
+    let g:ale_cpp_clang_options .= " -I ${BOOST_HOME}/include"
+  endif
+  if ($GCC_HOME != "")
+    let g:ale_cpp_clang_options .= " -I ${GCC_HOME}/include"
+  endif
   let g:ale_cpp_clang_options .= " -I $STEM/build/latest/generated/ch -I $STEM/build/latest/fake_c_incl"
 endif
 

@@ -36,6 +36,25 @@
 # }
 
 
+fzf-recent-dirs() {                                                                                               # {{{1
+  local out=($(command dirs -p | fzf --expect=alt-c "$@"))
+
+  case $(head -n1 <<< "$out") in
+    "alt-c")
+      # echo "cd ${out[1]}"
+      echo "cd $(sed 's:~:/home/kshenoy:' <<< ${out[1]})"
+      eval "cd $(sed 's:~:/home/kshenoy:' <<< ${out[1]})"
+      ;;
+    *)
+      local dir="${out[0]}"
+      READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}${dir}${READLINE_LINE:$READLINE_POINT}"
+      READLINE_POINT=$(( READLINE_POINT + ${#dir} ))
+      ;;
+  esac
+  # echo "Key=${key}, Dir=${dir}"
+}
+
+
 fzf-lsf-bjobs() {                                                                                                  #{{{1
   local selected=$(lsf_bjobs -w |
     FZF_DEFAULT_OPTS="--header-lines=1 --height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
@@ -160,6 +179,7 @@ else
   # cd into the selected directory
   bind '"\C-t\C-d": " \C-e\C-u`__fzf_cd__`\e\C-e\er\C-m"'
 
+  bind -x '"\C-t\C-e": "fzf-recent-dirs"'
   bind -x '"\C-t\C-l": "fzf-lsf-bjobs"'
 
   # Ctrl+O: Show list of options of the command before the cursor using '<cmd> -h'

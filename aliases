@@ -142,11 +142,10 @@ alias f.='find . -maxdepth 1'
 alias f.n='f. -name'
 alias fgrep='fgrep --color=always'
 alias egrep='egrep --color=always'
-pgrep() {
-  # Bloody hack to make ps ignore this grep
-  local _i='['${1:0:1}']'${1:1}
-  ps aux | command grep -e "[P]ID" -e $_i
-  #echo ps aux \| command grep -e "[P]ID" -e $_i
+psgrep() {
+  # From https://askubuntu.com/a/185746/38952
+  # Using ww twice ensures that the output is not truncated to the width of the terminal
+  ps wwup $(command pgrep -f "$@")
 }
 
 grep() { command grep -sP --color=always "$@"; }
@@ -205,9 +204,10 @@ gvim_func() {
   if [[ -n "$TMUX" ]] && [[ $DISPLAY != "$(tmux show-env | grep DISPLAY | cut -d '=' -f2)" ]]; then
     tmux_pp update-env >& /dev/null
   fi
-  gvim "$@" 2> /dev/null
+  gvim "$@" -c 'call system("wmctrl -i -b add,maximized_vert -r " . v:windowid)' 2> /dev/null
 }
 alias v='gvim_func'
+
 vq() {
   gvim_func -q <(eval "$(fc -nl -1) $@")
 }
@@ -230,7 +230,7 @@ gvim_diff() {
   done
 
   # Run vimdiff only if there are differences and all files are present
-  gvim_func -geometry 319x70+0+0 -df -c 'set nobackup' "$@"
+  gvim_func -df -c 'set nobackup' "$@"
 }
 alias vd=gvim_diff
 

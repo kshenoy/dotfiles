@@ -39,3 +39,7 @@ call utils#SetHighlightInfo('ALEErrorSign', s:ale_sign)
 let s:ale_sign=utils#GetHighlightInfo('Todo')
 let s:ale_sign.guibg=s:sign_column_bg
 call utils#SetHighlightInfo('ALEWarningSign', s:ale_sign)
+
+" vim-signature settings
+highlight! link SignatureMarkText   CursorLineNr
+highlight! link SignatureMarkerText CursorLineNr

@@ -275,12 +275,6 @@ After installing a new font refresh the font cache by running
     (my/select-and-set-font))
 #+END_SRC
 
-The reason for adding the hook is that if I try to create a daemon, it errors out with
-    /error: Window system is not in use or not initialized/
-This is because we try to set a face-attribute before a frame is created which is a no-no for some reason.
-
-However, the downside to this is that if I have multiple such hooks (like in private.el) we can't dictate the order in which they're applied.
-
 Fallback to DejaVu Sans when the font lacks support for some glyphs. Taken from [[https://github.com/joodie/emacs-literal-config/blob/c66e30ce961b140dd3e84116f4d45cbc19d0d944/emacs.org#font][github:joodie]]
 How does this work? What is it supposed to do?
 #+BEGIN_SRC emacs-lisp :tangle no
@@ -594,7 +588,11 @@ Create a keybinding map specifically for auto-completion
 #+END_SRC
 
 *** company
-Provides auto-completion. Refer to [[https://youtu.be/XeWZfruRu6k][Uncle Dave's video]] for an introduction.
+Provides auto-completion.
+References:
+- [[https://youtu.be/XeWZfruRu6k][Uncle Dave's video]] for an introduction.
+- https://www.reddit.com/r/emacs/comments/8z4jcs/tip_how_to_integrate_company_as_completion/
+
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :init (add-hook 'after-init-hook 'global-company-mode)
@@ -923,6 +921,9 @@ Provides =g~= operator to cycle between snake_case → SCREAMING_SNAKE_CASE → 
 #+END_SRC
 
 ** flycheck
+References:
+- https://www.reddit.com/r/emacs/comments/931la6/tip_how_to_adopt_flycheck_as_your_new_best_friend/
+
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :hook (prog-mode . flycheck-mode)
@@ -987,8 +988,12 @@ From [[https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-ivy
 |---------+---------------------------------------------------------------------------------------------------------------|
 | Binding | Description                                                                                                   |
 |---------+---------------------------------------------------------------------------------------------------------------|
-| M-n     | [[http://mbork.pl/2018-04-21_counsel-rg_and_symbol_at_point][Insert symbol at point]]. By default /M-p/ and /M-n/ go back and forward in history.                                |
+| =M-n=     | [[http://mbork.pl/2018-04-21_counsel-rg_and_symbol_at_point][Insert symbol at point]]. By default /M-p/ and /M-n/ go back and forward in history.                                |
 |         | However, starting with /M-n/ we move the minibuffer history into the future, which is a probably "dwim" choice. |
+|---------+---------------------------------------------------------------------------------------------------------------|
+| =M-q=     | [[http://irreal.org/blog/?p=7457][Query replace]]. Start a substitution using the search pattern                                                  |
+|---------+---------------------------------------------------------------------------------------------------------------|
+| =C-c C-o= | [[https://oremacs.com/2015/11/04/ivy-occur/][ivy-occur]]. Launch occur using current input                                                                   |
 |---------+---------------------------------------------------------------------------------------------------------------|
 
 **** Rebind =C-r= to ivy-resume
@@ -1289,7 +1294,7 @@ At the moment, it hides not just the angle braces but also the text between them
 **** ToDo States
 Custom keywords
 #+BEGIN_SRC emacs-lisp
-  (setq org-todo-keywords '((sequence "TODO(t!)" "WAITING(w@/!)" "|" "DONE(d@)" "CANCEL(c@)")))
+  (setq org-todo-keywords '((sequence "TODO(t!)" "WAITING(w@/!)" "|" "DONE(d@)" "DEFER(f@)" "CANCEL(c@)")))
   ;; (setq org-todo-keyword-faces
   ;;       (quote (("TODO" :foreground "red" :weight bold)
   ;;               ("WAITING" :foreground "orange" :weight bold)

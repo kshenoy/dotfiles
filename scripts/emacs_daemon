@@ -86,7 +86,7 @@ while (( $# > 0 )); do
 
     --list|-l)
       echo "${_fg_green}Currently running daemons:${_reset}"
-      command ls -1 ${_socket_path}
+      [[ -d ${_socket_path} ]] && command ls -1 ${_socket_path}
       ;;
 
     *)
