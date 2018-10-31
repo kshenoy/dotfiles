@@ -6,6 +6,9 @@ Interesting configs:
 https://github.com/caisah/emacs.dz
 [[http://wolfecub.github.io/dotfiles/][Wolfe's Literate Emacs Config]]
 
+Resources:
+https://brainlessdeveloper.com/2017/12/27/making-emacs-work-like-my-vim-setup/
+
 * Init
 ** Archives
 /package-archives/ uses HTTP access to GNU by default. Replacing it with the https version instead
@@ -274,6 +277,12 @@ After installing a new font refresh the font cache by running
                   (my/select-and-set-font)))
     (my/select-and-set-font))
 #+END_SRC
+
+The reason for adding the hook is that if I try to create a daemon, it errors out with
+    /error: Window system is not in use or not initialized/
+This is because we try to set a face-attribute before a frame is created which is a no-no for some reason.
+
+However, the downside to this is that if I have multiple such hooks (like in private.el) we can't dictate the order in which they're applied.
 
 Fallback to DejaVu Sans when the font lacks support for some glyphs. Taken from [[https://github.com/joodie/emacs-literal-config/blob/c66e30ce961b140dd3e84116f4d45cbc19d0d944/emacs.org#font][github:joodie]]
 How does this work? What is it supposed to do?
@@ -989,7 +998,7 @@ From [[https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-ivy
 | Binding | Description                                                                                                   |
 |---------+---------------------------------------------------------------------------------------------------------------|
 | =M-n=     | [[http://mbork.pl/2018-04-21_counsel-rg_and_symbol_at_point][Insert symbol at point]]. By default /M-p/ and /M-n/ go back and forward in history.                                |
-|         | However, starting with /M-n/ we move the minibuffer history into the future, which is a probably "dwim" choice. |
+|         | However, starting with /M-n/ we move the minibuffer history into the future, which can be thought of as a "dwim" choice. |
 |---------+---------------------------------------------------------------------------------------------------------------|
 | =M-q=     | [[http://irreal.org/blog/?p=7457][Query replace]]. Start a substitution using the search pattern                                                  |
 |---------+---------------------------------------------------------------------------------------------------------------|

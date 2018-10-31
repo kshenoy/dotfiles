@@ -1,7 +1,7 @@
 # bashrc file for home
 
 # Aliases
-alias amd_vpn='sudo openconnect -u kshenoy --no-cert-check --token-mode=rsa atl-vpn.amd.com'
+alias amd_vpn='sudo openconnect -u kshenoy --token-mode=rsa atl-vpn.amd.com'
 
 # fzf: https://github.com/junegunn/fzf
 [[ -d /usr/local/install/fzf ]] && export FZF_PATH=/usr/local/install/fzf
