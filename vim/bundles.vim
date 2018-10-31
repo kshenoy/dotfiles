@@ -35,7 +35,6 @@ runtime! macros/matchit.vim
 call plug#('PeterRincker/vim-argumentative')
 " call plug#('justinmk/vim-sneak')
 call plug#('chaoren/vim-wordmotion')
-call plug#('rhysd/vim-clang-format')
 call plug#('rhysd/vim-textobj-word-column',    {'on': '<Plug>(textobj-wordcolumn'})
 call plug#('kana/vim-textobj-user')
 call plug#('glts/vim-textobj-comment',         {'on': '<Plug>(textobj-comment'})
@@ -71,7 +70,8 @@ call plug#('w0rp/ale')
 call plug#('sjl/gundo.vim',                    {'on': 'GundoToggle'})
 " call plug#('Yggdroot/indentLine',              PlugCond(has('conceal'), {'on': 'IndentLinesToggle'}))
 call plug#('Valloric/ListToggle',              {'on': ['LToggle', 'QToggle']})
-call plug#('Yggdroot/vim-mark')
+
+
 call plug#('tpope/vim-repeat')
 call plug#('kshenoy/vim-signature')
 " call plug#('kana/vim-submode')
@@ -88,6 +88,31 @@ call plug#('kshenoy/TWiki-Syntax',             {'for': 'twiki'})
 call plug#('chriskempson/base16-vim')
 " call plug#('kshenoy/vim-sol')
 
+" vim-mark -------------------------------------------------------------------------------------------------------- {{{1
+map           <leader>m       <Plug>my(Mark)
+nmap <silent> <Plug>my(Mark)m <Plug>MarkSet
+xmap <silent> <Plug>my(Mark)m <Plug>MarkSet
+nmap <silent> <Plug>my(Mark)n <Plug>MarkClear
+nmap <silent> <Plug>my(Mark)x <Plug>MarkRegex
+xmap <silent> <Plug>my(Mark)x <Plug>MarkRegex
+nmap <silent> <Plug>my(Mark)* <Plug>MarkSearchGroupNext
+xmap <silent> <Plug>my(Mark)* <Plug>MarkSearchGroupNext
+nmap <silent> <Plug>my(Mark)# <Plug>MarkSearchGroupPrev
+xmap <silent> <Plug>my(Mark)# <Plug>MarkSearchGroupPrev
+nmap <silent> <Plug>my(Mark)/ <Plug>MarkSearchAnyNext
+xmap <silent> <Plug>my(Mark)/ <Plug>MarkSearchAnyNext
+nmap <silent> <Plug>my(Mark)? <Plug>MarkSearchAnyPrev
+xmap <silent> <Plug>my(Mark)? <Plug>MarkSearchAnyPrev
+
+nmap <Plug>IgnoreMarkSearchCurrentNext <Plug>MarkSearchCurrentNext
+xmap <Plug>IgnoreMarkSearchCurrentNext <Plug>MarkSearchCurrentNext
+nmap <Plug>IgnoreMarkSearchCurrentPrev <Plug>MarkSearchCurrentPrev
+xmap <Plug>IgnoreMarkSearchCurrentPrev <Plug>MarkSearchCurrentPrev
+
+call plug#('inkarkat/vim-mark')
+" }}}1
+
+
 call plug#end()
 
 
@@ -101,13 +126,7 @@ let g:ale_sign_error='✗ '
 let g:ale_sign_style_error='✠ '
 " let g:ale_sign_warning='⚠ '
 let g:ale_sign_warning='! '
-" let g:syntastic_error_symbol='✗✗'
-" let g:syntastic_style_error_symbol='✠✠'
-" let g:syntastic_warning_symbol='∆∆'
-" let g:syntastic_style_warning_symbol='≈≈'
-
 let g:ale_echo_msg_format = '%linter%: %s'
-
 let g:ale_cpp_clang_options = '-std=c++14'
 
 " Initialize list if it doesn't exist
@@ -117,17 +136,17 @@ call add(g:ale_cpp_clangtidy_checks, 'llvm-header-guard')
 call add(g:ale_cpp_clangtidy_checks, 'modernize-*')
 call add(g:ale_cpp_clangtidy_checks, 'cpp-core-guidelines-*')
 
-let g:ale_linters = {
-\ 'cpp': ['clang']
-\ }
+let g:ale_linters = { 'cpp' : ['clang', 'clangtidy'] }
+let g:ale_fixers  = { 'cpp' : ['clang-format'] }
 
 nnoremap [s  :ALEPreviousWrap<CR>
 nnoremap ]s  :ALENextWrap<CR>
 nnoremap [S  :ALEFirst<CR>
 nnoremap ]S  :ALENext<CR>
-nnoremap =s  :ALELint<CR>
+nnoremap =sf :ALEFix<CR>
+nnoremap =sl :ALELint<CR>
 nnoremap =S  :ALEDetail<CR>
-nnoremap coS :ALEToggle<CR>
+nnoremap yoS :ALEToggle<CR>
 
 
 " AutoComplPop ---------------------------------------------------------------------------------------------------- {{{1
@@ -176,18 +195,18 @@ endif
 " let g:ctrlp_cache_dir           =
 
 if has('unix')
-  " The 'while read fname' section sorts the filenames in descending order by length thereby allowing to find the
-  " shortest occurence of a string
   let g:ctrlp_user_command = {
     \ 'types': {
       \ 1: ['.git', 'cd %s && git ls-files --cached --exclude-standard --others'],
       \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
-      \ 3: ['P4CONFIG', 'echo %s; cd $STEM; cat ' .
-             \ '<(cd $ANCHOR_ch/..; p4 have ... | \grep -v "$ANCHOR_ch/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|' .
-             \   'ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\|meta/\(build_time\|drop2cad\|upf\)\)") ' .
-             \ '<(cd $STEM; p4 opened ... 2> /dev/null | \grep add | \sed "s/#.*//" | \xargs -I{} -n1 p4 where {}) ' .
-             \ '<(cd $ANCHOR_avf; p4 have ... | \grep -v "$ANCHOR_avf/\(_env\)") ' .
-             \ '| \awk "{print \$3}" | sed "s:$STEM/::"'
+      \ 3: ['P4CONFIG', 'cd %s; cat ' .
+             \ '<(cd $ANCHOR_ch/..; p4 have ... 2> /dev/null | ' .
+             \   'command grep -v "$ANCHOR_ch/\(emu\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|' .
+             \     'ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\|meta/\(build_time\|drop2cad\|upf\)\)") ' .
+             \ '<(cd $STEM; p4 opened ... 2> /dev/null | ' .
+             \   'command grep add | command sed "s/#.*//" | command xargs -I{} -n1 p4 where {}) ' .
+             \ '<(cd $ANCHOR_avf; p4 have ... 2> /dev/null) ' .
+             \ '| command grep -v "/_env/" | command awk "{print \$3}" | command sed "s:$STEM/::"'
          \ ]
     \ },
     \ 'fallback': "find %s -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune -o " .
@@ -196,13 +215,12 @@ if has('unix')
                         \ "| while read filename; do echo ${#filename} $filename; done " .
                         \ "| sort -n | awk '{print $2}'"
   \ }
+
 elseif executable('ag')
   let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 elseif executable('pt')
   let g:ctrlp_user_command = 'pt %s -l --nocolor'
 endif
-
-"let g:ctrlp_user_command = 'find %s -type d \( -iname .svn -o -iname .git -o -iname .hg \) -prune -o -type f -print'
 
 "let g:ctrlp_abbrev = {
 "  \ 'gmode': 'i',
@@ -231,10 +249,8 @@ let g:ctrlp_prompt_mappings = {
   \ 'PrtSelectMove("k")': ['<C-P>'],
   \ 'PrtHistory(-1)':     ['<Down>'],
   \ 'PrtHistory(1)':      ['<Up>'],
-  \ 'ToggleType(1)':      ['<C-O>', '<C-L>'],
+  \ 'ToggleType(1)':      ['<C-L>'],
   \ 'ToggleType(-1)':     ['<C-H>'],
-  \ 'PrtCurLeft()':       ['<Left>'],
-  \ 'PrtCurRight()':      ['<Right>'],
   \ }
 
 map      <leader>j <Plug>my(CtrlP)
@@ -337,7 +353,7 @@ nnoremap <silent> <S-CR>             :FSHere<CR>
 
 " Gundo ----------------------------------------------------------------------------------------------------------- {{{1
 let g:gundo_preview_bottom=1
-nnoremap coU :GundoToggle<CR>
+nnoremap yoU :GundoToggle<CR>
 
 
 " IndentLine ------------------------------------------------------------------------------------------------------ {{{1
@@ -345,21 +361,8 @@ let g:indentLine_char = "┊"
 
 
 " ListToggle ------------------------------------------------------------------------------------------------------ {{{1
-nnoremap coL :LToggle<CR>
-nnoremap coQ :QToggle<CR>
-
-
-" vim-mark -------------------------------------------------------------------------------------------------------- {{{1
-map  <unique>          <leader>m             <Plug>my(Mark)
-nmap <unique> <silent> <Plug>my(Mark)m       <Plug>MarkSet
-xmap <unique> <silent> <Plug>my(Mark)m       <Plug>MarkSet
-nmap <unique> <silent> <Plug>my(Mark)x       <Plug>MarkRegex
-xmap <unique> <silent> <Plug>my(Mark)x       <Plug>MarkRegex
-nmap <unique> <silent> <Plug>my(Mark)n       <Plug>MarkClear
-nmap <unique> <silent> <Plug>my(Mark)<C-N>   <Plug>MarkSearchNext
-nmap <unique> <silent> <Plug>my(Mark)<C-P>   <Plug>MarkSearchPrev
-nmap <unique> <silent> <Plug>my(Mark)<C-A-N> <Plug>MarkSearchAnyNext
-nmap <unique> <silent> <Plug>my(Mark)<C-A-P> <Plug>MarkSearchAnyPrev
+nnoremap yoL :LToggle<CR>
+nnoremap yoQ :QToggle<CR>
 
 
 " vim-mucomplete -------------------------------------------------------------------------------------------------- {{{1
@@ -516,7 +519,7 @@ let g:switch_custom_definitions = [
 
 " TableMode ------------------------------------------------------------------------------------------------------- {{{1
 let g:table_mode_map_prefix = '<Plug>[table]'
-nnoremap coB :TableModeToggle<CR>
+nnoremap yoB :TableModeToggle<CR>
 
 
 " vim-textobj-* --------------------------------------------------------------------------------------------------- {{{1
@@ -543,6 +546,11 @@ for s:mode in ['x', 'o']
   endfor
   execute s:mode . 'map ' . 'a' . 'C <Plug>(textobj-comment-big-a)'
 endfor
+
+"" Common-case is not to format a single line but to format the entire file.
+"" Formatting the entire file doesn't need a count. Hence, if a count is given, assume we want to format lines instead.
+"" Note that line formatting can also be done using gqgq
+nnoremap <silent> <expr> gqq (v:count == 0 ? ":call utils#Preserve('normal gqi%')<CR>" : ":normal " . v:count . "gqq<CR>")
 
 
 " Targets --------------------------------------------------------------------------------------------------------- {{{1
