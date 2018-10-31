@@ -14,7 +14,7 @@ setl commentstring=//\ %s
 "
 " 22. EXECUTING EXTERNAL COMMANDS
 "
-setl formatprg=/tool/pandora64/.package/llvm-4.0.0-gcc630/bin/clang-format\ --style=file
+setl formatprg=clang-format\ --style=file
 
 
 "
