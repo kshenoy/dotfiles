@@ -382,8 +382,8 @@ _get_compact_pwd_() {                                                           
     cpwd=${cpwd/#$HOME/\~};
   else
     local _proj
-    for _proj in AS AH BR; do
-      local _proj_full=$(sed -e 's/AS/ASPEN/i' -e 's/AH/ASPEN_HIGHLANDS/i' -e 's/BR/BRECKENRIDGE/i' <<< ${_proj})
+    for _proj in AS AH BR NV; do
+      local _proj_full=$(sed -e 's/AS/ASPEN/i' -e 's/AH/ASPEN_HIGHLANDS/i' -e 's/BR/BRECKENRIDGE/i' -e 's/NV/NV21_EL3/i' <<< ${_proj})
       local _proj_lcase=$(tr 'A-Z' 'a-z' <<< ${_proj})
       local _me=$(whoami)
       if [[ "$cpwd" =~ ^"/proj/ch_func_gen_scratch" ]]; then

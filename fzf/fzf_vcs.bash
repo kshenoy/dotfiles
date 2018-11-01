@@ -3,12 +3,38 @@
 is_in_git_repo() {                                                                                                 #{{{1
   git rev-parse HEAD &> /dev/null
 }
+
 is_in_perforce_repo() {                                                                                            #{{{1
   p4 info &> /dev/null
 }
 
+__fzf-p4-strip-common-ancestors() (                                                                                #{{{1
+  # Scoped funtion to hide it from others
+  __strip() {
+    if [[ -n $item ]]; then
+      if [[ "$STEM/$item" =~ "$PWD" ]]; then
+        # Remove any common ancestors from filename
+        item="$STEM/$item"
+        item=${item##$PWD/}
+        printf '%q ' "$item";
+      else
+        printf '$STEM/%q ' "$item";
+      fi
+    fi;
+  }
 
-fzf-down() {                                                                                                       #{{{1
+  if [[ -p /dev/stdin ]]; then
+    while read -r item; do
+      __strip "$item"
+    done < "${1:-/dev/stdin}"
+  elif [[ -t 0 ]]; then
+    for item in "$@"; do
+      __strip "$item"
+    done
+  fi
+)
+
+__fzf-down() {                                                                                                     #{{{1
   fzf --height 50% "$@" --border
 }
 
@@ -16,7 +42,7 @@ fzf-down() {                                                                    
 fzf-git-diffs() {                                                                                                  #{{{1
   is_in_git_repo || return
   git -c color.status=always status --short |
-  fzf-down -m --ansi --nth 2..,.. \
+  fzf -m --ansi --nth 2..,.. \
     --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -500' |
   cut -c4- | sed 's/.* -> //'
 }
@@ -25,7 +51,7 @@ fzf-git-diffs() {                                                               
 fzf-git-branches() {                                                                                               #{{{1
   is_in_git_repo || return
   git branch -a --color=always | grep -v '/HEAD\s' | sort |
-  fzf-down --ansi --multi --tac --preview-window right:70% \
+  __fzf-down --ansi --multi --tac --preview-window right:70% \
     --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1) | head -'$LINES |
   sed 's/^..//' | cut -d' ' -f1 |
   sed 's#^remotes/##'
@@ -35,7 +61,7 @@ fzf-git-branches() {                                                            
 fzf-git-tags() {                                                                                                   #{{{1
   is_in_git_repo || return
   git tag --sort -version:refname |
-  fzf-down --multi --preview-window right:70% \
+  __fzf-down --multi --preview-window right:70% \
     --preview 'git show --color=always {} | head -'$LINES
 }
 
@@ -43,7 +69,7 @@ fzf-git-tags() {                                                                
 fzf-git-hashes() {                                                                                                 #{{{1
   is_in_git_repo || return
   git log --date=short --format="%C(green)%C(bold)%cd %C(auto)%h%d %s (%an)" --graph --color=always |
-  fzf-down --ansi --no-sort --reverse --multi --bind 'ctrl-s:toggle-sort' \
+  __fzf-down --ansi --no-sort --reverse --multi --bind 'ctrl-s:toggle-sort' \
     --header 'Press CTRL-S to toggle sort' \
     --preview 'grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git show --color=always | head -'$LINES |
   grep -o "[a-f0-9]\{7,\}"
@@ -53,32 +79,9 @@ fzf-git-hashes() {                                                              
 fzf-git-remotes() {                                                                                                #{{{1
   is_in_git_repo || return
   git remote -v | awk '{print $1 "\t" $2}' | uniq |
-  fzf-down --tac \
+  __fzf-down --tac \
     --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" {1} | head -200' |
   cut -d$'\t' -f1
-}
-
-
-fzf-p4-opened() {                                                                                                  #{{{1
-  local cmd='p4 opened | sed -r -e "s/#.*$//" -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::"'
-  local selected=$(eval "$cmd" |
-    FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
-    while read -r item; do
-      if [[ -n $item ]]; then
-        if [[ "$STEM/$item" =~ "$PWD" ]]; then
-          # Remove any common ancestors from filename
-          item="$STEM/$item"
-          item=${item##$PWD/}
-          printf '%q ' "$item";
-        else
-          printf '$STEM/%q ' "$item";
-        fi
-      fi;
-    done
-  )
-
-  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
-  READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
 }
 
 
@@ -87,29 +90,48 @@ __fzf_p4_walist__() {                                                           
 }
 
 
-__fzf_vcs_cd__() {                                                                                                 #{{{1
+__fzf-p4-cd() {                                                                                                    #{{{1
+  local cmd='command find $STEM -mindepth 1 \
+    -type d \( -path $STEM/_env -o -path $STEM/emu -o -path $STEM/env_squash -o -path $STEM/import -o \
+      -path $STEM/powerPro -o -path $STEM/sdpx \) -prune \
+    -o -type d -print 2> /dev/null | sed "s:$STEM/::"'
+
+  local dir=$(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m)
+  if [[ -z "$dir" ]]; then
+    return
+  fi
+
+  printf '%q ' $(__fzf-p4-strip-common-ancestors "$dir")
+}
+
+
+fzf-vcs-cd() {                                                                                                     #{{{1
   if is_in_perforce_repo; then
-    local cmd='command find $STEM -mindepth 1 \
-      -type d \( -path $STEM/_env -o -path $STEM/emu -o -path $STEM/env_squash -o -path $STEM/import -o \
-        -path $STEM/powerPro -o -path $STEM/sdpx \) -prune \
-      -o -type d -print 2> /dev/null | sed "s:$STEM/::"'
-
-    local dir=$(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m)
-    if [[ -z "$dir" ]]; then
-      return
-    fi
-
-    if [[ "$STEM/$dir" =~ "$PWD" ]]; then
-      # Remove any common ancestors from filename
-      dir="$STEM/$dir"
-      dir=${dir##$PWD/}
-      printf '%q ' "$dir";
-    else
-      printf 'cd $STEM/%q' "$dir"
-    fi
+    __fzf-p4-cd
   else
     __fzf_cd__
   fi
+}
+
+
+__fzf-p4-all-files() {                                                                                             #{{{1
+  FZF_CTRL_T_COMMAND='{ {p4 have $STEM/... | command awk "{print \$3}" | command sed "s:$STEM/::"} || \
+    find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//; } 2> /dev/null' \
+    fzf-file-widget
+}
+
+fzf-vcs-all-files() {                                                                                              #{{{1
+  if is_in_git_repo; then
+    FZF_CTRL_T_COMMAND='{ git ls-tree --full-tree -r --name-only HEAD || \
+      find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//; } 2> /dev/null' \
+      fzf-file-widget
+  elif is_in_perforce_repo; then
+    # Creating a separate function to allow over-riding this based on a per-project basis
+    __fzf-p4-all-files
+  else
+    fzf-file-widget
+  fi
+  echo
 }
 
 
@@ -118,34 +140,29 @@ fzf-vcs-files() {                                                               
     FZF_CTRL_T_COMMAND='{ git ls-tree -r --name-only HEAD || \
       find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//; } 2> /dev/null' \
       fzf-file-widget
-
   elif is_in_perforce_repo; then
-    local cmd='cat \
-      <(cd $ANCHOR_ch/..; p4 have ... 2> /dev/null | command grep -v "$ANCHOR_ch/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)") \
-      <(cd $STEM; p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" | command xargs -I{} -n1 p4 where {}) \
-      <(cd $ANCHOR_avf; p4 have ... 2> /dev/null) \
-      | command grep -v "/_env/" | command awk "{print \$3}" | command sed "s:$STEM/::"'
-
-    local selected=$(eval "$cmd" |
-      FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
-      while read -r item; do
-        if [[ -n $item ]]; then
-          if [[ "$STEM/$item" =~ "$PWD" ]]; then
-            # Remove any common ancestors from filename
-            item="$STEM/$item"
-            item=${item##$PWD/}
-            printf '%q ' "$item";
-          else
-            printf '$STEM/%q ' "$item";
-          fi
-        fi;
-      done
-    )
-
-    READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
-    READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
+    FZF_CTRL_T_COMMAND='{ {p4 have ... | command awk "{print \$3}" | command sed "s:$STEM/::"} || \
+      find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//; } 2> /dev/null' \
+      fzf-file-widget
   else
     fzf-file-widget
   fi
   echo
+}
+
+
+fzf-vcs-status() {                                                                                                 #{{{1
+  if is_in_git_repo; then
+    local selected=$(git -c color.status=always status --short | fzf -m --nth 2..,.. "$@" | awk '{print $NF}')
+  elif is_in_perforce_repo; then
+    local selected=$(p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" |
+      column -s# -o " #" -t | column -s- -o- -t |
+      fzf -m -d# --nth 1 "$@" | awk '{print $1}' | __fzf-p4-strip-common-ancestors)
+  else
+    return
+  fi
+
+  # FIXME: Using fzf-file-widget seems to break this for some reason
+  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
+  READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
 }

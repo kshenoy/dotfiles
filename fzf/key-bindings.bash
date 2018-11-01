@@ -1,41 +1,3 @@
-# __fzf_select__() {                                                                                               #{{{1
-#   local _cmd=""
-#   if [[ -n "${STEM}" ]] && [[ $PWD =~ ^${STEM} ]]; then
-#     _cmd='cat <(p4 have $STEM/... | \
-#                   \grep -v "$STEM/\(emu\|_env\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\)") \
-#               <(p4 opened ... 2> /dev/null | \grep add | \sed "s/#.*//" | \xargs -I{} -n1 p4 where {}) \
-#               <(cd $STEM/import/avf; p4 have ... | \grep -v "$STEM/import/avf/\(_env\)") \
-#           | \awk "{print \$3}" | sed "s:$STEM/::"'
-#   else
-#     _cmd="${FZF_CTRL_T_COMMAND:-"command find -L . -mindepth 1 \\( -path '*/\\.*' -o -fstype 'sysfs' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
-#       -o -type f -print \
-#       -o -type d -print \
-#       -o -type l -print 2> /dev/null | cut -b3-"}"
-#   fi
-
-#   echo $_cmd
-
-#   local _out=($(eval "$_cmd | FZF_DEFAULT_OPTS=\"--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS\" fzf -m $@"))
-
-#   local _key=$(head -n1 <<< "$_out")
-#   case ${_key} in
-#     "alt-v")
-#       _out[0]="gvim"
-#       ;;
-#     "alt-e")
-#       _out[0]="emacs"
-#       ;;
-#     "alt-c")
-#       if [[ -d ${_out[1]} ]]; then
-#         _out[0]="cd"
-#       fi
-#       ;;
-#   esac
-
-#   paste -s -d' ' <<< ${_out[@]}
-# }
-
-
 fzf-recent-dirs() {                                                                                               # {{{1
   local out=($(command dirs -p | fzf --expect=alt-c "$@"))
 
@@ -173,7 +135,7 @@ if [[ -o vi ]]; then
 else
   if (( $BASH_VERSINFO > 3 )); then
     # bind -x '"\C-t\C-t": "fzf-file-widget"'
-    bind -x '"\C-t\C-t": "fzf-vcs-files"'
+    bind -x '"\C-t\C-t": "fzf-vcs-all-files"'
   fi
 
   # cd into the selected directory
@@ -189,9 +151,10 @@ else
   # bind -x '"\C-t\C-g\C-e": "__fzf_expt__"'
 
   # Version-control
-  bind -x '"\C-t\C-p\C-f": "fzf-vcs-files"'
-  bind -x '"\C-t\C-p\C-o": "fzf-p4-opened"'
-  bind '"\C-t\C-p\C-g": " \C-e\C-u`__fzf_vcs_cd__`\e\C-e\er\C-m"'
+  bind -x '"\C-t\C-p\C-e": "fzf-vcs-files"'
+  bind -x '"\C-t\C-p\C-f": "fzf-vcs-all-files"'
+  bind -x '"\C-t\C-p\C-s": "fzf-vcs-status"'
+  bind '"\C-t\C-p\C-g": " \C-e\C-u`fzf-vcs-cd`\e\C-e\er\C-m"'
   bind '"\C-t\C-p\C-w": " \C-e\C-u`__fzf_p4_walist__`\e\C-e\er\C-m"'
 
   bind '"\er": redraw-current-line'
@@ -202,5 +165,5 @@ else
   bind '"\C-t\C-p\C-r": "$(fzf-git-remotes)\e\C-e\er"'
 
   # Alt+/: From http://brettterpstra.com/2015/07/09/shell-tricks-inputrc-binding-fun/
-  bind '"\C-t\e/": "$(!!|FZF_DEFAULT_OPTS=\"--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS\" fzf -m)\C-a \C-m\C-m"'
+  bind '"\C-t\e/": "$(!!|FZF_DEFAULT_OPTS=\"--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS\" fzf -m)\C-a \C-m"'
 fi

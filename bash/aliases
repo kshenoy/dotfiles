@@ -275,11 +275,10 @@ elif [[ $MYSHELL =~ "zsh" ]]; then
   alias sosc='. ~/.zshrc && clnpath && echo Sourced zshrc'
   alias sosf='. ~/.dotfiles/zsh/zshrc-func && echo Sourced zshrc-func'
 fi
-alias gosa='$VISUAL ~/.dotfiles/aliases'
+alias gosa='$VISUAL ~/.dotfiles/bash/aliases'
 alias gost='$VISUAL ~/.dotfiles/tmux/tmux.conf'
-alias gosw='$VISUAL ~/.dotfiles/aliases-work'
 alias gosx='$VISUAL ~/.Xresources'
-alias sosa='. ~/.dotfiles/aliases && echo Sourced aliases'
+alias sosa='. ~/.dotfiles/bash/aliases && echo Sourced aliases'
 
 
 #=======
@@ -304,14 +303,6 @@ alias psmall="perl -lne 'BEGIN{"'$s=<>};$s=$_ if $_<$s;END{print "$s"}'"'"
 alias pbig="perl -lne 'BEGIN{"'chomp($s=<>)};$s=$_ if $_>$s;END{print "$s"}'"'"
 alias par1="perl -pe 'exit if /^\s*$/'"
 alias get_bits='perl -e '"'"'$a=hex($ARGV[0]);$m=$ARGV[1];$l=(defined $ARGV[2]?$ARGV[2]:$m); printf "0x%x\n", (($a >> $l) & ((1 << ($m-$l+1)) - 1))'"'"''
-
-
-#==============
-# FuzzyFinder
-#
-#bind '"\C-f": "fzf\n"'
-# fzf - Ignore .gitignore contents etc. by filtering through ag
-#bind '"\C-f": "ag -l -g \"\" | fzf\n"'
 
 
 #============
@@ -345,7 +336,7 @@ alias gA='git add -A .'
 alias gD='git diff --word-diff'
 alias gh='git help'
 alias grst='git reset --hard HEAD'
-alias gs='git status -sb'
+alias gs='git status --short'
 alias gS='git status'
 
 

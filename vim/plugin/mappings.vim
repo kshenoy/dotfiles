@@ -20,12 +20,12 @@ execute 'nnoremap <silent> govm :e ' . g:dotvim . '/plugin/mappings.vim<CR>'
 execute 'nnoremap <silent> govb :e ' . g:dotvim . '/bundles.vim<CR>'
 nnoremap <silent> govl :e ~/.vimrc_local<CR>
 
-nnoremap <silent> gosa :e ~/.dotfiles/aliases<CR>
+nnoremap <silent> gosa :e ~/.dotfiles/bash/aliases<CR>
 nnoremap <silent> gosf :e ~/.dotfiles/bash/bashrc-func<CR>
 nnoremap <silent> gosp :e ~/.dotfiles/bash/bashrc-prompt<CR>
 nnoremap <silent> gosc :e ~/.bashrc<CR>
 nnoremap <silent> gost :e ~/.dotfiles/tmux/tmux.conf<CR>
-nnoremap <silent> gosw :e ~/.dotfiles/aliases-work<CR>
+nnoremap <silent> gosl :e ~/.dotfiles/bash/work/aliases<CR>
 
 """ Redirect F1 to list of all commands which is more useful than the default help page
 noremap <F1> :vert bo h index<CR>

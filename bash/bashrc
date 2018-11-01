@@ -260,7 +260,7 @@ for i in \
   ~/.dotfiles/bash/bashrc-func          \
   ~/.dotfiles/bash/bashrc-prompt        \
   ~/.bashrc_local                       \
-  ~/.dotfiles/aliases                   \
+  ~/.dotfiles/bash/aliases              \
   ~/.dotfiles/fzf/fzf.bash              \
   ~/.dotfiles/tmux/tmux_completion_bash \
 ; do

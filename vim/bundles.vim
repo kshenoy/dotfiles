@@ -199,15 +199,7 @@ if has('unix')
     \ 'types': {
       \ 1: ['.git', 'cd %s && git ls-files --cached --exclude-standard --others'],
       \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
-      \ 3: ['P4CONFIG', 'cd %s; cat ' .
-             \ '<(cd $ANCHOR_ch/..; p4 have ... 2> /dev/null | ' .
-             \   'command grep -v "$ANCHOR_ch/\(emu\|env_squash\|fp\|tools\|powerPro\|sdpx\|ch/verif/dft\|' .
-             \     'ch/verif/txn/old_yml_DO_NOT_USE\|ch/syn\|meta/\(build_time\|drop2cad\|upf\)\)") ' .
-             \ '<(cd $STEM; p4 opened ... 2> /dev/null | ' .
-             \   'command grep add | command sed "s/#.*//" | command xargs -I{} -n1 p4 where {}) ' .
-             \ '<(cd $ANCHOR_avf; p4 have ... 2> /dev/null) ' .
-             \ '| command grep -v "/_env/" | command awk "{print \$3}" | command sed "s:$STEM/::"'
-         \ ]
+      \ 3: ['P4CONFIG', 'p4 have %s/...']
     \ },
     \ 'fallback': "find %s -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune -o " .
                         \ "-type f ! \\( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' -o " .
