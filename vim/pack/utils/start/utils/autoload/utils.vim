@@ -82,7 +82,7 @@ function! utils#UpdateTags()                                                    
     return
   endif
 
-  let l:cmd = "gentags --create -w $REPO_PATH"
+  let l:cmd = "gentags -w $REPO_PATH"
   if v:version >= 800
     call job_start(l:cmd, {'close_cb': 'utils#UpdateTagsDone'})
   else

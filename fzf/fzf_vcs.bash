@@ -114,10 +114,39 @@ fzf-vcs-cd() {                                                                  
 }
 
 
-__fzf-p4-all-files() {                                                                                             #{{{1
-  FZF_CTRL_T_COMMAND='{ {p4 have $STEM/... | command awk "{print \$3}" | command sed "s:$STEM/::"} || \
-    find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//; } 2> /dev/null' \
-    fzf-file-widget
+# __fzf-p4-all-files() {                                                                                           #{{{1
+#   FZF_CTRL_T_COMMAND='{ {p4 have $STEM/... | command awk "{print \$3}" | command sed "s:$STEM/::"} || \
+#     find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//; } 2> /dev/null' \
+#     fzf-file-widget
+# }
+
+__fzf-p4-all-files() {
+  # Declaring a local post-process function in this manner isn't as clean as being fully-scoped inside this function.
+  # However, the downside of being fully-scoped is that changes to READLINE_LINE and READLINE_POINT are not propagated
+  # outside to the caller of this function. So this is the next best thing.
+  # It does clobber the default post-process function but at least this way I can have some other function define its
+  # own version of post-process and both can work.
+  # The other downside is that I have to restore the post-process function
+
+  __fzf-file-widget-post-process() { cat /dev/stdin | __fzf-p4-strip-common-ancestors; }
+
+  [[ -f $STEM/.filelist ]] || pfls
+
+  # Add the generated files to the list
+  if [[ -d $STEM/build/latest ]] && [[ -f $STEM/build/latest/BUILD_SUCCEEDED ]]; then
+    local gen_list=$STEM/build/latest/generated/.filelist
+    if [[ ! -f $gen_list ]] || [[ $gen_list -ot $STEM/build/latest/BUILD_SUCCEEDED ]]; then
+      command rm $gen_list 2> /dev/null
+      find $STEM/build/latest/generated -mindepth 1 \
+        \( -name '*deps' -o -name '*cache' -o -empty \) -prune -o \
+        -type f -print >| $STEM/build/latest/generated/.filelist
+    fi
+  fi
+
+  FZF_CTRL_T_COMMAND='cat $STEM/.filelist $STEM/build/latest/generated/.filelist 2> /dev/null | command sed "s:$STEM/::"' \
+  fzf-file-widget
+
+  __fzf-file-widget-post-process() { cat; }
 }
 
 fzf-vcs-all-files() {                                                                                              #{{{1
@@ -152,17 +181,19 @@ fzf-vcs-files() {                                                               
 
 
 fzf-vcs-status() {                                                                                                 #{{{1
+  # Refer __fzf-p4-all-files above for an explanation for why I'm defining and restoring __fzf-file-widget-post-process
+  # in this manner
+
   if is_in_git_repo; then
-    local selected=$(git -c color.status=always status --short | fzf -m --nth 2..,.. "$@" | awk '{print $NF}')
+    __fzf-file-widget-post-process() { cat /dev/stdin | awk '{print $NF}'; }
+
+    FZF_CTRL_T_COMMAND='git -c color.status=always status --short' fzf-file-widget -m --nth 2..,.. "$@"
   elif is_in_perforce_repo; then
-    local selected=$(p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" |
-      column -s# -o " #" -t | column -s- -o- -t |
-      fzf -m -d# --nth 1 "$@" | awk '{print $1}' | __fzf-p4-strip-common-ancestors)
-  else
-    return
+    __fzf-file-widget-post-process() { cat /dev/stdin | awk '{print $1}' | __fzf-p4-strip-common-ancestors; }
+
+    FZF_CTRL_T_COMMAND='p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" | column -s# -o "    #" -t | column -s- -o- -t' \
+    fzf-file-widget -d'#' --nth 1 "$@"
   fi
 
-  # FIXME: Using fzf-file-widget seems to break this for some reason
-  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
-  READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
+  __fzf-file-widget-post-process() { cat; }
 }

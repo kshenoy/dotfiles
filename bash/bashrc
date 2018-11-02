@@ -265,9 +265,9 @@ for i in \
   ~/.dotfiles/tmux/tmux_completion_bash \
 ; do
   if [[ -f ${i} ]]; then
-  # echo "  Sourcing ${i} ..."
-  . ${i}
-  # echo "  ... done"
+    echo "  Sourcing ${i} ..."
+    . ${i}
+    # echo "  ... done"
   fi
 done
 
