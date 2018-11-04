@@ -37,16 +37,16 @@ XTerm*fontdefault*Label: Size 9 (Default)
 XTerm*faceSize: 9
 XTerm*font1*Label: Size 8
 XTerm*faceSize1: 8
-XTerm*font2*Label: Size 9.5
-XTerm*faceSize2: 9.5
-XTerm*font3*Label: Size 10
-XTerm*faceSize3: 10
-XTerm*font4*Label: Size 11
-XTerm*faceSize4: 11
-XTerm*font5*Label: Size 12
-XTerm*faceSize5: 12
-XTerm*font6*Label: Size 14
-XTerm*faceSize6: 14
+XTerm*font2*Label: Size 10
+XTerm*faceSize2: 10
+XTerm*font3*Label: Size 11
+XTerm*faceSize3: 11
+XTerm*font4*Label: Size 12
+XTerm*faceSize4: 12
+XTerm*font5*Label: Size 14
+XTerm*faceSize5: 14
+XTerm*font6*Label: Size 16
+XTerm*faceSize6: 16
 XTerm*ForceBoxChars: true
 XTerm*internalBorder: 3
 XTerm*scaleHeight: 1.1
@@ -72,51 +72,30 @@ UXTerm*metaSendsEscape: true
 UXTerm*saveLines: 10000
 UXTerm*cursorBlink: true
 
+!! From https://unix.stackexchange.com/a/332367/111534
 UXTerm*faceName: Iosevka
-UXTerm*faceSize: 10
+UXTerm*fontdefault*Label: Size 9 (Default)
+UXTerm*faceSize: 9
+UXTerm*font1*Label: Size 8
+UXTerm*faceSize1: 8
+UXTerm*font2*Label: Size 10
+UXTerm*faceSize2: 10
+UXTerm*font3*Label: Size 11
+UXTerm*faceSize3: 11
+UXTerm*font4*Label: Size 12
+UXTerm*faceSize4: 12
+UXTerm*font5*Label: Size 14
+UXTerm*faceSize5: 14
+UXTerm*font6*Label: Size 16
+UXTerm*faceSize6: 16
+UXTerm*ForceBoxChars: true
+UXTerm*internalBorder: 3
 UXTerm*scaleHeight: 1.1
 
 UXTerm*on3Clicks: regex ([[:alpha:]]+://)?([[:alnum:]!#+,./=?@_~-]|(%[[:xdigit:]][[:xdigit:]]))+
 UXTerm*rightScrollBar: false
 UXTerm*scrollBar: false
-!UXTerm*printerCommand: xterm -T History -e sh -c 'less -r <&3' 3<&0
-!UXTerm*translations:   #override Ctrl <Key>slash: print-everything()
 
-
-!=======================================================================================================================
-! URxvt settings                                                                                                    {{{1
-!=======================================================================================================================
-! urxvt --help 2>&1| sed -n '/:  /s/^\s*/! URxvt./gp'
-! TERM=dump command man -Pcat urxvt | sed -n '/depth: b/,/^BACKGROUND/p'|sed '$d'| sed 's/@/%-.-%/g; s/\^/%-+-%/g' | sed '/^       [a-z]/s/^ */^/g' | tr -s "\n" |\
-! sed -e :a -e 'N;s/\n/@@/g;ta;P;D' | sed 's,\^\([^@]\+\)@*[\t ]*\([^\^]\+\),! \2\n! URxvt.\1\n\n,g' | sed 's,@@           ,\n           ,g' | sed 's,@*$,,g' |sed '/^[^!]/d'
-
-URxvt.cursorBlink:          true
-URxvt.externalBorder:       0
-URxvt.fading:               20
-URxvt.font:                 xft:Iosevka:pixelsize=12
-URxvt.geometry:             240x84
-URxvt.internalBorder:       3
-! URxvt.jumpScroll:         boolean
-URxvt.letterSpace:          -1
-URxvt.lineSpace:            3
-URxvt.loginShell:           true
-URxvt.mouseWheelScrollPage: false
-URxvt.rightScrollBar:       false
-URxvt.saveLines:            100000
-URxvt.scrollBar:            false
-URxvt.scrollBar_floating:   true
-URxvt.scrollBar_right:      true
-URxvt.scrollColor:          #777777
-URxvt.scrollTtyKeypress:    true
-URxvt.scrollTtyOutput:      false
-URxvt.scrollWithBuffer:     false
-URxvt.scrollstyle:          plain
-URxvt.secondaryScreen:      true
-URxvt.secondaryScroll:      true
-URxvt.skipScroll:           true
-URxvt.termName:             xterm-256color
-! URxvt.tripleclickwords:   boolean
-URxvt.visualBell:           false
 
 !=======================================================================================================================
 ! Xft settings                                                                                                      {{{1

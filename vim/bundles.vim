@@ -128,6 +128,7 @@ let g:ale_sign_style_error='✠ '
 let g:ale_sign_warning='! '
 let g:ale_echo_msg_format = '%linter%: %s'
 let g:ale_cpp_clang_options = '-std=c++14'
+let g:ale_cpp_clangtidy_options = '-std=c++14'
 
 " Initialize list if it doesn't exist
 let g:ale_cpp_clangtidy_checks = get(g:, 'ale_cpp_clangtidy_checks', [])
