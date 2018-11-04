@@ -7,7 +7,8 @@ nnoremap <silent> <leader>so :so $MYVIMRC<BAR>so $MYGVIMRC<CR>
 nnoremap <silent> <leader>sr :reg<CR>
 nnoremap <silent> <leader>sm :marks<CR>
 " Set size
-nnoremap <silent> <leader>ss :set columns=319<BAR>call system("wmctrl -i -b add,maximized_vert -r " . v:windowid)<CR>
+" nnoremap <silent> <leader>ss :set columns=319<BAR>call system("wmctrl -i -b add,maximized_vert -r " . v:windowid)<CR>
+nnoremap <silent> <leader>ss :set columns=273<BAR>call system("wmctrl -i -b add,maximized_vert -r " . v:windowid)<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " GOTO commands                                                                                                     {{{1

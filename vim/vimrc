@@ -391,8 +391,10 @@ if DISABLE_FROM == 27 | finish | endif
 let g:netrw_liststyle=3
 
 " Change size of fonts
-command! -bar -nargs=0 IncFontSize :let &guifont = substitute(&guifont, '\d\+', '\=submatch(0)+1', 'g')
-command! -bar -nargs=0 DecFontSize :let &guifont = substitute(&guifont, '\d\+', '\=submatch(0)-1', 'g')
+command! -bar -nargs=0 IncFontSize :let &guifont=join(
+      \ map(split(&guifont, ','), {key, val -> substitute(val, '\d\+$', '\=submatch(0)+1', '')}), ',')
+command! -bar -nargs=0 DecFontSize :let &guifont=join(
+      \ map(split(&guifont, ','), {key, val -> substitute(val, '\d\+$', '\=submatch(0)-1', '')}), ',')
 
 """ Autocommands                                                                                                    {{{2
 if has('autocmd')

@@ -32,7 +32,7 @@ XTerm*saveLines: 10000
 XTerm*cursorBlink: true
 
 !! From https://unix.stackexchange.com/a/332367/111534
-XTerm*faceName: Iosevka
+XTerm*faceName: Iosevka Term SS05
 XTerm*fontdefault*Label: Size 9 (Default)
 XTerm*faceSize: 9
 XTerm*font1*Label: Size 8
@@ -73,7 +73,7 @@ UXTerm*saveLines: 10000
 UXTerm*cursorBlink: true
 
 !! From https://unix.stackexchange.com/a/332367/111534
-UXTerm*faceName: Iosevka
+UXTerm*faceName: Iosevka Term SS05
 UXTerm*fontdefault*Label: Size 9 (Default)
 UXTerm*faceSize: 9
 UXTerm*font1*Label: Size 8
