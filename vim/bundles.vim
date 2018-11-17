@@ -1,7 +1,3 @@
-"
-" PLUGINS
-"
-
 " Automatically install plugins
 let s:plug_path=expand(g:dotvim . '/autoload/plug.vim')
 if !filereadable(s:plug_path)
@@ -20,103 +16,13 @@ function! s:PlugCond(cond, ...)
   return a:cond ? opts : extend(opts, { 'on': [], 'for': [] })
 endfunction
 
-call plug#('ctrlpvim/ctrlp.vim')
-call plug#('tacahiroy/ctrlp-funky')
-call plug#('FelikZ/ctrlp-py-matcher',          s:PlugCond(has('python')||has('python3')))
-" Plug '/home/kshenoy/.local/install/fzf'
-" call plug#('junegunn/fzf.vim')
-if has('python3')
-  call plug#('ivan-cukic/vim-ctrlp-switcher',  {'on': ['CtrlPSwitch', 'CtrlPSwitchBasic', 'CtrlPSwitchFull']})
-endif
-
-" Motion/TextObjects ---------------------------------------------------------------------------------------------------
 runtime! macros/matchit.vim
 
-call plug#('PeterRincker/vim-argumentative')
-" call plug#('justinmk/vim-sneak')
-call plug#('chaoren/vim-wordmotion')
-call plug#('rhysd/vim-textobj-word-column',    {'on': '<Plug>(textobj-wordcolumn'})
-call plug#('kana/vim-textobj-user')
-call plug#('glts/vim-textobj-comment',         {'on': '<Plug>(textobj-comment'})
-call plug#('kana/vim-textobj-entire',          {'on': '<Plug>(textobj-entire'})
-call plug#('kana/vim-textobj-function',        {'on': '<Plug>(textobj-function'})
-call plug#('kana/vim-textobj-indent',          {'on': '<Plug>(textobj-indent'})
-call plug#('kana/vim-textobj-line',            {'on': '<Plug>(textobj-line'})
-call plug#('saihoooooooo/vim-textobj-space',   {'on': '<Plug>(textobj-space'})
-" call plug#('tommcdo/vim-express')
 
-" Completion/Text insertion --------------------------------------------------------------------------------------------
-call plug#('dawikur/algorithm-mnemonics.vim',  {'for': 'cpp'})
-call plug#('lifepillar/vim-mucomplete')
-call plug#('Raimondi/delimitMate')
-call plug#('tpope/vim-endwise')
-call plug#('SirVer/ultisnips',                 s:PlugCond(has('python')||has('python3')))
-call plug#('tpope/vim-commentary',             {'on': '<Plug>Commentary'})
-call plug#('kshenoy/vim-origami')
-" call plug#('dhruvasagar/vim-table-mode')
-" call plug#('vim-scripts/DrawIt')
-call plug#('junegunn/vim-easy-align',          {'on': ['EasyAlign', '<Plug>(EasyAlign)']})
-call plug#('tommcdo/vim-exchange',             {'on': '<Plug>(Exchange'})
-call plug#('triglav/vim-visual-increment',     {'on': '<Plug>VisualIncrement'})
-call plug#('AndrewRadev/switch.vim',           {'on': 'Switch'})
-
-" Misc -----------------------------------------------------------------------------------------------------------------
+" abolish --------------------------------------------------------------------------------------------------------- {{{1
 call plug#('tpope/vim-abolish')
-call plug#('chrisbra/vim-diff-enhanced')
-call plug#('derekwyatt/vim-fswitch')
-call plug#('w0rp/ale')
-" call plug#('skywind3000/asyncrun.vim')
-" call plug#('tpope/vim-dispatch')
-call plug#('sjl/gundo.vim',                    {'on': 'GundoToggle'})
-" call plug#('Yggdroot/indentLine',              PlugCond(has('conceal'), {'on': 'IndentLinesToggle'}))
-call plug#('Valloric/ListToggle',              {'on': ['LToggle', 'QToggle']})
 
 
-call plug#('tpope/vim-repeat')
-call plug#('kshenoy/vim-signature')
-" call plug#('kana/vim-submode')
-call plug#('tpope/vim-surround')
-call plug#('tpope/vim-unimpaired')
-call plug#('tpope/vim-vinegar')
-call plug#('octol/vim-cpp-enhanced-highlight', {'for': 'cpp'})
-
-" FileTypes ------------------------------------------------------------------------------------------------------------
-call plug#('WeiChungWu/vim-SystemVerilog',     {'for': 'systemverilog'})
-call plug#('kshenoy/TWiki-Syntax',             {'for': 'twiki'})
-
-" Colorshemes ----------------------------------------------------------------------------------------------------------
-call plug#('chriskempson/base16-vim')
-" call plug#('kshenoy/vim-sol')
-
-" vim-mark -------------------------------------------------------------------------------------------------------- {{{1
-map           <leader>m       <Plug>my(Mark)
-nmap <silent> <Plug>my(Mark)m <Plug>MarkSet
-xmap <silent> <Plug>my(Mark)m <Plug>MarkSet
-nmap <silent> <Plug>my(Mark)n <Plug>MarkClear
-nmap <silent> <Plug>my(Mark)x <Plug>MarkRegex
-xmap <silent> <Plug>my(Mark)x <Plug>MarkRegex
-nmap <silent> <Plug>my(Mark)* <Plug>MarkSearchGroupNext
-xmap <silent> <Plug>my(Mark)* <Plug>MarkSearchGroupNext
-nmap <silent> <Plug>my(Mark)# <Plug>MarkSearchGroupPrev
-xmap <silent> <Plug>my(Mark)# <Plug>MarkSearchGroupPrev
-nmap <silent> <Plug>my(Mark)/ <Plug>MarkSearchAnyNext
-xmap <silent> <Plug>my(Mark)/ <Plug>MarkSearchAnyNext
-nmap <silent> <Plug>my(Mark)? <Plug>MarkSearchAnyPrev
-xmap <silent> <Plug>my(Mark)? <Plug>MarkSearchAnyPrev
-
-nmap <Plug>IgnoreMarkSearchCurrentNext <Plug>MarkSearchCurrentNext
-xmap <Plug>IgnoreMarkSearchCurrentNext <Plug>MarkSearchCurrentNext
-nmap <Plug>IgnoreMarkSearchCurrentPrev <Plug>MarkSearchCurrentPrev
-xmap <Plug>IgnoreMarkSearchCurrentPrev <Plug>MarkSearchCurrentPrev
-
-call plug#('inkarkat/vim-mark')
-" }}}1
-
-
-call plug#end()
-
-
-" Plugins - Settings ===================================================================================================
 " ale ------------------------------------------------------------------------------------------------------------- {{{1
 let g:ale_lint_on_enter=0
 " let g:ale_open_list='never'
@@ -149,16 +55,32 @@ nnoremap =sl :ALELint<CR>
 nnoremap =S  :ALEDetail<CR>
 nnoremap yoS :ALEToggle<CR>
 
+call plug#('w0rp/ale')
+
+
+" algorithm-mnemonics --------------------------------------------------------------------------------------------- {{{1
+call plug#('dawikur/algorithm-mnemonics.vim', {'for': 'cpp'})
+
+
+" argumentative --------------------------------------------------------------------------------------------------- {{{1
+call plug#('PeterRincker/vim-argumentative')
+
+
+" asyncrun -------------------------------------------------------------------------------------------------------- {{{1
+" call plug#('skywind3000/asyncrun.vim')
+
 
 " AutoComplPop ---------------------------------------------------------------------------------------------------- {{{1
 let g:acp_completeoptPreview = 0                                              " Do not show tag previews when completing
 
 
-" Base16 ---------------------------------------------------------------------------------------------------------- {{{1
+" base16 ---------------------------------------------------------------------------------------------------------- {{{1
 let g:base16_shell_path=glob('~/.config/base16-shell/scripts/')
 
+call plug#('chriskempson/base16-vim')
 
-" Commentary ------------------------------------------------------------------------------------------------------ {{{1
+
+" commentary ------------------------------------------------------------------------------------------------------ {{{1
 map  gc  <Plug>Commentary
 nmap gcc <Plug>CommentaryLine
 
@@ -166,8 +88,10 @@ augroup Commentary
   autocmd FileType xdefaults let &commentstring='!%s'
 augroup END
 
+call plug#('tpope/vim-commentary', {'on': '<Plug>Commentary'})
 
-" vim-cpp-enhanced-highlight -------------------------------------------------------------------------------------- {{{1
+
+" cpp-enhanced-highlight ------------------------------------------------------------------------------------------ {{{1
 let g:cpp_class_scope_highlight           = 1
 let g:cpp_member_variable_highlight       = 1
 let g:cpp_class_decl_highlight            = 1
@@ -177,10 +101,11 @@ highlight link cCustomFunc   cppStatement
 highlight link cCustomMemvar cppStructure
 highlight link cCustomClass  cCustomClassName
 
+call plug#('octol/vim-cpp-enhanced-highlight', {'for': 'cpp'})
+
 
 " CtrlP ----------------------------------------------------------------------------------------------------------- {{{1
 let g:ctrlp_map                 = ''
-let g:ctrlp_cmd                 = ''
 let g:ctrlp_buftag_ctags_bin    = '/tool/pandora64/latest/bin/ctags'
 let g:ctrlp_by_filename         = 1
 let g:ctrlp_switch_buffer       = 'H'        " Jump to window anywhere when C-x is pressed. Pressing <CR> will just open
@@ -193,7 +118,6 @@ let g:ctrlp_follow_symlinks     = 1
 if has('python')
   let g:ctrlp_match_func        = {'match': 'pymatcher#PyMatch'}
 endif
-" let g:ctrlp_cache_dir           =
 
 if has('unix')
   let g:ctrlp_user_command = {
@@ -211,40 +135,24 @@ if has('unix')
 
 elseif executable('ag')
   let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-elseif executable('pt')
-  let g:ctrlp_user_command = 'pt %s -l --nocolor'
 endif
 
-"let g:ctrlp_abbrev = {
-"  \ 'gmode': 'i',
-"  \ 'abbrevs': [
-"    \ {
-"      \ 'pattern': '^cd b',
-"      \ 'expanded': '@cd ~/.vim/bundle',
-"      \ 'mode': 'pfrz',
-"    \ },
-"    \ {
-"      \ 'pattern': '\(^@.\+\|\\\@<!:.\+\)\@<! ',
-"      \ 'expanded': '.\{-}',
-"      \ 'mode': 'pfr',
-"    \ },
-"    \ {
-"      \ 'pattern': '\\\@<!:.\+\zs\\\@<! ',
-"      \ 'expanded': '\ ',
-"      \ 'mode': 'pfz',
-"    \ },
-"  \ ]
-"\ }
-
-" <C-N>, <C-P> and <C-O> to match Helm's defaults
 let g:ctrlp_prompt_mappings = {
-  \ 'PrtSelectMove("j")': ['<C-N>'],
-  \ 'PrtSelectMove("k")': ['<C-P>'],
-  \ 'PrtHistory(-1)':     ['<Down>'],
-  \ 'PrtHistory(1)':      ['<Up>'],
-  \ 'ToggleType(1)':      ['<C-L>'],
-  \ 'ToggleType(-1)':     ['<C-H>'],
+  \ 'PrtSelectMove("j")':   ['<c-j>', '<c-n>'],
+  \ 'PrtSelectMove("k")':   ['<c-k>', '<c-p>'],
+  \ 'PrtHistory(-1)':       ['<Down>'],
+  \ 'PrtHistory(1)':        ['<Up>'],
   \ }
+" \ 'CreateNewFile()':      ['<c-y>'],
+" \ 'MarkToOpen()':         ['<c-z>'],
+" \ 'OpenMulti()':          ['<c-o>'],
+" \ 'PrtInsert()':          ['<c-\>'],
+" \ 'ToggleByFname()':      ['<c-d>'],
+" \ 'ToggleRegex()':        ['<c-r>'],
+" \ 'ToggleType(-1)':       ['<c-b>', '<c-down>'],
+" \ 'ToggleType(-1)':       ['<c-h>'],
+" \ 'ToggleType(1)':        ['<c-f>', '<c-up>'],
+" \ 'ToggleType(1)':        ['<c-l>'],
 
 map      <leader>j <Plug>my(CtrlP)
 nnoremap <silent>  <Plug>my(CtrlP)a :CtrlPSwitchBasic<CR>
@@ -261,7 +169,13 @@ nnoremap <silent>  <Plug>my(CtrlP)] :CtrlPtjump<CR>
 vnoremap <silent>  <Plug>my(CtrlP)] :CtrlPtjumpVisual<CR>
 nnoremap <silent>  <leader><leader> :CtrlPBuffer<CR>
 
-let g:ctrlpswitcher_mode=1
+call plug#('ctrlpvim/ctrlp.vim')
+call plug#('tacahiroy/ctrlp-funky')
+call plug#('FelikZ/ctrlp-py-matcher', s:PlugCond(has('python')||has('python3')))
+
+if has('python3')
+  call plug#('ivan-cukic/vim-ctrlp-switcher',  {'on': ['CtrlPSwitch', 'CtrlPSwitchBasic', 'CtrlPSwitchFull']})
+endif
 
 
 " delimitMate ----------------------------------------------------------------------------------------------------- {{{1
@@ -270,8 +184,22 @@ augroup delimitMate_my
   autocmd FileType systemverilog let b:delimitMate_quotes = "\" '"
 augroup END
 
+call plug#('Raimondi/delimitMate')
 
-" vim-easy-align -------------------------------------------------------------------------------------------------- {{{1
+
+" diff-enhanced --------------------------------------------------------------------------------------------------- {{{1
+call plug#('chrisbra/vim-diff-enhanced')
+
+
+" dispatch -------------------------------------------------------------------------------------------------------- {{{1
+" call plug#('tpope/vim-dispatch')
+
+
+" DrawIt ---------------------------------------------------------------------------------------------------------- {{{1
+" call plug#('vim-scripts/DrawIt')
+
+
+" easy-align ------------------------------------------------------------------------------------------------------ {{{1
 nmap ga <Plug>(EasyAlign)
 xmap ga <Plug>(EasyAlign)
 
@@ -301,14 +229,22 @@ let g:easy_align_delimiters = { '>': { 'pattern': '>>\|=>\|>' },
                             \   }
                             \ }
 
+call plug#('junegunn/vim-easy-align', {'on': ['EasyAlign', '<Plug>(EasyAlign)']})
 
-" vim-exchange ---------------------------------------------------------------------------------------------------- {{{1
+
+" endwise --------------------------------------------------------------------------------------------------------- {{{1
+call plug#('tpope/vim-endwise')
+
+
+" exchange -------------------------------------------------------------------------------------------------------- {{{1
 nmap cx  <Plug>(Exchange)
 nmap cxc <Plug>(ExchangeClear)
 xmap X   <Plug>(Exchange)
 
+call plug#('tommcdo/vim-exchange', {'on': '<Plug>(Exchange'})
 
-" vim-express ----------------------------------------------------------------------------------------------------- {{{1
+
+" express --------------------------------------------------------------------------------------------------------- {{{1
 " function! s:InitVimExpress()
 "   " Description: Creates operators upon startup as the plugin might not have beeen loaded at this point
 "   MapExpress gs join(sort(split(v:val, '\n')), '')
@@ -319,8 +255,10 @@ xmap X   <Plug>(Exchange)
 "   autocmd VimEnter * call s:InitVimExpress()
 " augroup END
 
+" call plug#('tommcdo/vim-express')
 
-" FSwitch --------------------------------------------------------------------------------------------------------- {{{1
+
+" fswitch --------------------------------------------------------------------------------------------------------- {{{1
 let g:fsnonewfiles = 1
 augroup FSwitch
   autocmd!
@@ -343,45 +281,85 @@ nnoremap <silent> <Plug>my(FSwitch)K <C-W><C-O>:FSSplitAbove<CR>
 nnoremap <silent> <Plug>my(FSwitch)L <C-W><C-O>:FSSplitRight<CR>
 nnoremap <silent> <S-CR>             :FSHere<CR>
 
+call plug#('derekwyatt/vim-fswitch')
 
-" Gundo ----------------------------------------------------------------------------------------------------------- {{{1
+
+" gundo ----------------------------------------------------------------------------------------------------------- {{{1
 let g:gundo_preview_bottom=1
 nnoremap yoU :GundoToggle<CR>
+
+call plug#('sjl/gundo.vim', {'on': 'GundoToggle'})
 
 
 " IndentLine ------------------------------------------------------------------------------------------------------ {{{1
 let g:indentLine_char = "┊"
+
+" call plug#('Yggdroot/indentLine', PlugCond(has('conceal'), {'on': 'IndentLinesToggle'}))
 
 
 " ListToggle ------------------------------------------------------------------------------------------------------ {{{1
 nnoremap yoL :LToggle<CR>
 nnoremap yoQ :QToggle<CR>
 
+call plug#('Valloric/ListToggle', {'on': ['LToggle', 'QToggle']})
 
-" vim-mucomplete -------------------------------------------------------------------------------------------------- {{{1
+
+" mark ------------------------------------------------------------------------------------------------------------ {{{1
+map           <leader>m       <Plug>my(Mark)
+nmap <silent> <Plug>my(Mark)m <Plug>MarkSet
+xmap <silent> <Plug>my(Mark)m <Plug>MarkSet
+nmap <silent> <Plug>my(Mark)n <Plug>MarkClear
+nmap <silent> <Plug>my(Mark)x <Plug>MarkRegex
+xmap <silent> <Plug>my(Mark)x <Plug>MarkRegex
+nmap <silent> <Plug>my(Mark)* <Plug>MarkSearchGroupNext
+xmap <silent> <Plug>my(Mark)* <Plug>MarkSearchGroupNext
+nmap <silent> <Plug>my(Mark)# <Plug>MarkSearchGroupPrev
+xmap <silent> <Plug>my(Mark)# <Plug>MarkSearchGroupPrev
+nmap <silent> <Plug>my(Mark)/ <Plug>MarkSearchAnyNext
+xmap <silent> <Plug>my(Mark)/ <Plug>MarkSearchAnyNext
+nmap <silent> <Plug>my(Mark)? <Plug>MarkSearchAnyPrev
+xmap <silent> <Plug>my(Mark)? <Plug>MarkSearchAnyPrev
+
+nmap <Plug>IgnoreMarkSearchCurrentNext <Plug>MarkSearchCurrentNext
+xmap <Plug>IgnoreMarkSearchCurrentNext <Plug>MarkSearchCurrentNext
+nmap <Plug>IgnoreMarkSearchCurrentPrev <Plug>MarkSearchCurrentPrev
+xmap <Plug>IgnoreMarkSearchCurrentPrev <Plug>MarkSearchCurrentPrev
+
+call plug#('inkarkat/vim-mark')
+
+
+" mucomplete ------------------------------------------------------------------------------------------------------ {{{1
 let g:mucomplete#chains = {
-  \ 'default': ['path', 'omni', 'keyn', 'dict', 'c-n', 'user', 'ulti']
+  \ 'default': ['path', 'omni', 'keyn', 'dict', 'c-n', 'user', 'ulti'],
+  \ 'cpp': ['tags', 'omni', 'keyn', 'ulti'],
+  \ 'vim': ['path', 'cmd', 'keyn']
   \ }
 let g:mucomplete#enable_auto_at_startup = 0
 let g:mucomplete#no_popup_mappings = 0
 
+call plug#('lifepillar/vim-mucomplete')
 
-" Origami --------------------------------------------------------------------------------------------------------- {{{1
+
+" origami --------------------------------------------------------------------------------------------------------- {{{1
 let g:OrigamiFoldAtCol = -4
 
+call plug#('kshenoy/vim-origami')
 
-" vim-parjumper --------------------------------------------------------------------------------------------------- {{{1
+
+" parjumper ------------------------------------------------------------------------------------------------------- {{{1
 " map g{ <Plug>(ParJumpBackward)
 " map g} <Plug>(ParJumpForward)
 
 
-" Repeat ---------------------------------------------------------------------------------------------------------- {{{1
+" repeat ---------------------------------------------------------------------------------------------------------- {{{1
 nnoremap <silent> <C-R> :<C-U>call repeat#wrap('U',v:count)<CR>
 nnoremap <silent> U     :<C-U>call repeat#wrap("\<Lt>C-R>",v:count)<CR>
 
+call plug#('tpope/vim-repeat')
 
-" Signature ------------------------------------------------------------------------------------------------------- {{{1
-let g:SignatureMarkTextHLDynamic   = 1
+
+" signature ------------------------------------------------------------------------------------------------------- {{{1
+let g:SignatureMarkTextHLDynamic = 1
 let g:SignatureMarkerTextHLDynamic = 1
 if exists('*signature#marker#Goto')
   for i in range(1,9)
@@ -390,8 +368,10 @@ if exists('*signature#marker#Goto')
   endfor
 endif
 
+call plug#('kshenoy/vim-signature')
 
-" Sneak ----------------------------------------------------------------------------------------------------------- {{{1
+
+" sneak ----------------------------------------------------------------------------------------------------------- {{{1
 " highlight link SneakPluginScope  CursorLine
 " highlight link SneakPluginTarget Normal
 
@@ -408,8 +388,19 @@ endif
 " map t <Plug>Sneak_t
 " map T <Plug>Sneak_T
 
+" call plug#('justinmk/vim-sneak')
 
-" Submode --------------------------------------------------------------------------------------------------------- {{{1
+
+" sol ------------------------------------------------------------------------------------------------------------- {{{1
+" call plug#('kshenoy/vim-sol')
+
+
+" solarized ------------------------------------------------------------------------------------------------------- {{{1
+let g:solarized_underline = 0
+"let g:solarized_visibility = "high"
+
+
+" submode --------------------------------------------------------------------------------------------------------- {{{1
 let g:submode_always_show_submode = 1
 let g:submode_keep_leaving_key    = 1
 
@@ -493,13 +484,14 @@ let g:submode_keep_leaving_key    = 1
 "   call submode#map       ( 'ResizeFont', 'n', 'r', '>' , '<Plug>IncFontSize' )
 " endif
 
-
-" Solarized ------------------------------------------------------------------------------------------------------- {{{1
-let g:solarized_underline = 0
-"let g:solarized_visibility = "high"
+" call plug#('kana/vim-submode')
 
 
-" Switch ---------------------------------------------------------------------------------------------------------- {{{1
+" surround -------------------------------------------------------------------------------------------------------- {{{1
+call plug#('tpope/vim-surround')
+
+
+" switch ---------------------------------------------------------------------------------------------------------- {{{1
 nnoremap <BS> :Switch<CR>
 let g:switch_mapping = ''
 let g:switch_custom_definitions = [
@@ -509,13 +501,25 @@ let g:switch_custom_definitions = [
                                 \   [ 'PASS', 'FAIL'  ]
                                 \ ]
 
+call plug#('AndrewRadev/switch.vim', {'on': 'Switch'})
 
-" TableMode ------------------------------------------------------------------------------------------------------- {{{1
+
+" SystemVerilog --------------------------------------------------------------------------------------------------- {{{1
+call plug#('WeiChungWu/vim-SystemVerilog', {'for': 'systemverilog'})
+
+
+" table-mode ------------------------------------------------------------------------------------------------------ {{{1
 let g:table_mode_map_prefix = '<Plug>[table]'
 nnoremap yoB :TableModeToggle<CR>
 
+" call plug#('dhruvasagar/vim-table-mode')
 
-" vim-textobj-* --------------------------------------------------------------------------------------------------- {{{1
+
+" Targets --------------------------------------------------------------------------------------------------------- {{{1
+let g:targets_separators = ', . ; : + - = ~ * # / | \ & $'
+
+
+" textobj-* ------------------------------------------------------------------------------------------------------- {{{1
 let g:textobj_comment_no_default_key_mappings    = 1
 let g:textobj_entire_no_default_key_mappings     = 1
 let g:textobj_function_no_default_key_mappings   = 1
@@ -545,24 +549,45 @@ endfor
 "" Note that line formatting can also be done using gqgq
 nnoremap <silent> <expr> gqq (v:count == 0 ? ":call utils#Preserve('normal gqi%')<CR>" : ":normal " . v:count . "gqq<CR>")
 
+call plug#('kana/vim-textobj-user')
+call plug#('glts/vim-textobj-comment',       {'on': '<Plug>(textobj-comment'})
+call plug#('kana/vim-textobj-entire',        {'on': '<Plug>(textobj-entire'})
+call plug#('kana/vim-textobj-function',      {'on': '<Plug>(textobj-function'})
+call plug#('kana/vim-textobj-indent',        {'on': '<Plug>(textobj-indent'})
+call plug#('kana/vim-textobj-line',          {'on': '<Plug>(textobj-line'})
+call plug#('saihoooooooo/vim-textobj-space', {'on': '<Plug>(textobj-space'})
+call plug#('rhysd/vim-textobj-word-column',  {'on': '<Plug>(textobj-wordcolumn'})
 
-" Targets --------------------------------------------------------------------------------------------------------- {{{1
-let g:targets_separators = ', . ; : + - = ~ * # / | \ & $'
+
+" TWiki-Syntax ---------------------------------------------------------------------------------------------------- {{{1
+call plug#('kshenoy/TWiki-Syntax', {'for': 'twiki'})
 
 
-" UltiSnips ------------------------------------------------------------------------------------------------------- {{{1
+" ultiSnips ------------------------------------------------------------------------------------------------------- {{{1
 let g:UltiSnipsEditSplit = "vertical"
 " Location of snippets
 execute 'let g:UltiSnipsSnippetDirectories=["' . g:dotvim . '/pack/settings/start/UltiSnips/snippets"]'
 let g:UltiSnipsEnableSnipMate=0
 let g:UltiSnipsExpandTrigger='<S-Tab>'
 
+call plug#('SirVer/ultisnips', s:PlugCond(has('python')||has('python3')))
 
-" vim-vinegar ----------------------------------------------------------------------------------------------------- {{{1
+
+" unimpaired ------------------------------------------------------------------------------------------------------ {{{1
+call plug#('tpope/vim-unimpaired')
+
+
+" vinegar --------------------------------------------------------------------------------------------------------- {{{1
 nnoremap - <Plug>VinegarUp
 
+call plug#('tpope/vim-vinegar')
 
-" vim-wordmotion -------------------------------------------------------------------------------------------------- {{{1
+
+" visual-increment ------------------------------------------------------------------------------------------------ {{{1
+call plug#('triglav/vim-visual-increment', {'on': '<Plug>VisualIncrement'})
+
+
+" wordmotion ------------------------------------------------------------------------------------------------------ {{{1
 let g:wordmotion_mappings = {
 \ 'w':          '<M-w>',
 \ 'b':          '<M-b>',
@@ -572,3 +597,8 @@ let g:wordmotion_mappings = {
 \ 'iw':         'i<M-w>',
 \ '<C-R><C-W>': '<C-R><M-w>'
 \ }
+
+call plug#('chaoren/vim-wordmotion')
+" }}}1
+
+call plug#end()
