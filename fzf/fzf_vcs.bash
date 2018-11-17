@@ -8,31 +8,20 @@ is_in_perforce_repo() {                                                         
   p4 info &> /dev/null
 }
 
-__fzf-p4-strip-common-ancestors() (                                                                                #{{{1
-  # Scoped funtion to hide it from others
-  __strip() {
-    if [[ -n $item ]]; then
-      if [[ "$STEM/$item" =~ "$PWD" ]]; then
-        # Remove any common ancestors from filename
-        item="$STEM/$item"
-        item=${item##$PWD/}
-        printf '%q ' "$item";
-      else
-        printf '$STEM/%q ' "$item";
-      fi
-    fi;
-  }
+__fzf-p4-strip-common-ancestors() {                                                                                #{{{1
+  for item in "$@"; do
+    [[ -z "$item" ]] && continue
 
-  if [[ -p /dev/stdin ]]; then
-    while read -r item; do
-      __strip "$item"
-    done < "${1:-/dev/stdin}"
-  elif [[ -t 0 ]]; then
-    for item in "$@"; do
-      __strip "$item"
-    done
-  fi
-)
+    if [[ "$STEM/$item" =~ "$PWD" ]]; then
+      # Remove any common ancestors from filename
+      item="$STEM/$item"
+      item=${item##$PWD/}
+      echo "$item";
+    else
+      echo "$STEM/$item";
+    fi
+  done
+}
 
 __fzf-down() {                                                                                                     #{{{1
   fzf --height 50% "$@" --border
@@ -114,13 +103,7 @@ fzf-vcs-cd() {                                                                  
 }
 
 
-# __fzf-p4-all-files() {                                                                                           #{{{1
-#   FZF_CTRL_T_COMMAND='{ {p4 have $STEM/... | command awk "{print \$3}" | command sed "s:$STEM/::"} || \
-#     find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//; } 2> /dev/null' \
-#     fzf-file-widget
-# }
-
-__fzf-p4-all-files() {
+__fzf-p4-all-files() {                                                                                             #{{{1
   # Declaring a local post-process function in this manner isn't as clean as being fully-scoped inside this function.
   # However, the downside of being fully-scoped is that changes to READLINE_LINE and READLINE_POINT are not propagated
   # outside to the caller of this function. So this is the next best thing.
@@ -128,7 +111,7 @@ __fzf-p4-all-files() {
   # own version of post-process and both can work.
   # The other downside is that I have to restore the post-process function
 
-  __fzf-file-widget-post-process() { cat /dev/stdin | __fzf-p4-strip-common-ancestors; }
+  __fzf-select-post-process() { __fzf-p4-strip-common-ancestors "$@"; }
 
   [[ -f $STEM/.filelist ]] || pfls
 
@@ -143,10 +126,10 @@ __fzf-p4-all-files() {
     fi
   fi
 
-  FZF_CTRL_T_COMMAND='cat $STEM/.filelist $STEM/build/latest/generated/.filelist 2> /dev/null | command sed "s:$STEM/::"' \
+  FZF_CTRL_T_COMMAND='cat $STEM/.filelist $STEM/build/latest/generated/.filelist 2> /dev/null | command sed s:$STEM/::' \
   fzf-file-widget
 
-  __fzf-file-widget-post-process() { cat; }
+  __fzf-select-post-process() { echo "$@"; }
 }
 
 fzf-vcs-all-files() {                                                                                              #{{{1
@@ -181,19 +164,19 @@ fzf-vcs-files() {                                                               
 
 
 fzf-vcs-status() {                                                                                                 #{{{1
-  # Refer __fzf-p4-all-files above for an explanation for why I'm defining and restoring __fzf-file-widget-post-process
+  # Refer __fzf-p4-all-files above for an explanation for why I'm defining and restoring __fzf-select-post-process
   # in this manner
 
   if is_in_git_repo; then
-    __fzf-file-widget-post-process() { cat /dev/stdin | awk '{print $NF}'; }
+    __fzf-select-post-process() { cat /dev/stdin | awk '{print $NF}'; }
 
     FZF_CTRL_T_COMMAND='git -c color.status=always status --short' fzf-file-widget -m --nth 2..,.. "$@"
   elif is_in_perforce_repo; then
-    __fzf-file-widget-post-process() { cat /dev/stdin | awk '{print $1}' | __fzf-p4-strip-common-ancestors; }
+    __fzf-select-post-process() { cat /dev/stdin | awk '{print $1}' | __fzf-p4-strip-common-ancestors; }
 
     FZF_CTRL_T_COMMAND='p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" | column -s# -o "    #" -t | column -s- -o- -t' \
-    fzf-file-widget -d'#' --nth 1 "$@"
+    fzf-file-widget --nth 1 "$@"
   fi
 
-  __fzf-file-widget-post-process() { cat; }
+  __fzf-select-post-process() { cat; }
 }
