@@ -27,7 +27,49 @@ endsnippet
 ##
 snippet _skel "Template for new files" b
 #!/usr/bin/env bash
+#
+# AUTHOR: kartik.shenoy@amd.com
+
+##======================================================================================================================
+## The three-fingered claw
+yell() { echo "\$0: $*" >&2; }
+die() { yell "$*"; exit 111; }
+try() { "$@" || die "Cannot $*"; }
+
+## Use the array $FUNCNAME[*] for stack trace of function calls
+## Use $LINENO to print the current line no.
+
+__help() {
+  local _name=$(basename \$0)
+
+  echo "<DESCRIPTION>
+
+SYNTAX:
+  $_name ...
+
+EXAMPLES:
+"
+}
+
+__finish() {
+  # Clean-up code goes here
+}
+
+## Enable debug logging
+# >|/tmp/debug.out
+
+##======================================================================================================================
+## Sanity check on inputs
+if [[ "$*" =~ -h ]]; then
+  __help
+  exit 0
+fi
+
+##======================================================================================================================
 $0
+
+##======================================================================================================================
+trap __finish EXIT
 endsnippet
 
 
