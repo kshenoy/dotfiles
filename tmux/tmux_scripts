@@ -4,10 +4,11 @@
 unset -f _tmux_attach_or_new_
 _tmux_attach_or_new_() {                                                                                          # {{{1
   # Attach to existing session or else create a new one
+  # Forcing the LANG to en_US.UTF-8 to avoid clobbering LANG=C set at work
   if [[ ! -z "$TMUX" ]]; then return; fi
 
   if [[ -z "$1" ]]; then
-    tmux -2 attach-session || tmux -2 new-session
+    LANG=en_US.UTF-8 tmux -2 attach-session || tmux -2 new-session
   else
     # The commented one-liner doesn't work when the supplied argument is a subset of an already existing session name
     # For eg. if we have a session called DebugBus, and we check if the session "Debug" exists, tmux returns true
@@ -15,10 +16,10 @@ _tmux_attach_or_new_() {                                                        
 
     if [[ $(tm ls | grep -P "^$1\b" 2> /dev/null) ]]; then
       #echo "Attaching to exising session..."
-      tmux -2 attach-session -t "$@"
+      LANG=en_US.UTF-8 tmux -2 attach-session -t "$@"
     else
       echo "Creating new session $1 ..."
-      tmux -2 new-session -s "$1"
+      LANG=en_US.UTF-8 tmux -2 new-session -s "$1"
     fi
   fi
 }

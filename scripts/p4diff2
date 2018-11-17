@@ -1,59 +1,198 @@
 #!/usr/bin/env bash
 #
-# Examples:
-# * p4diff2 ch/verif/l3/arch_l3/arch_lci.cc
-#     This runs regular p4 diff
-#
-# * p4diff2 ch/verif/l3/arch_l3/arch_lci.cc#15 ch/verif/l3/arch_l3/arch_lci.cc
-#     This compares arch_lci.cc in the workarea (with all edits) with rev#15 in the trunk
-#
-# * p4diff2 ch/verif/l3/arch_l3/arch_lci.cc#15 ch/verif/l3/arch_l3/arch_lci.cc#14
-#     This compares rev#15 of arch_lci.cc with rev#14 in the trunk
-#
-# * p4diff2 ch/verif/l3/arch_l3/arch_lci.cc#-0 ch/verif/l3/arch_l3/arch_lci.cc#-1
-#     This compares the head revision (#-0) of arch_lci.cc with the previous revision in the trunk
+# AUTHOR: kartik.shenoy@amd.com
 
+##======================================================================================================================
+_name=$(basename $0)
+
+yell() { echo "$_name: $*" >&2; }
+die() {
+  local _red=$(tput setaf 1)
+  local _reset=$(tput sgr0)
+  yell "${_red}ERROR${_reset}: $*";
+  exit 111;
+}
+try() { "$@" || die "Cannot $*"; }
+
+__help() {
+  echo "Diff any 2 files in the repo
+
+SYNTAX:
+  $_name FILE1[#rev1/@cl1] [FILE2[#rev2/@cl2]]
+
+EXAMPLES:
+  With 1 argument:
+  ----------------
+  * $_name ch/verif/l3/arch_l3/arch_lci.cc
+      Run regular p4 diff comparing the current state (with edits) against the HEAD
+
+  * $_name ch/verif/l3/arch_l3/arch_lci.cc#42
+      Diff the current state (with edits) against rev#42 in the repo
+
+  * $_name ch/verif/l3/arch_l3/arch_lci.cc@112358
+      Diff the current state (with edits) against the latest rev as of changelist 112358 in the repo
+
+  With 2 arguments:
+  -----------------
+  * $_name ch/verif/l3/arch_l3/arch_lci.cc#42 ch/verif/l3/arch_l3/arch_lci.cc
+      This compares arch_lci.cc in the workarea (with all edits) with rev#42 in the repo
+      Same as running \`$_name ch/verif/l3/arch_l3/arch_lci.cc#42\`
+
+  * $_name ch/verif/l3/arch_l3/arch_lci.cc#42 ch/verif/l3/arch_l3/arch_lci.cc#41
+      Diff rev#42 of arch_lci.cc with rev#41 in the repo
+
+  * $_name ch/verif/l3/arch_l3/arch_lci.cc#42 ch/verif/l3/arch_l3/arch_lci.cc@112358
+      Diff rev#42 of arch_lci.cc with the latest rev as of changelist 112358 in the repo
+
+  * $_name ch/verif/l3/arch_l3/arch_lci.cc ch/verif/l3/arch_l3/arch_lci.cc#-1
+      Diff the current state (with edits) with the head revision in the repo"
+}
+
+## Enable debug logging
+>|/tmp/debug.out
+
+##======================================================================================================================
+## Sanity check on inputs
+if (( $# < 1 )) || (( $# > 2 )); then
+  echo -e "Incorrect no. of arguments supplied.\n"
+  __help && exit 111
+elif [[ "$*" =~ -h ]]; then
+  __help
+  exit 0
+fi
+
+##======================================================================================================================
+## If only 1 argument is provided and a revision or changelist is not provided, then we can only run a regular diff
+if (( $# == 1)) && [[ ! "$1" =~ "#" ]] && [[ ! "$1" =~ "@" ]]; then
+  echo p4 diff "$@"
+  p4 diff "$@"
+  exit 0
+fi
+
+##======================================================================================================================
+## The rest of the code requires either P4DIFF or P4DIFF2 to be set.
+## If neither is set, assume that the user wants to run p4's regular diff2 command
 _cmd=${P4DIFF2:-${P4DIFF}}
+if [[ -z "${_cmd}" ]]; then
+  echo p4 diff2 "$@"
+  p4 diff2 "$@"
+  exit 0
+fi
+
+##======================================================================================================================
+__cl_to_rev() {
+  ## Convert changelist to a file revision
+  ## * __cl_to_rev ch/verif/l3/arch_l3/arch_lci/arch_lci.h@123456
+  ##   returns: ch/verif/l3/arch_l3/arch_lci/arch_lci.h#42
+
+  (( $# != 1 )) && die "Incorrect number of arguments supplied (Line $LINENO, ${FUNCNAME[0]})"
+  [[ ! "$1" =~ @[[:digit:]]+ ]] && die "'$1' does not have a valid changelist specifier (Line $LINENO, ${FUNCNAME[0]})"
+
+  local _in=$1
+  local _fname=${_in%%@*}
+  local _targ_cl=${_in##*@}
+
+  while read -r line; do
+    local _cl=$(awk '{print $4}' <<< "$line");
+    if (( $_cl <= $_targ_cl )); then
+      local _rev=$(awk '{print $2}' <<< "$line");
+      _out="$_fname$_rev"
+      return;
+    fi;
+  done < <(p4 filelog -sL $_in | grep '^\.\.\. #')
+
+  die "Unable to convert changelist to a revision for '$_in' (Line $LINENO, ${FUNCNAME[0]})"
+}
+
+##======================================================================================================================
+__sane_rev() {
+  ## Convert negative file revisions to positive ones
+  ## Assuming #42 is the head revision for ch/verif/l3/arch_l3/arch_lci/arch_lci.h
+  ## * __sane_rev ch/verif/l3/arch_l3/arch_lci/arch_lci.h#-1
+  ##   returns: ch/verif/l3/arch_l3/arch_lci/arch_lci.h#42
+  ## * __sane_rev ch/verif/l3/arch_l3/arch_lci/arch_lci.h#-3
+  ##   returns: ch/verif/l3/arch_l3/arch_lci/arch_lci.h#40
+
+  (( $# != 1 )) && die "Incorrect number of arguments supplied (Line $LINENO, ${FUNCNAME[0]})"
+  [[ ! "$1" =~ "#" ]] && die "'$1' does not have a valid file revision (Line $LINENO, ${FUNCNAME[0]})"
+
+  local _in="$1"
+  local _fname=${_in%%#*}
+  local _rev=${_in##*#}
+  local _headrev=$(p4 fstat $_fname | grep -Po '(?<=headRev )\d+')
+
+  echo "DEBUG: Input=$_in, Filename=$_fname, Rev=$_rev, HeadRev=$_headrev" >> /tmp/debug.out
+
+  if [[ "$_in" =~ \#[[:digit:]]+ ]]; then
+    # file was specified with a positive revision => check that rev is valid and return as is
+    if (( $_rev == 0 )); then
+      die "File revision should be non-zero in '$_in' (Line $LINENO, ${FUNCNAME[0]})"
+    elif (( $_rev > $_headrev )); then
+      die "File revision is invalid in '$_in'. It should be less than the Head revision=$_headrev (Line $LINENO, ${FUNCNAME[0]})"
+    fi
+
+    _out="$_in"
+    return;
+  elif [[ "$_in" =~ "#-" ]]; then
+    local _final_rev=$(( $_headrev + $_rev + 1 ))
+    _out="$_fname#$_final_rev"
+    return
+  fi
+
+  die "Unable to determine revision specifier for '$_in' (Line $LINENO, ${FUNCNAME[0]})"
+}
+
+##======================================================================================================================
+## If only 1 argument was given then we're comparing the current state of the file with the argument provided
+## Let file2 be the current file
+_file1=$1
+if (( $# == 1 )); then
+  _file2=${_file1%%[@#]*}
+else
+  _file2=$2
+fi
+
+##======================================================================================================================
+## Here, I try to figure out which rev of the files to use. This script accepts inputs in the form of changelists,
+## relative revisions (negative) so I've to convert them to positive values that perforce understands.
+if [[ "$_file1" =~ "@" ]]; then
+  __cl_to_rev $_file1
+  _file1=$_out
+fi
+if [[ "$_file1" =~ "#" ]]; then
+  __sane_rev $_file1
+  _file1=$_out
+fi
+
+if [[ "$_file2" =~ "@" ]]; then
+  __cl_to_rev $_file2
+  _file2=$_out
+fi
+if [[ "$_file2" =~ "#" ]]; then
+  __sane_rev $_file2
+  _file2=$_out
+fi
+
+##======================================================================================================================
+if [[ -z "$_file1" ]] || [[ -z "$_file2" ]]; then
+  die "Unable to determine the two files to compare (Line $LINENO)"
+fi
+# echo "DEBUG: file1=$_file1, file2=$_file2" >> /tmp/debug.out
 
 # If the file refers to a revision on the depot then we can use process substitution since we wouldn't want to edit it.
 # However, if the file is local to the workarea then using process substitution will prevent us from editing it.
 # Thus, I check if the file belongs to the local workarea or the depot and use process substitution accordingly.
-
-if (( $# == 1)) && [[ ! "$1" =~ "#" ]]; then
-  # Since revision is not mentioned and only 1 filename is specified, execute normal p4diff
-  p4 diff "$@"
-  exit 0
-elif [[ -n "${_cmd}" ]]; then
-  _file1="$1"
-  if [[ "$_file1" =~ "#" ]]; then
-    _ifile=${_file1%%#*}
-    _rev=${_file1##*#}
-    if [[ $_rev == -* ]]; then
-      echo $_ifile
-      _rev=$(( $(command p4 fstat $_ifile | command grep -Po '(?<=headRev )\d+') + $_rev ))
-    fi
-
-    _file1="/tmp/$$_1"
-    p4 print -q "$_ifile#$_rev" >| "$_file1"
-  fi
-
-  _file2="$2"
-  if (( $# == 1 )); then
-    _file2=${1%%#*}
-  elif [[ "$_file2" =~ "#" ]]; then
-    _ifile=${_file2%%#*}
-    _rev=${_file2##*#}
-    if [[ $_rev == -* ]]; then
-      _rev=$(( $(command p4 fstat $_ifile | command grep -Po '(?<=headRev )\d+') + $_rev ))
-    fi
-
-    _file2="/tmp/$$_2"
-    p4 print -q "$_ifile#$_rev" >| "$_file2"
-  fi
-
-  echo $_cmd "$_file1" "$_file2"
-  $_cmd "$_file1" "$_file2"
-else
-  echo p4 diff2 "$@"
-  p4 diff2 "$@"
+if [[ "$_file1" =~ "#" ]]; then
+  _fname=$(basename $_file1)
+  p4 print -q "$_file1" >| "/tmp/$_fname"
+  _file1="/tmp/$_fname"
 fi
+
+if [[ "$_file2" =~ "#" ]]; then
+  _fname=$(basename $_file2)
+  p4 print -q "$_file2" >| "/tmp/$_fname"
+  _file2="/tmp/$_fname"
+fi
+
+echo $_cmd "$_file1" "$_file2"
+$_cmd "$_file1" "$_file2"

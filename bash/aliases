@@ -90,7 +90,23 @@ fi
 #
 alias md='mkdir -p'
 #alias cd..='..'
-alias dirs='dirs -v'
+dirs() {
+  if [[ "$*" =~ [-+][0-9]+ ]]; then
+    # NOTE: The use of $* is deliberate here as it produces all the scripts arguments separated by the first character
+    # of $IFS which, by default, is a space. This allows me to match all arguments against a regex in one go instead of
+    # looping over them
+
+    # Use long-listing format. Without this, the home directory is display as '~' preventing me from doing something
+    # like `cp $(dirs +1)` as it results in an error: pushd: ~/.vim: No such file or directory
+    builtin dirs "$@" -l
+  elif (( $# == 0 )); then
+    # Display index along with the path. This allows me to use pushd and popd more easily
+    builtin dirs -v
+  else
+    builtin dirs "$@"
+  fi
+}
+
 #if [[ $MYSHELL =~ "bash" ]]; then
 #  alias ..='cd ..'
 #  alias ...='cd ../..'

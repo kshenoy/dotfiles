@@ -1477,6 +1477,11 @@ Creating new parents - To create new heading, add =/HeadingName= to the end when
   (setq org-outline-path-complete-in-steps nil)
 #+END_SRC
 
+Store the timestamp when an entry is refiled
+#+BEGIN_SRC emacs-lisp
+  (setq org-log-refile 'time)
+#+END_SRC
+
 ***** TODO Set org-refile targets based on current file
 Why would I want to refile something work-related under Softwares etc.
 A way to do it is by writing a function that sets /org-refile-targets/ in a let binding making it local.
