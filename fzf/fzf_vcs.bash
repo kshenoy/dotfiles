@@ -168,15 +168,16 @@ fzf-vcs-status() {                                                              
   # in this manner
 
   if is_in_git_repo; then
-    __fzf-select-post-process() { cat /dev/stdin | awk '{print $NF}'; }
+    __fzf-select-post-process() { awk '{print $NF}' <<< "$*"; }
 
     FZF_CTRL_T_COMMAND='git -c color.status=always status --short' fzf-file-widget -m --nth 2..,.. "$@"
   elif is_in_perforce_repo; then
-    __fzf-select-post-process() { cat /dev/stdin | awk '{print $1}' | __fzf-p4-strip-common-ancestors; }
+    __fzf-select-post-process() { __fzf-p4-strip-common-ancestors $(awk '{print $1}' <<< "$*"); }
 
-    FZF_CTRL_T_COMMAND='p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" | column -s# -o "    #" -t | column -s- -o- -t' \
+    # FZF_CTRL_T_COMMAND='p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" | column -s# -o "    #" -t | column -s- -o- -t' \
+    FZF_CTRL_T_COMMAND='p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" -e "s/#.*//"' \
     fzf-file-widget --nth 1 "$@"
   fi
 
-  __fzf-select-post-process() { cat; }
+  __fzf-select-post-process() { echo $@; }
 }

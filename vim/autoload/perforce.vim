@@ -357,3 +357,23 @@ function! perforce#DiffCurrentFile()                                            
   " Restore settings
   let &l:autoread=l:autoread
 endfunction
+
+
+function! perforce#Blame()                                                                                         "{{{1
+  " FIXME: Work-in-progress
+
+  if ($STEM == "")
+    echoe "$STEM is not set"
+    return
+  endif
+
+  let l:filename=expand('%:p')
+  let l:filetype=&filetype
+
+  redir! > /tmp/p4pr
+  silent execute "!p4pr " . l:filename
+  redir END
+
+  tabnew /tmp/p4pr
+  execute "set filetype=" . l:filetype
+endfunction

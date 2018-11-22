@@ -151,18 +151,18 @@ else
   # bind -x '"\C-t\C-g\C-e": "__fzf_expt__"'
 
   # Version-control
-  bind -x '"\C-t\C-p\C-e": "fzf-vcs-files"'
-  bind -x '"\C-t\C-p\C-f": "fzf-vcs-all-files"'
-  bind -x '"\C-t\C-p\C-s": "fzf-vcs-status"'
-  bind '"\C-t\C-p\C-g": " \C-e\C-u`fzf-vcs-cd`\e\C-e\er\C-m"'
-  bind '"\C-t\C-p\C-w": " \C-e\C-u`__fzf_p4_walist__`\e\C-e\er\C-m"'
+  bind -x '"\C-t\C-v\C-e": "fzf-vcs-files"'
+  bind -x '"\C-t\C-v\C-f": "fzf-vcs-all-files"'
+  bind -x '"\C-t\C-v\C-s": "fzf-vcs-status"'
+  bind '"\C-t\C-v\C-g": " \C-e\C-u`fzf-vcs-cd`\e\C-e\er\C-m"'
+  bind '"\C-t\C-v\C-w": " \C-e\C-u`__fzf_p4_walist__`\e\C-e\er\C-m"'
 
   bind '"\er": redraw-current-line'
-  bind '"\C-t\C-p\C-d": "$(fzf-git-diffs)\e\C-e\er"'
-  bind '"\C-t\C-p\C-b": "$(fzf-git-branches)\e\C-e\er"'
-  bind '"\C-t\C-p\C-t": "$(fzf-git-tags)\e\C-e\er"'
-  bind '"\C-t\C-p\C-h": "$(fzf-git-hashes)\e\C-e\er"'
-  bind '"\C-t\C-p\C-r": "$(fzf-git-remotes)\e\C-e\er"'
+  bind '"\C-t\C-v\C-d": "$(fzf-git-diffs)\e\C-e\er"'
+  bind '"\C-t\C-v\C-b": "$(fzf-git-branches)\e\C-e\er"'
+  bind '"\C-t\C-v\C-t": "$(fzf-git-tags)\e\C-e\er"'
+  bind '"\C-t\C-v\C-h": "$(fzf-git-hashes)\e\C-e\er"'
+  bind '"\C-t\C-v\C-r": "$(fzf-git-remotes)\e\C-e\er"'
 
   # Alt+/: From http://brettterpstra.com/2015/07/09/shell-tricks-inputrc-binding-fun/
   bind '"\C-t\e/": "$(!!|FZF_DEFAULT_OPTS=\"--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS\" fzf -m)\C-a \C-m"'

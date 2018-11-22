@@ -192,9 +192,6 @@ complete -f -o default -X '!*.gif'  kview
 #complete -f -o default -X '!*.+(mp3|MP3)' mpg123 mpg321
 #complete -f -o default -X '!*.+(ogg|OGG)' ogg123
 
-# Default LS_COLORS (Disabled as I use dir_colors)
-#export CLICOLOR=1
-
 
 #=======================================================================================================================
 # ENVIRONMENT VARIABLES                                                                                             {{{1
@@ -223,7 +220,7 @@ VISUAL=gvim
 #LESS="-icuf -P?f%f:stdin. [%T] (?pB%pB\%:byte %bB.)"
 
 #GREP_OPTIONS="--color=auto"
-GREP_COLOR=32
+export GREP_COLORS='1;32'
 
 LANG=en_US.UTF-8
 

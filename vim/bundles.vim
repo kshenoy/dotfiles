@@ -330,8 +330,8 @@ call plug#('inkarkat/vim-mark')
 
 " mucomplete ------------------------------------------------------------------------------------------------------ {{{1
 let g:mucomplete#chains = {
-  \ 'default': ['path', 'omni', 'keyn', 'dict', 'c-n', 'user', 'ulti'],
-  \ 'cpp': ['tags', 'omni', 'keyn', 'ulti'],
+  \ 'default': ['path', 'omni', 'keyn', 'dict', 'c-n', 'user'],
+  \ 'cpp': ['tags', 'omni', 'keyn'],
   \ 'vim': ['path', 'cmd', 'keyn']
   \ }
 let g:mucomplete#enable_auto_at_startup = 0
@@ -568,7 +568,10 @@ let g:UltiSnipsEditSplit = "vertical"
 " Location of snippets
 execute 'let g:UltiSnipsSnippetDirectories=["' . g:dotvim . '/pack/settings/start/UltiSnips/snippets"]'
 let g:UltiSnipsEnableSnipMate=0
-let g:UltiSnipsExpandTrigger='<S-Tab>'
+let g:UltiSnipsExpandTrigger='<C-Space><Tab>'
+let g:UltiSnipsListSnippets='<C-Space><C-Tab>'
+let g:UltiSnipsJumpForwardTrigger='<C-Space><C-J>'
+let g:UltiSnipsJumpBackwardTrigger='<C-Space><C-K>'
 
 call plug#('SirVer/ultisnips', s:PlugCond(has('python')||has('python3')))
 
