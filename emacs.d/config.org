@@ -222,8 +222,7 @@ From [[http://pragmaticemacs.com/emacs/visualise-and-copy-differences-between-fi
 
 ** Emacs server
 - Always start the emacs-server, except when run in daemon mode
-- Already Disable prompt asking you if you want to kill a buffer with a live process attached to it.
-  http://stackoverflow.com/questions/268088/how-to-remove-the-prompt-for-killing-emacsclient-buffers
+- Disable prompt asking you if you want to kill a buffer with a live process attached to it. [[https://stackoverflow.com/a/268205][StackOverflow]]
 
 #+BEGIN_SRC emacs-lisp
   (use-package server
