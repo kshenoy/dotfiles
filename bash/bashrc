@@ -263,15 +263,10 @@ for i in \
 ; do
   if [[ -f ${i} ]]; then
     echo "  Sourcing ${i} ..."
-    . ${i}
+    source ${i}
     # echo "  ... done"
   fi
 done
-
-# thefuck: https://github.com/nvbn/thefuck
-# if [[ -x $(command which thefuck 2> /dev/null) ]]; then
-#   eval $(thefuck --alias fk)
-# fi
 # }}}1
 
 # Base16 Color scheme for terminal

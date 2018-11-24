@@ -43,19 +43,13 @@ Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/
 * General
 ** Keybindings
 #+BEGIN_SRC emacs-lisp
-  (bind-keys* :prefix-map my-leader-map
-              :prefix-docstring "Top-level map"
-              :prefix "C-c")
-
-  (bind-keys  :map my-leader-map
-              :prefix-map my-jumper-command-map
+  (bind-keys* :prefix-map my-jumper-command-map
               :prefix-docstring "This map is used to put all keybindings that I use to jump around eg. open files, buffers etc."
-              :prefix "j")
+              :prefix "C-c f")
 
-  (bind-keys  :map my-leader-map
-              :prefix-map my-s-bindings-map
+  (bind-keys* :prefix-map my-s-bindings-map
               :prefix-docstring "This map is used to group together all s-mnemonic bindings such as substitution, sizing etc."
-              :prefix "s")
+              :prefix "C-c s")
 #+END_SRC
 
 I think the following would be handy
@@ -65,25 +59,17 @@ I think the following would be handy
 Original use of =C-c [= and =C-c ]= is to manipulate =org-agenda-files=. Since I don't use either of these, might as well put them to better use.
 
 #+BEGIN_SRC emacs-lisp
-  (bind-keys  :map my-leader-map
-              :prefix-map my-unimpaired-enable-map
+  (bind-keys* :prefix-map my-settings-enable-map
               :prefix-docstring "This map is used to enable settings ala vim-unimpaired"
-              :prefix "[")
+              :prefix "C-c [")
 
-  (bind-keys  :map my-leader-map
-              :prefix-map my-unimpaired-disable-map
+  (bind-keys* :prefix-map my-settings-disable-map
               :prefix-docstring "This map is used to disable settings ala vim-unimpaired"
-              :prefix "]")
+              :prefix "C-c ]")
 
-  (bind-keys  :map my-leader-map
-              :prefix-map my-unimpaired-toggle-map
+  (bind-keys* :prefix-map my-settings-toggle-map
               :prefix-docstring "This map is used to toggle settings"
-              :prefix "t")
-
-  (bind-keys* :map ctl-x-map
-              :prefix-map my-global-toggle-map
-              :prefix-docstring "Global map containing all toggle settings"
-              :prefix "t")
+              :prefix "C-c t")
 #+END_SRC
 
 To delete existing bindings, use =(unbind-key ...)=
@@ -589,10 +575,9 @@ Other examples:
 ** completion
 Create a keybinding map specifically for auto-completion
 #+BEGIN_SRC emacs-lisp
-  (bind-keys :map my-leader-map
-             :prefix-map my-auto-completion-map
-             :prefix-docstring "This map is used to put all auto-completion related keybindings"
-             :prefix "c")
+  (bind-keys* :prefix-map my-auto-completion-map
+              :prefix-docstring "This map is used to put all auto-completion related keybindings"
+              :prefix "C-c c")
 #+END_SRC
 
 *** company
@@ -1026,7 +1011,7 @@ As a result, by default I have to choose one or the other; I can't have both. Th
 
   (bind-keys :map my-jumper-command-map
              ("b" . ivy-switch-buffer)
-             ("j" . my/ivy-switch-virtual-buffer))
+             ("f" . my/ivy-switch-virtual-buffer))
 #+END_SRC
 
 *** /fin/
@@ -1660,10 +1645,9 @@ saving it to a variable and printing it out later in the capture template.
 :END:
 Custom keymap for org-mode bindings.
 #+BEGIN_SRC emacs-lisp
-  (bind-keys :map my-leader-map
-             :prefix-map my-org-bindings-map
+  (bind-keys :prefix-map my-org-bindings-map
              :prefix-docstring "This map is used to group together all org-mode settings"
-             :prefix "o"
+             :prefix "C-c o"
              ("a" . org-agenda)
              ("c" . counsel-org-capture))
   ;; :bind (("c" . calendar))
@@ -1671,10 +1655,9 @@ Custom keymap for org-mode bindings.
 
 <<Custom timestamp keymap>>. Also see [[id:d4634d95-be37-4bdf-987e-22da5778e958][Using ! to toggle timestamp type]]
 #+BEGIN_SRC emacs-lisp
-  (bind-keys :map my-leader-map
-             :prefix-map my-org-timestamp-bindings-map
+  (bind-keys :prefix-map my-org-timestamp-bindings-map
              :prefix-docstring "This map is used to group together all timestamp related bindings"
-             :prefix "."
+             :prefix "C-c ."
              ("." . my-org-time-stamp)
              ("!" . org-time-stamp-inactive)
              ("<" . org-date-from-calendar)
@@ -1961,9 +1944,9 @@ This lets us visually walk through the changes we've made, undo back to a certai
 Default binding is =C-x u=
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
-    :bind (:map my-unimpaired-enable-map
+    :bind (:map my-settings-enable-map
                 ("U" . undo-tree-visualize)
-           :map my-unimpaired-disable-map
+           :map my-settings-disable-map
                 ("U" . undo-tree-visualizer-quit))
     :config
     (setq undo-tree-visualizer-timestamps t)

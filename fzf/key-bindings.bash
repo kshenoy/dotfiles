@@ -125,45 +125,46 @@ __fzf_cmd_opts__() {                                                            
 #      -S : Display readline key sequences bound to macros and the strings they output
 #
 # Unbind the default key used by FZF
-bind '"\C-t": nop'
+bind '"\C-f": nop'
 bind '"\ec":  nop'
 
 if [[ -o vi ]]; then
   if (( $BASH_VERSINFO > 3 )); then
-    bind -x '"\C-t\C-t": "fzf-file-widget"'
+    bind -x '"\C-f\C-f": "fzf-file-widget"'
   fi
 else
   if (( $BASH_VERSINFO > 3 )); then
-    # bind -x '"\C-t\C-t": "fzf-file-widget"'
-    bind -x '"\C-t\C-t": "fzf-vcs-all-files"'
+    # bind -x '"\C-f\C-f": "fzf-file-widget"'
+    bind -x '"\C-f\C-f": "fzf-vcs-all-files"'
   fi
 
   # cd into the selected directory
-  bind '"\C-t\C-d": " \C-e\C-u`__fzf_cd__`\e\C-e\er\C-m"'
+  bind '"\C-f\C-d": " \C-e\C-u`__fzf_cd__`\e\C-e\er\C-m"'
 
-  bind -x '"\C-t\C-e": "fzf-recent-dirs"'
-  bind -x '"\C-t\C-l": "fzf-lsf-bjobs"'
+  bind -x '"\C-f\C-e": "fzf-recent-dirs"'
+  bind -x '"\C-f\C-l": "fzf-lsf-bjobs"'
 
   # Ctrl+O: Show list of options of the command before the cursor using '<cmd> -h'
-  bind -x '"\C-t\C-o": "__fzf_cmd_opts__"'
+  bind -x '"\C-f\C-o": "__fzf_cmd_opts__"'
 
   # Ctrl+G Ctrl+E: Experimental
-  # bind -x '"\C-t\C-g\C-e": "__fzf_expt__"'
+  # bind -x '"\C-f\C-g\C-e": "__fzf_expt__"'
 
   # Version-control
-  bind -x '"\C-t\C-v\C-e": "fzf-vcs-files"'
-  bind -x '"\C-t\C-v\C-f": "fzf-vcs-all-files"'
-  bind -x '"\C-t\C-v\C-s": "fzf-vcs-status"'
-  bind '"\C-t\C-v\C-g": " \C-e\C-u`fzf-vcs-cd`\e\C-e\er\C-m"'
-  bind '"\C-t\C-v\C-w": " \C-e\C-u`__fzf_p4_walist__`\e\C-e\er\C-m"'
+  bind -x '"\C-f\C-v\C-e": "fzf-vcs-files"'
+  bind -x '"\C-f\C-v\C-f": "fzf-vcs-all-files"'
+  bind -x '"\C-f\C-v\C-s": "fzf-vcs-status"'
+  bind '"\C-f\C-v\C-g": " \C-e\C-u`fzf-vcs-cd`\e\C-e\er\C-m"'
+  bind '"\C-f\C-v\C-w": " \C-e\C-u`__fzf_p4_walist__`\e\C-e\er\C-m"'
 
   bind '"\er": redraw-current-line'
-  bind '"\C-t\C-v\C-d": "$(fzf-git-diffs)\e\C-e\er"'
-  bind '"\C-t\C-v\C-b": "$(fzf-git-branches)\e\C-e\er"'
-  bind '"\C-t\C-v\C-t": "$(fzf-git-tags)\e\C-e\er"'
-  bind '"\C-t\C-v\C-h": "$(fzf-git-hashes)\e\C-e\er"'
-  bind '"\C-t\C-v\C-r": "$(fzf-git-remotes)\e\C-e\er"'
+  bind '"\C-f\C-v\C-d": "$(fzf-git-diffs)\e\C-e\er"'
+  bind '"\C-f\C-v\C-b": "$(fzf-git-branches)\e\C-e\er"'
+  bind '"\C-f\C-v\C-t": "$(fzf-git-tags)\e\C-e\er"'
+  bind '"\C-f\C-v\C-h": "$(fzf-git-hashes)\e\C-e\er"'
+  bind '"\C-f\C-v\C-r": "$(fzf-git-remotes)\e\C-e\er"'
 
-  # Alt+/: From http://brettterpstra.com/2015/07/09/shell-tricks-inputrc-binding-fun/
-  bind '"\C-t\e/": "$(!!|FZF_DEFAULT_OPTS=\"--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS\" fzf -m)\C-a \C-m"'
+  # Alt+/: Repeat last command and pipe result to FZF
+  # From http://brettterpstra.com/2015/07/09/shell-tricks-inputrc-binding-fun/
+  bind '"\C-f\e/": "!!|FZF_DEFAULT_OPTS=\"--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS\" fzf -m\C-m\C-m"'
 fi
