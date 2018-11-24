@@ -124,33 +124,48 @@ __fzf_cmd_opts__() {                                                            
 # bind -X : List all key sequences bound to shell commands (using -x)
 #      -S : Display readline key sequences bound to macros and the strings they output
 #
-# Unbind the default key used by FZF
-bind '"\C-f": nop'
-bind '"\ec":  nop'
+# Unbind C-t as it clobbers with tmux's prefix
+bind '"\C-t": nop'
 
-if [[ -o vi ]]; then
+if [[ -o vi ]]; then                                                                                                #{{{
+  # CTRL-F - Paste the selected file path into the command line (changed from default CTRL-T)
+  # - FIXME: Selected items are attached to the end regardless of cursor position
   if (( $BASH_VERSINFO > 3 )); then
     bind -x '"\C-f\C-f": "fzf-file-widget"'
+  elif __fzf_use_tmux__; then
+    bind '"\C-f\C-f": "\C-x\C-a$a \C-x\C-addi`__fzf_select_tmux__`\C-x\C-e\C-x\C-a0P$xa"'
+  else
+    bind '"\C-f\C-f": "\C-x\C-a$a \C-x\C-addi`__fzf_select__`\C-x\C-e\C-x\C-a0Px$a \C-x\C-r\C-x\C-axa "'
   fi
-else
+  bind -m vi-command '"\C-f\C-f": "i\C-f\C-f"'
+fi # }}}
+
+if [[ -o emacs ]]; then                                                                                             #{{{
+  # CTRL-F - Paste the selected file path into the command line (changed from default CTRL-T)
   if (( $BASH_VERSINFO > 3 )); then
     # bind -x '"\C-f\C-f": "fzf-file-widget"'
     bind -x '"\C-f\C-f": "fzf-vcs-all-files"'
+  elif __fzf_use_tmux__; then
+    bind '"\C-f\C-f": " \C-u \C-a\C-k`__fzf_select_tmux__`\e\C-e\C-y\C-a\C-d\C-y\ey\C-h"'
+  else
+    bind '"\C-f\C-f": " \C-u \C-a\C-k`__fzf_select__`\e\C-e\C-y\C-a\C-y\ey\C-h\C-e\er \C-h"'
   fi
 
-  # cd into the selected directory
-  bind '"\C-f\C-d": " \C-e\C-u`__fzf_cd__`\e\C-e\er\C-m"'
+  # cd into the selected directory. C-g to match VCS' binding C-v C-g. C-d because it operates on output of dirs command
+  # Unbind the default one first and then create new bindings
+  bind '"\ec": nop'
+  bind '"\C-f\C-g": " \C-e\C-u`__fzf_cd__`\e\C-e\er\C-m"'
+  bind -x '"\C-f\C-d": "fzf-recent-dirs"'
 
-  bind -x '"\C-f\C-e": "fzf-recent-dirs"'
   bind -x '"\C-f\C-l": "fzf-lsf-bjobs"'
 
-  # Ctrl+O: Show list of options of the command before the cursor using '<cmd> -h'
+  # CTRL-O: Show list of options of the command before the cursor using '<cmd> -h'
   bind -x '"\C-f\C-o": "__fzf_cmd_opts__"'
 
-  # Ctrl+G Ctrl+E: Experimental
+  # CTRL-G CTRL-E: Experimental
   # bind -x '"\C-f\C-g\C-e": "__fzf_expt__"'
 
-  # Version-control
+  # Version-control related bindings: CTRL-F CTRL-V
   bind -x '"\C-f\C-v\C-e": "fzf-vcs-files"'
   bind -x '"\C-f\C-v\C-f": "fzf-vcs-all-files"'
   bind -x '"\C-f\C-v\C-s": "fzf-vcs-status"'
@@ -164,7 +179,7 @@ else
   bind '"\C-f\C-v\C-h": "$(fzf-git-hashes)\e\C-e\er"'
   bind '"\C-f\C-v\C-r": "$(fzf-git-remotes)\e\C-e\er"'
 
-  # Alt+/: Repeat last command and pipe result to FZF
+  # Alt-/: Repeat last command and pipe result to FZF
   # From http://brettterpstra.com/2015/07/09/shell-tricks-inputrc-binding-fun/
   bind '"\C-f\e/": "!!|FZF_DEFAULT_OPTS=\"--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS\" fzf -m\C-m\C-m"'
-fi
+fi #}}}
