@@ -124,7 +124,7 @@ __fzf_cmd_opts__() {                                                            
 # bind -X : List all key sequences bound to shell commands (using -x)
 #      -S : Display readline key sequences bound to macros and the strings they output
 #
-# Unbind C-t as it clobbers with tmux's prefix
+# Unbind C-t as I want to sue C-f instead
 bind '"\C-t": nop'
 
 if [[ -o vi ]]; then                                                                                                #{{{
