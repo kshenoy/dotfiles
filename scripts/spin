@@ -28,10 +28,10 @@
 =head1 OPTIONS
 
  Mandatory arguments, exactly one must be specified:
- -p, --predicate=PRED  Spin till the PRED succeeds
- -m, --model=MODEL     Spin till the specified model was built successfully
- -j, --job=PATTERN     If PATTERN is a number, spin till the JobId=PATTERN completes.
-                       If PATTERN is alphanumeric, spin till all jobs submitted by user=PATTERN complete.
+ -p, --predicate=PRED  Spin until the PRED succeeds
+ -m, --model=MODEL     Spin until the specified model was built successfully
+ -j, --job=PATTERN     If PATTERN is a number, spin until the JobId=PATTERN completes.
+                       If PATTERN is alphanumeric, spin until all jobs submitted by user=PATTERN complete.
                        By default, the check is performed once every 5mins to prevent loading the lsf_server
 
  Optional Arguments:
@@ -42,7 +42,7 @@
  -i, --interval=I      Wait I seconds before checking again. [Default=60s]
      --man             Show the manpage
  -n, --num-tries=N     Try N times before giving up. [Default=infinite].
-     --while           Spin while the input predicate is true. Runs the provided command when the predicate fails
+     --while           Spin while the input predicate is true.
      --verbose         Verbose mode. Print values of all arguments
 
 =head1 EXAMPLES
@@ -91,11 +91,16 @@ $Data::Dumper::Sortkeys = 1;
 sub Alert;
 
 
+## Check if bootenv has been done
+die 'ERROR: $STEM is not set\n' unless defined($ENV{'STEM'});
+
+
 ## Option Handling =====================================================================================================
 my %opts = (                                                                                                      # {{{1
   'alert'         => 1,
   'alert_msg_set' => 0,
   'alert_msg'     => "\'Okidoki, job done!\'",
+  'end_stat'      => 0,
   'interval'      => 60,
   'interval_set'  => 0,
   'num_tries'     => -1,
@@ -132,7 +137,7 @@ GetOptions(                                                                     
   'model|m=s'       => sub { pod2usage(
                                -message => "ERROR: Multiple uses of predicate detected."
                                -verbose => 0, -exitval => 1) if $opts{predicate_set};
-                             $opts{'predicate'}    .= '[[ -f $STEM/build/' . $_[1] . '/BUILD_SUCCEEDED ]]';
+                             $opts{'predicate'}    .= "[[ -f $ENV{'STEM'}/build/" . $_[1] . '/BUILD_SUCCEEDED ]]';
                              $opts{'predicate_set'} = 1;
                              $opts{'interval'}      = 60 if (!$opts{'interval_set'});
                              $opts{'alert_msg'}     = "Model $_[1] was built successfully" if (!$opts{'alert_msg_set'});
@@ -146,7 +151,7 @@ GetOptions(                                                                     
                              $opts{'predicate'}    .= $_[1];
                              $opts{'predicate_set'} = 1;
                        },
-  'while'           => sub { $opts{'predicate'} = "! " .  $opts{'predicate'}; },
+  'while'           => sub { $opts{'end_stat'} = 1; },
   'help|h|?'        => sub { pod2usage( -verbose => 99, -exitval => 0,
                                         -sections => [ qw(DESCRIPTION SYNOPSIS OPTIONS EXAMPLES) ] ); },
   'man'             => sub { pod2usage( -verbose => 2,  -exitval => 0 ); },
@@ -167,10 +172,13 @@ my $n=0;
 do {
   sleep $opts{'interval'} if ($opts{'wait_first'});
 
-  if (  (system($opts{'predicate'}) == 0)
-     && $opts{'alert'}
-     ) {
-    Alert(0);
+  my $stat = system($opts{'predicate'});
+  if (($opts{'end_stat'} == 0) && ($stat == 0)) {
+    Alert(0) if $opts{'alert'};
+    exit 0;
+  } elsif (($opts{'end_stat'} != 0) && ($stat != 0)) {
+    Alert($stat) if $opts{'alert'};
+    exit 0;
   }
 
   sleep $opts{'interval'} unless ($opts{'wait_first'});
@@ -179,7 +187,8 @@ do {
 
 pod2usage(-verbose => 0, -exitval => 1, -message => "ERROR: Hit limit on number of tries");
 $opts{'alert_msg'} = "Hit limit on number of tries";
-Alert(1);
+Alert(1) if $opts{'alert'};
+exit 1;
 
 
 sub Alert {
@@ -191,5 +200,4 @@ sub Alert {
 
   # print "$cmd\n";
   system($cmd);
-  exit $status;
 }

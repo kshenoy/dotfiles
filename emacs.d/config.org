@@ -335,7 +335,7 @@ Mouse-wheel acts on the hovered window rather than the one where the typing focu
 ** Prettify
 *** Highlight current line
 #+BEGIN_SRC emacs-lisp
-  (bind-key "c" 'global-hl-line-mode my-global-toggle-map)
+  (bind-key "c" 'global-hl-line-mode my-settings-toggle-map)
 #+END_SRC
 
 *** Show matching parens
@@ -404,7 +404,7 @@ Since these are buffer-local variables, I have to use =setq-default=
     (interactive)  ; Allows to be called as a command via M-x
     (setq-default show-trailing-whitespace (not show-trailing-whitespace)))
 
-  (bind-key "SPC" 'my/toggle-trailing-whitespace my-global-toggle-map)
+  (bind-key "SPC" 'my/toggle-trailing-whitespace my-settings-toggle-map)
 #+END_SRC
 
 Enable it only in some modes
@@ -426,7 +426,7 @@ Use =C-c s SPC= to delete trailing whitespace manually
 
 *** Toggle wrap
 #+BEGIN_SRC emacs-lisp
-  (bind-key "w" 'toggle-truncate-lines my-global-toggle-map)
+  (bind-key "w" 'toggle-truncate-lines my-settings-toggle-map)
 #+END_SRC
 
 ** Terminal
@@ -934,7 +934,7 @@ Code-folding. From https://github.com/mwfogleman/.emacs.d/blob/master/michael.or
 #+BEGIN_SRC emacs-lisp
   (use-package hideshow
     :hook ((prog-mode . hs-minor-mode))
-    :bind (:map my-global-toggle-map
+    :bind (:map my-settings-toggle-map
                 ("f" . my-toggle-fold))
     :config
     (defun my-toggle-fold ()
@@ -1926,7 +1926,7 @@ Use brighter colors
     (set-face-attribute 'rainbow-delimiters-depth-7-face nil :foreground "spring green")
     (set-face-attribute 'rainbow-delimiters-depth-8-face nil :foreground "sienna1")
 
-    :bind (:map my-global-toggle-map
+    :bind (:map my-settings-toggle-map
                 ("r" . rainbow-delimiters-mode)))
 #+END_SRC
 

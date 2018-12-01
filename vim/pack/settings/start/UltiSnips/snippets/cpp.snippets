@@ -206,6 +206,10 @@ snippet erm ".erase(std::remove(...))"
 ${1:${VISUAL:container}}.erase(std::remove(std::begin($1), std::end($1), ${2:value}), std::end($1));
 endsnippet
 
+snippet ermi ".erase(std::remove_if(...))"
+${1:${VISUAL:container}}.erase(std::remove_if(std::begin($1), std::end($1), []($0)), std::end($1));
+endsnippet
+
 snippet rmi "std::remove_if"
 auto pos = std::remove_if(std::begin(${1:container}), std::end($1), []($2) {
   $3
@@ -285,14 +289,14 @@ if (searchIt != std::end($1)) {
 }
 endsnippet
 
+snippet cnn "Contains element using std::find"
+std::find(std::begin(${1:${VISUAL:container}}), std::end($1), ${2:<value>}) ${3:=}= std::end($1)$0
+endsnippet
+
 
 # Modifying sequence operations ------------------------------------------------------------------------------------{{{2
 snippet cpy "std::copy"
 std::copy(std::begin(${1:${VISUAL:src}}), std::end($1), std::back_inserter(${2:dest}));
-endsnippet
-
-snippet cpj "std::copy into std::make_ostream_joiner"
-std::copy(std::begin(${1:${VISUAL:src}}), std::end($1), std::experimental::make_ostream_joiner(${2:oss}, ','));
 endsnippet
 
 snippet cpi "std::copy_if"
@@ -327,6 +331,10 @@ std::ostringstream ${1:oss};
 oss << ${VISUAL}$0
 endsnippet
 
+snippet join "std::copy into std::make_ostream_joiner"
+std::ostringstream ${1:oss};
+std::copy(std::begin(${2:${VISUAL:src}}), std::end($2), std::experimental::make_ostream_joiner($1, ','));
+endsnippet
 
 
 #=======================================================================================================================

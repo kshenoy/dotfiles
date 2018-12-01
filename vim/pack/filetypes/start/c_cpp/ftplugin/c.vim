@@ -14,7 +14,9 @@ setl commentstring=//\ %s
 "
 " 22. EXECUTING EXTERNAL COMMANDS
 "
-setl formatprg=clang-format\ --style=file
+if &formatprg == ""
+  setl formatprg=clang-format\ --style=google
+endif
 
 
 "

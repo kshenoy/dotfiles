@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 #=======================================================================================================================
 # Aliases v/s Functions
 # A big limitation of aliases is that they are only expanded as the first argument,
@@ -13,63 +14,11 @@
 # To avoid this, I use functions for my most commonly used aliases so that they work everywhere and,
 # aliases only if I'm sure that they won't be used in the middle of a command.
 
-#=========
-# Aliases
-#=========
+
 # Identify the current shell
 MYSHELL=$(basename $(ps h p $$ | awk '{ print $NF }' | sed 's/-//g'))
 
 
-#=================================
-# Global aliases (Zsh specific)
-#
-# if [[ $MYSHELL =~ "zsh" ]]; then
-  # alias -g ...='../..'
-  # alias -g ....='../../..'
-  # alias -g .....='../../../..'
-  # alias -g CA="2>&1 | cat -A"
-  # alias -g WCL='| wc -l'
-  # alias -g D="DISPLAY=:0.0"
-  # alias -g DN=/dev/null
-  # alias -g ED="export DISPLAY=:0.0"
-  # alias -g EG='|& egrep'
-  # alias -g EH='|& head'
-  # alias -g EL='|& less'
-  # alias -g ELS='|& less -S'
-  # alias -g ETL='|& tail -20'
-  # alias -g ET='|& tail'
-  # alias -g F=' | fmt -'
-  # alias -g G='| grep'
-  # alias -g H='| head'
-  # alias -g HL='|& head -20'
-  # alias -g Sk="*~(*.bz2|*.gz|*.tgz|*.zip|*.z)"
-  # alias -g LL="2>&1 | less"
-  # alias -g L="| less"
-  # alias -g LS='| less -S'
-  # alias -g MM='| most'
-  # alias -g M='| more'
-  # alias -g NE="2> /dev/null"
-  # alias -g NS='| sort -n'
-  # alias -g NUL="> /dev/null 2>&1"
-  # alias -g PIPE='|'
-  # alias -g R=' > /c/aaa/tee.txt '
-  # alias -g RD='| rm -rf'
-  # alias -g RNS='| sort -nr'
-  # alias -g S='| sort'
-  # alias -g TL='| tail -20'
-  # alias -g T='| tail'
-  # alias -g SU='| sort -u'
-  # alias -g VM=/var/log/messages
-  # alias -g X0G='| xargs -0 egrep'
-  # alias -g X0='| xargs -0'
-  # alias -g XG='| xargs egrep'
-  # alias -g X='| xargs'
-# fi
-
-
-#=============
-# ls aliases
-#
 alias ls='ls -FLH --color=always'
 alias l=ls
 alias l1='ls -1'
@@ -78,18 +27,10 @@ alias la='ls -A'
 alias lla='ll -A'
 alias llt='ll -tr'
 alias llS='ll -Sr'
-if [[ $MYSHELL =~ "zsh" ]]; then
-  alias ld='ls -d *(-/DN)'
-elif [[ $MYSHELL =~ "bash" ]]; then
-  alias ld='\ls -F | command grep "/"'
-fi
+alias ld='\ls -F | command grep "/"'
 
 
-#====================
-# Directory aliases
-#
 alias md='mkdir -p'
-#alias cd..='..'
 dirs() {
   if [[ "$*" =~ [-+][0-9]+ ]]; then
     # NOTE: The use of $* is deliberate here as it produces all the scripts arguments separated by the first character
@@ -107,27 +48,7 @@ dirs() {
   fi
 }
 
-#if [[ $MYSHELL =~ "bash" ]]; then
-#  alias ..='cd ..'
-#  alias ...='cd ../..'
-#fi
 
-
-#==============
-# tar aliases
-#
-#alias tar='tar -v'
-#alias tcz='tar -xzf'
-#alias txz='tar -xzf'
-#alias txj='tar -xjf'
-#alias untar='tar -xf'
-#alias untgz='tar -zxf'
-#alias untbz='tar -jxf'
-
-
-#===============
-# Shell aliases
-#
 alias c=clear
 alias cl="c;l"
 
@@ -149,87 +70,69 @@ alias df='df -h'
 alias pppath='tr ":" "\n" <<< $PATH'
 alias clnpath='export PATH=$(tr ":" "\n" <<< $PATH | perl -ne "print unless \$seen{\$_}++" | paste -s -d":")'
 
+alias C=cat
+alias P=$PAGER
+alias H=head
+alias T='tail -n 50'
+alias hi=history
+alias hh='hi | T'
+alias xargs='xargs -t'
+alias x=exit
+alias k9='kill -9'
+
+
 #=================
 # Search related
-#
-alias fn='find . -name'
-alias fnd='find . -type d -name'
-alias f.='find . -maxdepth 1'
-alias f.n='f. -name'
-alias fgrep='fgrep --color=always'
-alias egrep='egrep --color=always'
+if hash fd 2> /dev/null; then
+  alias ftd='fd --type=d'
+  alias ftcpp='fd -e={hh,hpp,hxx,cc,cpp,cxx,inl,ipp,tpp}'
+  alias ftchdr='fd -e={hh,hpp,hxx}'
+  alias ftcsrc='fd -e={cc,cpp,cxx,inl,ipp,tpp}'
+  alias fthdl='fd -e={v,vh,x,sv,svh}'
+else
+  alias fn='find . -name'
+  alias fdd='find . -type d -name'
+fi
 psgrep() {
   # From https://askubuntu.com/a/185746/38952
   # Using ww twice ensures that the output is not truncated to the width of the terminal
   ps wwup $(command pgrep -f "$@")
 }
 
-grep() { command grep -sP --color=always "$@"; }
+# Explicitly declaring this as a function as without it RHEL7 gets confused and errors out
+function grep() { command grep -sP --color=always "$@"; }
 
-# If Ag/Pt/Ack exists, use it!!
-if hash ag 2> /dev/null; then
-  g()     { ag "$@"; }
-  gtc()   { ag --cpp "$@"; }
-  gtch()  { ag -G "\.(h|hh|hpp|tpp)$" "$@"; }
-  gtcc()  { ag -G "\.(c|cc|cpp|C|CC)$" "$@"; }
-  gtsv()  { ag -G "\.(sv|svh)$" "$@"; }
-  gtv()   { ag -G "\.(v|x)$" "$@"; }
-  gtsbs() { ag -G "\.sbs$" "$@"; }
-elif hash pt 2> /dev/null; then
-  g()     { pt "$@"; }
-elif hash ack 2> /dev/null; then
-  g()     { ack --color "$@"; }
-  gtc()   { a --type=cpp "$@"; }
-  gtcc()  { a --type=cpp --nohh "$@"; }
-  gtch()  { a --type=hh "$@"; }
+# If rg/ag exists, use it!!
+if hash rg 2> /dev/null; then
+  # Custom types and settings are defined in RIPGREP_CONFIG_PATH=~/.ripgreprc
+  g()     { command rg "$@"; }
+  gtc()   { command rg --type cpp "$@"; }
+  gtch()  { command rg --type chdr "$@"; }
+  gtcc()  { command rg --type csrc "$@"; }
+  gtrdl() { command rg --type rdl "$@"; }
+  gtsbs() { command rg --type sbs "$@"; }
+  gtv()   { command rg --type vlog "$@"; }
+  gtsv()  { command rg --type sv "$@"; }
+elif hash ag 2> /dev/null; then
+  g()     { command ag "$@"; }
+  gtc()   { command ag --cpp "$@"; }
+  gtch()  { command ag -G "\.(h|hh|hpp|tpp)$" "$@"; }
+  gtcc()  { command ag -G "\.(c|cc|cpp|C|CC)$" "$@"; }
+  gtsbs() { command ag -G "\.sbs$" "$@"; }
+  gtsv()  { command ag -G "\.(sv|svh)$" "$@"; }
+  gtv()   { command ag -G "\.(v|x)$" "$@"; }
 fi
 gi() { g -i "$@"; }
 gv() { g -v "$@"; }
-
-alias C=cat
-alias P=$PAGER
-alias H=head
-alias T='tail -n 50'
-if [[ $MYSHELL =~ "zsh" ]]; then
-  alias hi='history 1'         # Displays all history entries ( Zsh specific )
-  alias hh='history -50'       # Displays the last 100 history entries ( Zsh specific )
-else
-  alias hi=history
-  alias hh='hi | T'
-fi
-alias hig='hi | grep -i'
-alias hgrep=hig
-alias xargs='xargs -t'
-#alias lock='/usr/local/bin/xlock'
-alias x=exit
-alias k9='kill -9'
-
-#================
-# Mini-functions
-#
-#alias sim='echo /proj/gateway4/products/`pwd | cut -d'/' -f4`/expts/a0393831/simulations'
-#alias pwdsn 'set PWDSN = \`pwd | sed 's#\(products\)#.snapshot/nightly.0/\1#'\` && \`pwd | sed 's#\(products\)#.snapshot/nightly.0/\1#'\`'
 
 
 #=================
 # Editor aliases
 #
-unset -f gvim_func
-gvim_func() {
-  # If tmux is being used, check that DISPLAY is set correctly
-  if [[ -n "$TMUX" ]] && [[ $DISPLAY != "$(tmux show-env | grep DISPLAY | cut -d '=' -f2)" ]]; then
-    tmux_pp update-env >& /dev/null
-  fi
-  gvim "$@" -c 'call system("wmctrl -i -b add,maximized_vert -r " . v:windowid)' 2> /dev/null
-}
-alias v='gvim_func'
-
-vq() {
-  gvim_func -q <(eval "$(fc -nl -1) $@")
-}
+alias v=gvim
+vq() { gvim -q <(eval "$(fc -nl -1) $@"); }
 
 # Using -f keeps the window in the foreground and prevents a whole bunch of diffs opening at the same time
-unset -f gvim_diff
 gvim_diff() {
   # DESCRIPTON: Opening up vimdiff takes some observable amount of time. This function opens it only if required.
 
@@ -246,107 +149,49 @@ gvim_diff() {
   done
 
   # Run vimdiff only if there are differences and all files are present
-  gvim_func -df -c 'set nobackup' "$@"
+  gvim -df -c 'set nobackup' "$@"
 }
 alias vd=gvim_diff
 
 # alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
 alias vi='vim --config NONE'
 alias govb='$VISUAL ~/.vim/bundles.vim'
-alias govf='$VISUAL ~/.vim/autoload/my.vim'
-alias govg='$VISUAL ~/.vim/gvimrc'
 alias govm='$VISUAL ~/.vim/plugin/mappings.vim'
 alias govv='$VISUAL ~/.vim/vimrc'
 
 alias edbg="emacs --debug-init"
 alias ed="~/bin/emacs_daemon"
-if [[ $(hostname) =~ loki ]]; then
-  alias emacs='/usr/bin/env XLIB_SKIP_ARGB_VISUALS=1 emacs'
-  unset -f emacs_func
-  emacs_func() {
-    /usr/bin/env XLIB_SKIP_ARGB_VISUALS=1 emacsclient --alternate-editor="" --create-frame --quiet "$@" &
-  }
-else
-  unset -f emacs_func
-  emacs_func() {
-    emacsclient --alternate-editor="" --no-wait --create-frame --quiet "$@" &
-  }
-fi
+emacs_func() { emacsclient --alternate-editor="" --no-wait --create-frame --quiet "$@" & }
 alias e="emacs_func"
 
 
-#===============
-# Shell config
-#
-if [[ $MYSHELL =~ "bash" ]]; then
-  alias gosc='$VISUAL ~/.bashrc'
-  alias gosf='$VISUAL ~/.dotfiles/bash/bashrc-func'
-  alias gosp='$VISUAL ~/.dotfiles/bash/bashrc-prompt'
-  alias sosc='. ~/.bashrc && clnpath && echo Sourced bashrc'
-  alias sosf='. ~/.dotfiles/bash/bashrc-func   && echo Sourced bashrc-func'
-  alias sosp='. ~/.dotfiles/bash/bashrc-prompt && echo Sourced bashrc-prompt'
-elif [[ $MYSHELL =~ "zsh" ]]; then
-  alias gosc='$VISUAL ~/.zshrc'
-  alias gosf='$VISUAL ~/.zshrc-func'
-  alias sosc='. ~/.zshrc && clnpath && echo Sourced zshrc'
-  alias sosf='. ~/.dotfiles/zsh/zshrc-func && echo Sourced zshrc-func'
-fi
+#==========
+# Configs
+alias gosc='$VISUAL ~/.bashrc'
 alias gosa='$VISUAL ~/.dotfiles/bash/aliases'
+alias gosf='$VISUAL ~/.dotfiles/bash/bashrc-func'
 alias gost='$VISUAL ~/.dotfiles/tmux/tmux.conf'
 alias gosx='$VISUAL ~/.Xresources'
-alias sosa='. ~/.dotfiles/bash/aliases && echo Sourced aliases'
+alias sosc='. ~/.bashrc && clnpath && echo Sourced bashrc'
+alias sosa='. ~/.dotfiles/bash/aliases && . ~/.dotfiles/bash/bashrc-func && echo Sourced aliases and functions'
 
 
 #=======
 # Misc
-#
 alias j='jobs -l'
-alias archdate='date +%Y-%m-%d'
-alias so=source
-alias sco='. command'
+alias isodate='date +%Y-%m-%d'
 alias ,=jumper
 alias que=query
-alias color='. ~/.dotfiles/bash/utils/base16_color && base16_color'
-alias xxx='xrdb -load ~/.Xresources && color monokai dark'
 alias pls='sudo $(history -p !!)'
 
 
-#==================
-# Perl one-liners
-#
-alias p='perl -ln'
-alias psmall="perl -lne 'BEGIN{"'$s=<>};$s=$_ if $_<$s;END{print "$s"}'"'"
-alias pbig="perl -lne 'BEGIN{"'chomp($s=<>)};$s=$_ if $_>$s;END{print "$s"}'"'"
-alias par1="perl -pe 'exit if /^\s*$/'"
+#=======
+# Perl
 alias get_bits='perl -e '"'"'$a=hex($ARGV[0]);$m=$ARGV[1];$l=(defined $ARGV[2]?$ARGV[2]:$m); printf "0x%x\n", (($a >> $l) & ((1 << ($m-$l+1)) - 1))'"'"''
 
 
-#============
-# Locations
-#
-zsh="$HOME/.dotfiles/zsh"
-bash="$HOME/.dotfiles/bash"
-# Locations as named directories
-if [[ $MYSHELL =~ "zsh" ]]; then
-  hash -d dev="$HOME/Documents/dev/scratchy"
-  hash -d zsh="$HOME/.dotfiles/zsh"
-  hash -d bash="$HOME/.dotfiles/bash"
-fi
-alias path='readlink -f'
-
-
-#==============
-# apt Aliases
-#
-alias apt-ins='sudo apt-fast install'
-alias apt-upd='sudo apt-fast update'
-alias apt-rem='sudo apt-fast remove'
-alias apt-aurem='sudo apt-get autoremove'
-
-
-#==============
-# Git Aliases
-#
+#======
+# Git
 alias ga='git add'
 alias gA='git add -A .'
 alias gD='git diff --word-diff'
@@ -356,19 +201,14 @@ alias gs='git status --short'
 alias gS='git status'
 
 
-#========
-# Tools
-#
-alias tags='ctags --c-kinds=+p --c++-kinds=+p --fields=+Sail --extra=+q *'
+#=============
+# Misc Tools
 alias tmux='tmux_pp'
 alias tm='tmux'
 alias tmi=tmuxinator
 alias U='unison dotfiles -terse'
 
 
-#========================
-# Local machine aliases
-#
-if [[ -f ~/.aliases_local ]]; then
-  . ~/.aliases_local
-fi
+#================
+# Local aliases
+[[ -f ~/.aliases_local ]] && . ~/.aliases_local

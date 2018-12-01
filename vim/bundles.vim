@@ -124,7 +124,8 @@ if has('unix')
     \ 'types': {
       \ 1: ['.git', 'cd %s && git ls-files --cached --exclude-standard --others'],
       \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
-      \ 3: ['P4CONFIG', 'p4 have %s/...']
+      \ 3: ['P4CONFIG', 'p4 have %s/... |' .
+      \     ' command grep -v "/_env/" | command awk "{print \$3}" | command sed "s:$STEM/::"']
     \ },
     \ 'fallback': "find %s -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune -o " .
                         \ "-type f ! \\( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' -o " .

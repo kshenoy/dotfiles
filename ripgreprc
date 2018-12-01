@@ -1,0 +1,29 @@
+## Config file for ripgrep
+
+# Add to the cpp type.
+--type-add
+cpp:*.{ipp,tpp}
+
+--type-add
+chdr:include:h
+--type-add
+chdr:*.{H,hh,hxx}
+
+--type-add
+csrc:*.{C,cc,cpp,cxx,inl,ipp,tpp}
+
+--type-add
+rdl:*.rdl
+
+--type-add
+sbs:*.sbs
+
+--type-add
+hdl:include:verilog
+
+--type-add
+hdl:*.x
+
+
+# Because who cares about case!?
+--smart-case

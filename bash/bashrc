@@ -13,7 +13,7 @@ umask 002
 if [[ $- == *i* ]]; then
   # Shell is interactive
   # Turn off TTY "start" and "stop" commands in all interactive shells.
-  # They default to C-q and C-s, Bash uses C-s to do a forward history search.
+  # They default to C-q and C-s. I want to use C-s to do forward history search.
   stty start ''
   stty stop  ''
   stty -ixon # disable XON/XOFF flow control
@@ -25,6 +25,7 @@ fi
 #    -s : set
 #    -u : unset
 #    -q : check whether set/unset
+# List of options: http://wiki.bash-hackers.org/internals/shell_options
 
 # If set, a command name that is the name of a directory is executed as if it were the argument to the cd command.
 shopt -u autocd
@@ -63,7 +64,8 @@ shopt -s complete_fullquote
 
 # If set, Bash replaces directory names with the results of word expansion when performing filename completion.
 # This changes the contents of the readline editing buffer. If not set, Bash attempts to preserve what the user typed.
-# shopt -s direxpand
+# I use it mainly to prevent bash from escaping $ in $dir_variable
+shopt -s direxpand
 
 # If set, Bash attempts spelling correction on directory names during word completion if the directory name
 # initially supplied does not exist.
@@ -196,15 +198,16 @@ complete -f -o default -X '!*.gif'  kview
 #=======================================================================================================================
 # ENVIRONMENT VARIABLES                                                                                             {{{1
 #=======================================================================================================================
+# NOTE: exporting a variable makes it available for child processes via the environment
 ## HISTORY
-HISTSIZE=65535
-HISTFILESIZE=65535
+export HISTSIZE=65535
+export HISTFILESIZE=65535
 # Show timestamps in history
-HISTTIMEFORMAT="%F %T  "
-HISTCONTROL=ignoreboth #same as export HISTCONTROL=ignoredups:ignorespace
+export HISTTIMEFORMAT="%F %T  "
+export HISTCONTROL=ignoreboth #same as export HISTCONTROL=ignoredups:ignorespace
 # Ignore duplicates and trivial one- and two-char commands
-HISTIGNORE='?:??:history*:sosa:sosc:sosf:sosp:cd:que*:lla*'
-HOSTNAME="$(hostname)"
+export HISTIGNORE='?:??:history*:sosa:sosc:sosf:sosp:cd:que*:lla*'
+export HOSTNAME="$(hostname)"
 # Keeps history forever. Requires PROMPT_COMMAND='history -a; history -r'
 # Moving this to PROMPT_COMMAND to keep the HISTFILE current when sessions span multiple days
 # HISTFILE="${HOME}/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
@@ -212,21 +215,18 @@ HOSTNAME="$(hostname)"
 
 ## TERMINAL
 # Set terminal to mimic titeInhibit = true
-MANPAGER=less
-PAGER=less
-EDITOR=vim
-VISUAL=gvim
+export MANPAGER=less
+export PAGER=less
+export EDITOR=vim
+export VISUAL=gvim
 
 #LESS="-icuf -P?f%f:stdin. [%T] (?pB%pB\%:byte %bB.)"
 
 #GREP_OPTIONS="--color=auto"
 export GREP_COLORS='1;32'
+export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
 
-LANG=en_US.UTF-8
-
-# Ack
-#ACK_OPTIONS='--color-filename=COLOR --color-match=COLOR --color-lineno=COLOR --type-add verilog:ext:.sv,.svh,.v'
-#ACK_OPTIONS='--type-set verilog=.sv,.svh,.v'
+export LANG=en_US.UTF-8
 
 
 #=======================================================================================================================
@@ -270,7 +270,7 @@ done
 # }}}1
 
 # Base16 Color scheme for terminal
-BASE16_SHELL=$HOME/.config/base16-shell
+export BASE16_SHELL=$HOME/.config/base16-shell
 [[ -n "$PS1" ]] && \
 [[ -s $BASE16_SHELL/profile_helper.sh ]] && \
 eval "$($BASE16_SHELL/profile_helper.sh)"
@@ -291,7 +291,7 @@ unset rubyGemPath
 
 for path in /usr/man /usr/share/man ${HOME}/.local/man; do
   if [[ -d "$path" ]] && [[ ! "$MANPATH" == *$path* ]]; then
-    MANPATH=$path:$MANPATH
+    export MANPATH=$path:$MANPATH
   fi
 done
 
