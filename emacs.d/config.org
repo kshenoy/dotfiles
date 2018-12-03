@@ -5,6 +5,7 @@
 Interesting configs:
 https://github.com/caisah/emacs.dz
 [[http://wolfecub.github.io/dotfiles/][Wolfe's Literate Emacs Config]]
+[[https://huytd.github.io/emacs-from-scratch.html][Emacs from scratch]]
 
 Resources:
 https://brainlessdeveloper.com/2017/12/27/making-emacs-work-like-my-vim-setup/
@@ -29,10 +30,6 @@ Install and load use-package
 
   (defvar use-package-verbose t)
   (setq use-package-always-ensure t)
-
-  ;; Disable lazy-loading if using a daemon
-  (if (daemonp)
-      (setq use-package-always-demand t))
 #+END_SRC
 
 ** TODO Simplify init process
@@ -207,23 +204,15 @@ From [[http://pragmaticemacs.com/emacs/visualise-and-copy-differences-between-fi
 #+END_SRC
 
 ** Emacs server
-- Always start the emacs-server, except when run in daemon mode
-- Disable prompt asking you if you want to kill a buffer with a live process attached to it. [[https://stackoverflow.com/a/268205][StackOverflow]]
-
-#+BEGIN_SRC emacs-lisp
-  (use-package server
-    :disabled
-    :config
-    (unless (or (daemonp) (server-running-p))
-      (server-mode 1))
-    (add-hook 'server-switch-hook 'raise-frame))
-#+END_SRC
+[[http://emacshorrors.com/posts/determining-if-the-server-is-started-or-the-wonders-of-server-running-p.html][Server/Daemon blech! It's too confusing]]. Just start emacs in daemon mode and don't bother with the server.
 
 Alias for emacsclient:
-This will launch emacsclient if a server is already running and launch emacs if not
 #+BEGIN_EXAMPLE
-  alias e='emacsclient --alternate-editor="emacs" --create-frame --quiet'
+  alias e='emacsclient --alternate-editor="" --create-frame --quiet'
 #+END_EXAMPLE
+
+This will launch emacsclient if a daemon is already running and create one if not.
+Note that alternate-editor has been left blank. This forces it to create a daemon.
 
 ** Fonts
 :PROPERTIES:
@@ -250,17 +239,21 @@ After installing a new font refresh the font cache by running
       (set-face-attribute 'fixed-pitch    nil :font font)
       t))  ; This is required so that we can use this function in a cond block below
 
-  (defun my/select-and-set-font ()
-    " Select the font based on OS, hostname etc."
-    (cond ((eq system-type 'gnu/linux) (my/set-font-if-exists "Iosevka-9"))
-          ((eq system-type 'windows-nt) (my/set-font-if-exists "Iosevka-9"))))
+  ;; (cond ((eq system-type 'gnu/linux) (my/set-font-if-exists "Iosevka-9"))
+  ;;       ((eq system-type 'windows-nt) (my/set-font-if-exists "Iosevka-9"))))
 
+  (defun my/set-fonts()
+    (set-face-attribute 'default        nil :font "Iosevka SS05-9")
+    (set-face-attribute 'variable-pitch nil :font "Ubuntu Condensed-10")
+    (set-face-attribute 'fixed-pitch    nil :font "Iosevka SS05-9"))
+
+  ;; The hook is needed for some reason... I don't fully comprehend why
   (if (daemonp)
       (add-hook 'after-make-frame-functions
                 (lambda (frame)
                   (select-frame frame)
-                  (my/select-and-set-font)))
-    (my/select-and-set-font))
+                  (my/set-fonts)))
+    (my/set-fonts))
 #+END_SRC
 
 The reason for adding the hook is that if I try to create a daemon, it errors out with
@@ -1089,8 +1082,10 @@ eg. To kill multiple buffers
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
     :after (ivy)
-    :bind* (("C-s" . swiper)
-            ("C-M-s" . swiper-all)))
+    :bind* (("C-s" . counsel-grep-or-swiper)
+            ("C-M-s" . swiper-all))
+    :config (setq counsel-grep-base-command
+                  "rg --smart-case --max-columns 240 --no-heading --line-number --color never '%s' %s"))
 #+END_SRC
 
 *** counsel
@@ -1108,7 +1103,7 @@ NOTE: I'm deferring loading using =:commands= for those commands for which I can
 Use =C-c j= as prefix for all counsel-related keybindings
 #+BEGIN_SRC emacs-lisp
   :bind (:map my-jumper-command-map
-              ("/" . counsel-ag)))
+              ("/" . counsel-rg)))
 
   :config
   (defun my/counsel-imenu ()
