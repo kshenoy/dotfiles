@@ -285,6 +285,11 @@ nnoremap <silent> <S-CR>             :FSHere<CR>
 call plug#('derekwyatt/vim-fswitch')
 
 
+" fzf ------------------------------------------------------------------------------------------------------------- {{{1
+Plug $FZF_PATH
+Plug 'junegunn/fzf.vim'
+
+
 " gundo ----------------------------------------------------------------------------------------------------------- {{{1
 let g:gundo_preview_bottom=1
 nnoremap yoU :GundoToggle<CR>
