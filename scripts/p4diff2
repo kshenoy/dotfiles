@@ -45,7 +45,7 @@ EXAMPLES:
       Diff rev#42 of arch_lci.cc with the latest rev as of changelist 112358 in the repo
 
   * $_name ch/verif/l3/arch_l3/arch_lci.cc ch/verif/l3/arch_l3/arch_lci.cc#-1
-      Diff the current state (with edits) with the head revision in the repo"
+      If file is open for edits: Diff the current state with the head revision in the repo"
 }
 
 ## Enable debug logging

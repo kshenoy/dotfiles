@@ -222,7 +222,7 @@ endsnippet
 # Non-modifying sequence operations --------------------------------------------------------------------------------{{{2
 snippet alo "std::all_of"
 if (std::all_of(std::begin(${1:${VISUAL:container}}), std::end($1),
-      [](auto const& ${2:i}) {
+      [](auto const & ${2:i}) {
         $0
       })
    ) {
@@ -231,7 +231,7 @@ endsnippet
 
 snippet ano "std::any_of"
 if (std::any_of(std::begin(${1:${VISUAL:container}}), std::end($1),
-      [](auto const& ${2:i}) {
+      [](auto const & ${2:i}) {
         $0
       })
    ) {
@@ -240,7 +240,7 @@ endsnippet
 
 snippet nno "std::none_of"
 if (std::none_of(std::begin(${1:${VISUAL:container}}), std::end($1),
-      [](auto const& ${2:i}) {
+      [](auto const & ${2:i}) {
         $0
       })
    ) {
@@ -248,7 +248,7 @@ endsnippet
 
 snippet fre "std::for_each"
 std::for_each(std::begin(${1:${VISUAL:container}}), std::end($1),
-  [](auto const& ${2:i}) {
+  [](auto const & ${2:i}) {
     $0
   });
 endsnippet
@@ -259,7 +259,7 @@ endsnippet
 
 snippet cni "std::count_if"
 auto count = std::count_if(std::begin(${1:${VISUAL:container}}), std::end($1),
-  [](auto const& ${2:i}) {
+  [](auto const & ${2:i}) {
     $0
   });
 endsnippet
@@ -273,7 +273,7 @@ endsnippet
 
 snippet fni "std::find_if"
 auto searchIt = std::find_if(std::begin(${1:${VISUAL:container}}), std::end($1),
-  [](auto const& ${2:i}) {
+  [](auto const & ${2:i}) {
     $0
   });
 if (searchIt != std::end($1)) {
@@ -282,7 +282,7 @@ endsnippet
 
 snippet fin "std::find_if_not"
 auto searchIt = std::find_if_not(std::begin(${1:${VISUAL:container}}), std::end($1),
-  [](auto const& ${2:i}) {
+  [](auto const & ${2:i}) {
     $0
   });
 if (searchIt != std::end($1)) {
@@ -301,7 +301,7 @@ endsnippet
 
 snippet cpi "std::copy_if"
 std::copy_if(std::begin(${1:${VISUAL:src}}), std::end($1), std::back_inserter(${2:dest}),
-  [](auto const& ${3:i}) {
+  [](auto const & ${3:i}) {
     $0
   });
 endsnippet
