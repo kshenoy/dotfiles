@@ -2,7 +2,7 @@
 
 # Add to the cpp type.
 --type-add
-cpp:*.{ipp,tpp}
+cpp:*.ipp,*.tpp
 
 --type-add
 chdr:include:h

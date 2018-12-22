@@ -34,18 +34,18 @@ elif [[ ! "$*" =~ '--files-from' ]]; then
   exit $!
 fi
 
-local _ft_filt=()
-local _flist=()
-local _rg_opts=()
+_ft_filt=()
+_flist=()
+_rg_opts=()
 
 while (( $# > 0 )); do
   if [[ "$1" =~ '--files-from=' ]]; then
-    local _f=$(sed 's/--files-from=//' <<< "$1")
+    _f=$(sed 's/--files-from=//' <<< "$1")
     _flist+=("$_f")
   elif [[ "$1" =~ '--files-from' ]]; then
     shift
     _flist+=("$1")
-  elif [[ "$1" =~ [^-]-t[[:alpha:]]+ ]]; then
+  elif [[ "$1" =~ -t[[:alpha:]]+ ]]; then
     _ft_filt+=($(sed -s 's/^-t//' <<< "$1"))
   elif [[ "$1" == "--type" ]]; then
     shift
@@ -56,21 +56,21 @@ while (( $# > 0 )); do
 
   shift
 done
-# echo "FList: ${_flist[@]}"
-# echo "Types: ${_ft_filt[@]}"
-# echo "rg Opts: ${_rg_opts[@]}"
+# echo "DEBUG: FList: ${_flist[@]}"
+# echo "DEBUG: Types: ${_ft_filt[@]}"
+# echo "DEBUG: rg Opts: ${_rg_opts[@]}"
 
 # Compile list of filetypes to filter filelist by
-local _ft_pat=""
+_ft_pat=""
 for _ft in "${_ft_filt[@]}"; do
   _ft_pat="${_ft_pat}|$(command rg --type-list | command rg "^$_ft" | cut -d: -f2 | tr -d '*.{ }' | tr ',' '|')"
 done
 
 # Remove the leading |
 _ft_pat=${_ft_pat#|}
-# echo "FileType Pattern: $_ft_pat"
+# echo "DEBUG: FileType Pattern: $_ft_pat"
 
 # Finally search for PATTERN on all the files
 for _f in ${_flist[@]}; do
-  cat "$_f"
+  command grep -P "($_ft_pat)$" "$_f"
 done | command xargs -d '\n' rg "${_rg_opts[@]}"

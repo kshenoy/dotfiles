@@ -105,14 +105,8 @@ function grep() { command grep -sP --color=always "$@"; }
 # If rg/ag exists, use it!!
 if hash rg 2> /dev/null; then
   # Custom types and settings are defined in RIPGREP_CONFIG_PATH=~/.ripgreprc
-  g()     { command rg "$@"; }
-  gtc()   { command rg --type cpp "$@"; }
-  gtch()  { command rg --type chdr "$@"; }
-  gtcc()  { command rg --type csrc "$@"; }
-  gtrdl() { command rg --type rdl "$@"; }
-  gtsbs() { command rg --type sbs "$@"; }
-  gtv()   { command rg --type vlog "$@"; }
-  gtsv()  { command rg --type sv "$@"; }
+  # rgf is a wrapper around rg which provides a --files-from-option similar to ack
+  alias g=rgf
 elif hash ag 2> /dev/null; then
   g()     { command ag "$@"; }
   gtc()   { command ag --cpp "$@"; }
