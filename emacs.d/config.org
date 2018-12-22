@@ -231,29 +231,26 @@ After installing a new font refresh the font cache by running
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/set-font-if-exists (font)
-    " Check if FONT exists and set if it does"
+  (defun my/set-font-if-exists (type font)
+    "Check if FONT exists and set TYPE if it does."
     (when (and (display-graphic-p)(x-list-fonts font))
-      (set-face-attribute 'default        nil :font font)
-      (set-face-attribute 'variable-pitch nil :font font)
-      (set-face-attribute 'fixed-pitch    nil :font font)
+      (set-face-attribute type nil :font font)
       t))  ; This is required so that we can use this function in a cond block below
 
-  ;; (cond ((eq system-type 'gnu/linux) (my/set-font-if-exists "Iosevka-9"))
-  ;;       ((eq system-type 'windows-nt) (my/set-font-if-exists "Iosevka-9"))))
-
   (defun my/set-fonts()
-    (set-face-attribute 'default        nil :font "Iosevka SS05-9")
-    (set-face-attribute 'variable-pitch nil :font "Ubuntu Condensed-10")
-    (set-face-attribute 'fixed-pitch    nil :font "Iosevka SS05-9"))
+    (my/set-font-if-exists 'default "Iosevka SS05-9")
+    (my/set-font-if-exists 'fixed-pitch "Fira Code Medium-9")
+    (my/set-font-if-exists 'variable-pitch "Iosevka SS05-9")
+    ;; (cond ((eq system-type 'gnu/linux) (my/set-font-if-exists 'variable-pitch "Ubuntu Condensed-9"))
+    ;;       ((eq system-type 'windows-nt) (my/set-font-if-exists 'variable-pitch "Iosevka SS05-9"))))
+  (my/set-fonts)
 
   ;; The hook is needed for some reason... I don't fully comprehend why
-  (if (daemonp)
-      (add-hook 'after-make-frame-functions
-                (lambda (frame)
-                  (select-frame frame)
-                  (my/set-fonts)))
-    (my/set-fonts))
+  (when (daemonp)
+    (add-hook 'after-make-frame-functions
+              (lambda (frame)
+                (select-frame frame)
+                (my/set-fonts))))
 #+END_SRC
 
 The reason for adding the hook is that if I try to create a daemon, it errors out with
@@ -1084,8 +1081,9 @@ eg. To kill multiple buffers
     :after (ivy)
     :bind* (("C-s" . counsel-grep-or-swiper)
             ("C-M-s" . swiper-all))
-    :config (setq counsel-grep-base-command
-                  "rg --smart-case --max-columns 240 --no-heading --line-number --color never '%s' %s"))
+    :config (when (executable-find "rg")
+              (setq counsel-grep-base-command
+                    "rg --smart-case --max-columns 240 --no-heading --line-number --color never '%s' %s")))
 #+END_SRC
 
 *** counsel
@@ -1322,8 +1320,9 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 **** Make org-mode play nicely with Google Chrome
 From [[http://stackoverflow.com/a/6309985/734153][StackOverflow]]
 #+BEGIN_SRC emacs-lisp
-  (setq browse-url-browser-function 'browse-url-generic
-        browse-url-generic-program "google-chrome")
+  (when (eq system-type 'gnu/linux)
+    (setq browse-url-browser-function 'browse-url-generic
+          browse-url-generic-program "google-chrome"))
 #+END_SRC
 
 **** Templates
@@ -2000,7 +1999,8 @@ NOTE: I'm using =system-type= instead of =window-system= because when I start a 
   (use-package solarized-theme
     ;; :if (eq system-type 'gnu/linux)
     :init
-    (setq solarized-distinct-fringe-background t)
+    (setq solarized-distinct-fringe-background t
+          solarized-use-variable-pitch nil)
     :config
     (load-theme 'solarized-light t)
 
