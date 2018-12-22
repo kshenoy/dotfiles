@@ -37,8 +37,10 @@
   prompt = false
 [difftool "gvim"]
   cmd = gvim -df -c 'set columns=260|set lines=62|wincmd =' $LOCAL $BASE 2> /dev/null
+  trustExitCode = true
 [difftool "vim"]
   cmd = vim -df -c 'set columns=260|set lines=62|wincmd =' $LOCAL $BASE 2> /dev/null
+  trustExitCode = true
 [difftool "meld"]
   cmd = meld --diff $LOCAL $BASE
 
@@ -49,6 +51,7 @@
   cmd = meld --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $MERGED $REMOTE
 [mergetool "gvim"]
   cmd = vim_merge $BASE $REMOTE $LOCAL $MERGED
+  trustExitCode = true
 [credential]
   helper = cache --timeout=3600
 
