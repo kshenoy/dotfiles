@@ -4,38 +4,48 @@
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
-(package-initialize)
+;; (package-initialize)
 
-(custom-set-variables '(debug-on-error t))
+;; Bootstrap the config
+(let ((gc-cons-threshold most-positive-fixnum))
+  ;; Set repositories
+  (require 'package)
+  (setq-default load-prefer-newer t
+                package-enable-at-startup nil)
 
-;; Load custom file to grab all variables that are marked as safe. This prevents emacs from asking me
-;; if I want to treat the file-local variables defined in config.org as safe upon every start-up!
-(setq custom-file (concat user-emacs-directory "custom.el"))
-(load custom-file)
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+  (package-initialize)
 
-;; Declare config.org as a global variable
-(defvar my-init-config (expand-file-name "config.org" user-emacs-directory)
-  "Main configuration org file")
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package t))
 
-(setq my-init-config-el      (expand-file-name "config.el"  user-emacs-directory)
-      my-init-config-el-pass (concat my-init-config-el ".pass")
-      my-init-config-loaded nil)
+  (setq-default use-package-always-ensure t)
 
-(when (>= emacs-major-version 24)
-  ;; Run org-babel-load-file only if config.org is newer than config.el (http://disq.us/p/o5rfst)
-  (if (file-exists-p my-init-config)
-      (unless (and (file-exists-p my-init-config-el)
-                   (time-less-p (nth 5 (file-attributes my-init-config)) (nth 5 (file-attributes my-init-config-el))))
-        (if (fboundp 'org-babel-load-file)
-            (progn
-              (org-babel-load-file my-init-config)
-              ;; If we've reached here it means there were no errors in creating the .el file
-              ;; Create a copy of it in case I mess up the .org in the future
-              (when (file-exists-p my-init-config-el-pass)
-                (delete-file my-init-config-el-pass))
-              (copy-file my-init-config-el my-init-config-el-pass)
-              (setq my-init-config-loaded t))
-          (message "Function not found: org-babel-load-file")))
-    (message "Init-config-org file '%s' missing." my-init-config)))
+  ;; Use latest Org
+  (use-package org :ensure org-plus-contrib)
 
-(unless my-init-config-loaded (load-file my-init-config-el))
+  ;; Tangle configuration
+  (org-babel-load-file (expand-file-name "config.org" user-emacs-directory))
+
+  ;; If we've reached here it means there were no errors in creating the .el file
+  ;; Create a copy of it in case I screw up the config in the future
+  (copy-file (expand-file-name "config.el" user-emacs-directory)
+             (expand-file-name "config.el.pass" user-emacs-directory) t)
+
+  (garbage-collect))
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages (quote (org-plus-contrib use-package)))
+ '(safe-local-variable-values (quote ((org-confirm-babel-evaluate)))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
