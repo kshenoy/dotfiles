@@ -621,8 +621,14 @@ evil can be toggled using =C-z=
 #+BEGIN_SRC emacs-lisp
   :config
   (evil-mode t)
-  (dolist (mode '(git-rebase-mode term-mode org-toc-mode))
-    (add-to-list 'evil-emacs-state-modes mode))
+
+  (dolist (mode '(git-rebase-mode org-toc-mode))
+    (evil-set-initial-state mode 'emacs))
+  (evil-set-initial-state 'term-mode 'insert)
+
+  ;; (evil-set-initial-state 'org-capture-mode 'insert)
+  ;; This doesn't seem to work for some reason. Refer https://github.com/emacs-evil/evil/issues/1115 for details
+  (add-hook 'org-capture-mode-hook 'evil-insert-state)
 #+END_SRC
 
 **** Keybindings
@@ -1040,7 +1046,7 @@ Resources: [[http://orgmode.org/worg/org-configs/org-customization-guide.html][C
 #+BEGIN_SRC emacs-lisp
   :init
   (setq org-directory "~/Notes/")
-  (setq org-default-notes-file (expand-file-name org-directory "Inbox.org"))
+  (setq org-default-notes-file (expand-file-name "Inbox.org" org-directory))
 
   (setq org-M-RET-may-split-line '((item) (default . t)))
   ;; (setq org-special-ctrl-a/e t)
@@ -1407,6 +1413,11 @@ Show hierarchical headlines when refiling instead of flattening it out
 Show all the hierarchical headlines instead of having to step down them
 
 From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 - Capture 1]] and [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][Using Emacs 24 - Capture 2]]
+
+***** Capture templates
+:PROPERTIES:
+:CREATED:  [2018-12-28 Fri 23:04]
+:END:
 #+BEGIN_SRC emacs-lisp
   (setq org-capture-templates
         '(("t" "TODO" entry
@@ -1416,28 +1427,40 @@ From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 -
 
           ("c" "Misc" entry
            (file+headline org-default-notes-file "Inbox")
-           "* %?%(org-set-property \"CAPTURED\" \"%U\")"
+           "* %?"
            :jump-to-captured t :empty-lines 1)
 
           ("s"  "Code snippets")
 
           ("se" "Emacs snippets" entry (file "Software/emacs.org")
-           "* %?%(org-set-property \"CAPTURED\" \"%U\")"
+           "* %?"
            :jump-to-captured t :empty-lines 1)
 
           ("ss" "Shell snippets" entry (file "Software/shell.org")
-           "* %?%(org-set-property \"CAPTURED\" \"%U\")"
+           "* %?"
            :jump-to-captured t :empty-lines 1)
 
           ("sv" "Vim snippets" entry (file "Software/vim.org")
-           "* %?%(org-set-property \"CAPTURED\" \"%U\")"
+           "* %?"
            :jump-to-captured t :empty-lines 1)))
 #+END_SRC
 
 NOTE:
 - When using several keys, keys using the same prefix key must be sequential in the list and preceded by a 2-element entry explaining the prefix key.
   [[http://orgmode.org/manual/Template-elements.html#Template-elements][Template elements]], [[http://orgmode.org/manual/Template-elements.html#Template-expansion][Template expansion]]
-- Quick-note related to current state can be taken using =C-c C-z= and get added to the =LOGBOOK=
+- Quick notes related to current state can be taken using =C-c C-z= and get added to the =LOGBOOK=
+
+***** Add properties to captured items
+:PROPERTIES:
+:CREATED:  [2018-12-28 Fri 23:04]
+:ID:       f9b19f45-ee3a-4f40-b8af-0e5966e4df35
+:END:
+This adds the CREATED and ID property to all captures
+From https://stackoverflow.com/a/16247032/734153
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-capture-prepare-finalize-hook
+            (lambda() (org-expiry-insert-created)(org-id-get-create)))
+#+END_SRC
 
 ***** COMMENT Capture template for learning Spanish
 #+BEGIN_SRC emacs-lisp
@@ -1465,20 +1488,18 @@ Hence, I'm using a hacky way of explicitly prompting for input (since I can spec
 saving it to a variable and printing it out later in the capture template.
 
 ***** TODO Creating TODOs doesn't log it as a state change
-
 ***** Create frames for easy org-capture directly from the OS
 (credit: [[http://cestlaz.github.io/posts/using-emacs-24-capture-2/][here]])
 #+BEGIN_SRC emacs-lisp
-  (use-package noflet)
-
-  (defun my-make-capture-frame ()
-    "Create a new frame and run org-capture."
-    (interactive)
-    (make-frame '((name . "capture")))
-    (select-frame-by-name "capture")
-    (delete-other-windows)
-    (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
-      (counsel-org-capture)))
+  (use-package noflet
+    :config
+    (defun my-make-capture-frame ()
+      "Create a new frame and run org-capture."
+      (interactive)
+      (select-frame-by-name "capture")
+      (delete-other-windows)
+      (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
+        (counsel-org-capture))))
 
   (defadvice org-capture-finalize
       (after delete-capture-frame activate)
@@ -1492,6 +1513,11 @@ saving it to a variable and printing it out later in the capture template.
     (if (equal "capture" (frame-parameter nil 'name))
         (delete-frame)))
 #+END_SRC
+
+This can then be used to create a capture frame
+#+BEGIN_EXAMPLE
+  emacsclient --create-frame --no-wait --socket-name=capture --frame-parameters='(quote (name . "capture"))' --eval "(my-make-capture-frame)"
+#+END_EXAMPLE
 
 *** Keybindings
 :PROPERTIES:
@@ -1556,7 +1582,7 @@ Don't add some files to the agenda
                       (and 'file-exists-p
                            (not (string= "Spanish.org" x))
                            (not (string-match-p "Orgzly" x))))
-                    (mapcar (lambda (x) (expand-file-name org-directory x))
+                    (mapcar (lambda (x) (expand-file-name x org-directory))
                             '("Inbox.org" "Software/" "Personal/" "Work/"))))
 #+END_SRC
 
@@ -1697,7 +1723,6 @@ I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ens
     :ensure org-plus-contrib
     :init
     (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
-
     :config
 #+END_SRC
 
@@ -1705,11 +1730,12 @@ To effectively use custom ID, refer [[https://writequit.org/articles/emacs-org-m
 Note that =org-id= has been updated since then and now supports a method =org-id-get-create= which creates an ID if one is not present.
 Also, it uses the identifier /ID/ instead of /CUSTOM_ID/
 
-**** TODO Use org-id globally across all files
-Example on [[http://stackoverflow.com/a/27158715/734153][Emacs StackExchange]]
+**** Automatically add ID to newly created headings
+:PROPERTIES:
+:CREATED:  [2018-12-28 Fri 23:59]
+:END:
 #+BEGIN_SRC emacs-lisp
-  (setq org-id-track-globally t)
-  (setq org-id-extra-files '("~/.emacs.d/config.org"))
+  (add-hook 'org-insert-heading-hook 'org-id-get-create)
 #+END_SRC
 
 **** Completion while inserting link
@@ -1725,6 +1751,13 @@ Details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
     (concat "id:" (org-id-get-with-outline-path-completion org-refile-targets)))
 
   (eval-after-load 'org '(org-link-set-parameters "id" :complete 'org-id-complete-link))
+#+END_SRC
+
+**** TODO Use org-id globally across all files
+Example on [[http://stackoverflow.com/a/27158715/734153][Emacs StackExchange]]
+#+BEGIN_SRC emacs-lisp
+  (setq org-id-track-globally t)
+  (setq org-id-extra-files '("~/.emacs.d/config.org"))
 #+END_SRC
 
 **** /fin/
@@ -1827,5 +1860,5 @@ Placing at end to be called after all packages are loaded
 ** Private config
 #+BEGIN_SRC emacs-lisp
   (when (string-match-p "atlhen" (system-name))
-    (load (expand-file-name user-emacs-directory "private_work.el") t))
+    (load (expand-file-name "private_work.el" user-emacs-directory) t))
 #+END_SRC
