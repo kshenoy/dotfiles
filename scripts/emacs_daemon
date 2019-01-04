@@ -28,7 +28,7 @@ _emacs_path=""
 
 # By default, on a *nix-like platform, the sockets are located in a directory called /tmp/emacs1234 where
 # /tmp is the value of the environment variable TMPDIR (defaulting to /tmp) and 1234 is the user ID
-_socket_path="${TMPDIR:-/tmp}/emacs$(id -u)"
+_socket_path="${TMPDIR:-/tmp}/emacs$UID"
 
 # Colors for echo
 _fg_red=$(tput setaf 1)
