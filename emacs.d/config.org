@@ -1,14 +1,14 @@
 #+TITLE: Emacs Configuration
-#+PROPERTY: header-args :results output silent
+#+PROPERTY: header-args+ :results output silent
+#+PROPERTY: header-args+ :comments both :mkdirp yes
 #+TODO: TODO | DONE
 
-Interesting configs:
+Resources:
 https://github.com/caisah/emacs.dz
 [[http://wolfecub.github.io/dotfiles/][Wolfe's Literate Emacs Config]]
 [[https://huytd.github.io/emacs-from-scratch.html][Emacs from scratch]]
 [[https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org][AngryBacon]]
-
-Resources:
+[[https://to1ne.gitlab.io/literate-dotfiles/][Toon's Literate Dotfiles]]
 https://brainlessdeveloper.com/2017/12/27/making-emacs-work-like-my-vim-setup/
 
 Check if there's a way to keep all the config in this file itself with init.el being empty
@@ -621,13 +621,17 @@ evil can be toggled using =C-z=
 #+BEGIN_SRC emacs-lisp
   :config
   (evil-mode t)
+#+END_SRC
 
+Mode specific states
+#+BEGIN_SRC emacs-lisp
   (dolist (mode '(git-rebase-mode org-toc-mode))
     (evil-set-initial-state mode 'emacs))
   (evil-set-initial-state 'term-mode 'insert)
+#+END_SRC
 
-  ;; (evil-set-initial-state 'org-capture-mode 'insert)
-  ;; This doesn't seem to work for some reason. Refer https://github.com/emacs-evil/evil/issues/1115 for details
+evil-set-initial-state works only for major modes. Thus for minor modes I have to use an explicit hook. Refer this [[https://github.com/emacs-evil/evil/issues/1115][github issue]] for details
+#+BEGIN_SRC emacs-lisp
   (add-hook 'org-capture-mode-hook 'evil-insert-state)
 #+END_SRC
 
@@ -1704,7 +1708,7 @@ I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ens
 #+END_SRC
 
 *** org-expiry
-This allows me to add a =CREATED= property everytime I create a new org-heading
+This allows me to add a =CREATED= property everytime I create a new org-heading. From [[https://stackoverflow.com/a/13285957/734153][here]].
 #+BEGIN_SRC emacs-lisp
   (use-package org-expiry
     :after org
@@ -1800,6 +1804,20 @@ When a color is specified as a hex code or with its name, set the background of 
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-mode
     :defer t)
+#+END_SRC
+
+** undo-tree
+This lets us visually walk through the changes we've made, undo back to a certain point (or redo), and go down different branches.
+Default binding is =C-x u=
+#+BEGIN_SRC emacs-lisp
+  (use-package undo-tree
+    :bind (:map my-settings-enable-map
+                ("U" . undo-tree-visualize)
+           :map my-settings-disable-map
+                ("U" . undo-tree-visualizer-quit))
+    :custom
+    (undo-tree-visualizer-timestamps t)
+    (undo-tree-visualizer-diff t))
 #+END_SRC
 
 ** which-key
