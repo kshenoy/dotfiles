@@ -574,10 +574,11 @@ let g:UltiSnipsEditSplit = "vertical"
 " Location of snippets
 execute 'let g:UltiSnipsSnippetDirectories=["' . g:dotvim . '/pack/settings/start/UltiSnips/snippets"]'
 let g:UltiSnipsEnableSnipMate=0
-let g:UltiSnipsExpandTrigger='<C-Space><Tab>'
-let g:UltiSnipsListSnippets='<C-Space><C-Tab>'
-let g:UltiSnipsJumpForwardTrigger='<C-Space><C-J>'
-let g:UltiSnipsJumpBackwardTrigger='<C-Space><C-K>'
+" <C-X> is insert-mode completion so using <C-X><C-S> feels natural for snippets
+let g:UltiSnipsExpandTrigger='<C-X><C-S>'
+let g:UltiSnipsListSnippets='<C-X>g<C-S>'
+let g:UltiSnipsJumpForwardTrigger='<Tab>'
+let g:UltiSnipsJumpBackwardTrigger='<S-Tab>'
 
 call plug#('SirVer/ultisnips', s:PlugCond(has('python')||has('python3')))
 
