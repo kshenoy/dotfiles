@@ -15,14 +15,14 @@ setl commentstring=//\ %s
 " 22. EXECUTING EXTERNAL COMMANDS
 "
 if &formatprg == ""
-  setl formatprg=clang-format\ --style=google
+  setl formatprg=clang-format\ --style=llvm
 endif
 
 
 "
 " 23. RUNNING MAKE AND JUMPING TO ERRORS
 "
-setl makeprg=g++\ -std=c++14\ -o\ %:r\ %
+setl makeprg=clang++\ -Wall\ -Wextra\ -std=c++14\ -L$HOME/.local/lib\ -I$HOME/.local/include\ -o\ %:r\ %
 
 
 "

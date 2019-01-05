@@ -1200,7 +1200,7 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'org-structure-template-alist
-               '("sc" "#+BEGIN_SRC C++\n  #include <iostream>\n\n  using namespace std;\n\n  int main() {\n    ?cout << \"Hello World!\" << endl;\n  }\n#+END_SRC"))
+               '("sc" "#+BEGIN_SRC C++\n  #include <iostream>\n\n  using namespace std;\n\n  int main() {\n    ?cout << \"Hello World!\\n\";\n  }\n#+END_SRC"))
 
   (add-to-list 'org-structure-template-alist
                '("sl" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
@@ -1365,7 +1365,7 @@ Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
 
   (setq org-babel-C++-compiler "clang++")
   (setq org-babel-default-header-args:C++
-        '((:flags   . "-std=c++14 -Wall -Wextra -Werror ${BOOST_HOME:+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -Wl,${BOOST_HOME:+-rpath ${BOOST_HOME}/lib}")))
+        '((:flags . "-std=c++14 -Wall -Wextra -Werror ${BOOST_HOME:+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -L${HOME}/.local/lib -I${HOME}/.local/include -Wl,${BOOST_HOME:+-rpath ${BOOST_HOME}/lib}")))
 
   (setq org-babel-default-header-args:perl
         '((:results . "output")))
