@@ -28,6 +28,14 @@ Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/
               :prefix-docstring "This map is used to put all keybindings that I use to jump around eg. open files, buffers etc."
               :prefix "C-c f")
 
+  (bind-keys* :prefix-map my-auto-completion-map
+              :prefix-docstring "This map is used to put all auto-completion related keybindings"
+              :prefix "C-c c")
+
+  (bind-keys* :prefix-map my-goto-map
+              :prefix-docstring "This map is used to put all movement related keybindings"
+              :prefix "C-c g")
+
   (bind-keys* :prefix-map my-s-bindings-map
               :prefix-docstring "This map is used to group together all s-mnemonic bindings such as substitution, sizing etc."
               :prefix "C-c s")
@@ -51,10 +59,6 @@ Original use of =C-c [= and =C-c ]= is to manipulate =org-agenda-files=. Since I
   (bind-keys* :prefix-map my-settings-toggle-map
               :prefix-docstring "This map is used to toggle settings"
               :prefix "C-c t")
-
-  (bind-keys* :prefix-map my-auto-completion-map
-              :prefix-docstring "This map is used to put all auto-completion related keybindings"
-              :prefix "C-c c")
 #+END_SRC
 
 To delete existing bindings, use =(unbind-key ...)=
@@ -68,7 +72,7 @@ By default C-x = is bound to /what-cursor-position/ but evil maps both =ga= and 
   (bind-key* "C-x =" 'describe-char)
 #+end_src
 
-=key-translation-map= can be used to /map/ one set of keys to another [[id:f42c3dc8-c2f6-4f22-9f47-0c578479ef67][eg.]]
+=key-translation-map= can be used to /map/ one set of keys to another [[Make Escape quit everything][eg.]]
 
 *** revert-buffer
 #+begin_src emacs-lisp
@@ -531,11 +535,16 @@ Other examples:
 #+END_SRC
 
 ** avy
+I'm using =C-'= instead of creating a binding in =my-goto-map= as that's the default binding used in an ivy-minibuffer
+Also, I'm rebinding =M-g M-g= from =goto-line= as using a number with =avy-goto-line= makes it behave like =goto-line= anyway.
+Besides, =M-g g= is still bound to =goto-line= by default and, not to mention =<N>G= binding from evil.
+
 #+BEGIN_SRC emacs-lisp
   (use-package avy
     :after evil
-    :bind (:map evil-normal-state-map
-                ("g s" . avy-goto-char)))
+    :bind* (("C-'" . avy-goto-char-timer)
+            ("M-g M-g" . avy-goto-line))
+    :bind (:map my-goto-map ("o" . avy-org-goto-heading-timer)))
 #+END_SRC
 
 ** beacon
@@ -543,13 +552,13 @@ Other examples:
   (use-package beacon
     :custom
     (beacon-blink-when-window-scrolls nil)
-    (beacon-color (face-attribute 'highlight :background))
+    (beacon-color (face-attribute 'fringe :background))
     :config
     (beacon-mode 1)
     (add-hook 'after-load-theme-hook
               (lambda()
                 "Update beacon's background color once a theme is loaded"
-                (setq beacon-color (face-attribute 'highlight :background)))))
+                (setq beacon-color (face-attribute 'fringe :background)))))
 #+END_SRC
 
 ** company
@@ -664,7 +673,7 @@ evil-set-initial-state works only for major modes. Thus for minor modes I have t
   (add-hook 'org-mode-hook (lambda() (bind-key "z v" 'org-reveal evil-normal-state-map)))
 #+END_SRC
 
-Make Escape quit everything
+<<Make Escape quit everything>>
 #+BEGIN_SRC emacs-lisp
   (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
 #+END_SRC
@@ -850,25 +859,20 @@ Do not add a =^= (beginning of line anchor) while completing. Refer [[https://gi
 #+END_SRC
 
 *** Keybindings
-|---------+---------------------------------------------------------------------------------------------------------------|
-| Binding | Description                                                                                                   |
-|---------+---------------------------------------------------------------------------------------------------------------|
-| =M-n=     | [[http://mbork.pl/2018-04-21_counsel-rg_and_symbol_at_point][Insert symbol at point]]. By default /M-p/ and /M-n/ go back and forward in history.                                |
-|         | However, starting with /M-n/ we move the minibuffer history into the future, which can be thought of as a "dwim" choice. |
-|---------+---------------------------------------------------------------------------------------------------------------|
-| =M-q=     | [[http://irreal.org/blog/?p=7457][Query replace]]. Start a substitution using the search pattern                                                  |
-|---------+---------------------------------------------------------------------------------------------------------------|
-| =C-c C-o= | [[https://oremacs.com/2015/11/04/ivy-occur/][ivy-occur]]. Launch occur using current input                                                                   |
-|---------+---------------------------------------------------------------------------------------------------------------|
-
-**** Rebind =C-r= to ivy-resume
-By default =C-r= is bound to =isearch-backward=. Since I'm using swiper, it's no longer required and is way more useful this way.
-Also =C-h k= says that =C-r= is bound to =undo-tree-redo= found in =undo-tree-map= while it's really defined in =evil-normal-state-map= in evil_maps.el
 #+BEGIN_SRC emacs-lisp
-  (unbind-key "C-r" evil-normal-state-map)
-  (bind-key* "C-r" 'ivy-resume)
-  ;; (bind-key* "C-c C-r" 'ivy-resume)
+  (bind-key* "C-c C-r" 'ivy-resume)
 #+END_SRC
+
+|---------+------------------------------------------------------------------------------------------------------------------------|
+| Binding | Description                                                                                                            |
+|---------+------------------------------------------------------------------------------------------------------------------------|
+| =M-n=     | [[http://mbork.pl/2018-04-21_counsel-rg_and_symbol_at_point][Insert symbol at point]]. By default /M-p/ and /M-n/ go back and forward in history.                                         |
+|         | However, starting with /M-n/ we move the minibuffer history into the future, which can be thought of as a "dwim" choice. |
+|---------+------------------------------------------------------------------------------------------------------------------------|
+| =M-q=     | [[http://irreal.org/blog/?p=7457][Query replace]]. Start a substitution using the search pattern                                                           |
+|---------+------------------------------------------------------------------------------------------------------------------------|
+| =C-c C-o= | [[https://oremacs.com/2015/11/04/ivy-occur/][ivy-occur]]. Launch occur using current input                                                                            |
+|---------+------------------------------------------------------------------------------------------------------------------------|
 
 **** Show mix of buffers, recent files and bookmarks
 There is a variable =ivy-use-virtual-buffers= that does this. However, it is static and when set, dumps everything in =ivy-switch-buffer=.
@@ -1193,6 +1197,7 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 #+BEGIN_SRC emacs-lisp
   :config
   (setq org-clock-idle-time nil)
+  ;; (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
 #+END_SRC
 
 **** Templates
