@@ -885,9 +885,22 @@ As a result, by default I have to choose one or the other; I can't have both. Th
     (let* ((ivy-use-virtual-buffers t))
       (ivy-switch-buffer)))
 
+  (defun my-p4-files ()
+    "Use fzf with perforce"
+    (let (counsel-fzf-cmd "p4 have $STEM/... | fzf -f \"%s\"")
+      (counsel-fzf)))
+
+  (defun my-file-finder ()
+    "Context based file finding"
+    (interactive)
+    (cond ((locate-dominating-file default-directory ".git") (counsel-git))
+          ((locate-dominating-file default-directory "P4CONFIG") (my-p4-files))
+          (t (counsel-fzf))))
+
   (bind-keys :map my-fuzzy-jumper-command-map
              ("b" . ivy-switch-buffer)
-             ("f" . my-ivy-switch-virtual-buffer))
+             ("f" . my-file-finder)
+             ("j" . my-ivy-switch-virtual-buffer))
 #+END_SRC
 
 *** /fin/
