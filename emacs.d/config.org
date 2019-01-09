@@ -1895,6 +1895,6 @@ Placing at end to be called after all packages are loaded
 * After
 ** Private config
 #+BEGIN_SRC emacs-lisp
-  (when (string-match-p "atlhen" (system-name))
+  (when (string-match-p "atlibex" (system-name))
     (load (expand-file-name "private_work.el" user-emacs-directory) t))
 #+END_SRC
