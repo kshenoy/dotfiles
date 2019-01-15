@@ -3,7 +3,12 @@
 #+PROPERTY: header-args+ :comments both :mkdirp yes
 #+TODO: TODO | DONE
 
-Resources:
+* Resources
+** Useful literate config files
+:PROPERTIES:
+:ID:       b2032342-6c4c-48be-b370-6ae538a48e2c
+:CREATED:  [2019-01-15 Tue 05:25]
+:END:
 https://github.com/caisah/emacs.dz
 [[http://wolfecub.github.io/dotfiles/][Wolfe's Literate Emacs Config]]
 [[https://huytd.github.io/emacs-from-scratch.html][Emacs from scratch]]
@@ -14,6 +19,20 @@ https://brainlessdeveloper.com/2017/12/27/making-emacs-work-like-my-vim-setup/
 Check if there's a way to keep all the config in this file itself with init.el being empty
 Sacha Chua seems to have something like that. Her init.el is simply a link.
 Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/shaving_time_on_emacs_startup_from_org_literate/][reddit thread]]?
+
+** Debugging
+:PROPERTIES:
+:ID:       4e219760-3d5e-4a51-9837-8f24298b44d9
+:CREATED:  [2019-01-15 Tue 05:25]
+:END:
+Use =C-u C-M-x= with the point over the function to debug. This puts us into debugging minor mode in which the following bindings are useful
+
+| SPC | Step next      |
+| b   | Set breakpoint |
+| g   | Go (run)       |
+| h   | Goto here      |
+| i   | Step into      |
+| q   | Quit           |
 
 * General
 ** custom file
@@ -639,9 +658,13 @@ Mode specific states
   (evil-set-initial-state 'term-mode 'insert)
 #+END_SRC
 
-evil-set-initial-state works only for major modes. Thus for minor modes I have to use an explicit hook. Refer this [[https://github.com/emacs-evil/evil/issues/1115][github issue]] for details
+=evil-set-initial-state= works only for major modes. Thus for minor modes I have to use an explicit hook. Refer this [[https://github.com/emacs-evil/evil/issues/1115][github issue]] for details
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'org-capture-mode-hook 'evil-insert-state)
+  (dolist (hook '(org-capture-mode-hook))
+    (add-hook hook 'evil-insert-state))
+
+  (dolist (hook '(edebug-mode-hook))
+    (add-hook hook 'evil-emacs-state))
 #+END_SRC
 
 **** Keybindings
