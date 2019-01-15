@@ -1455,14 +1455,14 @@ From https://emacs.stackexchange.com/a/9813/9690
   (add-hook 'org-babel-after-execute-hook 'my-fix-inline-images)
 #+END_SRC
 
-***** TODO Jump to head of any block, not just src blocks
+***** Jump to head/tail of any block, not just src blocks
 :PROPERTIES:
 :ID:       964101eb-3077-411d-b9e5-9011c055c4ff
 :CREATED:  [2019-01-14 Mon 21:36]
 :END:
 =org-babel-goto-src-block-head= jumps to the beginning of a source block. This is super useful! Why restrict it only to source blocks?
 #+begin_src emacs-lisp
-  (defun my-org-babel-goto-block-head (p)
+  (defun my-org-babel-goto-block-corner (p)
     "Go to the beginning of the current block.
     If called with a prefix, go to the end of the block"
     (interactive "P")
@@ -1475,10 +1475,10 @@ From https://emacs.stackexchange.com/a/9813/9690
           (beginning-of-line)
           (skip-chars-forward " \r\t\n" end)
           (when (< (point) end)
-            (goto-char
-             (if p
-                 (org-element-property :end element)
-               (org-element-property :begin element))))))))
+            (goto-char (if p end begin))
+            (when p
+              (skip-chars-backward " \r\t\n")
+              (beginning-of-line)))))))
 #+end_src
 
 **** org-capture
@@ -1623,7 +1623,7 @@ Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-ke
 
 Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is left untouched to only jump to top of src blocks
 #+begin_src emacs-lisp
-  (bind-key "u" 'my-org-babel-goto-block-head org-babel-map)
+  (bind-key "u" 'my-org-babel-goto-block-corner org-babel-map)
 #+end_src
 
 *** /fin/
