@@ -1,9 +1,12 @@
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args+ :results output silent
 #+PROPERTY: header-args+ :comments both :mkdirp yes
-#+TODO: TODO | DONE
+#+TODO: FIXME(!) | DONE
 
 * Resources
+:PROPERTIES:
+:CREATED:  [2019-01-15 Tue 07:17]
+:END:
 ** Useful literate config files
 :PROPERTIES:
 :ID:       b2032342-6c4c-48be-b370-6ae538a48e2c
@@ -1200,7 +1203,7 @@ At the moment, it hides not just the angle braces but also the text between them
 **** ToDo States
 Custom keywords
 #+BEGIN_SRC emacs-lisp
-  (setq org-todo-keywords '((sequence "TODO(t!)" "WAITING(w@/!)" "|" "DONE(d@)" "DEFER(f@)" "CANCEL(c@)")))
+  (setq org-todo-keywords '((sequence "TODO(t!)" "WAITING(w@!/!)" "|" "DONE(d@!/!)" "DEFER(f@!/!)" "CANCEL(c@!)")))
   ;; (setq org-todo-keyword-faces
   ;;       (quote (("TODO" :foreground "red" :weight bold)
   ;;               ("WAITING" :foreground "orange" :weight bold)
@@ -1215,10 +1218,11 @@ Refer [[http://orgmode.org/manual/Tracking-TODO-state-changes.html][Tracking-TOD
 
 Add logging when task state changes
 #+BEGIN_SRC emacs-lisp
-  (setq org-log-done 'time) ; 'time/'note
-  (setq org-log-redeadline 'note)
-  (setq org-log-into-drawer t)  ; Save state changes into LOGBOOK drawer instead of in the body
-  (setq org-treat-insert-todo-heading-as-state-change t)
+  (setq org-log-done nil  ; Not required as state changes are logged in the LOGBOOK
+        org-log-redeadline 'note
+        org-log-into-drawer t  ; Save state changes into LOGBOOK drawer instead of in the body
+        org-treat-insert-todo-heading-as-state-change t
+        org-enforce-todo-dependencies t)  ; Prevent parent task from being marked complete till all child TODOS are marked as complete
 #+END_SRC
 
 Change from any todo state to any other state using =C-c C-t KEY=
