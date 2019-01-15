@@ -30,6 +30,7 @@ vim/autoload/plug*
 vim/pack/bundles
 vim/pack/settings/start/UltiSnips/pythonx/UltiSnips_globals.pyc
 vim/pack/settings/start/UltiSnips/pythonx/vimsnippets.pyc
+vim/pack/settings/start/UltiSnips/pythonx/__pycache__
 vim/tmp
 nvim/autoload/plug*
 nvim/bundles

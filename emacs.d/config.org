@@ -757,7 +757,9 @@ More intuitive keybindings for winner-mode
 *** evil-matchit
 #+BEGIN_SRC emacs-lisp
   (use-package evil-matchit
-    :after evil)
+    :after evil
+    :config
+    (global-evil-matchit-mode 1))
 #+END_SRC
 
 *** evil-numbers
@@ -1430,6 +1432,32 @@ From https://emacs.stackexchange.com/a/9813/9690
   (add-hook 'org-babel-after-execute-hook 'my-fix-inline-images)
 #+END_SRC
 
+***** TODO Jump to head of any block, not just src blocks
+:PROPERTIES:
+:ID:       964101eb-3077-411d-b9e5-9011c055c4ff
+:CREATED:  [2019-01-14 Mon 21:36]
+:END:
+=org-babel-goto-src-block-head= jumps to the beginning of a source block. This is super useful! Why restrict it only to source blocks?
+#+begin_src emacs-lisp
+  (defun my-org-babel-goto-block-head (p)
+    "Go to the beginning of the current block.
+    If called with a prefix, go to the end of the block"
+    (interactive "P")
+    (let* ((element (org-element-at-point)))
+      (when (or (eq (org-element-type element) 'example-block)
+                (eq (org-element-type element) 'src-block) )
+        (let ((begin (org-element-property :begin element))
+              (end (org-element-property :end element)))
+          ;; Ensure point is not on a blank line after the block.
+          (beginning-of-line)
+          (skip-chars-forward " \r\t\n" end)
+          (when (< (point) end)
+            (goto-char
+             (if p
+                 (org-element-property :end element)
+               (org-element-property :begin element))))))))
+#+end_src
+
 **** org-capture
 Show hierarchical headlines when refiling instead of flattening it out
 Show all the hierarchical headlines instead of having to step down them
@@ -1567,8 +1595,13 @@ The mnemonic is that Org leaves =C-c [a-z]= free for the user. Thus, I'm using =
 
 Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
 #+BEGIN_SRC emacs-lisp
-  (bind-key "C-k" 'org-babel-remove-result org-babel-map)
+  (define-key key-translation-map (kbd "C-c C-v C-k") (kbd "C-c C-v k"))
 #+END_SRC
+
+Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is left untouched to only jump to top of src blocks
+#+begin_src emacs-lisp
+  (bind-key "u" 'my-org-babel-goto-block-head org-babel-map)
+#+end_src
 
 *** /fin/
 #+BEGIN_SRC emacs-lisp
