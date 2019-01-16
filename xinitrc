@@ -14,6 +14,7 @@ has() {
 # if [[ -z $(ps aux | grep "[x]cape") ]]; then
 #   has xcape && xcape -t 300 -e 'Caps_Lock=Escape' &
 # fi
+
 # NOTE: The following allows not just CapsLock but all Controls to generate an Escape when tapped
 # However, it works well with NX
 setxkbmap -option 'ctrl:nocaps'
@@ -21,7 +22,9 @@ if [[ -z $(ps aux | grep "[x]cape") ]]; then
   has xcape && xcape -t 300 -e 'Control_L=Escape' &
 fi
 
-#setxkbmap -option 'shift:both_capslock'
+# * Tap both Shift to generate CapsLock
+# With CapsLock neutered, I figure I should have a backup just in case...
+setxkbmap -option 'shift:both_capslock'
 
 #xset -b            # Stop beeping at me (A.K.A turn off PC speaker)
 #xset r rate 330 60 # Set keyboard repeat rate

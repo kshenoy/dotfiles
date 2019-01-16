@@ -1068,6 +1068,43 @@ Use =C-c f= as prefix for all counsel-related keybindings
     :after ivy
     :custom
     (ivy-rich-path-style 'abbrev)
+
+    ;; Pretty-much the default, just bumping up the widths
+    (ivy-rich--display-transformers-list '(
+                                           ivy-switch-buffer
+                                           (:columns
+                                            ((ivy-rich-candidate (:width 40))
+                                             (ivy-rich-switch-buffer-size (:width 7))
+                                             (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
+                                             (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
+                                             (ivy-rich-switch-buffer-project (:width 15 :face success))
+                                             (ivy-rich-switch-buffer-path (:width
+                                                                           (lambda (x)
+                                                                             (ivy-rich-switch-buffer-shorten-path x
+                                                                                                                  (ivy-rich-minibuffer-width 0.3))))))
+                                            :predicate
+                                            (lambda (cand) (get-buffer cand)))
+
+                                           counsel-M-x
+                                           (:columns
+                                            ((counsel-M-x-transformer (:width 50))
+                                             (ivy-rich-counsel-function-docstring (:face font-lock-doc-face))))
+
+                                           counsel-describe-function
+                                           (:columns
+                                            ((counsel-describe-function-transformer (:width 50))
+                                             (ivy-rich-counsel-function-docstring (:face font-lock-doc-face))))
+
+                                           counsel-describe-variable
+                                           (:columns
+                                            ((counsel-describe-variable-transformer (:width 50))
+                                             (ivy-rich-counsel-variable-docstring (:face font-lock-doc-face))))
+
+                                           counsel-recentf
+                                           (:columns
+                                            ((ivy-rich-candidate (:width 0.8))
+                                             (ivy-rich-file-last-modified-time (:face font-lock-comment-face))))))
+
     :config
     (ivy-rich-mode t))
 #+END_SRC
@@ -1203,15 +1240,15 @@ At the moment, it hides not just the angle braces but also the text between them
 **** ToDo States
 Custom keywords
 #+BEGIN_SRC emacs-lisp
-  (setq org-todo-keywords '((sequence "TODO(t!)" "WAITING(w@!/!)" "|" "DONE(d@!/!)" "DEFER(f@!/!)" "CANCEL(c@!)")))
+  (setq org-todo-keywords '((sequence "TODO(t!)" "WAITING(w@/!)" "|" "DONE(d@/!)" "DEFER(f@/!)" "CANCEL(c@)")))
   ;; (setq org-todo-keyword-faces
   ;;       (quote (("TODO" :foreground "red" :weight bold)
   ;;               ("WAITING" :foreground "orange" :weight bold)
   ;;               ("DONE" :foreground "forest green" bold)
   ;;               ("CANCEL" :foreground "forest green" bold))))
 #+END_SRC
-=!=   - Log timestamp
 =@=   - Log timestamp and note
+=!=   - Log timestamp only
 =x/y= - =x= takes affect when entering the state and
       =y= takes affect when exiting if the state being entered doesn't have any logging
 Refer [[http://orgmode.org/manual/Tracking-TODO-state-changes.html][Tracking-TODO-state-changes]] for details
@@ -1970,8 +2007,10 @@ Placing at end to be called after all packages are loaded
 #+END_SRC
 
 * After
-** Private config
-#+BEGIN_SRC emacs-lisp
-  (when (string-match-p "atlibex" (system-name))
-    (load (expand-file-name "private_work.el" user-emacs-directory) t))
-#+END_SRC
+** Private config #+BEGIN_SRC emacs-lisp (when (string-match-p "atlibex" (system-name)) (load (expand-file-name "private_work.el" user-emacs-directory) t)) #+END_SRC
+** File-local variables
+Use =add-file-local-variable= or =add-file-local-variable-prop-line= instead of adding these manually
+
+# Local Variables:
+# org-refile-targets: ((nil :maxlevel . 9))
+# End:
