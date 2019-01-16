@@ -1,23 +1,25 @@
 #+TITLE: Emacs Configuration
-#+PROPERTY: header-args+ :results output silent
-#+PROPERTY: header-args+ :comments both :mkdirp yes
+#+PROPERTY: header-args+ :results output silent :tangle yes :noweb tangle :comments both :mkdirp yes
 #+TODO: FIXME(!) | DONE
 
-* Resources
+* Literate config
 :PROPERTIES:
 :CREATED:  [2019-01-15 Tue 07:17]
 :END:
-** Useful literate config files
+** Resources
 :PROPERTIES:
 :ID:       b2032342-6c4c-48be-b370-6ae538a48e2c
 :CREATED:  [2019-01-15 Tue 05:25]
 :END:
-https://github.com/caisah/emacs.dz
-[[http://wolfecub.github.io/dotfiles/][Wolfe's Literate Emacs Config]]
-[[https://huytd.github.io/emacs-from-scratch.html][Emacs from scratch]]
-[[https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org][AngryBacon]]
-[[https://to1ne.gitlab.io/literate-dotfiles/][Toon's Literate Dotfiles]]
-https://brainlessdeveloper.com/2017/12/27/making-emacs-work-like-my-vim-setup/
+- [[https://www.youtube.com/watch?v=49kBWM3RQQ8&list=PL9KxKa8NpFxIcNQa9js7dQQIHc81b0-Xg][YouTube: Mike Zamansky - Using Emacs]]
+- [[https://www.youtube.com/watch?v=d6iY_1aMzeg&list=PLX2044Ew-UVVv31a0-Qn3dA6Sd_-NyA1n][YouTube: Uncle Dave - Emacs Tutorial]]
+- [[https://www.youtube.com/playlist?list=PLrFss89N5XNw8rTgI2fVhSj9Y62TpphFI][YouTube: Yisrael Dov - Emacs is Great]]
+- https://github.com/caisah/emacs.dz
+- [[http://wolfecub.github.io/dotfiles/][Wolfe's Literate Emacs Config]]
+- [[https://huytd.github.io/emacs-from-scratch.html][Emacs from scratch]]
+- [[https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org][AngryBacon]]
+- [[https://to1ne.gitlab.io/literate-dotfiles/][Toon's Literate Dotfiles]]
+- https://brainlessdeveloper.com/2017/12/27/making-emacs-work-like-my-vim-setup/
 
 Check if there's a way to keep all the config in this file itself with init.el being empty
 Sacha Chua seems to have something like that. Her init.el is simply a link.
@@ -28,6 +30,7 @@ Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/
 :ID:       4e219760-3d5e-4a51-9837-8f24298b44d9
 :CREATED:  [2019-01-15 Tue 05:25]
 :END:
+
 Use =C-u C-M-x= with the point over the function to debug. This puts us into debugging minor mode in which the following bindings are useful
 
 | SPC | Step next      |
@@ -36,6 +39,16 @@ Use =C-u C-M-x= with the point over the function to debug. This puts us into deb
 | h   | Goto here      |
 | i   | Step into      |
 | q   | Quit           |
+
+*** Detangling
+[[https://www.youtube.com/watch?v=BLomb52wjvE][Yisrael Dov - Emacs is Great ep. 11]]
+
+*header-args*:
+- =:tangle yes=
+This allows me to run =org-babel-tangle= in the org file to generate the el file without having to restart emacs and rely on =org-babel-load-file=
+
+- =:comments both=
+This adds all the non-code related text as comments in the tangled file. It also adds comments wrappers with links back to the heading in the original Org mode file. Use =org-babel-tangle-jump-back-to-org= to jump back to the org file from the code block. If any changes are made in the tangled file, use =org-babel-detangle= to add it back to the original Org mode file.
 
 * General
 ** custom file
@@ -233,7 +246,7 @@ From [[http://pragmaticemacs.com/emacs/visualise-and-copy-differences-between-fi
 
 ** Emacs server
 A daemon can be started from the shell
-#+BEGIN_SRC bash
+#+BEGIN_SRC bash :tangle no
   emacs --daemon=SERVERNAME
 #+END_SRC
 
@@ -245,7 +258,7 @@ or from within emacs:
 The downside of this is that this seems to restart the server instead of creating multiple instances
 
 Once a daemon is started, a client can be started with
-#+BEGIN_SRC bash
+#+BEGIN_SRC bash :tangle no
   emacsclient --alternate-editor="" --create-frame --quiet --socket-name=SERVERNAME
 #+END_SRC
 This will launch emacsclient if a daemon is already running and create one if not.
@@ -279,7 +292,7 @@ Scale font size using =C-x C-+= and =C-x C--=. =C-x C-0= resets it.
 #+END_SRC
 
 After installing a new font refresh the font cache by running
-#+BEGIN_SRC bash
+#+BEGIN_SRC bash :tangle no
   fc-cache -fv
 #+END_SRC
 
