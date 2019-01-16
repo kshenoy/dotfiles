@@ -1242,10 +1242,14 @@ This frees up S-left and S-right which I can then use to cycles through the todo
   ;; (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
 #+END_SRC
 
-**** Templates
+**** TODO [[https://orgmode.org/manual/Easy-templates.html][Easy Templates]]
+:PROPERTIES:
+:ID:       851ad87b-250e-4c1e-83b1-6b4e1fa6b20d
+:CREATED:  [2019-01-11 Fri 13:03]
+:END:
+These get added only if org-version < 9.2
 =?= in each string controls where the point will be placed after expansion
-
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (add-to-list 'org-structure-template-alist
                '("sc" "#+BEGIN_SRC C++\n  #include <iostream>\n\n  using namespace std;\n\n  int main() {\n    ?cout << \"Hello World!\\n\";\n  }\n#+END_SRC"))
 
@@ -1261,6 +1265,19 @@ This frees up S-left and S-right which I can then use to cycles through the todo
   (add-to-list 'org-structure-template-alist
                '("ss" "#+BEGIN_SRC bash\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
 #+END_SRC
+
+For org-version >= 9.2, we have to use this. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-structure-template-alist '("sc" . "src C++"))
+  (add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("ss" . "src bash"))
+#+END_SRC
+
+However, note that since the following start with =s=, it will get clobbered by the default =src= block and not show up in the menu.
+Thus to get it to work as before using =<sc=, we have to add =org-tempo= to =org-modules=
+#+begin_src emacs-lisp
+  (add-to-list 'org-modules 'org-tempo)
+#+end_src
 
 **** Flatten links
 This is the counterpart to =org-insert-link=. From [[http://emacs.stackexchange.com/a/10714/9690][here]].
