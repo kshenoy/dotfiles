@@ -1,0 +1,352 @@
+#+TITLE: Git Configuration
+#+PROPERTY: header-args+ :results output silent :noweb tangle :comments both :mkdirp yes
+#+TODO: FIXME(!) | DONE
+
+* Resources
+- [[https://medium.com/@willhayjr/the-architecture-and-history-of-git-a-distributed-version-control-system-62b17dd37742][Architecture and History of Git]]
+- [[https://rachelcarmena.github.io/2018/12/12/how-to-teach-git.html][How to teach Git]]
+
+** [[https://git-scm.com/docs/gitglossary][Glossary]]
+A good way to understand git is to think of the repository as a tree where each commit comprises a node.
+This gives rise to the terminology of /trunk/ and /branch/. In git, the trunk is commonly referred to as the /master/.
+Technically, all branches are equal. However, one is designated as the default development branch and called /master/.
+
+Furthermore, while all nodes are equal, some are used more often than other and we label them for ease of use.
+These labels are nothing but pointers to these nodes the way /head/ and /tail/ are pointers to specific elements of a queue.
+
+|---------------+---------------------------------------------------------------------------------------------------------|
+| Labels        | Description                                                                                             |
+|---------------+---------------------------------------------------------------------------------------------------------|
+| local         | the local repository. Git is a distributed-vcs. Thus, creating a local git workarea is done by /cloning,/ |
+|               | implying that the local repository it is functionally identical to the remote one                       |
+| remote        | the remote repository                                                                                   |
+| upstream      | the repo that the current repo was forked from                                                          |
+| origin        | default name of the remote git repository                                                               |
+| origin/foo    | foo branch in origin                                                                                    |
+| HEAD          | points to the current *branch*. Normally HEAD points to the branch itself and not to a specific commit.   |
+|               | However, as the branch itself points to the latest commit, HEAD will as well, unless it's detached      |
+| detached HEAD | When we checkout a commit not at the tip of a branch, HEAD points to it and is said to be detached      |
+| branch        | A branch always points to the latest commit on it aka tip of the branch or branch head                  |
+| master        | the default development branch. Points to the latest commit                                             |
+|---------------+---------------------------------------------------------------------------------------------------------|
+
+** [[https://git-scm.com/book/en/v1/Git-Basics-Recording-Changes-to-the-Repository][File Status Lifecycle]]
+** Committing
+:PROPERTIES:
+:ID:       86c15079-6050-4bb4-9d3e-b8b5c0a7d5e0
+:CREATED:  [2019-01-15 Tue 09:13]
+:END:
+*** Making partial commits
+:PROPERTIES:
+:ID:       8ad7fce0-6a09-4af8-b544-381cbdd9f5ce
+:CREATED:  [2019-01-16 Wed 19:55]
+:END:
+https://coderwall.com/p/ufapcw/git-add-files-by-hunk
+Use =git add -p= to commit changes by hunks
+
+** Diff
+Syntax: =git diff <FROM> <TO>=
+
+|------------------------------+------------------------------------+-------------------------------------------------------------|
+| Command                      | FROM                               | TO                                                          |
+|------------------------------+------------------------------------+-------------------------------------------------------------|
+| git diff <commit1> <commit2> | commit1                            | commit2                                                     |
+| git diff                     | working (default value of commit1) | index (default value of commit2 when commit1 == working)    |
+| git diff --staged            | index                              | HEAD (default value of commit2 when commit1 == index)       |
+| git diff HEAD                | working (default value of commit1) | HEAD                                                        |
+| git diff origin/master       | working (default value of commit1) | latest commit of the master branch in the remote repository |
+|------------------------------+------------------------------------+-------------------------------------------------------------|
+
+Thus, we see that /--staged/ changes the default for commit1 from working to index
+
+NOTE:
+- /index/ is also known as the staging area
+- /--staged/ is synonymous with /--cached/
+
+** Renaming/Moving/Deleting
+Using =mv= or =rm= simply makes the changes locally but not the git repo. The file shows up as Changed but not staged.
+Hence, we've to explicitly let git know using these instead:
+=git rm= - Stages the removal and deletes the file locally
+=git rm --cached= - Deletes a staged file but keeps it locally
+=git mv= - Move/rename the file
+
+** Undoing
+From https://stackoverflow.com/a/15321456/734153
+
+|--------------+----------------+------------------------|
+| FROM         | TO             | Command                |
+|--------------+----------------+------------------------|
+| HEAD         | staging area   | git reset --soft HEAD^ |
+| staging area | working dir    | git reset HEAD         |
+| working dir  | previous index | git checkout -- <file> |
+|--------------+----------------+------------------------|
+
+NOTE:
+- /staging area/ is also known as the /index/
+- /--staged/ is synonymous with /--cached/
+
+** Submodules
+*** Adding
+#+begin_src bash
+  git submodule add <git@github...> <path/to/submodule>
+#+end_src
+
+*** Removing
+From https://davidwalsh.name/git-remove-submodule
+
+1. Delete the relevant section from =.gitmodules=
+2. Stage the =.gitmodules= changes using =git add .gitmodules=
+3. Delete the relevant section from =.git/config=
+4. Run =git rm --cached path/to/submodule= without a trailing slash
+5. Run =rm -rf .git/modules/submodule_name=
+6. Commit the changes
+7. Delete the now untracked submodule files =rm -rf path/to/submodule=
+
+*** Updating
+#+begin_src bash
+  git submodule update --recursive --remote
+#+end_src
+
+*** Sparse checkouts
+Refer [[https://briancoyner.github.io/2013/06/05/git-sparse-checkout.html][this]].
+
+** Branches
+Each branch that exists always tracks the master and another branch.
+Eg. in github, when viewing a branch foo, it mentions how many commits ahead and/or behind it is behind something else, say bar.
+In that case, foo is said to be tracking bar
+
+*** Creating a new branch
+#+begin_src bash
+  git checkout -b branch
+#+end_src
+
+When a new branch is created, the files of the new branch are created from that of the current branch/master.
+It also inherits any tracking information
+
+#+begin_src bash
+  git push origin <branchname>
+#+end_src
+
+Once a branch is created locally, we need to push it to the repository.
+Here /origin/ refers to the current repository.
+
+*** Updating the tracking
+#+begin_src bash
+  git branch -u <branch_to_track>
+#+end_src
+
+*** Merging branches
+Let's say we want to merge the changes from the /dev/ branch back into the /master/ branch
+
+#+begin_src bash
+  git checkout master
+  git merge dev
+#+end_src
+
+**** Syncing a fork from upstream
+A common case with a forked repository is to pull the changes from the base repository (/upstream/master/)
+#+begin_src bash
+  git checkout master
+  git fetch upstream/master
+  git merge upstream/master
+#+end_src
+
+** Specifying Revisions
+https://stackoverflow.com/a/2222920/734153
+
+* config
+:PROPERTIES:
+:header-args+: :tangle ~/.config/git/config
+:END:
+https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration
+https://git-scm.com/docs/git-config.html
+
+- =git config --show-origin --list= shows all settings in effect as well as where they were set from
+- =git config --show-origin <section>.<setting>= shows information about a specific setting
+
+** user
+:PROPERTIES:
+:ID:       1e425c17-41fe-4367-9172-72dd1185e65e
+:CREATED:  [2019-01-16 Wed 19:46]
+:END:
+#+begin_src conf
+  [user]
+  name  = Kartik Shenoy
+  email = theresmorethanoneway@gmail.com
+#+end_src
+
+** core
+:PROPERTIES:
+:ID:       9598a8ee-4861-402d-bf35-df51d46f7033
+:CREATED:  [2019-01-16 Wed 19:45]
+:END:
+#+begin_src conf
+  [core]
+  editor   = gvim --nofork
+  fileMode = false
+#+end_src
+
+I'm using the default value of =excludesfile= so this is not required. I have it here simply for documenting it
+It was generated at https://www.gitignore.io/api/c,c++,dropbox,emacs,vim,tags
+#+begin_src conf :tangle no
+  excludesfile = ~/.config/git/ignore
+#+end_src
+
+Centralize all hooks instead of configuring them on a per-repository basis
+#+begin_src conf
+  hooksPath = ~/.config/git/hooks/
+#+end_src
+
+** color
+:PROPERTIES:
+:ID:       5cb68ff9-b5a6-48ac-ab9a-554e5f7e3582
+:CREATED:  [2019-01-16 Wed 19:47]
+:END:
+#+begin_src conf
+  [color]
+  ui     = auto
+  branch = auto
+  diff   = auto
+  status = auto
+
+  [color "branch"]
+  current = green
+  remote  = red
+
+  [color "diff"]
+  meta = yellow
+  frag = magenta
+  old = red bold
+  new = green
+  plain = white
+
+  [color "status"]
+  added = yellow
+  changed = red
+  untracked = cyan
+#+end_src
+
+** diff
+:PROPERTIES:
+:ID:       42a789fa-3d8e-4344-ad2f-5479e9c34130
+:CREATED:  [2019-01-16 Wed 19:48]
+:END:
+#+begin_src conf
+  [diff]
+  tool = gvim
+
+  [difftool]
+  prompt = false
+
+  [difftool "gvim"]
+  cmd = gvim -df -c 'set columns=260|set lines=62|wincmd =' $LOCAL $BASE 2> /dev/null
+  trustExitCode = true
+
+  [difftool "vim"]
+  cmd = vim -df -c 'set columns=260|set lines=62|wincmd =' $LOCAL $BASE 2> /dev/null
+  trustExitCode = true
+
+  [difftool "meld"]
+  cmd = meld --diff $LOCAL $BASE
+#+end_src
+
+** merge
+:PROPERTIES:
+:ID:       f3c35e26-a99a-468a-be76-bd528270fd0d
+:CREATED:  [2019-01-16 Wed 19:48]
+:END:
+#+begin_src conf
+  [merge]
+  tool = gvim
+  conflictstyle = diff3
+
+  [mergetool "meld"]
+  cmd = meld --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $MERGED $REMOTE
+
+  [mergetool "gvim"]
+  cmd = vim_merge $BASE $REMOTE $LOCAL $MERGED
+  trustExitCode = true
+#+end_src
+
+** misc
+:PROPERTIES:
+:ID:       1cc3f0fb-c0f6-463a-80d3-a15b8078d096
+:CREATED:  [2019-01-16 Wed 19:49]
+:END:
+#+begin_src conf
+  [credential]
+  helper = cache --timeout=3600
+
+  [push]
+  default = matching
+#+end_src
+
+** aliases
+:PROPERTIES:
+:ID:       5398abaf-8160-41ca-ad1d-342fd5c7d9ca
+:CREATED:  [2019-01-16 Wed 19:50]
+:END:
+https://gitlab.com/to1ne/literate-dotfiles/blob/master/git.org
+https://haacked.com/archive/2014/07/28/github-flow-aliases/
+
+Using =!= as prefix allows running any command in the shell and it doesn't have to be a git command.
+Thus, if we want to create an alias to run multiple commands by chaining them together, we have to use =!=
+#+begin_src conf
+  [alias]
+  alias = !git config -l | grep alias | cut -c 7-
+#+end_src
+
+Open gitconfig file with my default editor
+#+begin_src conf
+  ec = config --global -e
+#+end_src
+
+#+begin_src conf
+  d  = diff
+  dw = diff --word-diff
+  dt = difftool
+  mt = mergetool
+  cl = clone
+  ci = commit
+  co = checkout
+  br = branch
+#+end_src
+
+Aliases for deleting the branch from various places
+#+begin_src conf
+  br-rm-remote = !"f() { branch=${1-$(git symbolic-ref --short HEAD)}; git push origin :$branch; }; f"
+  br-rm-local  = !"f() { branch=${1-$(git symbolic-ref --short HEAD)}; git branch -D $branch; }; f"
+  br-rm-all    = !"f() { branch=${1-$(git symbolic-ref --short HEAD)}; git push origin :$branch; git branch -D $branch; }; f"
+#+end_src
+
+This scrubs away all local branches that are merged.
+#+begin_src conf
+  br-scrub = !git branch --merged | egrep -v '(^\\*|master)' | xargs git branch -d
+#+end_src
+
+#+begin_src conf
+  lg = log --color --graph --pretty=format:' %C(yellow)%h %C(bold blue)<%an>%C(reset) %s %C(green)(%cr)%C(reset)%C(red)%d%C(reset)' --abbrev-commit
+  ls = log --oneline --decorate
+#+end_src
+
+Pull changes from the remote. Any local commits will be rebased to come after the commits from remote. =--prune= option removes remote-tracking branches that no longer exist on the remote.
+#+begin_src conf
+  sync = !git pull --rebase --prune && git submodule update --init --recursive
+#+end_src
+
+Safer wipes. Using =git reset HEAD --hard= leaves no room for undoing anything.
+This commits everything and then does a hard reset to remove that commit. The nice thing is, the commit is still there, but it’s just unreachable. Unreachable commits are a bit inconvenient to restore, but at least they are still there.
+I can run the =git reflog= command and find the SHA of the commit if I realize later that I made a mistake with the reset. The commit message will be “WIPE SAVEPOINT” in this case.
+#+begin_src conf
+  wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
+#+end_src
+
+* FIXME Figure out how to create link to gitignore in the Makefile
+:PROPERTIES:
+:ID:       c70e52b7-44fc-4ec3-9840-55fe87a147e5
+:CREATED:  [2019-01-16 Wed 21:46]
+:END:
+:LOGBOOK:
+- State "FIXME"      from              [2019-01-16 Wed 21:46]
+:END:
+ This would eliminate the need for the setup file

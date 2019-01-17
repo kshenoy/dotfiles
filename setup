@@ -15,8 +15,7 @@ ln -svTf ~/.dotfiles/bash/history            ~/.history_bash
 ln -svTf ~/.dotfiles/ctags                   ~/.ctags
 ln -svTf ~/.dotfiles/dircolors               ~/.dircolors
 ln -svTf ~/.dotfiles/emacs.d                 ~/.emacs.d
-ln -svTf ~/.dotfiles/git/config              ~/.gitconfig
-ln -svTf ~/.dotfiles/git/ignore              ~/.config/git/ignore
+ln -svTf ~/.dotfiles/gitignore               ~/.config/git/ignore
 # ln -svTf ~/.dotfiles/i3                    ~/.config/i3
 ln -svTf ~/.dotfiles/ssh/config              ~/.ssh/config
 ln -svTf ~/.dotfiles/tmux/tmux.conf          ~/.tmux.conf
