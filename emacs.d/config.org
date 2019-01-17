@@ -43,7 +43,7 @@ Use =C-u C-M-x= with the point over the function to debug. This puts us into deb
 *** Detangling
 [[https://www.youtube.com/watch?v=BLomb52wjvE][Yisrael Dov - Emacs is Great ep. 11]]
 
-*header-args*:
+[[https://org-babel.readthedocs.io/en/latest/header-args/][header-args]]:
 - =:tangle yes=
 This allows me to run =org-babel-tangle= in the org file to generate the el file without having to restart emacs and rely on =org-babel-load-file=
 

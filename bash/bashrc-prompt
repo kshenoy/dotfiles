@@ -344,8 +344,7 @@ _get_vcs_branch_() {                                                            
 
   if [[ $_vcs_type == "git" ]]; then
     #echo "Detected git versioning scheme"
-    local ref=$(git symbolic-ref HEAD 2> /dev/null) || return
-    echo "${ref#refs/heads/}"
+    git symbolic-ref --short HEAD 2> /dev/null
   elif [[ $_vcs_type == "hg" ]]; then
     #echo "Detected mercurial versioning scheme"
     echo "$(hg branch 2> /dev/null)"
