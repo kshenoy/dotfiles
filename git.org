@@ -3,6 +3,9 @@
 #+TODO: FIXME(!) | DONE
 
 * Resources
+:PROPERTIES:
+:header-args: :tangle no
+:END:
 - [[https://medium.com/@willhayjr/the-architecture-and-history-of-git-a-distributed-version-control-system-62b17dd37742][Architecture and History of Git]]
 - [[https://rachelcarmena.github.io/2018/12/12/how-to-teach-git.html][How to teach Git]]
 
@@ -158,6 +161,12 @@ https://stackoverflow.com/a/2222920/734153
 :PROPERTIES:
 :header-args+: :tangle ~/.config/git/config
 :END:
+#+begin_src conf :export none
+  ;; This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
+  ;; Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
+  ;; If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
+#+end_src
+
 https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration
 https://git-scm.com/docs/git-config.html
 
@@ -341,12 +350,23 @@ I can run the =git reflog= command and find the SHA of the commit if I realize l
   wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
 #+end_src
 
-* FIXME Figure out how to create link to gitignore in the Makefile
+* FIXME Figure out how to create a link to gitignore in the Makefile
 :PROPERTIES:
 :ID:       c70e52b7-44fc-4ec3-9840-55fe87a147e5
 :CREATED:  [2019-01-16 Wed 21:46]
+:header-args: :tangle no
 :END:
 :LOGBOOK:
 - State "FIXME"      from              [2019-01-16 Wed 21:46]
 :END:
  This would eliminate the need for the setup file
+
+* Local variables
+:PROPERTIES:
+:header-args: :tangle no
+:END:
+Use =add-file-local-variable= or =add-file-local-variable-prop-line= instead of adding these manually
+
+# Local Variables:
+# eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
+# End:

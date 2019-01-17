@@ -12,7 +12,12 @@
  '(package-selected-packages (quote (org-plus-contrib use-package)))
  '(safe-local-variable-values
    (quote
-    ((org-refile-targets
+    ((eval add-hook
+           (quote after-save-hook)
+           (lambda nil
+             (org-babel-tangle))
+           nil t)
+     (org-refile-targets
       (nil :maxlevel . 9))
      (org-confirm-babel-evaluate)))))
 (custom-set-faces

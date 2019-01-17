@@ -3,9 +3,13 @@
 #+TODO: FIXME(!) | DONE
 
 * Literate config
-:PROPERTIES:
-:CREATED:  [2019-01-15 Tue 07:17]
-:END:
+[[https://org-babel.readthedocs.io/en/latest/header-args/][header-args]]:
+- =:tangle yes=
+This allows me to run =org-babel-tangle= in the org file to generate the el file without having to restart emacs and rely on =org-babel-load-file=
+
+- =:comments both=
+This adds all the non-code related text as comments in the tangled file. It also adds comments wrappers with links back to the heading in the original Org mode file.
+
 ** Resources
 :PROPERTIES:
 :ID:       b2032342-6c4c-48be-b370-6ae538a48e2c
@@ -20,10 +24,6 @@
 - [[https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org][AngryBacon]]
 - [[https://to1ne.gitlab.io/literate-dotfiles/][Toon's Literate Dotfiles]]
 - https://brainlessdeveloper.com/2017/12/27/making-emacs-work-like-my-vim-setup/
-
-Check if there's a way to keep all the config in this file itself with init.el being empty
-Sacha Chua seems to have something like that. Her init.el is simply a link.
-Maybe some information in this [[https://www.reddit.com/r/emacs/comments/4uo9r0/shaving_time_on_emacs_startup_from_org_literate/][reddit thread]]?
 
 ** Debugging
 :PROPERTIES:
@@ -40,15 +40,14 @@ Use =C-u C-M-x= with the point over the function to debug. This puts us into deb
 | i   | Step into      |
 | q   | Quit           |
 
-*** Detangling
+** Detangling
 [[https://www.youtube.com/watch?v=BLomb52wjvE][Yisrael Dov - Emacs is Great ep. 11]]
 
-[[https://org-babel.readthedocs.io/en/latest/header-args/][header-args]]:
-- =:tangle yes=
-This allows me to run =org-babel-tangle= in the org file to generate the el file without having to restart emacs and rely on =org-babel-load-file=
-
-- =:comments both=
-This adds all the non-code related text as comments in the tangled file. It also adds comments wrappers with links back to the heading in the original Org mode file. Use =org-babel-tangle-jump-back-to-org= to jump back to the org file from the code block. If any changes are made in the tangled file, use =org-babel-detangle= to add it back to the original Org mode file.
+#+begin_src emacs-lisp :export none
+  ;; This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
+  ;; Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
+  ;; If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
+#+end_src
 
 * General
 ** custom file
@@ -2022,10 +2021,19 @@ Placing at end to be called after all packages are loaded
 #+END_SRC
 
 * After
-** Private config #+BEGIN_SRC emacs-lisp (when (string-match-p "atlibex" (system-name)) (load (expand-file-name "private_work.el" user-emacs-directory) t)) #+END_SRC
-** File-local variables
+** Private config
+#+begin_src emacs-lisp
+  (when (string-match-p "atlibex" (system-name))
+    (load (expand-file-name "private_work.el" user-emacs-directory) t))
+#+end_src
+
+* Local variables
+:PROPERTIES:
+:header-args: :tangle no
+:END:
 Use =add-file-local-variable= or =add-file-local-variable-prop-line= instead of adding these manually
 
 # Local Variables:
 # org-refile-targets: ((nil :maxlevel . 9))
+# eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
 # End:
