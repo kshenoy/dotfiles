@@ -4,7 +4,7 @@
 alias amd_vpn='sudo openconnect -u kshenoy --token-mode=rsa atl-vpn.amd.com'
 
 # fzf: https://github.com/junegunn/fzf
-[[ -d /usr/local/install/fzf ]] && export FZF_PATH=/usr/local/install/fzf
+[[ -d /opt/fzf ]] && export FZF_PATH=/opt/fzf
 
 ## Specific to root
 __histfile_perm_update__() {
