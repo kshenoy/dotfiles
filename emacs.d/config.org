@@ -107,6 +107,9 @@ By default C-x = is bound to /what-cursor-position/ but evil maps both =ga= and 
   (bind-key* "C-x =" 'describe-char)
 #+end_src
 
+In general, if the same binding exists for a key both with and without a modifier, then I try to remap only the one without the modifier.
+The mnemonic is that Emacs leaves =[a-z]= (under the =C-c= prefix) free for the user. Thus, =[a-z]= without a modifier are my bindings eg. as seen [[id:d5dbbf1c-588b-44ec-be35-5e19dcd6201c][here]] and [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][here]]
+
 =key-translation-map= can be used to /map/ one set of keys to another [[Make Escape quit everything][eg.]]
 
 *** revert-buffer
@@ -570,15 +573,18 @@ Other examples:
 #+END_SRC
 
 ** avy
+:PROPERTIES:
+:ID:       d5dbbf1c-588b-44ec-be35-5e19dcd6201c
+:END:
 I'm using =C-'= instead of creating a binding in =my-goto-map= as that's the default binding used in an ivy-minibuffer
-Also, I'm rebinding =M-g M-g= from =goto-line= as using a number with =avy-goto-line= makes it behave like =goto-line= anyway.
-Besides, =M-g g= is still bound to =goto-line= by default and, not to mention =<N>G= binding from evil.
+Also, I'm rebinding =M-g g= from =goto-line= as using a number with =avy-goto-line= makes it behave like =goto-line= anyway.
+Besides, =M-g M-g= is still bound to =goto-line= by default as well as the =<N>G= binding from evil.
 
 #+BEGIN_SRC emacs-lisp
   (use-package avy
     :after evil
     :bind* (("C-'" . avy-goto-char-timer)
-            ("M-g M-g" . avy-goto-line))
+            ("M-g g" . avy-goto-line))
     :bind (:map my-goto-map ("o" . avy-org-goto-heading-timer)))
 #+END_SRC
 
@@ -1682,10 +1688,6 @@ Custom keymap for org-mode bindings.
 #+BEGIN_SRC emacs-lisp
   (bind-key "C-c C-q" 'counsel-org-tag org-mode-map)
 #+END_SRC
-
-Note that org-mode usually has the same command mapped to both =<Prefix> [a-z]= and =<Prefix> C-[a-z]=.
-In such cases, I can use =<Prefix> [a-z]= to bind to something else and leave =<Prefix> C-[a-z]= alone.
-The mnemonic is that Org leaves =C-c [a-z]= free for the user. Thus, I'm using =[a-z]= in other places too.
 
 Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
 #+BEGIN_SRC emacs-lisp
