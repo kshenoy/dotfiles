@@ -7,4 +7,4 @@ orgs := $(filter-out $(docs), $(wildcard *.org))
 all: $(basename $(orgs))
 
 %: %.org
-	emacs --batch --no-init-file --load tangle.el --funcall literate-dotfiles-tangle $<
+	emacs --batch --no-init-file --load emacs.d/tangle.el --funcall literate-dotfiles-tangle $<

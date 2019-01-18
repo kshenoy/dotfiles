@@ -188,11 +188,8 @@ alias get_bits='perl -e '"'"'$a=hex($ARGV[0]);$m=$ARGV[1];$l=(defined $ARGV[2]?$
 # Git
 alias ga='git add'
 alias gA='git add -A .'
-alias gD='git diff --word-diff'
 alias gh='git help'
-alias grst='git reset --hard HEAD'
-alias gs='git status --short'
-alias gS='git status'
+alias gs='git status'
 
 
 #=============
