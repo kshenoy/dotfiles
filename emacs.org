@@ -2054,7 +2054,9 @@ Placing at end to be called after all packages are loaded
 :END:
 Use =add-file-local-variable= or =add-file-local-variable-prop-line= instead of adding these manually
 
+[[https://www.reddit.com/r/emacs/comments/372nxd/how_to_move_init_to_orgbabel/crjicdv/][Auto-tangle on save]] - Not using it because it was too aggressive for at least this file considering how often I tinker with it
+# eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
+
 # Local Variables:
 # org-refile-targets: ((nil :maxlevel . 9))
-# eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
 # End:
