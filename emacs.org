@@ -1,5 +1,5 @@
 #+TITLE: Emacs Configuration
-#+PROPERTY: header-args+ :results output silent :tangle yes :noweb tangle :comments both :mkdirp yes
+#+PROPERTY: header-args+ :results output silent :tangle ~/.emacs.d/init.el :noweb tangle :comments both :mkdirp yes
 #+TODO: FIXME(!) | DONE
 
 * Literate config
@@ -49,15 +49,36 @@ Use =C-u C-M-x= with the point over the function to debug. This puts us into deb
   ;; If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
 #+end_src
 
+* Bootstrap use-package
+:PROPERTIES:
+:ID:       7096b5ff-ae33-4474-b732-e17ef0696b58
+:CREATED:  [2019-01-17 Thu 19:47]
+:END:
+#+begin_src emacs-lisp
+  (require 'package)
+  (setq-default load-prefer-newer t
+                package-enable-at-startup nil)
+
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+  (package-initialize)
+
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package t))
+
+  (setq-default use-package-always-ensure t)
+#+end_src
+
 * General
 ** custom file
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq-default custom-file (expand-file-name "custom.el" user-emacs-directory))
   (load custom-file t)
-#+END_SRC
+#+end_src
 
 ** Keybindings
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-keys* :prefix-map my-fuzzy-jumper-command-map
               :prefix-docstring "This map is used to put all keybindings that I use to jump around eg. open files, buffers etc."
               :prefix "C-c f")
@@ -73,7 +94,7 @@ Use =C-u C-M-x= with the point over the function to debug. This puts us into deb
   (bind-keys* :prefix-map my-s-bindings-map
               :prefix-docstring "This map is used to group together all s-mnemonic bindings such as substitution, sizing etc."
               :prefix "C-c s")
-#+END_SRC
+#+end_src
 
 I think the following would be handy
   =[= - Enable setting
@@ -81,7 +102,7 @@ I think the following would be handy
   =]= - Disable setting
 Original use of =C-c [= and =C-c ]= is to manipulate =org-agenda-files=. Since I don't use either of these, might as well put them to better use.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-keys* :prefix-map my-settings-enable-map
               :prefix-docstring "This map is used to enable settings ala vim-unimpaired"
               :prefix "C-c [")
@@ -93,16 +114,16 @@ Original use of =C-c [= and =C-c ]= is to manipulate =org-agenda-files=. Since I
   (bind-keys* :prefix-map my-settings-toggle-map
               :prefix-docstring "This map is used to toggle settings"
               :prefix "C-c t")
-#+END_SRC
+#+end_src
 
 To delete existing bindings, use =(unbind-key ...)=
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-key* "C-h B" 'describe-personal-keybindings)
-#+END_SRC
+#+end_src
 
 By default C-x = is bound to /what-cursor-position/ but evil maps both =ga= and =g8= to that as well so might as well use it to show something useful.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-key* "C-x =" 'describe-char)
 #+end_src
 
@@ -119,11 +140,11 @@ The mnemonic is that Emacs leaves =[a-z]= (under the =C-c= prefix) free for the 
     (revert-buffer :ignore-auto :noconfirm))
 
   (bind-key* "<f5>" 'my-revert-buffer-no-confirm)
-#+END_SRC
+#+end_src
 
 *** describe-keymap
 [[https://stackoverflow.com/a/36994486/734153][From StackOverflow]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun my-describe-keymap (keymap)
     "Describe a keymap using `substitute-command-keys'."
     (interactive
@@ -142,18 +163,18 @@ The mnemonic is that Emacs leaves =[a-z]= (under the =C-c= prefix) free for the 
         (setq help-xref-stack-item (list #'my-describe-keymap keymap)))))
 
   (bind-key "K" 'my-describe-keymap help-map)
-#+END_SRC
+#+end_src
 
 eg. =(my-describe-keymap 'evil-window-map)=
 
 ** Autosave, Backup and History
 Change default location of backups to avoid littering PWD
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defvar backup-directory (concat user-emacs-directory "/tmp/backups"))
   (if (not (file-exists-p backup-directory)) (make-directory backup-directory t))
-#+END_SRC
+#+end_src
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq backup-directory-alist `(("." . ,backup-directory)))
   (setq make-backup-files         t)  ; backup of a file the first time it is saved.
   (setq backup-by-copying         t)  ; don't clobber symlinks
@@ -162,44 +183,44 @@ Change default location of backups to avoid littering PWD
   (setq delete-by-moving-to-trash t)
   (setq kept-old-versions         6)  ; oldest versions to keep when a new numbered backup is made (default: 2)
   (setq kept-new-versions         9)  ; newest versions to keep when a new numbered backup is made (default: 2)
-#+END_SRC
+#+end_src
 
 Change default location of autosaves to avoid littering PWD
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defvar autosave-directory (concat user-emacs-directory "tmp/autosaves/"))
   (if (not (file-exists-p autosave-directory)) (make-directory autosave-directory t))
-#+END_SRC
+#+end_src
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;; (setq auto-save-file-name-transforms `(("." ,autosave-directory t)))
   (setq auto-save-default t)  ; auto-save every buffer that visits a file
-#+END_SRC
+#+end_src
 
 Delete identical history entries
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq history-delete-duplicates t)
-#+END_SRC
+#+end_src
 
 Save mini-buffer history
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package savehist
     :init
     (setq savehist-file (concat user-emacs-directory "tmp/history.el")
           history-length 100)
     :config
     (savehist-mode t))
-#+END_SRC
+#+end_src
 
 ** QoL changes
 *** Remove visual clutter
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq inhibit-startup-message t)
   (setq initial-scratch-message "")
 
   (menu-bar-mode 0)
   (tool-bar-mode 0)
   (scroll-bar-mode 0)
-#+END_SRC
+#+end_src
 
 We can also put something like this into =~/.Xresources= to enable/disable certain things as soon as Emacs starts
 #+BEGIN_EXAMPLE
@@ -208,7 +229,7 @@ We can also put something like this into =~/.Xresources= to enable/disable certa
 #+END_EXAMPLE
 
 *** Better defaults
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq-default
    mouse-wheel-follow-mouse t          ; Mouse-wheel acts on the hovered window instead of where the typing focus is
    echo-keystrokes 0.1                 ; Let emacs react faster to keystrokes
@@ -225,62 +246,62 @@ We can also put something like this into =~/.Xresources= to enable/disable certa
   (column-number-mode t)               ; Show column no. in mode-line
   (global-visual-line-mode t)          ; Enable editing by visual lines
   (fset 'yes-or-no-p 'y-or-n-p)        ; Simpler y/n answers
-#+END_SRC
+#+end_src
 
 *** Winner mode - Undo/redo window layouts
 Undo and Redo changes in window configuration. Use =C-c right=, =C-c left= (default bindings) to switch between different layouts.
 This is useful when I close a window by mistake to undo it and restore the window layout.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (winner-mode 1)
-#+END_SRC
+#+end_src
 
 [[id:f42c3dc8-c2f6-4f22-9f47-0c578479ef67][More intuitive keybindings]] defined after evil is loaded
 
 ** Diff
 From [[http://pragmaticemacs.com/emacs/visualise-and-copy-differences-between-files/][Pragmatic Emacs]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ediff
     :config
     (setq ediff-window-setup-function 'ediff-setup-windows-plain  ; Don't start another frame
           ediff-split-window-function 'split-window-horizontally) ; Put windows side by side
     (add-hook 'ediff-after-quit-hook-internal 'winner-undo)) ; Revert windows on exit (needs winner mode)
-#+END_SRC
+#+end_src
 
 ** Emacs server
 A daemon can be started from the shell
-#+BEGIN_SRC bash :tangle no
+#+begin_src bash :tangle no
   emacs --daemon=SERVERNAME
-#+END_SRC
+#+end_src
 
 or from within emacs:
-#+BEGIN_SRC emacs-lisp :tangle no
+#+begin_src emacs-lisp :tangle no
   (setq server-name "SERVERNAME")
   (server-start)
-#+END_SRC
+#+end_src
 The downside of this is that this seems to restart the server instead of creating multiple instances
 
 Once a daemon is started, a client can be started with
-#+BEGIN_SRC bash :tangle no
+#+begin_src bash :tangle no
   emacsclient --alternate-editor="" --create-frame --quiet --socket-name=SERVERNAME
-#+END_SRC
+#+end_src
 This will launch emacsclient if a daemon is already running and create one if not.
 Note that alternate-editor has been left blank. This forces it to create a daemon.
 
 To check whether a server is running, we can use
-#+BEGIN_SRC emacs-lisp :tangle no
+#+begin_src emacs-lisp :tangle no
   (server-running-p "SERVERNAME")
-#+END_SRC
+#+end_src
 A complete list of all running servers can be found under /tmp/emacs$UID but it's [[http://emacshorrors.com/posts/determining-if-the-server-is-started-or-the-wonders-of-server-running-p.html][a little more complicated]] than that.
 
 So, let's just start a server if one isn't running. A downside of this is that it won't persist once emacs is killed
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package server
     :ensure nil
     :defer 5
     :config
     (unless (server-running-p server-name)
       (server-start)))
-#+END_SRC
+#+end_src
 
 ** Fonts
 :PROPERTIES:
@@ -288,17 +309,17 @@ So, let's just start a server if one isn't running. A downside of this is that i
 :END:
 Scale font size using =C-x C-+= and =C-x C--=. =C-x C-0= resets it.
 =text-scale-mode-step= controls the scaling factor. For obvious reasons, don't set it to 1 else it won't change at all
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq-default text-scale-mode-step 1.1
                 line-spacing 1)
-#+END_SRC
+#+end_src
 
 After installing a new font refresh the font cache by running
-#+BEGIN_SRC bash :tangle no
+#+begin_src bash :tangle no
   fc-cache -fv
-#+END_SRC
+#+end_src
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun my-set-font-if-exists (type font)
     "Check if FONT exists and set TYPE if it does."
     (when (and (display-graphic-p)(x-list-fonts font))
@@ -313,22 +334,22 @@ After installing a new font refresh the font cache by running
     ;;       ((eq system-type 'windows-nt) (my-set-font-if-exists 'variable-pitch "Iosevka SS05-9")))
   )
   (my-set-fonts)
-#+END_SRC
+#+end_src
 
 *** UTF-8 Please
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq locale-coding-system   'utf-8)
   (set-terminal-coding-system  'utf-8)
   (set-keyboard-coding-system  'utf-8)
   (set-selection-coding-system 'utf-8)
   (set-language-environment    "UTF-8")
   (prefer-coding-system        'utf-8)
-#+END_SRC
+#+end_src
 
 ** Intelligent narrowing and widening
 From [[http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html][endless parentheses]]
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun my-narrow-or-widen-dwim (p)
     "Widen if buffer is narrowed, narrow-dwim otherwise.
   Dwim means: region, org-src-block, org-subtree, or defun, whichever applies first.
@@ -354,33 +375,33 @@ From [[http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html][endless pa
 
   ;; This line actually replaces Emacs' entire narrowing keymap.
   (bind-key "n" 'my-narrow-or-widen-dwim ctl-x-map)
-#+END_SRC
+#+end_src
 
 ** Prettify
 *** Highlight current line
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-key "c" 'global-hl-line-mode my-settings-toggle-map)
-#+END_SRC
+#+end_src
 
 *** Insert and show matching delimiters
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (electric-pair-mode t)
   (show-paren-mode 1)
   (setq show-paren-delay 0)
   ;; (setq show-paren-style 'expression)
-#+END_SRC
+#+end_src
 
 *** Pretty symbols
 Replaces the text /lambda/ with λ. Full list of prettified symbols can be found in =prettify-symbols-alist=
 The =inhibit-compacting-font-caches= stops garbage collect from trying to handle font caches making things a lot faster
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (global-prettify-symbols-mode t)
   (setq inhibit-compacting-font-caches t)
   (setq prettify-symbols-unprettify-at-point 'right-edge)
-#+END_SRC
+#+end_src
 
 Default symbols that must be applied to all modes
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun my-pretty-symbols-default()
     (mapc (lambda(pair) (push pair prettify-symbols-alist))
           '(("!=" . ?≠)
@@ -388,14 +409,14 @@ Default symbols that must be applied to all modes
             (">=" . ?≥))))
 
   (add-hook 'prog-mode-hook (lambda() (my-pretty-symbols-default)))
-#+END_SRC
+#+end_src
 
 C/C++ specific symbols
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-hook 'c++-mode-hook
             (lambda() (mapc (lambda(pair) (push pair prettify-symbols-alist))
                        '(("->" . (?- (Br . Bc) ?- (Br . Bc) ?>))))))
-#+END_SRC
+#+end_src
 
 
 NOTE: Some symbols occupy less space and may affect indendation. In order to avoid this,
@@ -409,7 +430,7 @@ Use ~(">=" . (?\s (Br . Bl) ?\s (Bc . Bc) ?≥))~ instead of =?≥=
 :ID:       8d72d9c2-5b52-454f-892a-107b009563fa
 :END:
 Use only spaces and no tabs
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil
                 tab-width 2
                 show-trailing-whitespace nil
@@ -418,54 +439,54 @@ Use only spaces and no tabs
   (setq sentence-end-double-space nil) ; Count 1 space after a period as the end of a sentence, instead of 2
 
   ;; (bind-key "RET" 'newline-and-indent)
-#+END_SRC
+#+end_src
 Since these are buffer-local variables, I have to use =setq-default=
 
 *** Highlight trailing whitespace
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun my-toggle-trailing-whitespace ()
     "Toggle trailing whitespace"
     (interactive)  ; Allows to be called as a command via M-x
     (setq-default show-trailing-whitespace (not show-trailing-whitespace)))
 
   (bind-key "SPC" 'my-toggle-trailing-whitespace my-settings-toggle-map)
-#+END_SRC
+#+end_src
 
 Enable it only in some modes
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (dolist (hook '(prog-mode-hook text-mode-hook))
     (add-hook hook (lambda() (setq show-trailing-whitespace t))))
-#+END_SRC
+#+end_src
 
 *** Delete trailing whitespace
 Automatically while saving (from [[https://www.emacswiki.org/emacs/DeletingWhitespace#toc3][emacswiki]])
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
-#+END_SRC
+#+end_src
 
 Use =C-c s SPC= to delete trailing whitespace manually
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-key "SPC" 'delete-trailing-whitespace my-s-bindings-map)
-#+END_SRC
+#+end_src
 
 *** Toggle wrap
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-key "w" 'toggle-truncate-lines my-settings-toggle-map)
-#+END_SRC
+#+end_src
 
 ** Terminal
 Specify the shell to use to avoid prompt. From [[https://youtu.be/L9vA7FHoQnk?list=PLX2044Ew-UVVv31a0-Qn3dA6Sd_-NyA1n&t=192][Uncle Dave's video]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defvar my-term-shell "/bin/bash")
   (defadvice ansi-term (before force-bash)
     (interactive (list my-term-shell)))
   (ad-activate 'ansi-term)
-#+END_SRC
+#+end_src
 
 Launch
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-key* "<s-return>" 'ansi-term)
-#+END_SRC
+#+end_src
 
 ** Themes
 Misc info:
@@ -478,27 +499,27 @@ By default emacs layers the new theme on top of all previously applied themes.
 
 *** load-theme hook
 Emacs doesn't have a native hook that is called after a theme has loaded. So we've to create one. (from [[https://www.reddit.com/r/emacs/comments/4v7tcj/does_emacs_have_a_hook_for_when_the_theme_changes/d5wyu1r/][reddit]])
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defvar after-load-theme-hook nil
     "Hook run after a color theme is loaded using `load-theme'.")
   (defadvice load-theme (after run-after-load-theme-hook activate)
     "Run `after-load-theme-hook'."
     (run-hooks 'after-load-theme-hook))
-#+END_SRC
+#+end_src
 
 #+BEGIN_EXAMPLE
   (add-hook 'after-load-theme-hook (lambda() (message "Theme loaded")))
 #+END_EXAMPLE
 
-#+BEGIN_SRC emacs-lisp :tangle no
+#+begin_src emacs-lisp :tangle no
   (add-hook 'after-load-theme-hook
             (lambda()
               "Update fringe background color once a theme is loaded"
               (set-face-attribute 'fringe nil :background (face-attribute 'highlight :background))))
-#+END_SRC
+#+end_src
 
 *** [[https://github.com/bbatsov/solarized-emacs][solarized]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package solarized-theme
     :init
     (setq solarized-distinct-fringe-background t
@@ -512,32 +533,32 @@ Emacs doesn't have a native hook that is called after a theme has loaded. So we'
     (evil-emacs-state-cursor    '("#839496" bar))
     :config
     (load-theme 'solarized-light t))
-#+END_SRC
+#+end_src
 
 ** Frame related
 Frame parameters for all frames, regardless of window-system.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq default-frame-alist
       '((tool-bar-lines 0)
         (left-fringe . nil)
         (right-fringe . 0)
         (menu-bar-lines . 0)
         (vertical-scroll-bars . nil)))
-#+END_SRC
+#+end_src
 
 Per window-system overrides and additions to default-frame-alist.
 =window-system-default-frame-alist= uses symbols of type =window-system= and not =system-type=
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;; Set frame size pixelwise instead of characterwise
   (setq frame-resize-pixelwise t)
 
   (setq window-system-default-frame-alist
         '((x . ((top . 0) (left . 0) (width . 319) (height . 74)))
           (w32 . ((fullscreen . maximized)))))
-#+END_SRC
+#+end_src
 
 Set frame size programatically
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-keys :map my-s-bindings-map
              ("l" . (lambda () "Set emacs frame size to fit the left desktop monitor"
                       (interactive)
@@ -547,14 +568,14 @@ Set frame size programatically
                       (interactive)
                       (set-frame-position (selected-frame) 1919 0)
                       (set-frame-size     (selected-frame) 1910 1150 t))))
-#+END_SRC
+#+end_src
 
 For reasons I don't understand, when I start a server and create a frame it still shows scroll-bars.
 So, I have to disable this explicitly
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-to-list 'default-frame-alist
                '(vertical-scroll-bars . nil))
-#+END_SRC
+#+end_src
 
 * Packages
 =(featurep 'FEATURE)= can be used to determine if the package has been loaded or not.
@@ -566,10 +587,10 @@ Other examples:
 - /yas-minor-mode/ is a mode provided by the file /yasnippet.el/ and the feature is called /yasnippet/
 
 ** aggressive-indent
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package aggressive-indent
     :hook (emacs-lisp-mode . aggressive-indent-mode))
-#+END_SRC
+#+end_src
 
 ** avy
 :PROPERTIES:
@@ -579,16 +600,16 @@ I'm using =C-'= instead of creating a binding in =my-goto-map= as that's the def
 Also, I'm rebinding =M-g g= from =goto-line= as using a number with =avy-goto-line= makes it behave like =goto-line= anyway.
 Besides, =M-g M-g= is still bound to =goto-line= by default as well as the =<N>G= binding from evil.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package avy
     :after evil
     :bind* (("C-'" . avy-goto-char-timer)
             ("M-g g" . avy-goto-line))
     :bind (:map my-goto-map ("o" . avy-org-goto-heading-timer)))
-#+END_SRC
+#+end_src
 
 ** beacon
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package beacon
     :custom
     (beacon-blink-when-window-scrolls nil)
@@ -599,7 +620,7 @@ Besides, =M-g M-g= is still bound to =goto-line= by default as well as the =<N>G
               (lambda()
                 "Update beacon's background color once a theme is loaded"
                 (setq beacon-color (face-attribute 'fringe :background)))))
-#+END_SRC
+#+end_src
 
 ** company
 Provides auto-completion.
@@ -607,7 +628,7 @@ References:
 - [[https://youtu.be/XeWZfruRu6k][Uncle Dave's video]] for an introduction.
 - https://www.reddit.com/r/emacs/comments/8z4jcs/tip_how_to_integrate_company_as_completion/
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package company
     :init (add-hook 'after-init-hook 'global-company-mode)
     :hook (c-mode c++-mode)
@@ -617,23 +638,23 @@ References:
                   company-minimum-prefix-length 2
                   company-show-numbers t           ; Show numbers in the drop-down menu to simplify selection
                   company-selection-wrap-around t)
-#+END_SRC
+#+end_src
 
 *** Keybindings
 Replace Meta bindings with Ctrl
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (unbind-key "M-n" company-active-map)
   (unbind-key "M-p" company-active-map)
 
   (bind-keys :map company-active-map
              ("C-n" . company-select-next)
              ("C-p" . company-select-previous))
-#+END_SRC
+#+end_src
 
 *** Enable yasnippet for all backends
 (from [[https://emacs.stackexchange.com/a/10520/9690][emacs.stackexchange]])
 Keeping this at the end to be run after we've added all backends
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun company-mode/backend-with-yas (backend)
     (if (and (listp backend) (member 'company-yasnippet backend))
         backend
@@ -641,58 +662,58 @@ Keeping this at the end to be run after we've added all backends
               '(:with company-yasnippet))))
 
   (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
-#+END_SRC
+#+end_src
 
 *** /fin/
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 )
-#+END_SRC
+#+end_src
 
 *** company-irony
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package company-irony
     :after (company irony yasnippet)
     :config
     (add-to-list 'company-backends '(company-irony :with company-yasnippet)))
-#+END_SRC
+#+end_src
 
 ** evil
 Getting started guide: https://github.com/noctuid/evil-guide
 evil can be toggled using =C-z=
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil
     :init
     (setq evil-want-C-w-in-emacs-state t
           evil-want-Y-yank-to-eol t)
-#+END_SRC
+#+end_src
 
 *** :config
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   :config
   (evil-mode t)
-#+END_SRC
+#+end_src
 
 Mode specific states
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (dolist (mode '(git-rebase-mode org-toc-mode))
     (evil-set-initial-state mode 'emacs))
   (evil-set-initial-state 'term-mode 'insert)
-#+END_SRC
+#+end_src
 
 =evil-set-initial-state= works only for major modes. Thus for minor modes I have to use an explicit hook. Refer this [[https://github.com/emacs-evil/evil/issues/1115][github issue]] for details
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (dolist (hook '(org-capture-mode-hook))
     (add-hook hook 'evil-insert-state))
 
   (dolist (hook '(edebug-mode-hook))
     (add-hook hook 'evil-emacs-state))
-#+END_SRC
+#+end_src
 
 **** Keybindings
 :PROPERTIES:
 :ID:       f42c3dc8-c2f6-4f22-9f47-0c578479ef67
 :END:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun my-unimpaired-insert-line-before ()
     "Insert blank line line before the current one"
     (interactive)
@@ -711,27 +732,27 @@ Mode specific states
              ("] q"   . next-error)
              ("[ q"   . previous-error)
              ("[ Q"   . first-error))
-#+END_SRC
+#+end_src
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-hook 'org-mode-hook (lambda() (bind-key "z v" 'org-reveal evil-normal-state-map)))
-#+END_SRC
+#+end_src
 
 <<Make Escape quit everything>>
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
-#+END_SRC
+#+end_src
 
 ***** Follow newly created splits
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-keys :map evil-window-map
              ("s" . (lambda() (interactive) (evil-window-split)(other-window 1)))
              ("v" . (lambda() (interactive) (evil-window-vsplit)(other-window 1))))
-#+END_SRC
+#+end_src
 
 ***** Move by visual lines
 Note this is not a complete solution since it doesn't work when combined with operators (eg. =dj=)
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-keys :map evil-motion-state-map
              ("j"  . evil-next-visual-line)
              ("gj" . evil-next-line)
@@ -739,10 +760,10 @@ Note this is not a complete solution since it doesn't work when combined with op
              ("gk" . evil-previous-line)
              ("$"  . evil-end-of-line)
              ("g$" . evil-end-of-visual-line))
-#+END_SRC
+#+end_src
 
 ***** Sensible rebindings
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (define-key key-translation-map (kbd "C-w C-h") (kbd "C-w h"))
   (define-key key-translation-map (kbd "C-w C-j") (kbd "C-w j"))
   (define-key key-translation-map (kbd "C-w C-k") (kbd "C-w k"))
@@ -751,22 +772,22 @@ Note this is not a complete solution since it doesn't work when combined with op
   (define-key key-translation-map (kbd "C-w C-v") (kbd "C-w v"))
 
   (bind-key "U" 'redo evil-normal-state-map)
-#+END_SRC
+#+end_src
 
 More intuitive keybindings for winner-mode
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-keys :map evil-window-map
              ("u" . winner-undo)
              ("U" . winner-redo))
-#+END_SRC
+#+end_src
 
 *** /fin/
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   )
-#+END_SRC
+#+end_src
 
 *** evil-args
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-args
     :after evil
     :bind (:map evil-inner-text-objects-map
@@ -779,35 +800,35 @@ More intuitive keybindings for winner-mode
            :map evil-motion-state-map
                 ("] ," . evil-forward-arg)
                 ("[ ," . evil-backward-arg)))
-#+END_SRC
+#+end_src
 
 *** evil-commentary
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-commentary
     :after evil
     :bind (:map evil-normal-state-map
                 ("g c" . evil-commentary)
            :map evil-visual-state-map
                 ("g c" . evil-commentary)))
-#+END_SRC
+#+end_src
 
 *** evil-exchange
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-exchange
     :after evil
     :config (evil-exchange-cx-install))
-#+END_SRC
+#+end_src
 
 *** evil-matchit
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-matchit
     :after evil
     :config
     (global-evil-matchit-mode 1))
-#+END_SRC
+#+end_src
 
 *** evil-numbers
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-numbers
     :after evil
     :bind (:map evil-normal-state-map
@@ -816,44 +837,44 @@ More intuitive keybindings for winner-mode
            :map evil-visual-state-map
                ("C-c +" . evil-numbers/inc-at-pt)
                ("C-c -" . evil-numbers/dec-at-pt)))
-#+END_SRC
+#+end_src
 
 *** evil-string-inflection
 Provides =g~= operator to cycle between snake_case → SCREAMING_SNAKE_CASE → TitleCase → CamelCase → kebab-case
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-string-inflection
     :after evil
     :bind (:map evil-normal-state-map
                 ("g ~" . evil-operator-string-inflection)
            :map evil-visual-state-map
                 ("g ~" . evil-operator-string-inflection)))
-#+END_SRC
+#+end_src
 
 *** evil-surround
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-surround
     :after evil
     :config (global-evil-surround-mode))
-#+END_SRC
+#+end_src
 
 *** evil-visualstar
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-visualstar
     :after evil
     :config (global-evil-visualstar-mode))
-#+END_SRC
+#+end_src
 
 ** flycheck
 References:
 - https://www.reddit.com/r/emacs/comments/931la6/tip_how_to_adopt_flycheck_as_your_new_best_friend/
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package flycheck
     :hook (prog-mode . flycheck-mode)
     :custom
     (flycheck-gcc-language-standard "c++14")
     (flycheck-clang-language-standard "c++14"))
-#+END_SRC
+#+end_src
 
 ** hideshow
 :PROPERTIES:
@@ -861,7 +882,7 @@ References:
 :END:
 Code-folding. From https://github.com/mwfogleman/.emacs.d/blob/master/michael.org#cold-folding and [[https://www.reddit.com/r/emacs/comments/746cd0/which_code_folding_package_do_you_use/dnwi2x1/][reddit]]
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package hideshow
     :hook ((prog-mode . hs-minor-mode))
     :config
@@ -871,24 +892,24 @@ Code-folding. From https://github.com/mwfogleman/.emacs.d/blob/master/michael.or
         (end-of-line)
         (hs-toggle-hiding)))
     (bind-key "f" 'my-toggle-fold my-settings-toggle-map))
-#+END_SRC
+#+end_src
 
 ** hydra
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package hydra)
-#+END_SRC
+#+end_src
 
 Currently I'm using this only for =ivy-hydra=. More ideas in https::/github.com/kana/vim-submode
 
 ** irony
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package irony
     :hook (c-mode c++-mode)
     :config (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
-#+END_SRC
+#+end_src
 
 ** ivy et al.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ivy
     :custom
     (ivy-virtual-abbreviate 'abbreviate "Show abbreviated path in addition to the filename")
@@ -897,17 +918,17 @@ Currently I'm using this only for =ivy-hydra=. More ideas in https::/github.com/
     (setq ivy-count-format "%d/%d "
           ivy-height 12
           ivy-extra-directories nil)
-#+END_SRC
+#+end_src
 
 Do not add a =^= (beginning of line anchor) while completing. Refer [[https://github.com/abo-abo/swiper/issues/140][this]] and [[https://github.com/abo-abo/swiper/issues/1126][this]].
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq ivy-initial-inputs-alist nil)
-#+END_SRC
+#+end_src
 
 *** Keybindings
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-key* "C-c C-r" 'ivy-resume)
-#+END_SRC
+#+end_src
 
 |---------+------------------------------------------------------------------------------------------------------------------------|
 | Binding | Description                                                                                                            |
@@ -924,7 +945,7 @@ Do not add a =^= (beginning of line anchor) while completing. Refer [[https://gi
 There is a variable =ivy-use-virtual-buffers= that does this. However, it is static and when set, dumps everything in =ivy-switch-buffer=.
 As a result, by default I have to choose one or the other; I can't have both. This fixes that.
 =C-c j j= will show buffers, recent files and bookmarks while =C-c j b= will only show buffers
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun my-ivy-switch-virtual-buffer ()
     "Show recent files and bookmarks in the buffer list"
     (interactive)
@@ -947,19 +968,19 @@ As a result, by default I have to choose one or the other; I can't have both. Th
              ("b" . ivy-switch-buffer)
              ("f" . my-file-finder)
              ("j" . my-ivy-switch-virtual-buffer))
-#+END_SRC
+#+end_src
 
 *** /fin/
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   )
-#+END_SRC
+#+end_src
 
 *** ivy-hydra
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ivy-hydra
     :after (ivy hydra)
     :config
-#+END_SRC
+#+end_src
 
 **** Customize the default ivy-hydra
 Provides some vim-ish movements and calling methods. From [[https://github.com/abo-abo/hydra/wiki/hydra-ivy-replacement][here]]
@@ -970,7 +991,7 @@ eg. To kill multiple buffers
 - Once the 'kill' action has been selected, select the buffer to kill using the movement keys and press =f= to execute the action
 - Pressing =f= keeps the hydra menu open to allow selecting other buffers to execute the selected action
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-key "\C-o"
     (defhydra soo-ivy (:hint nil :color pink)
       "
@@ -1013,15 +1034,15 @@ eg. To kill multiple buffers
       ("C" ivy-toggle-case-fold)
       ("r" ivy-occur :exit t))
     ivy-minibuffer-map)
-#+END_SRC
+#+end_src
 
 **** /fin/
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   )
-#+END_SRC
+#+end_src
 
 *** swiper
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package swiper
     :after ivy
     :bind* ("C-M-s" . swiper-all)
@@ -1032,7 +1053,7 @@ eg. To kill multiple buffers
     (when (executable-find "rg")
       (setq counsel-grep-base-command
             "rg --smart-case --max-columns 240 --no-heading --line-number --color never '%s' %s")))
-#+END_SRC
+#+end_src
 
 *** counsel
 NOTE: I'm deferring loading using =:commands= for those commands for which I cannot use =:bind= here
@@ -1045,7 +1066,7 @@ using =counsel-M-x= causes ivy-rich to put a docstring in there which it doesn't
 
 NOTE: I'm deferring loading by using the =commands= keyword for =counsel-org-tag= because the binding for it,
 =C-c C-q= is found in =org-mode-map= which hasn't been defined yet.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package counsel
     :after ivy
     :commands (counsel-org-tag counsel-org-goto counsel-semantic-or-imenu)
@@ -1054,10 +1075,10 @@ NOTE: I'm deferring loading by using the =commands= keyword for =counsel-org-tag
                  ("a" . counsel-apropos)
                  ("f" . counsel-describe-function)
                  ("v" . counsel-describe-variable))
-#+END_SRC
+#+end_src
 
 Use =C-c f= as prefix for all counsel-related keybindings
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   :bind (:map my-fuzzy-jumper-command-map
               ("/" . counsel-rg)
          :map my-s-bindings-map
@@ -1071,17 +1092,17 @@ Use =C-c f= as prefix for all counsel-related keybindings
         (counsel-org-goto)
       (counsel-semantic-or-imenu)))
   (bind-key "o" 'my-counsel-imenu my-fuzzy-jumper-command-map)
-#+END_SRC
+#+end_src
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   )
-#+END_SRC
+#+end_src
 
 *** [[https://github.com/Yevgnen/ivy-rich][ivy-rich]]
 :PROPERTIES:
 :CREATED:  [2018-07-09 Mon 16:46]
 :END:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ivy-rich
     :after ivy
     :custom
@@ -1125,20 +1146,20 @@ Use =C-c f= as prefix for all counsel-related keybindings
 
     :config
     (ivy-rich-mode t))
-#+END_SRC
+#+end_src
 
 ** modern-c++-font-lock
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package modern-cpp-font-lock
     :hook (c++-mode . modern-c++-font-lock-mode))
-#+END_SRC
+#+end_src
 
 ** org
 This solution is by [[https://www.reddit.com/r/emacs/comments/5sx7j0/how_do_i_get_usepackage_to_ignore_the_bundled/ddixpr9/][/u/Wolfer1ne on reddit]].
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org
     :ensure org-plus-contrib
-#+END_SRC
+#+end_src
 
 <<ensure_target>>
 I specifically grab =org-plus-contrib= from the org repository instead of the bundled version to be able to use org-expiry
@@ -1147,7 +1168,7 @@ Passing an argument to =:ensure= (other than t or nil) allows us to use a differ
 Resources: [[http://orgmode.org/worg/org-configs/org-customization-guide.html][Customization guide]], [[https://www.reddit.com/r/emacs/comments/8nvnlu/extending_orgmode/dzz1el9][Extensions]]
 
 *** :init
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   :init
   (setq org-directory "~/Notes/")
   (setq org-default-notes-file (expand-file-name "Inbox.org" org-directory))
@@ -1165,13 +1186,13 @@ Resources: [[http://orgmode.org/worg/org-configs/org-customization-guide.html][C
   (setq org-link-search-must-match-exact-headline nil)
   (setq org-startup-with-inline-images t)
   (setq org-imenu-depth 10)
-#+END_SRC
+#+end_src
 
 **** org-babel source blocks
 Enable syntax highlighting within the source blocks and keep the editing popup window within the same window.
 Also, strip leading and trailing empty lines if any.
 /org-src-preserve-indentation/ will not add an extra level of indentation to the source code
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-src-fontify-natively                       t
         org-src-window-setup                           'current-window
         org-src-strip-leading-and-trailing-blank-lines t
@@ -1191,13 +1212,13 @@ Languages which can be evaluated in Org-mode buffers.
 #+end_src
 
 Ask for confirmation before evaluating? NO!
-#+BEGIN_SRC emacs-lisp :tangle no
+#+begin_src emacs-lisp :tangle no
   (defun my-org-babel-evaluate-silent (lang body)
     "Do not ask for confirmation to evaluate these languages."
     (not (or (string= lang "emacs-lisp"))))
 
   (setq org-confirm-babel-evaluate 'my/org-babel-evaluate-silent)
-#+END_SRC
+#+end_src
 
 On second thought it's better not to do this because of the security implications.
 A safer way to go about it is by enabling it on a file-by-file basis using the following modeline
@@ -1206,19 +1227,19 @@ A safer way to go about it is by enabling it on a file-by-file basis using the f
 #+END_EXAMPLE
 
 **** Clean View
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-startup-indented t)
   (setq org-hide-leading-stars t)
   (setq org-odd-level-only nil)
 
   ;; others: ▼, ↴, ⬎, ⤷, …, ⋱
   (setq org-ellipsis " ▼")
-#+END_SRC
+#+end_src
 
 ***** TODO Hide the < and > around targets
 From [[http://emacs.stackexchange.com/a/19239/9690][Emacs StackExchange]]
 At the moment, it hides not just the angle braces but also the text between them.
-#+BEGIN_SRC emacs-lisp :tangle no
+#+begin_src emacs-lisp :tangle no
   (defcustom org-hidden-links-additional-re "<<[<]?[[:alnum:]]+>>[>]?"
     "Regular expression that matches strings where the invisible-property is set to org-link."
     :type '(choice (const :tag "Off" nil) regexp)
@@ -1236,10 +1257,10 @@ At the moment, it hides not just the angle braces but also the text between them
                                                (add-to-list 'org-font-lock-extra-keywords
                                                             '(org-activate-hidden-links-additional
                                                               (0 '(face org-target invisible org-link))))))
-#+END_SRC
+#+end_src
 
 ***** TODO Show the emphasis and target markers on point
-#+BEGIN_SRC emacs-lisp :tangle no
+#+begin_src emacs-lisp :tangle no
   (defun org-show-emphasis-markers-at-point ()
     (save-match-data
       (if (and (org-in-regexp org-emph-re 2)
@@ -1253,18 +1274,18 @@ At the moment, it hides not just the angle braces but also the text between them
         (apply 'font-lock-flush (list (match-beginning 3) (match-beginning 5))))))
 
   (add-hook 'post-command-hook 'org-show-emphasis-markers-at-point nil t)
-#+END_SRC
+#+end_src
 
 **** ToDo States
 Custom keywords
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-todo-keywords '((sequence "TODO(t!)" "WAITING(w@/!)" "|" "DONE(d@/!)" "DEFER(f@/!)" "CANCEL(c@)")))
   ;; (setq org-todo-keyword-faces
   ;;       (quote (("TODO" :foreground "red" :weight bold)
   ;;               ("WAITING" :foreground "orange" :weight bold)
   ;;               ("DONE" :foreground "forest green" bold)
   ;;               ("CANCEL" :foreground "forest green" bold))))
-#+END_SRC
+#+end_src
 =@=   - Log timestamp and note
 =!=   - Log timestamp only
 =x/y= - =x= takes affect when entering the state and
@@ -1272,30 +1293,30 @@ Custom keywords
 Refer [[http://orgmode.org/manual/Tracking-TODO-state-changes.html][Tracking-TODO-state-changes]] for details
 
 Add logging when task state changes
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-log-done nil  ; Not required as state changes are logged in the LOGBOOK
         org-log-redeadline 'note
         org-log-into-drawer t  ; Save state changes into LOGBOOK drawer instead of in the body
         org-treat-insert-todo-heading-as-state-change t
         org-enforce-todo-dependencies t)  ; Prevent parent task from being marked complete till all child TODOS are marked as complete
-#+END_SRC
+#+end_src
 
 Change from any todo state to any other state using =C-c C-t KEY=
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-use-fast-todo-selection t)
-#+END_SRC
+#+end_src
 
 This frees up S-left and S-right which I can then use to cycles through the todo states but skip setting timestamps and entering notes which is very convenient when all I want to do is change the status of an entry without changing its timestamps
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-treat-S-cursor-todo-selection-as-state-change nil)
-#+END_SRC
+#+end_src
 
 *** :config
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   :config
   (setq org-clock-idle-time nil)
   ;; (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
-#+END_SRC
+#+end_src
 
 **** TODO [[https://orgmode.org/manual/Easy-templates.html][Easy Templates]]
 :PROPERTIES:
@@ -1304,29 +1325,29 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 :END:
 These get added only if org-version < 9.2
 =?= in each string controls where the point will be placed after expansion
-#+BEGIN_SRC emacs-lisp :tangle no
+#+begin_src emacs-lisp :tangle no
   (add-to-list 'org-structure-template-alist
-               '("sc" "#+BEGIN_SRC C++\n  #include <iostream>\n\n  using namespace std;\n\n  int main() {\n    ?cout << \"Hello World!\\n\";\n  }\n#+END_SRC"))
+               '("sc" "#+begin_src C++\n  #include <iostream>\n\n  using namespace std;\n\n  int main() {\n    ?cout << \"Hello World!\\n\";\n  }\n#+end_src"))
 
   (add-to-list 'org-structure-template-alist
-               '("sl" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
+               '("sl" "#+begin_src emacs-lisp\n?\n#+end_src\n" "<src lang=\"?\">\n\n</src>"))
 
   (add-to-list 'org-structure-template-alist
-               '("sp" "#+BEGIN_SRC python\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
+               '("sp" "#+begin_src python\n?\n#+end_src\n" "<src lang=\"?\">\n\n</src>"))
 
   ;; (add-to-list 'org-structure-template-alist
-  ;;              '("sd" "#+BEGIN_SRC dot :file /tmp/out.png\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
+  ;;              '("sd" "#+begin_src dot :file /tmp/out.png\n?\n#+end_src\n" "<src lang=\"?\">\n\n</src>"))
 
   (add-to-list 'org-structure-template-alist
-               '("ss" "#+BEGIN_SRC bash\n?\n#+END_SRC\n" "<src lang=\"?\">\n\n</src>"))
-#+END_SRC
+               '("ss" "#+begin_src bash\n?\n#+end_src\n" "<src lang=\"?\">\n\n</src>"))
+#+end_src
 
 For org-version >= 9.2, we have to use this. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-to-list 'org-structure-template-alist '("sc" . "src C++"))
   (add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist '("ss" . "src bash"))
-#+END_SRC
+#+end_src
 
 However, note that since the following start with =s=, it will get clobbered by the default =src= block and not show up in the menu.
 Thus to get it to work as before using =<sc=, we have to add =org-tempo= to =org-modules=
@@ -1336,7 +1357,7 @@ Thus to get it to work as before using =<sc=, we have to add =org-tempo= to =org
 
 **** Flatten links
 This is the counterpart to =org-insert-link=. From [[http://emacs.stackexchange.com/a/10714/9690][here]].
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun my-org-flatten-link (&optional replace-with-description)
     "Replace an org link with its description if REPLACE-WITH-DESCRIPTION is true. If not or if description doesn't exist, replace with its url"
     (interactive)
@@ -1347,7 +1368,7 @@ This is the counterpart to =org-insert-link=. From [[http://emacs.stackexchange.
                              (org-match-string-no-properties 1))))
           (apply 'delete-region remove)
           (insert description))))
-#+END_SRC
+#+end_src
 
 **** Use ! to toggle timestamp type
 :PROPERTIES:
@@ -1360,7 +1381,7 @@ Thus, this allows me to use =C-c .= to insert a timestamp and when prompted to e
 use =!= to toggle between active and inactive timestamps. Also see [[Custom timestamp keymap]].
 From [[http://emacs.stackexchange.com/questions/38062/configure-key-to-toggle-between-active-and-inactive-timestamps#38065][Emacs StackExchange]]
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun org-toggle-time-stamp-activity ()
     "Toggle activity of time stamp or range at point."
     (interactive)
@@ -1422,39 +1443,39 @@ From [[http://emacs.stackexchange.com/questions/38062/configure-key-to-toggle-be
       (forward-char)))
 
   ;; (org-defkey org-mode-map (kbd "C-c .") #'my-org-time-stamp)
-#+END_SRC
+#+end_src
 
 **** org-refile
 By [[https://www.reddit.com/r/emacs/comments/4366f9/how_do_orgrefiletargets_work/czg008y/][/u/awalker4 on reddit]].
 Show upto 3 levels of headings from the current file and two levels of headings from all agenda files
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-refile-targets
         '((nil . (:maxlevel . 3))
           (org-agenda-files . (:maxlevel . 2))))
-#+END_SRC
+#+end_src
 Each element of the list generates a set of possible targets.
 /nil/ indicates that all the headings in the current buffer will be considered.
 
 Following are from Aaron Bieber's post [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Organizing Notes with Refile]]
 
 Creating new parents - To create new heading, add =/HeadingName= to the end when using refile (=C-c C-w=)
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-refile-allow-creating-parent-nodes 'confirm)
   (setq org-refile-use-outline-path 'file)
   (setq org-outline-path-complete-in-steps nil)
-#+END_SRC
+#+end_src
 
 Store the timestamp when an entry is refiled
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-log-refile 'time)
-#+END_SRC
+#+end_src
 
 ***** TODO Set org-refile targets based on current file
 Why would I want to refile something work-related under Softwares etc.
 A way to do it is by writing a function that sets /org-refile-targets/ in a let binding making it local.
 eg. implementation by abo-abo: [[https://github.com/abo-abo/worf/blob/master/worf.el][worf-refile-other]]
 
-#+BEGIN_SRC emacs-lisp :tangle no
+#+begin_src emacs-lisp :tangle no
   (load-library "find-lisp")
 
   (defun my-org-refile-targets ()
@@ -1470,7 +1491,7 @@ eg. implementation by abo-abo: [[https://github.com/abo-abo/worf/blob/master/wor
 
   (bind-key* "C-c C-w" 'my-org-refile)
   (bind-key "C-c C-w" 'my-org-refile org-mode-map)
-#+END_SRC
+#+end_src
 
 ***** TODO Rice org-refile
 eg. https://emacs-china.org/t/topic/3622
@@ -1478,7 +1499,7 @@ eg. https://emacs-china.org/t/topic/3622
 **** org-babel
 Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-babel-default-header-args
         '((:results . "verbatim replace")))
 
@@ -1490,11 +1511,11 @@ Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
         '((:results . "output")))
 
   (setq org-babel-python-command "python3")
-#+END_SRC
+#+end_src
 
 ***** TODO Display errors and warnings in an org-babel code block
 From [[http://emacs.stackexchange.com/questions/2952/display-errors-and-warnings-in-an-org-mode-code-block][Emacs StackExchange]]
-#+BEGIN_SRC emacs-lisp :tangle no
+#+begin_src emacs-lisp :tangle no
   (defvar org-babel-eval-verbose t
     "A non-nil value makes `org-babel-eval' display")
 
@@ -1518,18 +1539,18 @@ From [[http://emacs.stackexchange.com/questions/2952/display-errors-and-warnings
           (buffer-string)))))
 
   (setq org-babel-eval-verbose t)
-#+END_SRC
+#+end_src
 
 ***** Refresh inline images after evaluating org-babel code
 From https://emacs.stackexchange.com/a/9813/9690
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun my-fix-inline-images ()
     (when org-inline-image-overlays
       (org-redisplay-inline-images)))
 
   (add-hook 'org-babel-after-execute-hook 'my-fix-inline-images)
-#+END_SRC
+#+end_src
 
 ***** Jump to head/tail of any block, not just src blocks
 :PROPERTIES:
@@ -1567,7 +1588,7 @@ From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 -
 :PROPERTIES:
 :CREATED:  [2018-12-28 Fri 23:04]
 :END:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-capture-templates
         '(("t" "TODO" entry
            (file+headline org-default-notes-file "Inbox")
@@ -1592,7 +1613,7 @@ From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 -
           ("sv" "Vim snippets" entry (file "Software/vim.org")
            "* %?"
            :jump-to-captured t :empty-lines 1)))
-#+END_SRC
+#+end_src
 
 NOTE:
 - When using several keys, keys using the same prefix key must be sequential in the list and preceded by a 2-element entry explaining the prefix key.
@@ -1606,13 +1627,13 @@ NOTE:
 :END:
 This adds the CREATED and ID property to all captures
 From https://stackoverflow.com/a/16247032/734153
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-hook 'org-capture-prepare-finalize-hook
             (lambda() (org-expiry-insert-created)(org-id-get-create)))
-#+END_SRC
+#+end_src
 
 ***** COMMENT Capture template for learning Spanish
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-to-list 'org-capture-templates '(("l"  "Spanish")
 
                                         ("ls" "Item" entry
@@ -1630,7 +1651,7 @@ From https://stackoverflow.com/a/16247032/734153
                                          "\n* %(setq my-spanish-capture (read-string \"Spanish: \")) :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"hide1cloze\")%(org-set-property \"VERB_INFINITIVE\" (concat \"\\\"\" my-spanish-capture \"\\\"\"))%(org-set-property \"VERB_TRANSLATION\" (concat \"\\\"to \" (setq my-english-capture (read-from-minibuffer \"English: to \")) \"\\\"\"))%(org-set-property \"VERB_INFINITIVE_HINT\" (concat \"\\\"\" (substring my-spanish-capture 0 1) \"...\\\"\"))\n\nSpanish: [%(message my-spanish-capture)]\nEnglish: [to %(message my-english-capture)]\n\n** Notes\n** Examples\n** Simple Present Tense :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"conjugate\")%(org-set-property \"VERB_TENSE\" \"\\\"simple present\\\"\")\n\n| yo               | %?  |\n| tú               |   |\n| él/ella/Ud.      |   |\n| nosotros         |   |\n| vosotros         |   |\n| ellos/ellas/Uds. |   |"
                                          :jump-to-captured t :empty-lines 1))
                t)
-#+END_SRC
+#+end_src
 
 ****** TODO Using %^{prompt} in org-capture template doesn't allow specifying accented characters with =C-x 8=
 Hence, I'm using a hacky way of explicitly prompting for input (since I can specify accented characters that way),
@@ -1639,7 +1660,7 @@ saving it to a variable and printing it out later in the capture template.
 ***** TODO Creating TODOs doesn't log it as a state change
 ***** Create frames for easy org-capture directly from the OS
 (credit: [[http://cestlaz.github.io/posts/using-emacs-24-capture-2/][here]])
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package noflet
     :config
     (defun my-make-capture-frame ()
@@ -1661,7 +1682,7 @@ saving it to a variable and printing it out later in the capture template.
     "Advise capture-destroy to close the frame"
     (if (equal "capture" (frame-parameter nil 'name))
         (delete-frame)))
-#+END_SRC
+#+end_src
 
 This can then be used to create a capture frame
 #+BEGIN_EXAMPLE
@@ -1673,25 +1694,25 @@ This can then be used to create a capture frame
 :ID:       ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7
 :END:
 Custom keymap for org-mode bindings.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-keys :prefix-map my-org-bindings-map
              :prefix-docstring "This map is used to group together all org-mode settings"
              :prefix "C-c o"
              ("a" . org-agenda)
              ("c" . counsel-org-capture))
   ;; :bind (("c" . calendar))
-#+END_SRC
+#+end_src
 
 <<Custom timestamp keymap>>. Also see [[id:d4634d95-be37-4bdf-987e-22da5778e958][Using ! to toggle timestamp type]]
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-key "C-c C-q" 'counsel-org-tag org-mode-map)
-#+END_SRC
+#+end_src
 
 Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (define-key key-translation-map (kbd "C-c C-v C-k") (kbd "C-c C-v k"))
-#+END_SRC
+#+end_src
 
 Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is left untouched to only jump to top of src blocks
 #+begin_src emacs-lisp
@@ -1699,9 +1720,9 @@ Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is le
 #+end_src
 
 *** /fin/
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   )
-#+END_SRC
+#+end_src
 
 *** TODO Archive subtrees hierarchically
 Archive subtrees under the same hierarchy as the original in the archive files
@@ -1710,22 +1731,22 @@ https://fuco1.github.io/2017-04-20-Archive-subtrees-under-the-same-hierarchy-as-
 
 *** htmlize
 Syntax highlighting when exporting to HTML? Yes, please!
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package htmlize
     :disabled
     :after org)
-#+END_SRC
+#+end_src
 
 *** org-agenda
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-agenda
     :after org
     :ensure nil
-#+END_SRC
+#+end_src
 
 **** :init
 Don't add some files to the agenda
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   :init
   (setq org-agenda-files
         (seq-filter (lambda (x)
@@ -1734,29 +1755,29 @@ Don't add some files to the agenda
                            (not (string-match-p "Orgzly" x))))
                     (mapcar (lambda (x) (expand-file-name x org-directory))
                             '("Inbox.org" "Software/" "Personal/" "Work/"))))
-#+END_SRC
+#+end_src
 
 **** :config
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   :config
   (setq org-agenda-tags-column -120)          ; Monitors are wide, might as well use it :/
   (setq org-agenda-skip-scheduled-if-done t)  ; Why isn't this default?
   (setq org-agenda-skip-deadline-if-done t)
   (setq org-agenda-window-setup 'only-window)
   (setq org-agenda-restore-windows-after-quit t)
-#+END_SRC
+#+end_src
 
 Show the previous 7 days as well in the agenda. Also, force agenda to start on a Monday.
 Hence, these two combined always show entries starting from the previous Monday.
 Source: https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-agenda-start-day "-7d")
   (setq org-agenda-start-on-weekday 1)
-#+END_SRC
+#+end_src
 
 **** org-agenda custom commands
 Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun my-org-skip-subtree-if-habit ()
     "Skip an agenda entry if it has a STYLE property equal to \"habit\"."
     (let ((subtree-end (save-excursion (org-end-of-subtree t))))
@@ -1801,23 +1822,23 @@ Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mod
                                                      (org-agenda-skip-if nil '(scheduled deadline))))
                       (org-agenda-overriding-header "ALL normal priority tasks:"))))
            ((org-agenda-compact-blocks t)))))
-#+END_SRC
+#+end_src
 
 **** Keybindings
 [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][General org keybindings]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   :config
-#+END_SRC
+#+end_src
 
 Open the custom "Daily agenda and all TODOs" directly. Based on [[http://emacs.stackexchange.com/a/868/9690][Emacs StackExchange]].
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (bind-key* "<f12>" '(lambda (&optional arg) (interactive "P")(org-agenda arg "w")))
-#+END_SRC
+#+end_src
 
 **** /fin/
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   )
-#+END_SRC
+#+end_src
 
 *** org-bullets
 Other bullets to consider:
@@ -1825,18 +1846,18 @@ Default: "◉ ○ ✸ ✿"
 Large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
 Small: ► • ★ ▸
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-bullets
     :after org
     :config
     (add-hook 'org-mode-hook (lambda() (org-bullets-mode 1))))
-#+END_SRC
+#+end_src
 
 A good way to find more characters is to use =M-x insert-char=
 
 *** org-drill
 I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ensure_target]].
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-drill
     :disabled
     :after org
@@ -1851,11 +1872,11 @@ I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ens
     (use-package org-drill-table
       :disabled
       :load-path "bundle/org-drill-table"))
-#+END_SRC
+#+end_src
 
 *** org-expiry
 This allows me to add a =CREATED= property everytime I create a new org-heading. From [[https://stackoverflow.com/a/13285957/734153][here]].
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-expiry
     :after org
     :ensure org-plus-contrib
@@ -1863,18 +1884,18 @@ This allows me to add a =CREATED= property everytime I create a new org-heading.
     (setq org-expiry-inactive-timestamps t) ; Don't have everything in the agenda view
     :config
     (org-expiry-insinuate))
-#+END_SRC
+#+end_src
 
 *** org-id
 I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ensure_target]].
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-id
     :after org
     :ensure org-plus-contrib
     :init
     (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
     :config
-#+END_SRC
+#+end_src
 
 To effectively use custom ID, refer [[https://writequit.org/articles/emacs-org-mode-generate-ids.html#update-2016-09-07][this]].
 Note that =org-id= has been updated since then and now supports a method =org-id-get-create= which creates an ID if one is not present.
@@ -1884,9 +1905,9 @@ Also, it uses the identifier /ID/ instead of /CUSTOM_ID/
 :PROPERTIES:
 :CREATED:  [2018-12-28 Fri 23:59]
 :END:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-hook 'org-insert-heading-hook 'org-id-get-create)
-#+END_SRC
+#+end_src
 
 **** Completion while inserting link
 :PROPERTIES:
@@ -1895,43 +1916,43 @@ Also, it uses the identifier /ID/ instead of /CUSTOM_ID/
 To use completion, insert link using =C-c C-l= and select =id:= as type and completion should trigger.
 =org-id-get-with-outline-path-completion= returns the ID of the selected heading and creates it if it doesn't have one already.
 Details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun org-id-complete-link (&optional arg)
     "Create an id: link using completion"
     (concat "id:" (org-id-get-with-outline-path-completion org-refile-targets)))
 
   (eval-after-load 'org '(org-link-set-parameters "id" :complete 'org-id-complete-link))
-#+END_SRC
+#+end_src
 
 **** TODO Use org-id globally across all files
 Example on [[http://stackoverflow.com/a/27158715/734153][Emacs StackExchange]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-id-track-globally t)
   (setq org-id-extra-files '("~/.emacs.d/config.org"))
-#+END_SRC
+#+end_src
 
 **** /fin/
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   )
-#+END_SRC
+#+end_src
 
 ** pcre2el
 From [[https://www.reddit.com/r/emacs/comments/60nb8b/favorite_builtin_emacs_commands/df8h8hm/][/u/Irkry on reddit]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package pcre2el
     :config (pcre-mode t))
-#+END_SRC
+#+end_src
 
 ** popup-kill-ring
 Use =M-y= to show a list of all killed/yanked text to paste at the cursor location
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package popup-kill-ring
     :bind ("M-y" . popup-kill-ring))
-#+END_SRC
+#+end_src
 
 ** rainbow-delimiters
 Use brighter colors
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package rainbow-delimiters
     :bind (:map my-settings-toggle-map ("r" . rainbow-delimiters-mode))
     :config
@@ -1943,19 +1964,19 @@ Use brighter colors
     (set-face-attribute 'rainbow-delimiters-depth-6-face nil :foreground "orchid")
     (set-face-attribute 'rainbow-delimiters-depth-7-face nil :foreground "spring green")
     (set-face-attribute 'rainbow-delimiters-depth-8-face nil :foreground "sienna1"))
-#+END_SRC
+#+end_src
 
 ** rainbow-mode
 When a color is specified as a hex code or with its name, set the background of the face to the value of the color itself
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package rainbow-mode
     :defer t)
-#+END_SRC
+#+end_src
 
 ** undo-tree
 This lets us visually walk through the changes we've made, undo back to a certain point (or redo), and go down different branches.
 Default binding is =C-x u=
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package undo-tree
     :bind (:map my-settings-enable-map
                 ("U" . undo-tree-visualize)
@@ -1964,20 +1985,20 @@ Default binding is =C-x u=
     :custom
     (undo-tree-visualizer-timestamps t)
     (undo-tree-visualizer-diff t))
-#+END_SRC
+#+end_src
 
 ** which-key
 Shows which keys can be pressed next.
 eg. if you press =C-x= and wait a few seconds, a window pops up with all the key bindings following the currently entered incomplete command.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package which-key
     :config (which-key-mode))
-#+END_SRC
+#+end_src
 
 ** yasnippet
 Use =C-d= to clear the field without accepting the default field name
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package yasnippet
     :commands (yas-reload-all yas-minor-mode)
     :init
@@ -1991,7 +2012,7 @@ Use =C-d= to clear the field without accepting the default field name
                ("C-c & v" . yas-visit-snippet-file)
                ("C-c & r" . yas-reload-all)
                ("C-c & &" . yas-describe-tables)))
-#+END_SRC
+#+end_src
 
 NOTE:
 - Normally, I would've used =:hook= to defer loading. However, just running =yas-minor-mode= isn't sufficient and yasnippet
@@ -2002,7 +2023,7 @@ NOTE:
 
 ** delight
 Placing at end to be called after all packages are loaded
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package delight
     :config
     (delight '((abbrev-mode nil t)
@@ -2018,7 +2039,7 @@ Placing at end to be called after all packages are loaded
                (undo-tree-mode nil undo-tree)
                (yas-minor-mode nil yasnippet)
                (which-key-mode nil which-key))))
-#+END_SRC
+#+end_src
 
 * After
 ** Private config
