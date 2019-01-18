@@ -115,9 +115,9 @@ unset -f =dec
 =dec() (                                                                                                          # {{{1
   _help () { # {{{
     echo 'SYNTAX:'
-    echo '  =dec NUM [FROM=10]'
+    echo '  =dec NUM [FROM=16]'
     echo '  echo NUM | =dec [FROM=16]'
-    echo '  =dec [FROM=10] <<< "NUM"'
+    echo '  =dec [FROM=16] <<< "NUM"'
   } # }}}
 
   if (( $# >= 2 )); then
@@ -172,10 +172,10 @@ unset -f =slice
 =slice() (                                                                                                        # {{{1
   _help() { # {{{
     echo 'SYNTAX:'
-    echo '  =bitslice NUM MSB LSB'
-    echo '  =bitslice NUM BIT'
-    echo '  echo NUM | =bitslice MSB LSB'
-    echo '  =bitslice MSB LSB <<< "NUM"'
+    echo '  =slice NUM MSB LSB'
+    echo '  =slice NUM BIT'
+    echo '  echo NUM | =slice MSB LSB'
+    echo '  =slice MSB LSB <<< "NUM"'
     echo
     echo "NOTE: MSB >= LSB"
   } # }}}

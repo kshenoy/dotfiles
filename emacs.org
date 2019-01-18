@@ -1,6 +1,6 @@
-#+TITLE: Emacs Configuration
+#+TITLE: emacs configuration
 #+PROPERTY: header-args+ :results output silent :tangle ~/.emacs.d/init.el :noweb tangle :comments both :mkdirp yes
-#+TODO: FIXME(!) | DONE
+#+TODO: TODO(!) FIXME(!) |
 
 * Literate config
 [[https://org-babel.readthedocs.io/en/latest/header-args/][header-args]]:
@@ -171,7 +171,8 @@ eg. =(my-describe-keymap 'evil-window-map)=
 Change default location of backups to avoid littering PWD
 #+begin_src emacs-lisp
   (defvar backup-directory (concat user-emacs-directory "/tmp/backups"))
-  (if (not (file-exists-p backup-directory)) (make-directory backup-directory t))
+  (unless (file-exists-p backup-directory)
+    (make-directory backup-directory t))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -1323,7 +1324,7 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 :ID:       851ad87b-250e-4c1e-83b1-6b4e1fa6b20d
 :CREATED:  [2019-01-11 Fri 13:03]
 :END:
-These get added only if org-version < 9.2
+These should get added only if org-version < 9.2
 =?= in each string controls where the point will be placed after expansion
 #+begin_src emacs-lisp :tangle no
   (add-to-list 'org-structure-template-alist
@@ -2049,14 +2050,13 @@ Placing at end to be called after all packages are loaded
 #+end_src
 
 * Local variables
-:PROPERTIES:
-:header-args: :tangle no
-:END:
 Use =add-file-local-variable= or =add-file-local-variable-prop-line= instead of adding these manually
 
 [[https://www.reddit.com/r/emacs/comments/372nxd/how_to_move_init_to_orgbabel/crjicdv/][Auto-tangle on save]] - Not using it because it was too aggressive for at least this file considering how often I tinker with it
 # eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
 
 # Local Variables:
+# org-enforce-todo-checkbox-dependencies: nil
+# org-enforce-todo-dependencies: nil
 # org-refile-targets: ((nil :maxlevel . 9))
 # End:

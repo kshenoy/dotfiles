@@ -1,6 +1,6 @@
-#+TITLE: Git Configuration
+#+TITLE: git configuration
 #+PROPERTY: header-args+ :results output silent :noweb tangle :comments both :mkdirp yes
-#+TODO: FIXME(!) | DONE
+#+TODO: TODO FIXME |
 
 * Resources
 :PROPERTIES:
@@ -35,46 +35,40 @@ These labels are nothing but pointers to these nodes the way /head/ and /tail/ a
 
 ** [[https://git-scm.com/book/en/v1/Git-Basics-Recording-Changes-to-the-Repository][File Status Lifecycle]]
 ** Committing
-:PROPERTIES:
-:ID:       86c15079-6050-4bb4-9d3e-b8b5c0a7d5e0
-:CREATED:  [2019-01-15 Tue 09:13]
-:END:
 *** Making partial commits
-:PROPERTIES:
-:ID:       8ad7fce0-6a09-4af8-b544-381cbdd9f5ce
-:CREATED:  [2019-01-16 Wed 19:55]
-:END:
 https://coderwall.com/p/ufapcw/git-add-files-by-hunk
 Use =git add -p= to commit changes by hunks
 
 ** Diff
 Syntax: =git diff <FROM> <TO>=
 
-|------------------------------+------------------------------------+-------------------------------------------------------------|
-| Command                      | FROM                               | TO                                                          |
-|------------------------------+------------------------------------+-------------------------------------------------------------|
-| git diff <commit1> <commit2> | commit1                            | commit2                                                     |
-| git diff                     | working (default value of commit1) | index (default value of commit2 when commit1 == working)    |
-| git diff --staged            | index                              | HEAD (default value of commit2 when commit1 == index)       |
-| git diff HEAD                | working (default value of commit1) | HEAD                                                        |
-| git diff origin/master       | working (default value of commit1) | latest commit of the master branch in the remote repository |
-|------------------------------+------------------------------------+-------------------------------------------------------------|
+|-------------------------------+-------------------------------------------------------------+------------------------------|
+| FROM                          | TO                                                          | Command                      |
+|-------------------------------+-------------------------------------------------------------+------------------------------|
+| commit1                       | commit2                                                     | git diff <commit1> <commit2> |
+|-------------------------------+-------------------------------------------------------------+------------------------------|
+| working (default for commit1) | staging area (default for commit2 when commit1 == working)  | git diff                     |
+| working (default for commit1) | HEAD                                                        | git diff HEAD                |
+| working (default for commit1) | latest commit of the master branch in the remote repository | git diff origin/master       |
+|-------------------------------+-------------------------------------------------------------+------------------------------|
+| staging area                  | HEAD (default for commit2 when commit1 == staging area)     | git diff --staged            |
+|-------------------------------+-------------------------------------------------------------+------------------------------|
 
 Thus, we see that /--staged/ changes the default for commit1 from working to index
 
 NOTE:
-- /index/ is also known as the staging area
+- /staging area/ is also known as the /index/
 - /--staged/ is synonymous with /--cached/
 
 ** Renaming/Moving/Deleting
 Using =mv= or =rm= simply makes the changes locally but not the git repo. The file shows up as Changed but not staged.
 Hence, we've to explicitly let git know using these instead:
-=git rm= - Stages the removal and deletes the file locally
-=git rm --cached= - Deletes a staged file but keeps it locally
-=git mv= - Move/rename the file
+- =git rm= Stages the removal and deletes the file locally
+- =git rm --cached= Deletes a staged file but keeps it locally
+- =git mv= Move/rename the file
 
 ** Undoing
-From https://stackoverflow.com/a/15321456/734153
+From https://stackoverflow.com/a/15321456/734153.
 
 |--------------+----------------+------------------------|
 | FROM         | TO             | Command                |
@@ -162,9 +156,9 @@ https://stackoverflow.com/a/2222920/734153
 :header-args+: :tangle ~/.config/git/config
 :END:
 #+begin_src conf :export none
-  ;; This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
-  ;; Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
-  ;; If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
+  # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
+  # Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
+  # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
 #+end_src
 
 https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration
@@ -174,10 +168,6 @@ https://git-scm.com/docs/git-config.html
 - =git config --show-origin <section>.<setting>= shows information about a specific setting
 
 ** user
-:PROPERTIES:
-:ID:       1e425c17-41fe-4367-9172-72dd1185e65e
-:CREATED:  [2019-01-16 Wed 19:46]
-:END:
 #+begin_src conf
   [user]
   name  = Kartik Shenoy
@@ -185,10 +175,6 @@ https://git-scm.com/docs/git-config.html
 #+end_src
 
 ** core
-:PROPERTIES:
-:ID:       9598a8ee-4861-402d-bf35-df51d46f7033
-:CREATED:  [2019-01-16 Wed 19:45]
-:END:
 #+begin_src conf
   [core]
   editor   = gvim --nofork
@@ -207,10 +193,6 @@ Centralize all hooks instead of configuring them on a per-repository basis
 #+end_src
 
 ** color
-:PROPERTIES:
-:ID:       5cb68ff9-b5a6-48ac-ab9a-554e5f7e3582
-:CREATED:  [2019-01-16 Wed 19:47]
-:END:
 #+begin_src conf
   [color]
   ui     = auto
@@ -236,10 +218,6 @@ Centralize all hooks instead of configuring them on a per-repository basis
 #+end_src
 
 ** diff
-:PROPERTIES:
-:ID:       42a789fa-3d8e-4344-ad2f-5479e9c34130
-:CREATED:  [2019-01-16 Wed 19:48]
-:END:
 #+begin_src conf
   [diff]
   tool = gvim
@@ -260,10 +238,6 @@ Centralize all hooks instead of configuring them on a per-repository basis
 #+end_src
 
 ** merge
-:PROPERTIES:
-:ID:       f3c35e26-a99a-468a-be76-bd528270fd0d
-:CREATED:  [2019-01-16 Wed 19:48]
-:END:
 #+begin_src conf
   [merge]
   tool = gvim
@@ -278,10 +252,6 @@ Centralize all hooks instead of configuring them on a per-repository basis
 #+end_src
 
 ** misc
-:PROPERTIES:
-:ID:       1cc3f0fb-c0f6-463a-80d3-a15b8078d096
-:CREATED:  [2019-01-16 Wed 19:49]
-:END:
 #+begin_src conf
   [credential]
   helper = cache --timeout=3600
@@ -291,12 +261,8 @@ Centralize all hooks instead of configuring them on a per-repository basis
 #+end_src
 
 ** aliases
-:PROPERTIES:
-:ID:       5398abaf-8160-41ca-ad1d-342fd5c7d9ca
-:CREATED:  [2019-01-16 Wed 19:50]
-:END:
-https://gitlab.com/to1ne/literate-dotfiles/blob/master/git.org
-https://haacked.com/archive/2014/07/28/github-flow-aliases/
+- https://gitlab.com/to1ne/literate-dotfiles/blob/master/git.org
+- https://haacked.com/archive/2014/07/28/github-flow-aliases/
 
 Using =!= as prefix allows running any command in the shell and it doesn't have to be a git command.
 Thus, if we want to create an alias to run multiple commands by chaining them together, we have to use =!=
@@ -350,14 +316,9 @@ I can run the =git reflog= command and find the SHA of the commit if I realize l
   wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
 #+end_src
 
-* FIXME Figure out how to create a link to gitignore in the Makefile
+* Figure out how to create a link to gitignore in the Makefile
 :PROPERTIES:
-:ID:       c70e52b7-44fc-4ec3-9840-55fe87a147e5
-:CREATED:  [2019-01-16 Wed 21:46]
 :header-args: :tangle no
-:END:
-:LOGBOOK:
-- State "FIXME"      from              [2019-01-16 Wed 21:46]
 :END:
  This would eliminate the need for the setup file
 
@@ -369,4 +330,7 @@ Use =add-file-local-variable= or =add-file-local-variable-prop-line= instead of 
 
 # Local Variables:
 # eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
+# org-enforce-todo-checkbox-dependencies: nil
+# org-enforce-todo-dependencies: nil
+# org-refile-targets: ((nil :maxlevel . 9))
 # End:
