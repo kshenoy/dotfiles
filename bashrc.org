@@ -1,0 +1,2731 @@
+#+TITLE: bash configuration
+#+PROPERTY: header-args+ :results output silent :noweb tangle :comments both :mkdirp yes
+#+TODO: TODO FIXME |
+
+* bashrc
+:PROPERTIES:
+:header-args+: :tangle ~/test/.bashrc
+:CREATED:  [2019-01-18 Fri 21:17]
+:END:
+#+begin_src bash :export none
+  # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
+  # Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
+  # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
+#+end_src
+
+** interactive, login shell settings
+How to check for login v/s interactive shell
+#+begin_src bash
+  # shopt -q login_shell && echo "Login shell" || echo "Not a login shell"
+  # [[ $- == *i* ]] && echo "This is an interactive shell" || echo "This is a script"
+#+end_src
+
+If shell is interactive turn off TTY "start" and "stop" commands in all interactive shells.
+They default to ~C-q~ and ~C-s~. I want to use ~C-s~ to do forward history search.
+#+begin_src bash
+  if [[ $- == *i* ]]; then
+    stty start ''
+    stty stop  ''
+    stty -ixon # disable XON/XOFF flow control
+    stty ixoff # enable sending (to app) of start/stop characters
+    stty ixany # let any character restart output, not only start character
+  fi
+#+end_src
+
+** default permissions
+#+begin_src bash
+  umask 002
+#+end_src
+
+** configuration
+[[https://unix.stackexchange.com/questions/32409/set-and-shopt-why-two][shopt v/s set]]
+
+Using [[https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html][shopt]]: [[http://wiki.bash-hackers.org/internals/shell_options][List of shell options]]
+~-s~ : set
+~-u~ : unset
+~-q~ : query whether set/unset
+
+If set, a command name that is the name of a directory is executed as if it were the argument to the cd command.
+#+begin_src bash
+  shopt -u autocd
+#+end_src
+
+If this is set, an argument to the cd builtin command that is not a directory is assumed to be the name of a variable whose value is the directory to change to.
+#+begin_src bash
+  shopt -s cdable_vars
+#+end_src
+
+If set, minor errors in the spelling of a directory component in a cd command will be corrected.
+The errors checked for are transposed characters, a missing character, and a character too many.
+If a correction is found, the corrected path is printed, and the command proceeds.
+#+begin_src bash
+  shopt -s cdspell
+#+end_src
+
+If this is set, Bash checks that a command found in the hash table exists before trying to execute it.
+If a hashed command no longer exists, a normal path search is performed.
+#+begin_src bash
+  shopt -s checkhash
+#+end_src
+
+If set, Bash lists the status of any stopped and running jobs before exiting an interactive shell.
+If any jobs are running, this causes the exit to be deferred until a second exit is attempted without an intervening command (see Job Control).
+The shell always postpones exiting if any jobs are stopped.
+#+begin_src bash
+  shopt -s checkjobs
+#+end_src
+
+If set, Bash checks the window size after each command and, if necessary, updates the values of LINES and COLUMNS.
+#+begin_src bash
+  shopt -s checkwinsize
+#+end_src
+
+If set, Bash attempts to save all lines of a multiple-line command in the same history entry.
+#+begin_src bash
+  shopt -s cmdhist
+#+end_src
+
+If set, Bash quotes all shell metacharacters in filenames and directory names when performing completion.
+If not set, Bash removes metacharacters such as the dollar sign from the set of characters that will be quoted in completed filenames when these metacharacters appear in shell variable references in words to be completed.
+This means that dollar signs in variable names that expand to directories will not be quoted; however, any dollar signs appearing in filenames will not be quoted, either.
+This is active only when bash is using backslashes to quote completed filenames.
+#+begin_src bash
+  shopt -s complete_fullquote
+#+end_src
+
+If set, Bash replaces directory names with the results of word expansion when performing filename completion.
+This changes the contents of the readline editing buffer. If not set, Bash attempts to preserve what the user typed.
+I use it mainly to prevent bash from escaping $ in $dir_variable
+#+begin_src bash
+  shopt -s direxpand
+#+end_src
+
+If set, Bash attempts spelling correction on directory names during word completion if the directory name initially supplied does not exist.
+#+begin_src bash
+  shopt -s dirspell
+#+end_src
+
+If set, Bash includes filenames beginning with a ‘.’ in the results of filename expansion.
+#+begin_src bash
+  shopt -s dotglob
+#+end_src
+
+If set, aliases are expanded as described below under Aliases, Aliases.
+#+begin_src bash
+  # shopt -s expand_aliases
+#+end_src
+
+If set, the extended pattern matching features described above (see Pattern Matching) are enabled.
+#+begin_src bash
+  # shopt -s extglob
+#+end_src
+
+If set, patterns which fail to match filenames during filename expansion result in an expansion error.
+#+begin_src bash
+  # shopt -s failglob
+#+end_src
+
+If set, the pattern ‘**’ used in a filename expansion context will match all files and zero or more directories and subdirectories.
+If the pattern is followed by a ‘/’, only directories and subdirectories match.
+#+begin_src bash
+  # shopt -s globstar
+#+end_src
+Not using this as it's too slow! - Use [[id:2870e3ab-aa92-4006-9899-372135ae00c4][home-brewed @]] instead
+
+If set, shell error messages are written in the standard GNU error message format.
+#+begin_src bash
+  # shopt -s gnu_errfmt
+#+end_src
+
+If set, the history list is appended to the file named by the value of the HISTFILE variable when the shell exits, rather than overwriting the file.
+#+begin_src bash
+  shopt -s histappend
+#+end_src
+
+If set, and Readline is being used, a user is given the opportunity to re-edit a failed history substitution.
+#+begin_src bash
+  shopt -s histreedit
+#+end_src
+
+If set, and Readline is being used, the results of history substitution are not immediately passed to the shell parser.
+Instead, the resulting line is loaded into the Readline editing buffer, allowing further modification.
+eg. commands using (!, !!, etc.) will print to shell first for confirmation and not auto-execute
+#+begin_src bash
+  shopt -s histverify
+#+end_src
+
+If set, Bash will send SIGHUP to all jobs when an interactive login shell exits (see [[https://www.gnu.org/software/bash/manual/html_node/Signals.html][Signals]]).
+#+begin_src bash
+  shopt -s huponexit
+#+end_src
+
+If set, and job control is not active, the shell runs the last command of a pipeline not executed in the background
+#+begin_src bash
+  shopt -s lastpipe
+#+end_src
+
+If enabled, and the cmdhist option is enabled, multi-line commands are saved to the history with embedded newlines rather than using semicolon separators where possible.
+#+begin_src bash
+  shopt -s lithist
+#+end_src
+
+If set, and a file that Bash is checking for mail has been accessed since the last time it was checked, the message "The mail in mailfile has been read" is displayed.
+#+begin_src bash
+  shopt -s mailwarn
+#+end_src
+
+If set, and Readline is being used, Bash will not attempt to search the PATH for possible completions when completion is attempted on an empty line.
+#+begin_src bash
+  # shopt -s no_empty_cmd_completion
+#+end_src
+
+If set, Bash matches filenames in a case-insensitive fashion when performing filename expansion.
+#+begin_src bash
+  # shopt -s nocaseglob
+#+end_src
+
+If set, Bash matches patterns in a case-insensitive fashion when performing matching while executing case or =[[= conditional commands,
+when performing pattern substitution word expansions, or when filtering possible completions as part of programmable completion.
+#+begin_src bash
+  # shopt -s nocasematch
+#+end_src
+
+If set, Bash allows filename patterns which match no files to expand to a null string, rather than themselves.
+#+begin_src bash
+  # shopt -s nullglob
+#+end_src
+
+If this is set, the shift builtin prints an error message when the shift count exceeds the number of parameters.
+#+begin_src bash
+  shopt -s shift_verbose
+#+end_src
+
+#+begin_src bash
+  set -o noclobber
+  #set -o vi
+  set bell-style none
+  # Otherwise some completions will fail
+  set +o nounset
+#+end_src
+
+** history
+NOTE: exporting a variable makes it available for child processes via the environment
+
+Increase size of history in the terminal. Default is a measly 512 lines
+#+begin_src bash
+  export HISTSIZE=65535
+  export HISTFILESIZE=65535
+#+end_src
+
+Add timestamps to history
+#+begin_src bash
+  export HISTTIMEFORMAT="%F %T  "
+#+end_src
+
+Ignore duplicates and trivial one/two char commands as I've a bad habit of doing =cl= all the time.
+Furthermore, I can add all the commands I want to ignore to it as well.
+#+begin_src bash
+  export HISTIGNORE='?:??:history*:sosa:sosc:sosf:sosp:cd:que*:lla*'
+#+end_src
+
+=ignoredups= allows me to ignore the same command type multiple times consecutively
+=ignorespace= does not add commands that start with a space to the history just in case I don't want to log something
+=ignoreboth= does both
+#+begin_src bash
+  export HISTCONTROL=ignoreboth
+#+end_src
+
+Keeps history forever. Requires ~PROMPT_COMMAND='history -a; history -r'~
+#+begin_src bash :tangle no
+  HISTFILE="${HOME}/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
+  mkdir -p $(dirname ${HISTFILE})
+#+end_src
+However, a downside of this is that when sessions span multiple days, commands end up getting logged in the wrong files
+Thus, I've moved this to =PROMPT_COMMAND= instead to keep the HISTFILE current.
+
+** editor, pager, reading, searching etc.
+#+begin_src bash
+  export MANPAGER=less
+  export PAGER=less
+  export EDITOR=vim
+  export VISUAL=gvim
+  # LESS="-icuf -P?f%f:stdin. [%T] (?pB%pB\%:byte %bB.)"
+#+end_src
+
+Make less more friendly for non-text input files, see lesspipe(1)
+#+begin_src bash
+  [[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
+#+end_src
+
+#+begin_src bash
+  #GREP_OPTIONS="--color=auto"
+  export GREP_COLORS='1;32'
+  export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
+#+end_src
+
+** misc
+Catch-all for the settings I'm not sure why I added to my .bashrc in the first place
+#+begin_src bash
+  export HOSTNAME="$(hostname)"
+  export LANG=en_US.UTF-8
+#+end_src
+
+Set variable identifying the chroot you work in (used in the prompt below)
+#+begin_src bash
+  if [[ -z "$debian_chroot" ]] && [ -r /etc/debian_chroot ]; then
+      debian_chroot=$(cat /etc/debian_chroot)
+  fi
+#+end_src
+
+If not running interactively, don't do anything
+#+begin_src bash
+  [[ -z "$PS1" ]] && return
+#+end_src
+** colors
+*** ls colors
+See [[id:2823d31a-572c-44ec-80e1-84acbbb6412e][dircolors]]
+#+begin_src bash
+  if [[ -x /usr/bin/dircolors ]]; then
+    [[ -r ~/.dircolors ]] && eval "$(/usr/bin/dircolors -b ${HOME}/.dircolors)" || eval "$(/usr/bin/dircolors -b)"
+  fi
+#+end_src
+
+*** base16 themes
+#+begin_src bash
+  export BASE16_SHELL=$HOME/.config/base16-shell
+  [[ -n "$PS1" ]] && \
+  [[ -s $BASE16_SHELL/profile_helper.sh ]] && \
+  eval "$($BASE16_SHELL/profile_helper.sh)"
+#+end_src
+
+*** colored man pages with less
+#+begin_src bash
+  man() {
+    env \
+      LESS_TERMCAP_mb=$(printf "\e[1;31m") \
+      LESS_TERMCAP_md=$(printf "\e[1;31m") \
+      LESS_TERMCAP_me=$(printf "\e[0m") \
+      LESS_TERMCAP_se=$(printf "\e[0m") \
+      LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
+      LESS_TERMCAP_ue=$(printf "\e[0m") \
+      LESS_TERMCAP_us=$(printf "\e[1;32m") \
+      man "$@"
+  }
+#+end_src
+
+** prompt
+[[https://wiki.archlinux.org/index.php/Bash/Prompt_customization][Prompt Customization on ArchWiki]]:
+=PS1= is the primary prompt displayed before each command.
+=PS2= is the secondary prompt used in case of a multi-line command
+=PROMPT_COMMAND= is evaluated right before PS1 is displayed.
+
+I use this by assigning it to a function which updates PS1 and PS2 allowing me to have a dynamic prompt
+#+begin_src bash
+  PROMPT_COMMAND=_setprompt_
+#+end_src
+
+Use bash builtin =checkwinsize= option for terminals which fail to properly set the $COLUMNS variable. (bug workaround)
+#+begin_src bash
+  shopt -s checkwinsize
+#+end_src
+
+*** Colors and helper functions
+These are the color init strings for the basic file types. A color init string consists of one or more of the following numeric codes:
+Attribute codes: 00:Normal, 01:Bold, 04:Underline, 05=Blink, 06:Outline, 07:Reverse, 08:Concealed
+
+| Color   | Foreground | Background |
+|---------+------------+------------|
+| black   |         30 |         40 |
+| red     |         31 |         41 |
+| green   |         32 |         42 |
+| yellow  |         33 |         43 |
+| blue    |         34 |         44 |
+| magenta |         35 |         45 |
+| cyan    |         36 |         46 |
+| white   |         37 |         47 |
+
+NOTE: Non-printable sequences should be enclosed in \[ and \] else it'll cause long commands to not wrap correctly
+These are some colors and line-graphics that I use in different prompts so I'm putting them in one place.
+#+begin_src bash :tangle no :noweb-ref prompt-common
+  local _reset="\[$(tput sgr0)\]"
+  local _bold="\[$(tput bold)\]"
+  local _fg_black="\[$(tput setaf 0)\]"
+  local _fg_light_black="\[$(tput setaf 8)\]"
+  local _fg_red="\[$(tput setaf 1)\]"
+  local _fg_yellow="\[$(tput setaf 3)\]"
+  local _fg_green="\[$(tput setaf 2)\]"
+
+  local _dash="─"
+  local _ulcorner="┌"
+  local _ulcorner="╭"
+  local _llcorner="└"
+  local _llcorner="╰"
+#+end_src
+
+Check if specified directory is under a Version-controlled system
+#+begin_src bash
+  _get_vcs_type_() {
+    # Arguments: 1 - Variable to return VCS type
+    #            2 - Directory to check. If skipped, defaults to PWD
+
+    local _cwd=$PWD
+    if (( $# > 0 )); then
+      command cd $1
+    fi
+
+    if git rev-parse --git-dir > /dev/null 2>&1; then
+      # Check if PWD is under Git
+      echo "git"
+    elif hg status > /dev/null 2>&1; then
+      # Check if PWD is under Mercurial
+      echo "hg"
+    else
+      # No VCS. Return empty string
+      echo ""
+    fi
+
+    if (( $# > 0 )); then
+      command cd $_cwd
+    fi
+  }
+#+end_src
+
+If PWD is under a VCS, return the branch. If not, return an empty string
+#+begin_src bash
+  _get_vcs_branch_() {
+    # Arguments: 1 - The variable into which the branch name must be written
+
+    local _vcs_type=${1}
+
+    if [[ $_vcs_type == "git" ]]; then
+      #echo "Detected git versioning scheme"
+      git symbolic-ref --short HEAD 2> /dev/null
+    elif [[ $_vcs_type == "hg" ]]; then
+      #echo "Detected mercurial versioning scheme"
+      echo "$(hg branch 2> /dev/null)"
+    else
+      echo ""
+    fi
+  }
+#+end_src
+
+Get the status of the VCS - works only for git at the moment
+#+begin_src bash
+  _get_vcs_status_() {
+    local _vcs_type=${1}
+    local _vcs_branch=${2}
+
+    if [[ "${_vcs_type}" == "git" ]]; then
+      if $(echo "$(git log origin/$_vcs_branch..HEAD 2> /dev/null)" | grep '^commit' &> /dev/null); then
+        echo "staged"
+      elif [[ -n $(git status -s --ignore-submodules=dirty  2> /dev/null) ]]; then
+        echo "modified"
+      else
+        echo "committed"
+      fi
+    fi
+  }
+#+end_src
+
+Contract the following: /proj/ch_func_dev{1:0}/ASPEN_HIGHLANDS -> ~AH{1:0}
+Contract more if it's my directory
+#+begin_src bash
+  _get_compact_pwd_() {
+    local cpwd=${PWD}
+    if [[ -n "$HOME" ]] && [[ "$cpwd" =~ ^"$HOME" ]]; then
+      cpwd=${cpwd/#$HOME/\~};
+    else
+      local _proj
+      for _proj in AS AH BR NV; do
+        local _proj_full=$(sed -e 's/AS/ASPEN/i' -e 's/AH/ASPEN_HIGHLANDS/i' -e 's/BR/BRECKENRIDGE/i' -e 's/NV/NV21_EL3/i' <<< ${_proj})
+        local _proj_lcase=$(tr 'A-Z' 'a-z' <<< ${_proj})
+        local _me=$(whoami)
+        if [[ "$cpwd" =~ ^"/proj/ch_func_gen_scratch" ]]; then
+          cpwd=$(sed -e "s:^/proj/ch_func_gen_scratch\([0-9]\)/${_proj_full}/:~${_proj}\1_Scratch/:" <<< $cpwd)
+        elif [[ "$cpwd" =~ ^/proj/ch_func_dev ]]; then
+          cpwd=$(sed -e "s:^/proj/ch_func_dev\([0-9]\)/\(${_proj}\|${_proj_full}\)/:~${_proj}\1/:" <<< $cpwd)
+          cpwd=$(sed -e "s:^\(~${_proj}[0-9]\)/${_me}/${_proj_lcase}[0-9]:\1:" <<< $cpwd)
+        fi
+      done
+    fi
+    echo $cpwd
+  }
+#+end_src
+
+*** mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]
+Also based on [[http://aperiodic.net/phil/prompt/][Phil's Zsh prmpt]]. This is what it looks like:
+#+begin_example
+  ┌ kshenoy @ svvgar-nx16 in ~/.vim ───────────────────── 03:57pm Aug 02, Fri
+  └ (^_^) ➤
+#+end_example
+
+The function has to be called ~_setprompt_~ as that's what =PROMPT_COMMAND= is set to
+#+begin_src bash
+  _setprompt_() {
+    # Colors and line-graphics that I use commonly
+    <<prompt-common>>
+#+end_src
+
+This is all the information I need to set my prompt!
+#+begin_src bash
+  # This has to be placed first
+  local _exit_status="$?"
+
+  # We use this instead of $COLUMNS as when a shell is starting, the $COLUMNS variable is not set
+  local columns=$(tput cols)
+
+  # If root user then colour the arrow red.
+  if (( "${UID}" == 0 )); then
+      local _fg_user_symbol=${_fg_red}
+  else
+    local _fg_user_symbol=${_bold}${_fg_light_black}
+  fi
+
+  # The info variables
+  local _pwd=$(_get_compact_pwd_)
+
+  # Force time to US Mountain Time. I don't want to export TZ as it messes up some other scripts
+  local _time="$(TZ=US/Mountain date +%I:%M%P) "
+  local _user="$(whoami) "
+  local _user_host_sep="@ "
+  local _pwd_sep="in "
+  local _host="$(hostname) "
+
+  # VCS specific
+  local _vcs_type=$(_get_vcs_type_)
+  local _vcs_branch=$(_get_vcs_branch_ ${_vcs_type})
+  local _vcs_sep=" on "
+
+  if [[ $_vcs_type == "git" ]]; then
+    local _user_symbol=" ±"
+
+  elif [[ $_vcs_type == "hg" ]]; then
+    local _user_symbol=" ☿"
+  else
+    #local _user_symbol=" ○"
+    #local _user_symbol=" ➤"
+    local _user_symbol=" $"
+    local _vcs_sep=""
+  fi
+#+end_src
+
+Here, I try to decide what all to put on the prompt depending on the width of the screen.
+I work backwards by constructing the full prompt and remove stuff if it's longer than the screen width as most of the it won't be.
+#+begin_src bash
+  # Set length of info
+  _info="${_ulcorner} ${_user}${_user_host_sep}${_host}${_pwd_sep}${_pwd}${_vcs_sep}${_vcs_branch} ${_time}"
+
+  # If info is wider than the screen, drop the time
+  if (( $columns < ${#_info} )); then
+    _time=""
+    _info="${_ulcorner} ${_user}${_user_host_sep}${_host}${_pwd_sep}${_pwd}${_vcs_sep}${_vcs_branch} "
+  fi
+  _pwd_sep="${_fg_light_black}${_pwd_sep}${_reset}"
+
+  # If the info still can't fit, drop user and domain info
+  if (( $columns < ${#_info} )); then
+    _user=""
+    _user_host_sep=""
+    _host=""
+    _pwd_sep=""
+    _info="${_ulcorner} ${_pwd}${_vcs_sep}${_vcs_branch} "
+  fi
+
+  # If the info still can't fit, drop vcs branch
+  if (( $columns < ${#_info} )); then
+    _vcs_sep=""
+    _vcs_branch=""
+    _info="${_ulcorner} ${_pwd} "
+  fi
+
+  # If the info still can't fit, truncate PWD
+  if (( $columns < ${#_info} )); then
+    _pwd_sep="..."
+    while (( $columns < ${#_info} )); do
+      _pwd=`echo $_pwd | sed 's|^/\?[^/]*/||'`
+      _info="${_ulcorner} ${_pwd_sep}${_pwd} "
+    done
+    _pwd_sep="${_bold}${_fg_green}${_pwd_sep}${_reset}"
+  fi
+
+  local _fillsize=$(( $columns - ${#_info} - 1 ))
+  local _fill=$(printf "${_dash}%.0s" $(seq 1 $_fillsize))" "
+
+  # Colorize vcs:
+  if [[ $_vcs_type == "git" ]]; then
+    local _vcs_status=$(_get_vcs_status_ ${_vcs_type} ${_vcs_branch})
+    if [[ "${_vcs_status}" == "staged" ]]; then
+      _vcs_branch="${_fg_yellow}${_vcs_branch}${_reset}"
+    elif [[ "${_vcs_status}" == "modified" ]]; then
+      _vcs_branch="${_fg_red}${_vcs_branch}${_reset}"
+    elif [[ "${_vcs_status}" == "committed" ]]; then
+      _vcs_branch="${_bold}${_fg_green}${_vcs_branch}${_reset}"
+    fi
+  fi
+
+  # Create exit status indicator based on exit status of last command
+  if (( "$_exit_status" == 0 )); then
+    _exit_status="${_bold}${_fg_green} (^_^)"
+  else
+    _exit_status="${_fg_red} (@_@)"
+  fi
+#+end_src
+
+Now that I've decided what all I want to put on the prompt and how, it's time to set the prompt variables
+#+begin_src bash
+  PS1="\n${_reset}"
+  PS1+="${_fg_light_black}${_ulcorner}${_reset} "
+  PS1+="${_fg_red}${_user}${_reset}"
+  PS1+="${_fg_light_black}${_user_host_sep}${_reset}"
+  PS1+="${_fg_yellow}${_host}${_reset}"
+  PS1+="${_pwd_sep}"
+  PS1+="${_bold}${_fg_green}${_pwd}${_reset}"
+  PS1+="${_fg_light_black}${_vcs_sep}${_reset}"
+  PS1+="${_vcs_branch} "
+  PS1+="${_fg_light_black}${_fill}${_reset}"
+  PS1+="${_fg_yellow}${_time}${_reset}"
+  PS1+="\n"
+  PS1+="${_fg_light_black}${_llcorner}${_reset}"
+  PS1+="${_exit_status}${_reset}"
+  PS1+="${_fg_user_symbol}${_user_symbol}${_reset} "
+
+  PS2="      ${_fg_user_symbol}...${_reset}   "
+#+end_src
+
+Miscellaneous stuff that I want to evaluate dynamically so I've put it here. I really should find a better place for them.
+#+begin_src bash
+    # Evaluate dynamic variables only if dyn_vars is defined (Not required for prompt)
+    declare -F dyn_vars &> /dev/null && dyn_vars
+
+    # Putting this here to keep the HISTFILE current when sessions span multiple days
+    # FIXME: Find a better way to do this i.e. do it once a day instead of everytime the prompt is refreshed
+    HISTFILE="${HOME}/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
+    [[ -d $(dirname ${HISTFILE}) ]] || mkdir -p $(dirname ${HISTFILE})
+    # Write to the history file immediately instead of waiting till the end of the session
+    history -a
+  }
+#+end_src
+
+** aliases
+# Aliases v/s Functions
+A big limitation of aliases is that they are only expanded as the first argument, or after another alias with a trailing space on the end of the command.
+
+eg. let's say I have the following aliases set up
+#+begin_src bash :tangle no
+  alias g=grep
+  alias vq='v -q <(!!)'
+#+end_src
+Now, if I run =g SOMETHING= followed by =vq= then =vq= doesn't run as expected because ~!!~ expands to 'g SOMETHING'.
+However, in the expanded form, 'g' doesn't get replaced with grep because of the afore-mentioned limitation.
+
+To avoid this, I use functions for my most commonly used aliases so that they work everywhere and, aliases only if I'm sure that they won't be used in the middle of a command.
+
+#+begin_src bash
+  alias l=ls
+  alias ll='ls -lh'
+  alias la='ls -A'
+  alias lla='ll -A'
+  alias llt='ll -tr'
+  alias llS='ll -Sr'
+  alias ld='\ls -F | command grep "/"'
+#+end_src
+
+#+begin_src bash
+  alias c=clear
+  alias cl="c;l"
+
+  alias d='diff'
+  alias ds='diff -y'
+  alias dt='meld'
+  alias td='tkdiff'
+
+  #alias echo '\echo -e'
+  #alias lock='/usr/local/bin/xlock'
+  alias be='bindkey -me'
+  alias bv='bindkey -v'
+  alias mv='mv -vi'
+  alias cp='cp -vi'
+  alias rm='rm -vi'
+  alias rd='rm -rvf'
+  alias ln='ln -svi'
+  alias df='df -h'
+  alias pppath='tr ":" "\n" <<< $PATH'
+  alias clnpath='export PATH=$(tr ":" "\n" <<< $PATH | perl -ne "print unless \$seen{\$_}++" | paste -s -d":")'
+
+  alias C=cat
+  alias P=$PAGER
+  alias H=head
+  alias T='tail -n 50'
+  alias hi=history
+  alias hh='hi | T'
+  alias xargs='xargs -t'
+  alias x=exit
+  alias k9='kill -9'
+  alias j='jobs -l'
+  alias isodate='date +%Y-%m-%d'
+  alias pls='sudo $(history -p !!)'
+  duh() { du -h "$@" | sort -rh; }
+#+end_src
+
+#+begin_src bash
+  alias fn='find . -name'
+  alias ftd='find . -type d -name'
+#+end_src
+
+From https://askubuntu.com/a/185746/38952
+Using ww twice ensures that the output is not truncated to the width of the terminal
+#+begin_src bash
+  psgrep() { ps wwup $(command pgrep -f "$@"); }
+#+end_src
+
+Explicitly declaring this as a function as without it RHEL7 gets confused and errors out
+#+begin_src bash
+  function grep() { command grep -sP --color=always "$@"; }
+  gi() { g -i "$@"; }
+  gv() { g -v "$@"; }
+#+end_src
+
+"bookmarks" for commonly used configs
+#+begin_src bash
+  alias gosc='$VISUAL ~/.bashrc'
+  alias gosa='$VISUAL ~/.dotfiles/bash/aliases'
+  alias gosf='$VISUAL ~/.dotfiles/bash/bashrc-func'
+  alias gost='$VISUAL ~/.dotfiles/tmux/tmux.conf'
+  alias gosx='$VISUAL ~/.Xresources'
+  alias sosc='. ~/.bashrc && clnpath && echo Sourced bashrc'
+  alias sosa='. ~/.dotfiles/bash/aliases && . ~/.dotfiles/bash/bashrc-func && echo Sourced aliases and functions'
+#+end_src
+
+#+begin_src bash
+  alias U='unison dotfiles -terse'
+#+end_src
+
+*** git
+#+begin_src bash
+  alias ga='git add'
+  alias gA='git add -A .'
+  alias gh='git help'
+  alias gs='git status'
+#+end_src
+
+*** perforce
+#+begin_src bash
+  alias pf='p4'
+  alias pfa='p4 add'
+  alias pfd='p4 diff'
+  alias pfd2='p4diff2'
+  alias pfdg='P4DIFF= p4 diff -du | grepdiff --output-matching=hunk'
+  alias pfe='p4 edit'
+  alias pfh='pf help'
+  alias pfo='p4 opened'
+  alias pfres='p4 resolve'
+  alias pfrev='p4 revert'
+  alias pflog='p4 filelog -stl -m 5'
+#+end_src
+
+Show top N (default=10) changes
+#+begin_src bash
+  pftop() {
+    local num=10
+    if (( $# > 0 )) && [[ "$1" =~ ^[0-9]+$ ]]; then
+      num=$1
+      shift
+    fi
+    p4 changes -m $num "$@" $STEM/...
+  }
+#+end_src
+
+*** local - work
+#+begin_src bash :tangle (when (string-match "\\^atl" (system-name)) "~/test/.bashrc")
+#+end_src
+
+#+begin_src bash
+  alias e="emacs_func ${STEM+--socket-name=${STEM//\//_}}"
+
+  mkv() { mkverdi -novericom $(command grep -Po '\-model\s*\S+' sim.out) -rc ~/novas.rc -guiConf ~/novas.conf -tkName "verdi_$(tmux display-message -p '#S:#I.#P')" "$@" & }
+  alias findFirstError='findFirstError --tkName "verdi_$(tmux display-message -p "#S:#I.#P")"'
+  alias cid='cat ${REPO_PATH+$REPO_PATH/}configuration_id'
+
+  vv() { vv -tkName "verdi_$(tmux display-message -p '#S:#I.#P')" & }
+
+  alias wtf='WhyTheFail'
+  alias lmn='ljd -nomail -l'
+
+  alias perr="perl -ne 'print if /error:/../:error/;exit if /:error/'"
+  bu()   { bucket "$@"; }
+  bus()  { bucket -s "$@"; }
+  bu1()  { bucket -n 1 "$@"; }
+  bu1w() { watch --no-title -n 60 "bucket -n 1 $@"; }
+  busw() { watch --no-title -n 60 "bucket -s $@"; }
+  alias toclippy="sed -e 's/$/
+  /' | tee ~/clippy.txt"
+
+  # LANG=C is the default setting at the system level. That causes xterm to not display unicode characters correctly.
+  # Setting LANG=en_US.UTF-8 seems to get rid of the font rendering issues but causes a bunch of other side-effects which
+  # are hard to figure out and harder to work-around. So I'm keeping LANG=C to avoid them (the devil you know...)
+  # To get xterm to render the font correctly I force the encoding while starting it
+  alias xt='xterm -en en_US.UTF-8'
+  # alias xtr='echo "resize -s 62 273"; resize -s 62 273'
+  # alias xtr='wmctrl -i -r $(xdotool getactivewindow) -e 0,1920,25,1918,1144; wmctrl -i -r $(xdotool getactivewindow) -b add,maximized_vert'
+  alias tmxvnc='tmux new-window -d -n "XVNC" "x11vnc"'
+
+  alias rcf=$'recreate_fail -switches \'-avf "-TestCompressedLog 0 --agg_dump_on"\''
+  alias trapbug='P4DIFF= s_trapbug -bug'
+#+end_src
+
+#+begin_src bash
+  alias rg='release_gate -gui'
+  alias rgd='release_gate -donate'
+  alias rgg='release_gate_gui'
+
+  rgfq() {
+    command grep FAILED $STEM/release_gate_tmp/release_gate.log |
+    command awk '{print $1}' |
+    command sed -r -e 's/(build|sim)_/-/' -e 's/_(m)?rg(\w*)\.[0-9]+$/_\1rg\2/' |
+    command paste -s -d' '
+    # echo -e "rg -noauto $_fq\n"
+    # rg -noauto $_fq
+  }
+
+  rgre() {
+    # Because release_gate -redeploy doesn't work
+    local _cmd="$(command grep -Po "(?<=command line is ')[^']*" $STEM/release_gate_tmp/release_gate.log)"
+    echo "$_cmd"
+    eval "$_cmd"
+  }
+#+end_src
+
+#+begin_src bash
+  alias rr='~/bin/rerun'
+  alias rrb='rr --norun --build --recompile'
+  alias rrbr='rr --build --recompile'
+  alias rrc='rr --norun --clean'
+  alias rrca='build -clean_all'
+  alias rrcb='rr --norun --clean --build --recompile'
+  alias rrcr='rr --clean'
+  alias rrdbg=$'rr --add \'-avf "--/L3.Debug.*Graph/ --/L3.Debug.*Resources/"\' --dsp'
+  alias rrr='rr --norun --recompile'
+#+end_src
+
+Dynamic variables (Recomputed everytime path changes via preprompt or equivalent). If $REPO_PATH is set, expand ${...} to $REPO_PATH/ (append trailing slash)
+This allows us to use $rtl etc as an absolute path when $REPO_PATH is set and when bootenv isn't done, as a relative path
+
+Note that something similar could be achieved by setting CDPATH=$REPO_PATH. And as long as we're in a CH workarea, all the below variables should work the same
+However, if we're in a non-CH repository like VH then it'll not work. Hence, I've created explicit variables by basing them off ch which in turn is set based on the value of ANCHOR_ch
+#+begin_src bash
+  dyn_vars() {
+    export ch="${ANCHOR_ch-ch}"
+    export r="${ch}/rtl"
+    export tb="${ch}/tb"
+    export tc="${ch}/tc"
+    export v="${ch}/verif"
+    export cl3="${v}/chk_l3"
+    export vcov="${v}/coverage"
+    export l3="${v}/l3"
+    export txn="${v}/txn"
+    export avf="${ANCHOR_avf-import/avf}"
+    export reg="${ANCHOR_aspen_regs-meta/registers}"
+    export sim="${STEM+$STEM/}sim"
+  }
+  dyn_vars
+#+end_src
+
+#+begin_src bash
+  trapbug_rm() {
+    ssh atlvsub01 xargs /home/ainfra/bin/rm_defunct_bug_data --bug_data_path /proj/aspen_bug_data/ASPEN --bug_dirs << BUGS
+  "$@"
+  BUGS
+  }
+#+end_src
+
+Calling these as gpp/clangpp as I don't want to call it g++/clang++ and have it interfere with my regular build flow
+#+begin_src bash
+  gpp() {
+    g++ -Wall -Wextra -std=c++14 \
+        -L${GCC_HOME}/lib -L${BOOST_HOME}/lib -L${HOME}/.local/lib \
+        -I${BOOST_HOME}/include -I${HOME}/.local/include \
+        -Wl,-rpath ${BOOST_HOME}/lib "$@"
+  }
+  clangpp() {
+    clang++ -Wall -Wextra -std=c++14 \
+            -L${LLVM_HOME}/lib -L${BOOST_HOME}/lib -L${HOME}/.local/lib \
+            -I${BOOST_HOME}/include -I${HOME}/.local/include \
+            -Wl,-rpath ${BOOST_HOME}/lib "$@"
+  }
+#+end_src
+
+Parse the output file and dump the error
+#+begin_src bash
+  psig() {
+    perl -lne 'if(/^\s+-+$/../^\s*$/){if(/^\s+-+$/){$c=0;}elsif(/^\s*$/){print "  ($c) $s";}else{$c++;}}else{s/^\s+|\s+$//g;$s=$_}' $1
+  }
+
+  rgsig() {
+    for i in $(command grep FAIL ${REPO_PATH+$REPO_PATH/}release_gate_tmp/release_gate.log | colm -1); do
+      local _sim=${i##*release_gate_tmp/}
+      _sim=${_sim%%/*}
+      echo -e "\n${_sim}";
+      psig $i;
+    done
+  }
+
+  rgww() {
+    for i in $(command grep FAIL ${REPO_PATH+$REPO_PATH/}release_gate_tmp/release_gate.log | colm -1); do
+      local _sim=${i##*release_gate_tmp/}
+      _sim=${_sim%%/*}
+      echo -e "\n${_sim}";
+      pww $i | sed 's:/.*/\(release_gate_tmp/\):$STEM/\1:'
+    done
+  }
+#+end_src
+
+#+begin_src bash
+  tel() {
+    while (( $# > 0 )); do
+      getent passwd $1 | \
+          perl -aF/[:,]/ -lne 'map(s/^\s+//,@F);print "ID:;$F[0]\nName:;$F[4]\nCube:;$F[5]\nExt:;$F[6]"' | \
+          /usr/bin/column -t -s \;
+
+      shift
+      if (( $# > 0 )); then echo "----"; fi
+    done
+  }
+
+  dotty() {
+    for i in $*; do
+      dot -Tgif -o `basename $i .gv`.gif $i
+    done
+  }
+
+  but() {
+    model=unittest_${1#unittest_}
+    shift;
+
+    echo build -model $model
+    rerun --norun --build --model $model $@
+    local _ret=$?
+    if (( $_ret != 0 )); then
+        return $_ret;
+    fi
+
+    if [[ ${model} =~ _dbg$ ]]; then
+        echo gdb $REPO_PATH/build/${model}/${model}
+        gdb $REPO_PATH/build/${model}/${model}
+    else
+      echo $REPO_PATH/build/${model}/${model}
+      $REPO_PATH/build/${model}/${model}
+    fi
+  }
+
+  wtff() {
+    model=`basename ${1%_rg.build.log}`
+    wtf -m $model
+  }
+#+end_src
+**** lsf
+#+begin_src bash
+  bj() {
+    local _fmt_str="id:8"
+    [[ "$*" =~ -u ]] && _fmt_str="$_fmt_str user:9"
+    _fmt_str="$_fmt_str stat:6 queue: submit_time:13"
+    [[ "$*" =~ -d ]] && _fmt_str="$_fmt_str finish_time:13 exit_code:"
+
+    command lsf_bjobs -o "$_fmt_str name" "$@"
+    # lsf_bjobs -w "$@" | perl -aF"\s+" -lne 'printf("%-7s  %-8s  %-4s  %-9s  %-14s  %-10s  %-12s  %s\n", ($. == 1 ? @F[0..5,7,6] : @F[0..5],"@F[$#F-2..$#F]","@F[6..$#F-3]"))'
+  }
+
+  bjg() {
+    bj >| /tmp/$$
+    head -n 1 /tmp/$$
+
+    if (( $# == 0 )); then
+      grep "$$" /tmp/$$
+    else
+      grep "$@" /tmp/$$
+    fi
+  }
+
+  alias bk='lsf_bkill'
+  alias bq='lsf_bqueues'
+#+end_src
+
+**** perforce
+#+begin_src bash
+  alias pf='p4w'
+  alias pfchk='pf sanity_check 2> >(perl -pe "exit if m{^Sanity checking $STEM[^:]}")'
+  alias pfco='p4_mkwa -change_branch'
+#+end_src
+
+Get a list of opened files relative to the current directory
+#+begin_src bash
+  pfor() {
+    if (( $# > 0 )); then
+      p4 opened "$@"
+    else
+      p4 opened
+    fi | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*):$STEM:" -e "s:$PWD/::" -e 's/#.*//'
+    # fi | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*):$STEM:" -e "s:$PWD/::" | column -s# -o '    #' -t | column -s- -o- -t
+  }
+#+end_src
+
+This does a couple of things before and after updating such as
+- Create a patch if there are any existing changes. Git is good about warning you in case there are any uncommited changes. Perforce is happy to clobber it and mess up the merge. So, I create a patch as a backup in case things go horribly wrong.
+- Source the project-specific rc files
+- Regen the filelist that is used by fzf, vim etc. for completion
+- Recreates the tags
+#+begin_src bash
+  pfu() {
+    # Save ENV variables
+    local _env_tmux=$TMUX
+    local _env_tmux_pane=$TMUX_PANE
+
+    if [[ $(p4w opened 2> /dev/null) != "" ]] && \
+       [[ -f $STEM/pre-update/configuration_id ]] && \
+       [[ "$(head -n1 $STEM/configuration_id)" != "$(head -n1 $STEM/pre-update/configuration_id)" ]]; then
+      echo "Creating a patch of the changes before updating..."
+      patch_capture -r -p pre-update > /dev/null
+      command cp $STEM/configuration_id $STEM/pre-update
+    fi
+
+    echo p4w update_env "$@"
+    p4w update_env "$@"
+    local ret=$?
+
+    # Restore ENV variables
+    export TMUX=$_env_tmux
+    export TMUX_PANE=$_env_tmux_pane
+
+    [[ $ret == 0 ]] && __wa_setup
+  }
+
+  pful() {
+    local _changelist="latest"
+
+    # If a valid username is provided then grab latest changelist by that user
+    if (( $# == 1 )) && id $1 > /dev/null; then
+      # FIXME: Filter out pending changelists
+      _changelist=$(p4 changes -m1 -u $1 | awk '{print $2}')
+    fi
+
+    pfu "@$_changelist"
+  }
+#+end_src
+
+Generate a list of relevant files in the project that is used by fzf, vim etc. for comletion
+#+begin_src bash
+  pfls() {
+    [[ -z $STEM ]] && return 1
+
+    cat \
+      <(cd $STEM; p4 have ... 2> /dev/null) \
+      <(cd $STEM; p4 opened ... 2> /dev/null | command grep add \
+        | command sed "s/#.*//" | command xargs -I{} -n1 p4 where {}) \
+      | command awk '{print $3}' >| $STEM/.filelist
+  }
+#+end_src
+
+ripgrep integration
+#+begin_src bash
+  pff() {
+    command rg --no-line-number --no-heading --color=never "$@" ${STEM:+$STEM/}.filelist
+  }
+  p4f() {
+    command p4 have $STEM/... | command rg --no-line-number --no-heading --color=never "$@"
+  }
+
+  alias pfg='rgf --files-from=$STEM/.filelist'
+#+end_src
+
+**** vim
+#+begin_src bash
+  gvim_server() {
+    # There is no way to automatically launch a server if one doesn't exist when using --remote-send
+    # Thus, check if --remote-send has been passed in and if a server doesn't exist create one
+    # NOTE: ${STEM^^} converts $STEM to uppercase. vim servernames are always in uppercase
+    if [[ "$*" =~ --remote-send ]] && [[ -n "$STEM" ]] &&
+       [[ ! $(command vim --serverlist | command grep "${STEM^^}" 2> /dev/null) ]]; then
+      gvim --servername "$STEM"
+    fi
+    gvim ${STEM:+--servername $STEM} "$@"
+  }
+  alias v=gvim_server
+  alias vc='gvim_server --remote-silent'
+#+end_src
+
+Open results of a previous command in a quickfix window in a remote vim eg. =rg PATTERN= followed by =vq --vimgrep=
+#+begin_src bash
+  vq() {
+    eval "$(fc -nl -1) $@ >| /tmp/vimqf"
+    gvim_server --remote-send ":silent -tabnew|lcd $PWD|silent cfile /tmp/vimqf"
+  }
+#+end_src
+
+#+begin_src bash
+  vlog() {
+    local _comp=$(command grep -o 'error.*component=\S\+' sim.out | sed 's/.*=//')
+    if [[ $_comp == "sim.out" ]] || [[ ${_comp}.log == *AggL3.log ]] || [[ ${_comp}.log == *L3Seq.log ]]; then
+      _comp=""
+    else
+      _comp=${_comp:+${_comp}.log}
+    fi
+    local _files=()
+    for i in sim.out ${_comp} *AggL3.log *AggL3Seq.log; do
+      if [[ -f "$i" ]]; then
+        _files=("${_files[@]}" "$i")
+      fi
+    done
+    vim -p "${_files[@]}" "$@" -c 'set nobackup' -c 'set autoread' -c 'silent! /error:\|Backtrace:' -c 'silent! "norm zt"'
+  }
+
+  vsig() {
+    file_lnum=$(command grep -Po -m1 '(?<=source\=)[^:]+:\d+' summary.rj)
+    file=${file_lnum%:*}
+    lnum=${file_lnum#*:}
+
+    file=$(pff ${file})
+
+    # echo "File=${file} Line=${lnum}"
+    vc +$lnum $file
+  }
+#+end_src
+
+**** workarea related
+#+begin_src bash
+  make_wa_vars() {
+    local _proj _ch _wa _scr
+    for _proj in as ah br nv; do
+      case $_proj in
+        as) local _proj_full=ASPEN;;
+        ah) local _proj_full=ASPEN_HIGHLANDS;;
+        br) local _proj_full=BRECKENRIDGE;;
+        nv) local _proj_full=NV21_EL3;;
+      esac
+
+      for _ch in {0..1}; do
+        eval "export ${_proj}${_ch}='/proj/ch_func_dev${_ch}/${_proj_full}'"
+        eval "export ${_proj}${_ch}ks='/proj/ch_func_dev${_ch}/${_proj_full}/kshenoy'"
+        for _wa in {1..6}; do
+          eval "export ${_proj}${_ch}${_wa}='/proj/ch_func_dev${_ch}/${_proj_full}/kshenoy/${_proj}${_ch}${_wa}'"
+        done
+      done
+
+      for _scr in {0..2}; do
+        eval "export ${_proj}s${_scr}='/proj/ch_func_gen_scratch${_scr}/${_proj_full}/kshenoy'"
+      done
+    done
+  }
+
+  make_wa_vars
+#+end_src
+
+#+begin_src bash
+  mkwa() {
+    _mkwa_help() {
+      echo 'SYNTAX:'
+      echo '  mkwa PROJ[/BRANCH=PROJ_trunk][@CHANGELIST=latest]'
+      echo '  mkwa tb_env'
+    }
+
+    if [[ -f "$1" ]]; then
+      local _temp=$(sed 's/p4_mkwa\s\+-configuration_id\s\+//' "$1")
+    else
+      local _temp=${1}
+    fi
+
+    local _proj=""
+    local _branch=""
+    local _cl=""
+    local _fg_red=$(tput setaf 1)
+    local _fg_green=$(tput setaf 2)
+    local _reset=$(tput sgr0)
+
+    if [[ "${_temp}" =~ @ ]]; then
+      local _cl=" -changelist ${_temp#*@}"
+      _temp=${_temp%@*}
+    fi
+    # echo $_temp
+
+    if [[ "$_temp" =~ / ]]; then
+      local _branch=" -branch_name ${_temp#*/}"
+      _proj=${_temp%/*}
+    else
+      _proj=$_temp
+    fi
+    # echo $_temp
+
+    case ${_proj} in
+      as) _proj="aspen" ;;&
+      ah) _proj="aspen_highlands" ;;&
+      br) _proj="breckenridge" ;;&
+      cb) ;;&
+      nv) _proj="nv21_el3";;
+      vh) _proj="valhalla" ;;&
+      zn) _proj="zen" ;;&
+      ,*)
+        if [[ -z "${_proj}" ]]; then
+          echo -e "${_fg_red}ERROR${_reset}: Project not specified\n"; _help
+          return 1
+        fi
+        ;;
+    esac
+
+    # Save ENV variables
+    local _env_tmux=$TMUX
+    local _env_tmux_pane=$TMUX_PANE
+
+    local _cmd="p4_mkwa -codeline ${_proj}${_branch}${_cl}"
+    echo -e "${_cmd}\n"
+    . /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash && export LANG=en_US.UTF-8
+    $_cmd
+
+    # Restore ENV variables
+    export TMUX=$_env_tmux
+    export TMUX_PANE=$_env_tmux_pane
+
+    __wa_setup
+  }
+#+end_src
+
+Get a list of all the workareas in use.
+#+begin_src bash
+  wa_list() {
+    local _proj _ch _wa _path
+    for _ch in {0..1}; do
+      for _proj in as ah br; do
+        local _proj_long=$(sed -e 's/as/ASPEN/' -e 's/ah/ASPEN_HIGHLANDS/' -e 's/br/BRECKENRIDGE/' <<< $_proj)
+        for _wa in {1..6}; do
+          _path="/proj/ch_func_dev${_ch}/${_proj_long}/kshenoy/${_proj}${_ch}${_wa}"
+          if [[ -d ${_path} ]] && [[ "$(ls -A ${_path})" ]]; then
+            if [[ -t 1 ]]; then
+              echo ${_path}:
+              ls ${_path} | command grep '/$' | sed 's/^/  /'
+            else
+              find ${_path} -mindepth 1 -maxdepth 1 -type d -not -name '\.*'
+            fi
+          fi
+        done
+      done
+    done
+  }
+#+end_src
+
+This does a bunch of things after a workarea has been created/updated such as:
+- Source any project-specific rc files
+- Create a list of relevant files that are used by fzf and vim for completion
+- Generated tags and cscope database
+#+begin_src bash
+  __wa_setup() {
+    # Source aliases etc.
+    source ~/.dotfiles/bash/aliases && source ~/.dotfiles/bash/bashrc-func && echo Sourced aliases and functions
+
+    [[ -z "$STEM" ]] && return
+    for proj in 'AS|ASPEN' 'AH|ASPEN_HIGHLANDS' 'BR|BRECKENRIDGE' 'NV21_EL3'; do
+      if [[ $STEM =~ /proj/ch_func_dev[[:digit:]]/($proj) ]]; then
+        export PROJ_HOME=$(sed -r -e "s:(/proj/ch_func_dev[[:digit:]]?/($proj)/).*:\1:" <<< "$STEM")$(whoami)
+        break
+      fi
+    done
+    [[ ! -d "$PROJ_HOME" ]] && return
+
+    for i in $PROJ_HOME/.bashrc; do
+      [[ -f ${i} ]] && . ${i} && echo "Sourced ${i}"
+    done
+
+    pfls &
+
+    # Create tags
+    local _fg_green=$(tput setaf 2)
+    local _reset=$(tput sgr0)
+    echo "${_fg_green}[Generating tags...]${_reset}"
+    ~kshenoy/bin/gentags &
+
+    # Start emacs daemon if one isn't present
+    # [[ -n "${_workarea}" ]] && ~kshenoy/bin/emacs_daemon -s ${workarea//\//_} &> /dev/null &
+  }
+#+end_src
+
+#+begin_src bash
+  alias benv='. /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash && bootenv && __wa_setup'
+
+  lenv() {
+    # Save ENV variables
+    local _env_tmux=$TMUX
+    local _env_tmux_pane=$TMUX_PANE
+    local _old_pwd=$PWD
+
+    local _workarea=${1:-$PWD}
+    if [[ -L ${_workarea} ]]; then
+      _workarea=$(readlink ${_workarea})
+    fi
+    if [[ -f ${_workarea} ]]; then
+      _workarea=$(dirname ${_workarea})
+    fi
+    echo "loadenv into ${_workarea}"
+
+    command pushd "${_workarea}" > /dev/null
+    . /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash && loadenv
+    local ret=$?
+
+    # Restore ENV variables
+    export TMUX=$_env_tmux
+    export TMUX_PANE=$_env_tmux_pane
+
+    __wa_setup
+
+    [[ -z "$STEM" ]] && return
+
+    local _new_wd=${_old_pwd/*${STEM//\//_}/$STEM}
+    [[ -d "$_new_wd" ]] && command pushd "${_new_wd}" > /dev/null
+  }
+#+end_src
+
+Remove an existing workarea cleanly
+#+begin_src bash
+  pfrem() {
+    local _workarea=$(readlink -f ${1:-${REPO_PATH:-$PWD}})
+    if [[ $_workarea != $REPO_PATH ]]; then
+      command cd $_workarea
+      . /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash
+      loadenv
+    fi
+
+    local _scratch_dir=$(readlink -f ${_workarea}/build | command sed 's/build$//')
+    echo -e "\nDeleting workarea: '$_workarea'"
+    cd $_workarea/..
+
+    p4w remove $_workarea
+    local _exit_code=$?
+    if (( $_exit_code != 0 )); then
+      return $_exit_code;
+    fi
+
+    echo -e "\nDeleting workarea from scratch disk..."
+    echo "  command rm -rf $_scratch_dir"
+    rm_rf_silent $_scratch_dir
+
+    # Kill emacs daemon. Use explicit path to avoid kill any other daemons
+    ~kshenoy/bin/emacs_daemon -k ${_workarea//\//_}
+  }
+#+end_src
+
+**** Source any project specific rc files
+I also do this while doing a =loadenv= but also doing it here as it makes to pick up any changes while sourcing aliases
+#+begin_src bash
+  # Using an explicit if to prevent it from having a non-zero exit status if file doesn't exist
+  if [[ -f $PROJ_HOME/.bashrc ]]; then
+    . $PROJ_HOME/.bashrc && echo "Sourced $PROJ_HOME/.bashrc"
+  fi
+#+end_src
+
+** utilities
+*** @: a simpler and faster alternative to globstar
+:PROPERTIES:
+:ID:       2870e3ab-aa92-4006-9899-372135ae00c4
+:END:
+=@ ls /some/long/path/**/that/I/dont/want/to/type= is converted to =ls $(find /some/long/path/ -path '*/that/I/dont/want/to/type')=
+#+begin_src bash
+  unset -f @
+  function @ {
+    local _cmd=()
+    for i in "$@"; do
+      if [[ $i =~ '**' ]]; then
+        _cmd+=('$(find'    $(command awk 'BEGIN {FS="**"} {print $1}' <<< "$i"))
+        _cmd+=('-path' "'*"$(command awk 'BEGIN {FS="**"} {print $2}' <<< "$i")"')")
+      else
+        _cmd+=("$i")
+      fi
+    done
+    # echo "${_cmd[@]}"
+    # echo
+    eval "${_cmd[@]}"
+  }
+#+end_src
+
+*** alert
+Simply function to "alert" when a command completes.
+NOTE: This must be used as a function to have access to the history via the fc command
+
+Use like this: =sleep 10 && alert=
+#+begin_src bash
+  unset -f alert
+  alert() {
+    # Pick up display message if provided as argument. If not show the last command that was run
+    local _msg=${1:-"'$(fc -nl -1 | sed -e 's/^\s*//' -e 's/\s*[;&|]\+\s*alert$//')' has completed"}
+
+    # Add TMUX information if available
+    if [[ -n $TMUX ]]; then
+      _msg="$(tmux display-message -p "[#S:#I.#P]") ${_msg}"
+    else
+      _msg="[$$] ${_msg}"
+    fi
+
+    # Indicate normal completion or error
+    local _icon=$( (($? == 0)) && echo terminal || echo error)
+
+    notify-send --urgency=low -i ${_icon} "${_msg}"
+  }
+#+end_src
+
+*** [[https://github.com/ggreer/the_silver_searcher][ag - SilverSearcher]]
+:PROPERTIES:
+:header-args+: :tangle (when (and (executable-find "ag") (not (executable-find "rg"))) "~/test/.bashrc")
+:END:
+Use this only if =ag= exists and =rg= doesn't
+#+begin_src bash
+  alias g=ag
+  alias gtc='ag --cpp'
+  alias gtch='ag -G "\.(h|hh|hpp|tpp)$"'
+  alias gtcc='ag -G "\.(c|cc|cpp|C|CC)$"'
+  alias gtsbs='ag -G "\.sbs$"'
+  alias gtsv='ag -G "\.(sv|svh)$"'
+  alias gtv='ag -G "\.(v|x)$"'
+#+end_src
+
+*** calc
+Simple wrapper around =irb= to make it more natural to use. eg. ~= 4 + 5~
+#+begin_src bash
+  unset -f =
+  =() {
+    local _input="${@:-$(</dev/stdin)}"
+    # echo $_input
+
+    # if [[ $_input =~ [:xdigit:]+\[[:digit:]+:[:digit:]+\] ]]; then
+    #   _input=${_input#.*[}
+    #   echo $_input
+    #   return
+    # fi
+    # = "($_input >> $_lsb) & ($_msb - $_lsb)"
+
+    # If there's no explicit output formatting, try to infer from the input
+    if [[ ! $_input =~ to_s ]]; then
+      if [[ $_input =~ 0x ]] || [[ $_input =~ [a-fA-F] ]]; then
+        local _base=16
+      elif [[ $_input =~ 0b ]]; then
+        local _base=2
+      fi
+      _input="(${_input}).to_s(${_base})"
+    fi
+
+    local _result=$(echo "$_input" | irb -m --noverbose | command sed 's/"//g')
+
+    # Pretty-print formatted output
+    if [[ $_input =~ 'to_s(16)' ]]; then
+      _result="0x${_result}"
+    elif [[ $_input =~ 'to_s(2)' ]]; then
+      _result="0b${_result}"
+    fi
+
+    echo $_result
+  }
+#+end_src
+
+#+begin_src bash
+  unset -f =base
+  =base() (
+    _help () {
+      echo 'SYNTAX:'
+      echo '  =base NUM TO [FROM=10]'
+      echo '  echo NUM | =base TO [FROM=10]'
+      echo '  =base TO [FROM=10] <<< "NUM"'
+    }
+
+    if (( $# >= 3 )); then
+      local _num=$1
+      shift
+    elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
+      # From pipe or from redirection respectively
+      local _num=$(</dev/stdin)
+    elif (( $# <= 1 )); then
+      echo -e "ERROR: Insufficient arguments. At least two required\n"; _help
+      return 1
+    else
+      local _num=$1
+      shift
+    fi
+
+    local _ibase=${2:-10}
+    local _obase=$1
+
+    case $_ibase in
+      2)
+        _num=${_num#0[bB]}
+        ;;
+      16)
+        _num=$(tr '[a-f]' '[A-F]' <<< "${_num#0[xX]}")
+        ;;
+    esac
+
+    local _result=$(echo "obase=${_obase}; ibase=${_ibase}; $_num" | bc)
+    case $_obase in
+      2)
+        _result="0b${_result}"
+        ;;
+      16)
+        _result="0x${_result}"
+        ;;
+    esac
+
+    echo $_result
+  )
+#+end_src
+
+#+begin_src bash
+  unset -f =bin
+  =bin() (
+    _help () {
+      echo 'SYNTAX:'
+      echo '  =bin NUM [FROM=10]'
+      echo '  echo NUM | =bin [FROM=10]'
+      echo '  =bin [FROM=10] <<< "NUM"'
+    }
+
+    if (( $# >= 2 )); then
+      local _num=$1
+      shift
+    elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
+      # From pipe or from redirection respectively
+      local _num=$(</dev/stdin)
+    elif (( $# == 0 )); then
+      echo -e "ERROR: Insufficient arguments. At least one required\n"; _help
+      return 1
+    else
+      local _num=$1
+      shift
+    fi
+
+    local _ibase=${1:-10}
+    local _obase=2
+    =base $_num $_obase $_ibase
+  )
+#+end_src
+
+#+begin_src bash
+  unset -f =dec
+  =dec() (
+    _help () {
+      echo 'SYNTAX:'
+      echo '  =dec NUM [FROM=16]'
+      echo '  echo NUM | =dec [FROM=16]'
+      echo '  =dec [FROM=16] <<< "NUM"'
+    }
+
+    if (( $# >= 2 )); then
+      local _num=$1
+      shift
+    elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
+      # From pipe or from redirection respectively
+      local _num=$(</dev/stdin)
+    elif (( $# == 0 )); then
+      echo -e "ERROR: Insufficient arguments. At least one required\n"; _help
+      return 1
+    else
+      local _num=$1
+      shift
+    fi
+
+    local _ibase=${1:-16}
+    local _obase=10
+    =base $_num $_obase $_ibase
+  )
+#+end_src
+
+#+begin_src bash
+  unset -f =hex
+  =hex() (
+    _help () {
+      echo 'SYNTAX:'
+      echo '  =hex NUM [FROM=10]'
+      echo '  echo NUM | =hex [FROM=10]'
+      echo '  =hex [FROM=10] <<< "NUM"'
+    }
+
+    if (( $# >= 2 )); then
+      local _num=$1
+      shift
+    elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
+      # From pipe or from redirection respectively
+      local _num=$(</dev/stdin)
+    elif (( $# == 0 )); then
+      echo -e "ERROR: Insufficient arguments. At least one required\n"; _help
+      return 1
+    else
+      local _num=$1
+      shift
+    fi
+
+    local _ibase=${1:-10}
+    local _obase=16
+    =base $_num $_obase $_ibase
+  )
+#+end_src
+
+#+begin_src bash
+  unset -f =slice
+  =slice() (
+    _help() {
+      echo 'SYNTAX:'
+      echo '  =slice NUM MSB LSB'
+      echo '  =slice NUM BIT'
+      echo '  echo NUM | =slice MSB LSB'
+      echo '  =slice MSB LSB <<< "NUM"'
+      echo
+      echo "NOTE: MSB >= LSB"
+    }
+
+    if (( $# >= 3 )); then
+      local _num=$1
+      shift
+    elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
+      # From pipe or from redirection respectively
+      local _num=$(</dev/stdin)
+    elif (( $# < 1 )); then
+      echo -e "ERROR: Insufficient arguments. At least one more required\n"; _help
+      return 1
+    else
+      local _num=$1
+      shift
+    fi
+
+    local _msb=$1
+    local _lsb=${2:-$_msb}
+
+    if (( $_lsb > $_msb )); then
+      echo -e "ERROR: MSB must be greater than or equal to LSB when slicing\n"; _help
+      return 1
+    fi
+
+    # echo "in=$_num, msb=$_msb, lsb=$_lsb"
+    = "($_num >> $_lsb) & ((1 << ($_msb - $_lsb + 1)) - 1)"
+  )
+#+end_src
+
+*** dir related
+#+begin_src bash
+  alias md='mkdir -p'
+
+  # Create new dir(s) and enter it (last directory if multiple arguments are given)
+  unset -f mcd
+  mcd() {
+    command mkdir -p "$@" || return
+    cd -- "${@: -1}"
+  }
+#+end_src
+
+Silent push and popd. Use dirs -v for vertical dirstack
+#+begin_src bash
+pushd() { command pushd "$@" > /dev/null ; }
+popd()  { command popd  "$@" > /dev/null ; }
+#+end_src
+
+#+begin_src bash
+  dirs() {
+    if [[ "$*" =~ [-+][0-9]+ ]]; then
+      # NOTE: The use of $* is deliberate here as it produces all the scripts arguments separated by the first character
+      # of $IFS which, by default, is a space. This allows me to match all arguments against a regex in one go instead of
+      # looping over them
+
+      # Use long-listing format. Without this, the home directory is display as '~' preventing me from doing something
+      # like `cp $(dirs +1)` as it results in an error: pushd: ~/.vim: No such file or directory
+      builtin dirs "$@" -l
+    elif (( $# == 0 )); then
+      # Display index along with the path. This allows me to use pushd and popd more easily
+      builtin dirs -v
+    else
+      builtin dirs "$@"
+    fi
+  }
+#+end_src
+
+DirStack - Emulate Zsh's behavior of pushd lifting the directory to tos instead of cycling the stack
+- cd =      Lists the contents of the stack.
+- =cd +N=     Exchanges the current directory with the directory stored in 'N'. 'cd +0' is a NOP.
+- =cd -=      Is the same as 'cd +1'
+- =cd +=      Pops the current directory off the stack and cd's to the next directory on the stack (equivalent to popd).
+- =cd=        Goes to $REPO_PATH if it's set else goes to $HOME
+- =cd ,TARG=  Jump to a directory in the path that starts with TARG using [[id:19b2ef22-73ae-40ca-a043-6c507d865658][jumper]]
+#+begin_src bash
+  unset -f cdpp
+  cdpp() {
+    local _dir
+    if (( $#==0 )); then
+      _dir=${REPO_PATH-${HOME/%\//}}
+    else
+      until [[ $1 != "--" ]]; do
+        shift;
+      done
+      _dir=${1/%\//}
+    fi
+
+    local _dirstack=($(command dirs))
+    case ${_dir} in
+      +[0-9]*)
+        #echo "Jumping to a dir on the stack"
+        # $[#_dirstack[@]] gives the number of elements in _dirstack
+        #if ((${_dir}<$[#_dirstack[@]])); then
+        command popd $1 > /dev/null
+        command pushd ${_dirstack[$1]/#~/$HOME} > /dev/null
+        ;;
+
+      -)
+        #echo "Jumping to the prev dir"
+        command popd +1 > /dev/null
+        command pushd ${_dirstack[1]/#~/$HOME} > /dev/null
+        ;;
+
+      +)
+        #echo "Popping current dir from the stack"
+        command popd > /dev/null
+        ;;
+
+      =)
+        command dirs -v
+        ;;
+
+      ,*\*\**)
+        local _src=${1%%\*\**}; _src=${_src:-.}
+        local _dst=${1##*\*\*}
+        # echo find ${_src} -type d -path "*${_dst}" -print -quit
+        _dir=$(find ${_src} -type d -path "*${_dst}" -print -quit)
+        if [[ -z ${_dir} ]]; then
+          # find was unable to find a matching directory
+          echo "ERROR: Unable to find ${_dst#/} under ${_src}"
+          return 1
+        fi
+        ;;&  # This will cause it to get evaluated against *) as well
+
+      ,,*)
+        # echo "Jumping to a parent dir in the path ($_dir)"
+        _dir=$(jumper ${_dir:1})
+        ;;&  # This will cause it to get evaluated against *) as well
+
+      ,*)
+        #echo "Pushing $_dir onto the stack"
+        command pushd ${_dir} > /dev/null
+        if [[ $? != 0 ]]; then return; fi
+
+        # Remove any duplicate entries
+        # $[#_dirstack[@]] gives the number of elements in _dirstack
+        local _i=0
+        while (( $_i < ${#_dirstack[@]} )); do
+          #echo $_i / ${#_dirstack[@]} : ${_dir/#~/$HOME} ${_dirstack[$_i]/#~/$HOME}
+          if [ "$PWD" == "${_dirstack[$_i]/#~/$HOME}" ]; then
+            command popd +$((($_i+1))) > /dev/null
+            break
+          fi
+          let _i=$_i+1
+        done
+        ;;
+    esac
+  }
+
+  alias cd=cdpp
+#+end_src
+
+Smarter =..= eg. =.. 3= will jump up 3 levels. Also take a look at [[id:19b2ef22-73ae-40ca-a043-6c507d865658][jumper]]
+#+begin_src bash
+  ..() {
+    local _levels=${1:-1};
+    if (( $_levels <= 0 )); then
+      _levels=1;
+    fi;
+
+    cd $(printf '../%.0s' $(seq 1 ${_levels}))
+  }
+#+end_src
+
+[[https://www.reddit.com/r/commandline/comments/4v1y05/favorite_alias_commands/d5v2i5c/][rationalize_dots]] - This is an interesting idea but I'm a little wary of binding something to ~.~
+#+begin_src bash :tangle no
+  unset -f rationalize_dots
+  rationalize_dots() {
+    local -n  n  r=READLINE_LINE  i=READLINE_POINT
+
+    (( n = i > 3 ? i - 3 : 0 ))
+
+    if [[ ${r:n:3} == ?([$' \t\n"\'/']).. ]]; then
+      r=${r:0:i}/..${r:i}
+      (( i += 3 ))
+    else
+      r=${r:0:i}.${r:i}
+      (( i++ ))
+    fi
+  }
+
+  bind -x '".":"rationalize_dots"'
+#+end_src
+
+*** emacs
+#+begin_src bash
+  alias edbg="emacs --debug-init"
+  alias ed="~/bin/emacs_daemon"
+  emacs_func() { emacsclient --alternate-editor="" --no-wait --create-frame --quiet "$@" & }
+  alias e="emacs_func"
+#+end_src
+
+*** [[https://github.com/sharkdp/fd][fd]]
+:PROPERTIES:
+:header-args+: :tangle (when (executable-find "fd") "~/test/.bashrc")
+:END:
+If =fd= is installed, prefer it to find (some aliases will get over-written)
+#+begin_src bash
+  alias ftd='fd --type=d'
+  alias ftcpp='fd -e={hh,hpp,hxx,cc,cpp,cxx,inl,ipp,tpp}'
+  alias ftchdr='fd -e={hh,hpp,hxx}'
+  alias ftcsrc='fd -e={cc,cpp,cxx,inl,ipp,tpp}'
+  alias fthdl='fd -e={v,vh,x,sv,svh}'
+#+end_src
+
+*** TODO [[https://github.com/junegunn/fzf][fzf]]
+#+begin_src bash :tangle (when (string-match "budgie" (system-name)) "~/test/.bashrc")
+  [[ -d /opt/fzf ]] && export FZF_PATH=/opt/fzf
+#+end_src
+
+#+begin_src bash :tangle (when (string-match "\\^atl" (system-name)) "~/test/.bashrc")
+  [[ -d $HOME/.local/install/fzf ]] && export FZF_PATH="$HOME/.local/install/fzf"
+#+end_src
+
+*** jumper
+:PROPERTIES:
+:ID:       19b2ef22-73ae-40ca-a043-6c507d865658
+:END:
+Jump to any arbitrary folder in the current filepath. Case-insensitive and supports fuzzy matching
+Based on [[http://brettterpstra.com/2014/05/14/up-fuzzy-navigation-up-a-directory-tree/][up]]. Also take a look at [[https://github.com/vigneshwaranr/bd][bd]].
+#+begin_src bash
+  unset -f jumper
+  jumper() {
+    if (($# == 0)); then
+      echo "ERROR: Insufficient number of arguments"
+      echo "SYNTAX: path_jump <dir>[/subdir]"
+    fi
+
+    # Jumping to a subdirectory of the parent dir in the path
+    local _targ=${1%%/*}
+    local _subdir="${1/${_targ}/}"
+    # echo "Targ:$_targ, SubDir:$_subdir" >> log
+
+    # Plain-old jumping, no fuzziness
+    # local _dir=$(echo $PWD | sed "s,\(^.*${_targ}[^/]*\)/.*$,\1,")
+
+    # Remove spaces, escape any bare dots and add fuzzy magic
+    local _rx=$(ruby -e "print '${_targ}'.gsub(/\s+/,'').split('').join('.*?').gsub(/\.(?!\*\?)/,'\.')")
+    local _dir=$(echo $PWD | ruby -e "print STDIN.read.sub(/(.*?\/${_rx}[^\/]*).*/,'\1')")
+
+    echo ${_dir}/${_subdir}
+  }
+
+  alias ,=jumper
+#+end_src
+
+*** query
+which on steroids. Shows aliases and function definitions recursively.
+Since this function deals with aliases, it cannot be made into a stand-alone script since aliases are not accessible inside subshells.
+#+begin_src bash
+  unset -f query
+  query() (
+    # Yep, parentheses is correct. It makes this a subshell function allowing the definition to be inaccessible from outside
+    # Thus, no more polluting of shell space with helper functions
+
+    _query_help_() {
+      echo "Usage:"
+      echo "    query [OPTION]... INPUT..."
+      echo
+      echo "INPUT can be one or more alias, file, command, function etc. but must be specified last"
+      echo
+      echo "Options:"
+      echo "    -h, --help             Print this help"
+      echo "        --ascii            Use ASCII instead of extended characters"
+      echo "        --color            Colorize output"
+      echo "        --nocolor          Don't colorize output"
+      echo "    -d, --max-depth <N>    Recurse only N-levels deep. If N=0, query only the specified input"
+      echo "        --nodefine         Don't print the function definition"
+    }
+
+
+    _query_parse_args_() {
+      #echo "DEBUG: Parse:'$@'"
+
+      # Default values of options
+      _query_opts[ascii]=0
+      _query_opts[color]=1
+      _query_opts[define]=1
+      _query_opts[depth]=-1
+      _query_opts[input]=""
+      _query_opts[level]=0
+
+      local _i
+      for _i in "$@"; do
+        if [[ $_i =~ ^-h$ ]] || [[ $_i =~ ^--help$ ]]; then
+          _query_help_
+          return 0
+        fi
+      done
+
+      local _opt_end=false
+      while (( $# > 0 )); do
+        #echo "DEBUG: Arg:'$1'"
+        case $1 in
+          --?*)
+          ;&
+          -[[:alpha:]])
+            if ! $_opt_end && [[ ! $1 =~ ^-l$ ]] && [[ ! $1 =~ ^--level$ ]]; then
+              _cmd_recurse+=("$1")
+            fi
+            ;;&
+
+          --ascii)
+            _query_opts[ascii]=1
+            ;;
+
+          --color)
+            _query_opts[color]=1
+            ;;
+          --nocolor)
+            _query_opts[color]=0
+            ;;
+
+          --level|-l)
+            # Internal use only. Should not be specified by the user
+            shift
+            if [[ ! $1 =~ ^[0-9]+$ ]]; then
+              echo "ERROR: Current level must be a number"
+              return 1;
+            fi
+            _query_opts[level]=$1
+            ;;
+
+          --max-depth|-d)
+            shift
+            if [[ ! $1 =~ ^[0-9]+$ ]]; then
+              echo -e "ERROR: Max-depth must be a number\n"
+              _query_help_
+              return 1;
+            fi
+            _query_opts[depth]=$1
+            ;;
+
+          --nodefine)
+            #echo "Don't print function definition"
+            _query_opts[define]=0
+            ;;
+
+          --)
+            # Standard shell separator between options and arguments
+            if ! $_opt_end; then
+              _opt_end=true
+            fi
+            ;;
+
+          -*)
+            if ! $_opt_end; then
+              echo -e "ERROR: Invalid option: '$1'"
+              _query_help_
+              return 1;
+            fi
+            ;&
+
+          ,*)
+            # To support multiple inputs
+            while (( $# > 1 )); do
+              query ${_cmd_recurse[@]} --level 0 $1
+              shift
+              echo -e "\n"
+            done
+            _query_opts[input]=$1
+            ;;
+        esac
+        shift
+      done
+
+      # If you don't give me something to work with, then what am I supposed to do?
+      if [[ -z ${_query_opts[input]} ]]; then
+        echo "ERROR: No input specified"
+        return 1;
+      fi
+    }
+
+
+    _query_alias_() {
+      echo "${_query_pp[sep]}${_query_pp[input]} (${_query_pp[type]})"
+      while read; do
+        echo "${_query_pp[spc]}${REPLY}";
+      done < <(command type -a -- "${_query_opts[input]}" | command head -n2)
+
+      # Recurse
+      if (( ${_query_opts[depth]} == -1 )) || (( ${_query_opts[level]} < ${_query_opts[depth]} )); then
+        local _out_arr=()
+        read -a _out_arr <<< $(command type -a -- ${_query_opts[input]} | command grep -Po "(?<=aliased to .).*(?='$)")
+        local _query_next=()
+        local _level_next=$((${_query_opts[level]} + 1))
+        _query_tree[$_level_next]=0
+
+        local _i=0
+        for _i in ${_out_arr[@]}; do
+          if [[ "$_i" != "${_query_opts[input]}" ]]; then
+            if [[ $(command type -t -- "$_i") =~ file|function|alias ]]; then
+              _query_tree[$_level_next]=$(( ${_query_tree[$_level_next]} + 1 ))
+              _query_next+=("$_i")
+            fi
+          fi
+        done
+        for _i in ${_query_next[@]}; do
+          _query_tree[${_level_next}]=$(( ${_query_tree[$_level_next]} - 1 ))
+          query "${_cmd_recurse[@]}" --level ${_level_next} $_i
+        done
+      fi
+    }
+
+
+    _query_file_() {
+      echo "${_query_pp[sep]}${_query_pp[input]} (${_query_pp[type]})"
+      while read; do
+        echo "${_query_pp[spc]}${REPLY}";
+      done < <(command type -a -- "${_query_opts[input]}" | command head -n1)
+    }
+
+
+    _query_function_() {
+      echo "${_query_pp[sep]}${_query_pp[input]} (${_query_pp[type]})"
+      shopt -s extdebug
+      IFS=" " read -a _arr <<< $(command declare -F -- "${_query_opts[input]}")
+      shopt -u extdebug
+      echo -e "${_query_pp[spc]}Defined in ${_arr[2]} at line ${_arr[1]}"
+
+      # Print the function definition
+      if [[ "${_query_opts[define]}" == "1" ]]; then
+        while read; do
+          echo "${_query_pp[spc]}${REPLY}";
+        done < <(command type -a -- "${_query_opts[input]}" | command tail -n+2)
+      fi
+    }
+
+
+    _query_pp_() {
+      _query_pp[spc]=""
+      _query_pp[sep]=""
+
+      # Setup the tree-drawing characters
+      if [[ "${_query_opts[ascii]}" == "1" ]]; then
+        local _v_bar='|'
+        local _h_bar='-'
+        local _x_bar='+'
+        local _xl_bar='\'
+      else
+        local _v_bar='│'
+        local _h_bar='─'
+        local _x_bar='├'
+        local _xl_bar='└'
+      fi
+      _query_pp[xl]=${_query_pp[xl]:-$_x_bar}
+
+      # Colorize the output?
+      if [[ "${_query_opts[color]}" == "1" ]]; then
+        local _c_type="$(tput setaf 4)"
+        local _c_input="$(tput bold)$(tput setaf 2)"
+        local _c_reset="$(tput sgr0)"
+      else
+        local _c_type=""
+        local _c_input=""
+        local _c_reset=""
+      fi
+
+      if [[ "${_query_opts[level]}" != "0" ]]; then
+        local _i=0
+        for (( _i=1; _i <= ${_query_opts[level]}; _i++ )); do
+          #echo ${_query_tree[$_i]}
+          if (( ${_query_tree[$_i]} > 0 )); then
+            _query_pp[spc]="${_query_pp[spc]}${_v_bar}   "
+          else
+            _query_pp[spc]="${_query_pp[spc]}    "
+          fi
+        done
+        if (( ${_query_tree[${_query_opts[level]}]} == 0 )); then
+          _x_bar=${_xl_bar}
+        fi
+        _query_pp[sep]="${_query_pp[spc]%????}${_x_bar}${_h_bar}${_h_bar} "
+        echo "${_query_pp[spc]%????}${_v_bar}"
+      fi
+
+      _query_pp[type]="${_c_type}${_type}${_c_reset}"
+      _query_pp[input]="${_c_input}${_query_opts[input]}${_c_reset}"
+    }
+
+    #echo "DEBUG: Cmd='$@'"
+    # Default values for options
+    local -A _query_opts=()
+    local -a _cmd_recurse=()
+    _query_parse_args_ "$@"
+    local _ret_val=$?
+    if [[ "$_ret_val" != "0" ]]; then
+      return $_ret_val;
+    fi
+
+    local _type=$(command type -t -- "${_query_opts[input]}")
+    #echo "DEBUG: Input='${_query_opts[input]}', Type='${_type}'"
+
+    # Pretty-print the tree structure for recursive lookups
+    local -A _query_pp=()
+    if (( ${_query_opts[level]} == 0 )); then
+      echo
+      local -a _query_tree=()
+    fi
+    _query_pp_
+
+    case $_type in
+      "file")
+        _query_file_
+        ;;
+      "function")
+        _query_function_
+        ;;
+      "alias")
+        _query_alias_
+        ;;
+      ,*)
+        command type -a -- "${_query_opts[input]}"
+        ;;
+    esac
+  )
+#+end_src
+
+#+begin_src bash
+  alias que=query
+#+end_src
+
+*** [[https://github.com/BurntSushi/ripgrep][ripgrep]]
+:PROPERTIES:
+:header-args+: :tangle (when (executable-find "rg") "~/test/.bashrc")
+:END:
+Tangle this only if =rg= exists. =rgf= is my wrapper around =rg= which provides a --files-from-option similar to ack
+#+begin_src bash
+  alias g=rgf
+#+end_src
+
+Custom types and settings are defined in RIPGREP_CONFIG_PATH=~/.ripgreprc
+
+*** rm enhancements
+Delete in background
+#+begin_src bash
+  unset -f rm_rf
+  rm_rf_silent() {
+
+    # FIXME: Doesn't work if there are spaces in the filename
+    for i in "$@"; do
+      # Remove trailing slash and move to hidden
+      ni=${i/%\//}
+      bi=$(basename $ni)
+      ni=${ni/%${bi}/.${bi}}
+
+      #echo ${ni}.$$
+      command mv $i ${ni}.$$
+      command rm -rf ${ni}.$$ &
+    done
+  }
+  alias rdj='rm_rf_silent'
+#+end_src
+
+Delete all files except the specified ones.
+All arguments are considered relative to the PWD even if any argument has an absolute path
+This is because, for this function to work, two pieces of information are needed -
+  1. a base workarea from which
+  2. a list of files or folders that should not be deleted
+The arguments provide us with 2. However, this still leaves the issue of specifying the base workarea.
+
+Also, currently, only files and folders located in the PWD can be specified. Those located in subfolders are not supported
+#+begin_src bash
+  unset -f rm_but
+  rm_but() {
+    local _names=""
+    for i in "$@"; do
+      _names="$_names -name "'"'"$i"'" -o'
+    done
+    _names=${_names%" -o"}
+    #echo $_names
+
+    echo "find . -mindepth 1 -maxdepth 1 $_names -prune -o -print"
+    find . -mindepth 1 -maxdepth 1 $_names -prune -o -print
+  }
+
+  alias rmb='rm_but'
+#+end_src
+
+*** TODO tmux
+#+begin_src bash
+  alias tmux='tmux_pp'
+  alias tm='tmux'
+  alias tmi=tmuxinator
+#+end_src
+
+*** vim
+#+begin_src bash
+  alias v=gvim
+  # alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
+  alias vi='vim --config NONE'
+#+end_src
+
+Open results of the last shell command in vim quickfix.
+Very useful for searching something using =rg= etc. and iterating through the results in vim
+#+begin_src bash
+  vq() { gvim -q <(eval "$(fc -nl -1) $@"); }
+#+end_src
+
+Opening up vimdiff takes some observable amount of time. This will run it only if required.
+Using -f keeps the window in the foreground and prevents a whole bunch of diffs opening at the same time
+#+begin_src bash
+  gvim_diff() {
+    # If there are no differences, print that files are identical and return
+    command diff -qs "$@" && return
+
+    # At this point, diff can have non-zero error code because of actual differences or because it couldn't find the file.
+    # To eliminate the 2nd case, check to see if all files are present. If not, return.
+    # If any files are missing, the previous diff command will output the error.
+    for i in "$@"; do
+      if [[ ! -f "$i" ]]; then
+        return
+      fi
+    done
+
+    # Run vimdiff only if there are differences and all files are present
+    gvim -df -c 'set nobackup' "$@"
+  }
+  alias vd=gvim_diff
+#+end_src
+
+#+begin_src bash
+  alias govb='$VISUAL ~/.vim/bundles.vim'
+  alias govm='$VISUAL ~/.vim/plugin/mappings.vim'
+  alias govv='$VISUAL ~/.vim/vimrc'
+#+end_src
+
+** local bashrc
+*** home
+:PROPERTIES:
+:header-args: :tangle (when (string-match "budgie" (system-name)) "~/test/.bashrc")
+:END:
+#+begin_src bash
+  alias amd_vpn='sudo openconnect -u kshenoy --token-mode=rsa atl-vpn.amd.com'
+#+end_src
+
+Update permissions of the history when exiting as root
+#+begin_src bash
+  _histfile_perm_update_() {
+    if [[ -f $HISTFILE ]]; then
+      echo "Changing permissions of HISTFILE..."
+      chown ks $HISTFILE
+      chgrp ks $HISTFILE
+      chmod 640 $HISTFILE
+    fi
+  }
+
+  if (( "${UID}" == 0 )); then
+    trap _histfile_perm_update_ EXIT
+  fi
+#+end_src
+
+*** work
+:PROPERTIES:
+:header-args: :tangle (when (string-match "\\^atl" (system-name)) "~/test/.bashrc")
+:END:
+#+begin_src bash
+  export TZ="US/Mountain"
+
+  # This is needed to display the terminal characters correctly : /
+  # Loading the HDK resets LANG=C which causes font rendering issues in xterm so putting it after the module load
+  # Update - I'm starting xterm by passing it `-en en_US.UTF-8` instead of forcing LANG as that has other side-effects
+  # export LANG=en_US.UTF-8
+#+end_src
+
+To help load pandora modules. This also puts the pandora binaries in the path
+See http://cmdwww/sysadmin/modules for more information
+- =module load <vendorname>/[version]=
+- =module list= - to look at loaded modules
+- =module avail <package>= - to see different versions of the package eg. `module avail emacs`
+#+begin_src bash
+  . /proj/verif_release_ro/cbwa_initscript/nodisk_current/cbwa_init.bash
+
+  module load hdk-6/1.1
+  module load emacs/25.1
+  # emacs has its own version of tags so loading ctags after emacs to ensure that we don't pick up emacs' ctags
+  module load ctags/4518
+  module load fd/7.2.0
+  module load git/2.16.2
+  module load ripgrep/0.10.0
+  module load tmux/2.7
+  module load vim/8.1.0561
+  module load xterm/326
+#+end_src
+
+** completion
+*** command completion
+#+begin_src bash
+  if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
+    . /etc/bash_completion
+  fi
+
+  complete -A hostname   rsh rcp telnet rlogin r ftp ping disk
+  complete -A export     printenv
+  complete -A variable   export local readonly unset
+  complete -A enabled    builtin
+  complete -A alias      alias unalias
+  complete -A function   function
+  complete -A user       su mail finger
+
+  complete -A helptopic  help     # currently same as builtins
+  complete -A shopt      shopt
+  complete -A stopped -P '%' bg
+  complete -A job -P '%' fg jobs disown
+
+  complete -A directory  mkdir rmdir
+  complete -A directory  -o default cd
+
+  # Compression
+  complete -f -o default -X '*.+(zip|ZIP)'  zip
+  complete -f -o default -X '!*.+(zip|ZIP)' unzip
+  complete -f -o default -X '*.+(z|Z)'      compress
+  complete -f -o default -X '!*.+(z|Z)'     uncompress
+  complete -f -o default -X '*.+(gz|GZ)'    gzip
+  complete -f -o default -X '!*.+(gz|GZ)'   gunzip
+  complete -f -o default -X '*.+(bz2|BZ2)'  bzip2
+  complete -f -o default -X '!*.+(bz2|BZ2)' bunzip2
+
+  # Misc filetypes
+  complete -f -o default -X '!*.ps'  gs ghostview ps2pdf ps2ascii
+  complete -f -o default -X '!*.dvi' dvips dvipdf xdvi dviselect dvitype
+  complete -f -o default -X '!*.pdf' acroread pdf2ps
+  complete -f -o default -X '!*.+(pdf|ps)' gv
+  complete -f -o default -X '!*.texi*' makeinfo texi2dvi texi2html texi2pdf
+  complete -f -o default -X '!*.tex' tex latex slitex
+  complete -f -o default -X '!*.lyx' lyx
+  complete -f -o default -X '!*.+(htm*|HTM*)' lynx html2ps
+  complete -f -o default -X '!*.pl'  perl perl5
+  complete -f -o default -X '!*.gv'   dot
+  complete -f -o default -X '!*.gif'  kview
+
+  # Multimedia
+  #complete -f -o default -X '!*.+(jp*g|gif|xpm|png|bmp)' xv gimp
+  #complete -f -o default -X '!*.+(mp3|MP3)' mpg123 mpg321
+  #complete -f -o default -X '!*.+(ogg|OGG)' ogg123
+#+end_src
+
+Completion for custom tools at work
+#+begin_src bash :tangle (when (string-match "\\^atl" (system-name)) "~/test/.bashrc")
+  complete -f -o default -X '!*.xml' ljd
+  complete -f -o default -X '!*.vv' vv
+#+end_src
+
+*** tmux completion
+See [[http://www.debian-administration.org/articles/317][here]] for how to write more. Based upon the example at http://paste-it.appspot.com/Pj4mLycDE
+#+begin_src bash
+  _tmux_complete_() (
+    _tmux_expand_() {
+      [ "$cur" != "${cur%\\}" ] && cur="$cur"'\';
+      if [[ "$cur" == \~*/* ]]; then
+        eval cur=$cur;
+      else
+        if [[ "$cur" == \~* ]]; then
+          cur=${cur#\~};
+          COMPREPLY=($( compgen -P '~' -u $cur ));
+          return ${#COMPREPLY[@]};
+        fi;
+      fi
+    }
+
+    _tmux_filedir_() {
+      local IFS='
+      ';
+      _tmux_expand_ || return 0;
+      if [ "$1" = -d ]; then
+        COMPREPLY=(${COMPREPLY[@]} $( compgen -d -- $cur ));
+        return 0;
+      fi;
+      COMPREPLY=(${COMPREPLY[@]} $( eval compgen -f -- \"$cur\" ))
+    }
+
+    _tmux_complete_client_() {
+      local IFS=$'\n'
+      local cur="${1}"
+      COMPREPLY=( ${COMPREPLY[@]:-} $(compgen -W "$(tmux -q list-clients | cut -f 1 -d ':')" -- "${cur}") )
+    }
+
+    _tmux_complete_session_() {
+      local IFS=$'\n'
+      local cur="${1}"
+      COMPREPLY=( ${COMPREPLY[@]:-} $(compgen -W "$(tmux -q list-sessions | cut -f 1 -d ':')" -- "${cur}") )
+    }
+
+    _tmux_complete_window_() {
+      local IFS=$'\n'
+      local cur="${1}"
+      local session_name="$(echo "${cur}" | sed 's/\\//g' | cut -d ':' -f 1)"
+      local sessions
+
+      sessions="$(tmux -q list-sessions | sed -re 's/([^:]+:).*$/\1/')"
+      if [[ -n "${session_name}" ]]; then
+        sessions="${sessions}
+        $(tmux -q list-windows -t "${session_name}" | sed -re 's/^([^:]+):.*$/'"${session_name}"':\1/')"
+      fi
+      cur="$(echo "${cur}" | sed -e 's/:/\\\\:/')"
+      sessions="$(echo "${sessions}" | sed -e 's/:/\\\\:/')"
+      COMPREPLY=( ${COMPREPLY[@]:-} $(compgen -W "${sessions}" -- "${cur}") )
+    }
+
+    local cur prev
+    local i cmd cmd_index option option_index
+    local opts=""
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    if [ ${prev} == -f ]; then
+      _tmux_filedir_
+    else
+      # Search for the command
+      local skip_next=0
+      for ((i=1; $i<=$COMP_CWORD; i++)); do
+        if [[ ${skip_next} -eq 1 ]]; then
+          #echo "Skipping"
+          skip_next=0;
+        elif [[ ${COMP_WORDS[i]} != -* ]]; then
+          cmd="${COMP_WORDS[i]}"
+          cmd_index=${i}
+          break
+        elif [[ ${COMP_WORDS[i]} == -f ]]; then
+          skip_next=1
+        fi
+      done
+
+      # Search for the last option command
+      skip_next=0
+      for ((i=1; $i<=$COMP_CWORD; i++)); do
+        if [[ ${skip_next} -eq 1 ]]; then
+          #echo "Skipping"
+          skip_next=0;
+        elif [[ ${COMP_WORDS[i]} == -* ]]; then
+          option="${COMP_WORDS[i]}"
+          option_index=${i}
+          if [[ ${COMP_WORDS[i]} == -- ]]; then
+            break;
+          fi
+        elif [[ ${COMP_WORDS[i]} == -f ]]; then
+          skip_next=1
+        fi
+      done
+
+      if [[ $COMP_CWORD -le $cmd_index ]]; then
+        # The user has not specified a command yet
+        local all_commands="$(tmux -q list-commands | cut -f 1 -d ' ')"
+        COMPREPLY=( ${COMPREPLY[@]:-} $(compgen -W "${all_commands}" -- "${cur}") )
+      else
+        case ${cmd} in
+          attach-session|attach)
+            case "$prev" in
+              -t) _tmux_complete_session_ "${cur}" ;;
+               ,*) options="-t -d" ;;
+            esac ;;
+          detach-client|detach)
+            case "$prev" in
+              -t) _tmux_complete_client_ "${cur}" ;;
+               ,*) options="-t" ;;
+            esac ;;
+          lock-client|lockc)
+            case "$prev" in
+              -t) _tmux_complete_client_ "${cur}" ;;
+               ,*) options="-t" ;;
+            esac ;;
+          lock-session|locks)
+            case "$prev" in
+              -t) _tmux_complete_session_ "${cur}" ;;
+               ,*) options="-t -d" ;;
+            esac ;;
+          new-session|new)
+            case "$prev" in
+              -t) _tmux_complete_session_ "${cur}" ;;
+              -[n|d|s]) options="-d -n -s -t --" ;;
+              ,*)
+                if [[ ${COMP_WORDS[option_index]} == -- ]]; then
+                  _command_offset ${option_index}
+                else
+                  options="-d -n -s -t --"
+                fi
+                ;;
+            esac
+            ;;
+          refresh-client|refresh)
+            case "$prev" in
+              -t) _tmux_complete_client_ "${cur}" ;;
+              ,*) options="-t" ;;
+            esac ;;
+          rename-session|rename)
+            case "$prev" in
+              -t) _tmux_complete_session_ "${cur}" ;;
+              ,*) options="-t" ;;
+            esac ;;
+          source-file|source)
+            _tmux_filedir_ ;;
+          has-session|has|kill-session)
+            case "$prev" in
+              -t) _tmux_complete_session_ "${cur}" ;;
+              ,*) options="-t" ;;
+            esac ;;
+          suspend-client|suspendc)
+            case "$prev" in
+              -t) _tmux_complete_client_ "${cur}" ;;
+              ,*) options="-t" ;;
+            esac ;;
+          switch-client|switchc)
+            case "$prev" in
+              -c) _tmux_complete_client_ "${cur}" ;;
+              -t) _tmux_complete_session_ "${cur}" ;;
+              ,*) options="-l -n -p -c -t" ;;
+            esac ;;
+
+          send-keys|send)
+            case "$option" in
+              -t) _tmux_complete_window_ "${cur}" ;;
+              ,*) options="-t" ;;
+            esac ;;
+          esac # case ${cmd}
+      fi # command specified
+    fi # not -f
+
+    if [[ -n "${options}" ]]; then
+      COMPREPLY=( ${COMPREPLY[@]:-} $(compgen -W "${options}" -- "${cur}") )
+    fi
+
+    return 0
+  )
+
+  complete -F _tmux_complete_ tmux
+  complete -F _tmux_complete_ tmux_pp
+#+end_src
+
+*** alias completion
+Automatically add completion for all aliases to commands having completion functions. This must be called only at the very end
+#+begin_src bash
+  alias_completion() {
+    local namespace="alias_completion"
+
+    # parse function based completion definitions, where capture group 2 => function and 3 => trigger
+    local compl_regex='complete( +[^ ]+)* -F ([^ ]+) ("[^"]+"|[^ ]+)'
+    # parse alias definitions, where capture group 1 => trigger, 2 => command, 3 => command arguments
+    local alias_regex="alias ([^=]+)='(\"[^\"]+\"|[^ ]+)(( +[^ ]+)*)'"
+
+    # create array of function completion triggers, keeping multi-word triggers together
+    eval "local completions=($(complete -p | sed -ne "/$compl_regex/s//'\3'/p"))"
+    (( ${#completions[@]} == 0 )) && return 0
+
+    # create temporary file for wrapper functions and completions
+    rm -f "/tmp/${namespace}-*.tmp" # preliminary cleanup
+    local tmp_file="$(mktemp "/tmp/${namespace}-${RANDOM}.tmp")" || return 1
+
+    # read in "<alias> '<aliased command>' '<command args>'" lines from defined aliases
+    local line; while read line; do
+      eval "local alias_tokens=($line)" 2>/dev/null || continue # some alias arg patterns cause an eval parse error
+      local alias_name="${alias_tokens[0]}" alias_cmd="${alias_tokens[1]}" alias_args="${alias_tokens[2]# }"
+
+      # skip aliases to pipes, boolan control structures and other command lists
+      # (leveraging that eval errs out if $alias_args contains unquoted shell metacharacters)
+      eval "local alias_arg_words=($alias_args)" 2>/dev/null || continue
+
+      # skip alias if there is no completion function triggered by the aliased command
+      [[ " ${completions[*]} " =~ " $alias_cmd " ]] || continue
+      local new_completion="$(complete -p "$alias_cmd")"
+
+      # create a wrapper inserting the alias arguments if any
+      if [[ -n $alias_args ]]; then
+          local compl_func="${new_completion/#* -F /}"; compl_func="${compl_func%% *}"
+          # avoid recursive call loops by ignoring our own functions
+          if [[ "${compl_func#_$namespace::}" == $compl_func ]]; then
+              local compl_wrapper="_${namespace}::${alias_name}"
+                  echo "function $compl_wrapper {
+                      (( COMP_CWORD += ${#alias_arg_words[@]} ))
+                      COMP_WORDS=($alias_cmd $alias_args \${COMP_WORDS[@]:1})
+                      $compl_func
+                  }" >> "$tmp_file"
+                  new_completion="${new_completion/ -F $compl_func / -F $compl_wrapper }"
+          fi
+      fi
+
+      # replace completion trigger by alias
+      new_completion="${new_completion% *} $alias_name"
+      echo "$new_completion" >> "$tmp_file"
+    done < <(alias -p | sed -ne "s/$alias_regex/\1 '\2' '\3'/p")
+    source "$tmp_file" && rm -f "$tmp_file"
+  };
+#+end_src
+
+* LS_COLORS/dircolors
+:PROPERTIES:
+:ID:       2823d31a-572c-44ec-80e1-84acbbb6412e
+:header-args+: :tangle ~/test/.dircolors
+:END:
+#+begin_src bash :export none
+  # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
+  # Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
+  # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
+#+end_src
+
+=ls= uses the value of the environment variable =LS_COLORS= to display. =dircolors= is a utility to set =LS_COLORS=
+
+=COLOR= needs one of these arguments:
+- ~tty~ colorizes output to ttys, but not pipes.
+- ~all~ adds color characters to all output
+- ~none~ shuts colorization off.
+#+begin_src bash
+  COLOR tty
+#+end_src
+
+Extra command line options for ls go here. Basically these ones are:
+~-F~ show '/' for dirs, '*' for executables, etc.
+~-T 0~ don't trust tab spacing when formatting ls output.
+#+begin_src bash :tangle no
+  OPTIONS -F -T 0
+#+end_src
+
+There should be one TERM entry for each termtype that is colorizable
+#+begin_src bash
+  TERM Eterm
+  TERM ansi
+  TERM color_xterm
+  TERM con132x25
+  TERM con132x30
+  TERM con132x43
+  TERM con132x60
+  TERM con80x25
+  TERM con80x28
+  TERM con80x30
+  TERM con80x43
+  TERM con80x50
+  TERM con80x60
+  TERM console
+  TERM dtterm
+  TERM gnome
+  TERM kon
+  TERM konsole
+  TERM kterm
+  TERM linux
+  TERM linux-c
+  TERM mach-color
+  TERM rxvt
+  TERM screen
+  TERM screen
+  TERM screen-w
+  TERM screen.linux
+  TERM uxterm
+  TERM vt100
+  TERM xterm
+  TERM xterm-256color
+  TERM xterm-debian
+#+end_src
+
+These are the color init strings for the basic file types. A color init string consists of one or more of the following numeric codes:
+Attribute codes: 00:Normal, 01:Bold, 04:Underline, 05=Blink, 06:Outline, 07:Reverse, 08:Concealed
+| Color   | Foreground | Background |
+|-----------------------------------|
+| black   |     30     |     40     |
+| red     |     31     |     41     |
+| green   |     32     |     42     |
+| yellow  |     33     |     43     |
+| blue    |     34     |     44     |
+| magenta |     35     |     45     |
+| cyan    |     36     |     46     |
+| white   |     37     |     47     |
+
+#+begin_src bash
+  BLK     40;33;01    # block device driver
+  CHR     40;33;01    # character device driver
+  DIR     00;34       # directory
+  DOOR    01;35       # door
+  EXEC    00;32       # files with execute permissions
+  FIFO    40;33       # pipe
+  FILE    00          # normal file
+  LINK    00;36       # symbolic link. (If this is set to 'target' instead of a numerical value, the color is as for the file pointed to.)
+  MISSING 05;37;41    # ... and the files they point to
+  NORMAL  00          # global default, although everything should be something.
+  ORPHAN  01;37;41    # orphaned syminks
+  SOCK    01;35       # socket
+#+end_src
+
+List any file extensions like '.gz' or '.tar' that you would like ls to colorize below. Put the extension, a space, and the color init string.
+(and any comments you want to add after a '#')
+
+Executables
+#+begin_src bash
+  .cmd 00;32
+  .exe 00;32
+  .com 00;32
+  .btm 00;32
+  .bat 00;32
+  .sh  00;32
+  .csh 00;32
+#+end_src
+
+Archives or compressed files
+#+begin_src bash
+  .tar  00;31
+  .tgz  00;31
+  .arj  00;31
+  .taz  00;31
+  .lzh  00;31
+  .zip  00;31
+  .z    00;31
+  .Z    00;31
+  .gz   00;31
+  .bz2  00;31
+  .deb  00;31
+  .rpm  00;31
+  .jar  00;31
+  .bz   00;31
+  .tz   00;31
+  .cpio 00;31
+#+end_src
+
+Image formats
+#+begin_src bash
+  .jpg  00;35
+  .jpeg 00;35
+  .gif  00;35
+  .bmp  00;35
+  .pbm  00;35
+  .pgm  00;35
+  .ppm  00;35
+  .tga  00;35
+  .xbm  00;35
+  .xpm  00;35
+  .tif  00;35
+  .tiff 00;35
+  .png  00;35
+  .mpg  00;35
+  .mpeg 00;35
+  .avi  00;35
+  .fli  00;35
+  .gl   00;35
+  .dl   00;35
+  .xcf  00;35
+  .xwd  00;35
+#+end_src
+
+Audio formats
+#+begin_src bash
+  .ogg 00;35
+  .mp3 00;35
+  .wav 00;35
+#+end_src
+
+Documents
+#+begin_src bash :tangle no
+  .csv 00;00
+  .xls 00;00
+  .pdf 00;00
+  .doc 00;00
+  .txt 00;00
+  .md  00;00
+  .ppt 00;00
+#+end_src
+
+* Local variables
+Use =add-file-local-variable= or =add-file-local-variable-prop-line= instead of adding these manually
+
+# Local Variables:
+# org-enforce-todo-checkbox-dependencies: nil
+# org-enforce-todo-dependencies: nil
+# org-refile-targets: ((nil :maxlevel . 9))
+# End:
