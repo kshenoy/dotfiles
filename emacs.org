@@ -1151,6 +1151,18 @@ Use =C-c f= as prefix for all counsel-related keybindings
     (ivy-rich-mode t))
 #+end_src
 
+** magit
+:PROPERTIES:
+:ID:       e68b0e9c-3ca5-4e9b-a22c-45f3a041e90d
+:CREATED:  [2019-01-21 Mon 23:17]
+:END:
+[[https://www.reddit.com/r/emacs/comments/abt3dp/its_magit_john_weigley_emacssf/][It's Magit! - John Wiegley]]
+[[https://cestlaz.github.io/posts/using-emacs-47-magit][Using Emacs 47: Magit - Mike Zamansky]]
+#+begin_src emacs-lisp
+  (use-package magit
+    :bind* ("C-x g" . magit-status))
+#+end_src
+
 ** modern-c++-font-lock
 #+begin_src emacs-lisp
   (use-package modern-cpp-font-lock
@@ -1974,6 +1986,16 @@ When a color is specified as a hex code or with its name, set the background of 
 #+begin_src emacs-lisp
   (use-package rainbow-mode
     :defer t)
+#+end_src
+
+** [[https://github.com/larstvei/Try][try]]
+:PROPERTIES:
+:ID:       4edba4e7-7920-47bf-b6c1-9221bc5a0841
+:CREATED:  [2019-01-21 Mon 23:12]
+:END:
+Try packages without installing them
+#+begin_src emacs-lisp
+  (use-package try)
 #+end_src
 
 ** undo-tree
