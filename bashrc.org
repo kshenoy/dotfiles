@@ -2099,7 +2099,35 @@ Tangle this only if =rg= exists. =rgf= is my wrapper around =rg= which provides 
   alias g=rgf
 #+end_src
 
-Custom types and settings are defined in RIPGREP_CONFIG_PATH=~/.ripgreprc
+ripgrep config file
+#+begin_src conf :tangle ~/test/.ripgreprc
+  # Add to the cpp type.
+  --type-add
+  cpp:*.ipp,*.tpp
+
+  --type-add
+  chdr:include:h
+  --type-add
+  chdr:*.{H,hh,hxx}
+
+  --type-add
+  csrc:*.{C,cc,cpp,cxx,inl,ipp,tpp}
+
+  --type-add
+  rdl:*.rdl
+
+  --type-add
+  sbs:*.sbs
+
+  --type-add
+  hdl:include:verilog
+
+  --type-add
+  hdl:*.x
+
+  # Because who cares about case!?
+  --smart-case
+#+end_src
 
 *** rm enhancements
 Delete in background
@@ -2147,11 +2175,144 @@ Also, currently, only files and folders located in the PWD can be specified. Tho
   alias rmb='rm_but'
 #+end_src
 
-*** TODO tmux
+*** tmux
+:PROPERTIES:
+:CREATED:  [2019-01-21 Mon 20:40]
+:END:
 #+begin_src bash
   alias tmux='tmux_pp'
   alias tm='tmux'
   alias tmi=tmuxinator
+#+end_src
+
+#+begin_src bash
+  unset -f _tmux_attach_or_new_
+  _tmux_attach_or_new_() {
+    # Attach to existing session or else create a new one
+    # Forcing the LANG to en_US.UTF-8 to avoid clobbering LANG=C set at work
+    if [[ ! -z "$TMUX" ]]; then return; fi
+
+    if [[ -z "$1" ]]; then
+      LANG=en_US.UTF-8 tmux -2 attach-session || tmux -2 new-session
+    else
+      # The commented one-liner doesn't work when the supplied argument is a subset of an already existing session name
+      # For eg. if we have a session called DebugBus, and we check if the session "Debug" exists, tmux returns true
+      #tmux -2 attach-session -t "$@" || ( echo "Creating new session..." && tmux -2 new-session -s "$@" )
+
+      if [[ $(tm ls | grep -P "^$1\b" 2> /dev/null) ]]; then
+        #echo "Attaching to exising session..."
+        LANG=en_US.UTF-8 tmux -2 attach-session -t "$@"
+      else
+        echo "Creating new session $1 ..."
+        LANG=en_US.UTF-8 tmux -2 new-session -s "$1"
+      fi
+    fi
+  }
+
+  unset -f _tmux_update_env_
+  _tmux_update_env_() {
+    # Update environment variables in TMUX
+    # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
+    echo "Updating to latest tmux environment...";
+
+    local _line;
+    while read _line; do
+      if [[ $_line == -* ]]; then
+        unset ${_line/#-/}
+      else
+        _line=${_line/=/=\"}
+        _line=${_line/%/\"}
+        eval export $_line;
+      fi;
+    done < <(tmux show-environment)
+
+    echo "...done"
+  }
+
+  unset -f _tmux_send_keys_other_panes_
+  _tmux_send_keys_other_panes_() {
+    local _pane_current=$(tmux display-message -p '#P')
+    for _pane in $(tmux list-panes -F '#P'); do
+      if (( "$_pane" != "$_pane_current" )); then
+        tmux send-keys -t ${_pane} "$@"
+      fi
+    done
+  }
+
+  unset -f _tmux_send_keys_all_panes_
+  _tmux_send_keys_all_panes_() {
+    for _pane in $(tmux list-panes -F '#P'); do
+      tmux send-keys -t ${_pane} "$@"
+    done
+  }
+
+  unset -f _tmux_send_keys_all_
+  _tmux_send_keys_all_() {
+    for _window in $(tmux list-windows -F '#I'); do
+      for _pane in $(tmux list-panes -t ${_window} -F '#P'); do
+        tmux send-keys -t ${_window}.${_pane} "$@"
+      done
+    done
+  }
+
+  unset -f _tmux_select_session_
+  _tmux_select_session_() {
+    tmux list-sessions | awk -F: '{ print $1 " \"" $2 "\""; }' |\
+      xargs dialog --ok-label 'Attach' --cancel-label 'New session' --menu tmux 20 80 20 2>/tmp/tmux-session \
+      && tmux attach-session -t $(cat /tmp/tmux-session; rm /tmp/tmux-session) \
+      || tmux
+  }
+
+
+  unset -f tmux_pp
+  tmux_pp() {
+    # We can't make the helper functions private because doing so will run tmux_pp in a subshell
+    # However, since we can't export variables from a subshell to its parent shell, tmux_update_env won't work
+
+    local cmd=$1; shift;
+
+    case $cmd in
+      attach-new|an)
+        # if (( $(command tmux -V) < 2.3 )); then
+          _tmux_attach_or_new_ "$@"
+        # else
+          # command tmux new-session -A -s "$@"
+        # fi
+        ;;
+
+      update-env|ue)
+        if (( $# > 0 )); then echo "Ignoring extra arguments: '$@'"; fi
+        _tmux_update_env_
+        ;;
+
+      update-env-all-panes|ueap)
+        tmux_pp send-keys-all-panes "tmux_pp ue" C-m
+        ;;
+
+      update-env-all|uea)
+        tmux_pp send-keys-all "tmux_pp ue" C-m
+        ;;
+
+      sk)
+        command tmux send-keys "$@"
+        ;;
+
+      send-keys-other-panes|skop)
+        _tmux_send_keys_other_panes_ "$@"
+        ;;
+
+      send-keys-all-panes|skap)
+        _tmux_send_keys_all_panes_ "$@"
+        ;;
+
+      send-keys-all|ska)
+        _tmux_send_keys_all_ "$@"
+        ;;
+
+      ,*)
+        command tmux ${cmd} "$@"
+    esac
+  }
 #+end_src
 
 *** vim
