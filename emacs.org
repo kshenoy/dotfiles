@@ -613,8 +613,10 @@ Besides, =M-g M-g= is still bound to =goto-line= by default as well as the =<N>G
 #+begin_src emacs-lisp
   (use-package beacon
     :custom
-    (beacon-blink-when-window-scrolls nil)
-    (beacon-color (face-attribute 'fringe :background))
+    (beacon-blink-when-focused t)
+    (beacon-blink-when-window-scrolls t)
+    (beacon-size 80)
+    (beacon-color "#eee8d5")
     :config
     (beacon-mode 1)
     (add-hook 'after-load-theme-hook

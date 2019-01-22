@@ -2,16 +2,16 @@
 #+PROPERTY: header-args+ :results output silent :noweb tangle :comments both :mkdirp yes
 #+TODO: TODO FIXME |
 
+* tmux.conf
+:PROPERTIES:
+:header-args+: :tangle ~/.tmux.conf
+:END:
 #+begin_src conf :export none
   # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
   # Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
   # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
 #+end_src
 
-* tmux.conf
-:PROPERTIES:
-:header-args+: :tangle ~/.tmux.conf
-:END:
 [[https://linux.die.net/man/1/tmux][tmux man page]]
 To show options:
 - =tmux show-options -g [option_name]= Show global option/show all if none specified
