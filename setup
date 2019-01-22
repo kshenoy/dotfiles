@@ -19,7 +19,6 @@ ln -svTf ~/.dotfiles/emacs.d/snippets        ~/.emacs.d/snippets
 ln -svTf ~/.dotfiles/gitignore               ~/.config/git/ignore
 # ln -svTf ~/.dotfiles/i3                    ~/.config/i3
 ln -svTf ~/.dotfiles/ssh/config              ~/.ssh/config
-ln -svTf ~/.dotfiles/tmux/tmux.conf          ~/.tmux.conf
 ln -svTf ~/.dotfiles/unison/dotfiles.prf     ~/.unison/dotfiles.prf
 ln -svTf ~/.dotfiles/vim                     ~/.config/nvim
 ln -svTf ~/.dotfiles/vim                     ~/.vim

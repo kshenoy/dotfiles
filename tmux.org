@@ -1,0 +1,312 @@
+#+TITLE: tmux configuration
+#+PROPERTY: header-args+ :results output silent :noweb tangle :comments both :mkdirp yes
+#+TODO: TODO FIXME |
+
+#+begin_src conf :export none
+  # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
+  # Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
+  # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
+#+end_src
+
+* tmux.conf
+:PROPERTIES:
+:header-args+: :tangle ~/.tmux.conf
+:END:
+[[https://linux.die.net/man/1/tmux][tmux man page]]
+To show options:
+- =tmux show-options -g [option_name]= Show global option/show all if none specified
+- =tmux show-options -w [option_name]= Show window option/show all if none specified
+- =tmux show-options -s [option_name]= Show server option/show all if none specified
+
+** Main options
+=C-b= is a pain to use when in copy mode as to scroll-up a full screen, we've to press =C-b= twice since upon the first press it's interpreted as a prefix.
+Thus change it to =C-q=. =C-a= is the default prefix used by screen but it collides with collides with emacs readline.
+#+begin_src conf
+  unbind C-b
+  set -g prefix C-q
+  # For nested Tmux sessions
+  # bind C-q send-prefix
+#+end_src
+
+Disable wait for escape sequence to enable faster command sequence
+#+begin_src conf
+  set -sg escape-time 0
+  set -sg repeat-time 600
+#+end_src
+
+Enable mouse support
+#+begin_src conf
+  set -g mouse on
+#+end_src
+
+Set bash as the default shell
+#+begin_src conf :tangle no
+  set -g default-shell /tool/pandora64/bin/bash
+#+end_src
+
+vi-mode for copy-paste
+#+begin_src conf
+  setw -g mode-keys vi
+#+end_src
+
+Set the default terminal mode to 256color mode
+#+begin_src conf
+  set -g default-terminal "xterm-256color"
+#+end_src
+
+Sane scrolling (http://superuser.com/a/314620)
+#+begin_src conf
+  set -ga terminal-overrides ',xterm*:smcup@:rmcup@'
+#+end_src
+
+#+begin_src conf
+  set -g history-limit 10000
+  setw -g alternate-screen on
+#+end_src
+
+** Status Bar configuration
+#+begin_src conf
+  set -g status on
+#+end_src
+
+The default keybindings to use
+#+begin_src conf
+  set -g status-keys emacs
+#+end_src
+
+Center the window list
+#+begin_src conf
+  set -g status-justify centre
+#+end_src
+
+Colors!
+#+begin_src conf
+  set -g status-fg colour7
+  set -g status-bg colour18
+  #set -g status-left-fg white
+  #set -g status-left-bg colour25
+  set -g message-fg colour7
+  set -g message-bg colour0
+  set -g message-attr bright
+#+end_src
+
+Increase the time between refresh (Default=15)
+#+begin_src conf
+  set -g status-interval 60
+#+end_src
+
+On the left we have the Session information
+#+begin_src conf
+  set -g status-left-length 50
+  set -g status-left ' #[fg=colour1,bold]#S#[fg=colour7] #[fg=colour8]•'
+#+end_src
+
+On the right I have information about running jobs, both local and on LSF and the clock
+#+begin_src conf
+  set -g status-right-length 60
+  set -g status-right "#[fg=colour8]•#[fg=colour4] JOBS: #(command jobs -r 2>/dev/null | wc -l)r #(command jobs -s 2> /dev/null | wc -l)s #[fg=colour8]•#[fg=colour4] LSF: #(command lsf_bjobs -sum | tail -n1 | command awk '{print $1\"r \"$5\"p\"}') #[fg=colour8]• #[fg=colour3]%b %d, %a %H:%M "
+#+end_src
+
+Enable activity alerts
+#+begin_src conf
+  setw -g monitor-activity on
+  set  -g visual-activity on
+#+end_src
+
+Attempt to set the window title using the =\e]2;...\007= xterm code if the terminal appears to be an xterm
+Since I'm using xterm in full-screen mode, I don't bother with the title anymore
+#+begin_src conf :tangle no
+  set -g set-titles on
+  # set -g set-titles-string '#H #S'
+#+end_src
+
+** Pane configuration
+Set the starting pane index to 1
+#+begin_src conf
+  setw -g pane-base-index 1
+#+end_src
+
+Make the active pane stand-out visually
+#+begin_src conf
+  set -g pane-border-fg        colour18
+  set -g pane-active-border-fg colour18
+#+end_src
+
+** Window configuration
+Set the starting window index to 1
+#+begin_src conf
+  set -g base-index 1
+#+end_src
+
+Make active pane stand out
+#+begin_src conf :tangle no
+  setw -g window-active-style 'bg=#272822'    # bg color of active pane
+  setw -g window-style        'bg=#272822'    # bg color of inactive panes
+#+end_src
+
+Status Bar display
+#+begin_src conf
+  setw -g window-status-format "#[fg=colour20] #I:#W "
+  setw -g window-status-attr bright
+  setw -g window-status-current-format "#[attr=bright]#[fg=colour5] #I:#W "
+  setw -g window-status-current-attr bright
+#+end_src
+
+Blink the pane tab in case of any activity
+#+begin_src conf
+  setw -g window-status-activity-attr blink
+#+end_src
+
+Window is only constrained in size if a smaller client is actively looking at it
+#+begin_src conf
+  setw -g aggressive-resize on
+#+end_src
+
+** Bindings
+Mostly, there's a method to the keybinding madness
+- I use as many as vim's bindings as possible. Since I use evil in emacs I only end up having to learn one set of bindings that I can use everywhere
+- Pane and Window bindings use similar suffix for related behavior eg. =h= to go to the 'left' one. I differentiate between them depending on the prefix. eg. Ctrl is used for panes while Meta (Alt) is used for window bindings.
+
+=-r= indicates that the binding is repeatable i.e. the prefix need not be pressed again to use it
+
+Reload tmux.conf
+#+begin_src conf
+  unbind r
+  bind r   source-file ~/.tmux.conf \; refresh-client -S\; display-message " Config reloaded".
+  unbind C-r
+  bind C-r source-file ~/.tmux.conf \; refresh-client -S\; display-message " Config reloaded".
+#+end_src
+
+Remove suspend-client binding
+#+begin_src conf
+  unbind C-z
+#+end_src
+
+I'm using 'C-Space' as my insert-mode leader in vim so I'll unbind that everywhere as well
+#+begin_src bash
+  unbind -T copy-mode 'C-Space'
+  unbind C-Space
+#+end_src
+
+Allows fast scrolling through a pane's history. -e specifies that scrolling to the bottom exits copy-mode
+#+begin_src conf
+  bind PageUp copy-mode -eu
+#+end_src
+
+copy-paste.
+Use =prefix+]= to paste. =prefix+p= would be the logical choice for paste but it's better used in next/previous context
+#+begin_src conf
+  bind -T copy-mode-vi 'v'   send -X begin-selection
+  bind -T copy-mode-vi 'V'   send -X select-line
+  bind -T copy-mode-vi 'C-v' send -X rectangle-toggle
+  bind -T copy-mode-vi 'y'   send -X copy-selection-and-cancel
+  bind -T copy-mode-vi 'Y'   send -X copy-pipe-and-cancel
+#+end_src
+
+*** Pane bindings
+I tried to use this as a repeatable binding (by using =-r=) but it most of the time it hinders rather than helps.
+I never use more than 2 panes vertically and/or horizontally so most of the time I'm just 1 =C-q= away.
+Making this repeatable means that once I'm in my target pane tmux is still in repeatable binding mode so I've to explicitly press Escape to get out of it.
+#+begin_src conf
+  bind C-q last-pane
+#+end_src
+
+Use h-j-k-l instead of arrow keys
+#+begin_src conf
+  unbind Up
+  unbind Down
+  unbind Left
+  unbind Right
+
+  bind C-h select-pane -L
+  bind C-j select-pane -D
+  bind C-k select-pane -U
+  bind C-l select-pane -R
+
+  bind h select-pane -L
+  bind j select-pane -D
+  bind k select-pane -U
+  bind l select-pane -R
+#+end_src
+
+Kill pane without confirmation
+#+begin_src conf
+  bind    c   kill-pane
+  bind    C-o kill-pane -a
+#+end_src
+
+Create Panes. Use vim's bindings to create splits here. It's more intuitive
+#+begin_src conf
+  bind -r C-s split-window -v -c '#{pane_current_path}'
+  bind -r C-v split-window -h -c '#{pane_current_path}'
+#+end_src
+
+Goto Pane
+bind C-g display-panes
+#+begin_src conf
+  bind C-g display-panes
+#+end_src
+
+Resize Panes
+#+begin_src conf
+  bind -r S-Up    resize-pane -U 20
+  bind -r S-Down  resize-pane -D 20
+  bind -r S-Left  resize-pane -L 20
+  bind -r S-Right resize-pane -R 20
+#+end_src
+
+Swap panes. These are the default bindings
+#+begin_src conf :tangle no
+  bind -r { swap-pane -U
+  bind -r } swap-pane -D
+#+end_src
+
+Move pane to new Window, move existing window to pane (Not using presently)
+#+begin_src conf :tangle no
+  bind   C-b break-pane
+  bind   C-f command-prompt -p "Join pane from:"  "join-pane -s ':%%'"
+#+end_src
+
+*** Window bindings
+#+begin_src conf
+  bind -r M-h previous-window
+  bind -r M-l next-window
+  bind -r M-q last-window
+#+end_src
+
+#+begin_src conf
+  bind -r M-n new-window
+#+end_src
+
+Kill window without confirmation, kill other windows
+#+begin_src conf
+  bind    M-c kill-window
+  bind    M-o kill-window -a
+#+end_src
+
+Move window left
+#+begin_src conf
+  bind -r M-{ swap-window -t -1
+  bind -r M-} swap-window -t +1
+#+end_src
+
+#+begin_src conf :tangle no
+  bind M-j command-prompt -p "Join pane to:"  "join-pane -t ':%%'"
+#+end_src
+
+#+begin_src conf :tangle no
+  bind M-g command-prompt -p "Goto Window:" "select-window -t '%%'"
+#+end_src
+
+* Local variables
+:PROPERTIES:
+:header-args: :tangle no
+:END:
+Use =add-file-local-variable= or =add-file-local-variable-prop-line= instead of adding these manually
+
+# Local Variables:
+# eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
+# org-enforce-todo-checkbox-dependencies: nil
+# org-enforce-todo-dependencies: nil
+# org-refile-targets: ((nil :maxlevel . 9))
+# End:
