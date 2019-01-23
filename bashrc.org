@@ -2100,7 +2100,13 @@ Tangle this only if =rg= exists. =rgf= is my wrapper around =rg= which provides 
 #+end_src
 
 ripgrep config file
-#+begin_src conf :tangle ~/test/.ripgreprc
+#+begin_src bash :export none :tangle ~/.ripgreprc
+  # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
+  # Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
+  # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
+#+end_src
+
+#+begin_src conf :tangle ~/.ripgreprc
   # Add to the cpp type.
   --type-add
   cpp:*.ipp,*.tpp
