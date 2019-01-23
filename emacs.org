@@ -25,7 +25,7 @@ This adds all the non-code related text as comments in the tangled file. It also
 - [[https://to1ne.gitlab.io/literate-dotfiles/][Toon's Literate Dotfiles]]
 - https://brainlessdeveloper.com/2017/12/27/making-emacs-work-like-my-vim-setup/
 
-** Debugging
+** COMMENT Debugging
 :PROPERTIES:
 :ID:       4e219760-3d5e-4a51-9837-8f24298b44d9
 :CREATED:  [2019-01-15 Tue 05:25]
@@ -39,6 +39,11 @@ Use =C-u C-M-x= with the point over the function to debug. This puts us into deb
 | h   | Goto here      |
 | i   | Step into      |
 | q   | Quit           |
+
+Setting this gives a backtrace
+#+begin_src emacs-lisp
+  (setq debug-on-error t)
+#+end_src
 
 ** Detangling
 [[https://www.youtube.com/watch?v=BLomb52wjvE][Yisrael Dov - Emacs is Great ep. 11]]
@@ -631,21 +636,26 @@ Besides, =M-g M-g= is still bound to =goto-line= by default as well as the =<N>G
 Provides auto-completion.
 References:
 - [[https://youtu.be/XeWZfruRu6k][Uncle Dave's video]] for an introduction.
-- https://www.reddit.com/r/emacs/comments/8z4jcs/tip_how_to_integrate_company_as_completion/
+- [[https://www.reddit.com/r/emacs/comments/8z4jcs/tip_how_to_integrate_company_as_completion][reddit:How to use company as a completion framework]]
 
 #+begin_src emacs-lisp
   (use-package company
-    :init (add-hook 'after-init-hook 'global-company-mode)
-    :hook (c-mode c++-mode)
-    :bind (:map my-auto-completion-map
-                ("&" . company-yasnippet))
-    :config (setq company-idle-delay 0
-                  company-minimum-prefix-length 2
-                  company-show-numbers t           ; Show numbers in the drop-down menu to simplify selection
-                  company-selection-wrap-around t)
+    :custom
+    (company-idle-delay 0.1)
+    (company-minimum-prefix-length 2)
+    (company-show-numbers t)           ; Show numbers in the drop-down menu to simplify selection
+    (company-selection-wrap-around t)
+
+    :config
+    (global-company-mode)
 #+end_src
 
 *** Keybindings
+Explicitly trigger yasnippet
+#+begin_src emacs-lisp
+  (bind-key "&" 'company-yasnippet my-auto-completion-map)
+#+end_src
+
 Replace Meta bindings with Ctrl
 #+begin_src emacs-lisp
   (unbind-key "M-n" company-active-map)
@@ -655,6 +665,45 @@ Replace Meta bindings with Ctrl
              ("C-n" . company-select-next)
              ("C-p" . company-select-previous))
 #+end_src
+
+*** Don't get in the way of mah typing!
+The intent of this section is to make company as unobtrusive as possible; I want company to show me completions as I type but I want complete control over if I want to accept it or not. By default, when the completion menu pops-up, the =company-active-map= is activated and it stays open while any key in it is pressed. However, what I find annoying is that it hijacks some bindings making them unavailable for regular use till I've either accepted a completion or explicitly rejected it using =C-g.=
+
+To fix this, I'm going to start by unsetting =company-require-match= which shows the menu but doesn't select an entry which allows me to keep typing.
+#+BEGIN_SRC emacs-lisp
+  (setq company-require-match nil)
+#+END_SRC
+
+Next, I'm going to use [[https://github.com/company-mode/company-mode/blob/master/company-tng.el][company-tng]] (/tab-n-go/) as the frontend which allows showing the menu with no entry selected.
+#+begin_src emacs-lisp
+  (require 'company-tng)
+  (setq company-frontends '(company-tng-frontend
+                            company-pseudo-tooltip-frontend
+                            company-echo-metadata-frontend))
+#+end_src
+
+I'm going to call this state as /not-explicitly-interacted-with-company/ and while in this state, I want to reduce the
+number of keys bound in =company-active-map= to minimize my chances of needing to kill it to just be able to continue typing.
+Unbinding keys from company-active-map allows me to use them for emacs' actions rather than for company's.
+#+BEGIN_SRC emacs-lisp
+  (unbind-key "C-h"      company-active-map)
+  (unbind-key "C-s"      company-active-map)
+  (unbind-key "C-M-s"    company-active-map)
+  (unbind-key "C-w"      company-active-map)
+  (unbind-key "RET"      company-active-map)
+  (unbind-key "TAB"      company-active-map)
+  (unbind-key "<f1>"     company-active-map)
+  (unbind-key "<up>"     company-active-map)
+  (unbind-key "<down>"   company-active-map)
+  (unbind-key "<return>" company-active-map)
+  (unbind-key "<tab>"    company-active-map)
+#+END_SRC
+(=<return>= and =<tab>= are for windowed emacs while =RET= and =TAB= are for terminal)
+
+All done! Now, while I type, company shows me a list of completions but doesn't highlight any of them till I select one. Also, I can use almost all keys to continue typing with the exception of =C-n=, =C-p= and =M-[0-9]= which I use to interact with company. Pressing =C-n= or =C-p= selects the first or last entry from the completion menu and highlights it.
+Once I've explicitly interacted with the completion menu, I can cycle through the entries using =C-n= and =C-p.= A selected entry is automatically inserted and there's no need to confirm the selection. At any time I can abort the completion using =C-g= and it restores the text to its state before completion.
+
+This does not use a lot of company's fancy features such as searching and filtering but it's less intrusive and I'm willing to make that trade-off
 
 *** Enable yasnippet for all backends
 (from [[https://emacs.stackexchange.com/a/10520/9690][emacs.stackexchange]])
@@ -674,7 +723,30 @@ Keeping this at the end to be run after we've added all backends
 )
 #+end_src
 
-*** company-irony
+*** FIXME COMMENT [[https://github.com/sebastiencs/company-box][company-box]]
+:PROPERTIES:
+:ID:       bc8afa5b-79fc-431f-9a61-300363b87160
+:CREATED:  [2019-01-22 Tue 21:29]
+:END:
+:LOGBOOK:
+- State "FIXME"      from "TODO"       [2019-01-22 Tue 21:54]
+- State "TODO"       from              [2019-01-22 Tue 21:54]
+:END:
+Disabled for now because it uses images which are huge compared to the font making it look very ugly
+#+begin_src emacs-lisp
+  (use-package company-box
+    :if (>= emacs-major-version 26)
+    :hook (company-mode . company-box-mode))
+#+end_src
+
+*** FIXME COMMENT company-irony
+:PROPERTIES:
+:CREATED:  [2019-01-22 Tue 23:14]
+:END:
+:LOGBOOK:
+- State "FIXME"      from "TODO"       [2019-01-22 Tue 23:14]
+- State "TODO"       from              [2019-01-22 Tue 23:14]
+:END:
 #+begin_src emacs-lisp
   (use-package company-irony
     :after (company irony yasnippet)
@@ -875,7 +947,7 @@ References:
 
 #+begin_src emacs-lisp
   (use-package flycheck
-    :hook (prog-mode . flycheck-mode)
+    :hook ((prog-mode . flycheck-mode))
     :custom
     (flycheck-gcc-language-standard "c++14")
     (flycheck-clang-language-standard "c++14"))
@@ -906,10 +978,17 @@ Code-folding. From https://github.com/mwfogleman/.emacs.d/blob/master/michael.or
 
 Currently I'm using this only for =ivy-hydra=. More ideas in https::/github.com/kana/vim-submode
 
-** irony
+** FIXME COMMENT irony
+:PROPERTIES:
+:CREATED:  [2019-01-22 Tue 23:14]
+:END:
+:LOGBOOK:
+- State "FIXME"      from "TODO"       [2019-01-22 Tue 23:14]
+- State "TODO"       from              [2019-01-22 Tue 23:14]
+:END:
 #+begin_src emacs-lisp
   (use-package irony
-    :hook (c-mode c++-mode)
+    :hook ((c-mode c++-mode) . irony-mode)
     :config (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 #+end_src
 
@@ -2058,7 +2137,7 @@ Placing at end to be called after all packages are loaded
                (beacon-mode nil beacon)
                (company-mode nil company)
                (flycheck-mode nil flycheck)
-               (irony-mode nil irony)
+               ;; (irony-mode nil irony)
                (ivy-mode nil ivy)
                (org-indent-mode nil org-indent)
                (pcre-mode nil pcre2el)
