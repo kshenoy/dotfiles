@@ -54,6 +54,8 @@ Use =C-u C-M-x= with the point over the function to debug. This puts us into deb
 :ID:       7096b5ff-ae33-4474-b732-e17ef0696b58
 :CREATED:  [2019-01-17 Thu 19:47]
 :END:
+[[info:use-package][info:use-package]]
+
 #+begin_src emacs-lisp
   (require 'package)
   (setq-default load-prefer-newer t
