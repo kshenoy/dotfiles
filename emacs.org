@@ -2076,7 +2076,8 @@ When a color is specified as a hex code or with its name, set the background of 
 :END:
 Try packages without installing them
 #+begin_src emacs-lisp
-  (use-package try)
+  (use-package try
+    :commands (try try-and-refresh))
 #+end_src
 
 ** undo-tree

@@ -69,14 +69,14 @@ Sane scrolling (http://superuser.com/a/314620)
   set -g status on
 #+end_src
 
-The default keybindings to use
+Use emacs keybindings in tmux's command prompt. Emacs is the default but if I don't set this explicitly, it gets set to vi as my $VISUAL and $EDITOR are set to gvim and vim respectively.
 #+begin_src conf
   set -g status-keys emacs
 #+end_src
 
-Center the window list
+Left-justify the window list
 #+begin_src conf
-  set -g status-justify centre
+  set -g status-justify left
 #+end_src
 
 Colors!
@@ -140,8 +140,8 @@ Set the starting window index to 1
 
 Make active pane stand out
 #+begin_src conf :tangle no
-  setw -g window-active-style 'bg=#272822'    # bg color of active pane
-  setw -g window-style        'bg=#272822'    # bg color of inactive panes
+  setw -g window-active-style 'bg=#272822'  # bg color of active pane
+  setw -g window-style        'bg=#272822'  # bg color of inactive panes
 #+end_src
 
 Status Bar display

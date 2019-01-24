@@ -306,7 +306,7 @@ This scrubs away all local branches that are merged.
 
 Pull changes from the remote. Any local commits will be rebased to come after the commits from remote. =--prune= option removes remote-tracking branches that no longer exist on the remote.
 #+begin_src conf
-  sync = !git pull --rebase --prune && git submodule update --init --recursive
+  sync = !git stash && git pull --rebase --prune && git submodule update --init --recursive && git stash pop
 #+end_src
 
 Safer wipes. Using =git reset HEAD --hard= leaves no room for undoing anything.
