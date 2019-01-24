@@ -2722,7 +2722,7 @@ Automatically add completion for all aliases to commands having completion funct
 * LS_COLORS/dircolors
 :PROPERTIES:
 :ID:       2823d31a-572c-44ec-80e1-84acbbb6412e
-:header-args+: :tangle ~/test/.dircolors
+:header-args+: :tangle ~/.dircolors
 :END:
 #+begin_src bash :export none
   # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.

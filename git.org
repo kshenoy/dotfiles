@@ -316,12 +316,6 @@ I can run the =git reflog= command and find the SHA of the commit if I realize l
   wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
 #+end_src
 
-* Figure out how to create a link to gitignore in the Makefile
-:PROPERTIES:
-:header-args: :tangle no
-:END:
- This would eliminate the need for the setup file
-
 * Local variables
 :PROPERTIES:
 :header-args: :tangle no

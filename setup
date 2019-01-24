@@ -13,10 +13,6 @@ ln -svTf "$_dropbox"/Config/dotfiles       ~/.dotfiles
 ln -svTf ~/.dotfiles/bash/bashrc             ~/.bashrc
 ln -svTf ~/.dotfiles/bash/history            ~/.history_bash
 ln -svTf ~/.dotfiles/ctags                   ~/.ctags
-ln -svTf ~/.dotfiles/dircolors               ~/.dircolors
-ln -svTf ~/.dotfiles/emacs.d/private_work.el ~/.emacs.d/private_work.el
-ln -svTf ~/.dotfiles/emacs.d/snippets        ~/.emacs.d/snippets
-ln -svTf ~/.dotfiles/gitignore               ~/.config/git/ignore
 # ln -svTf ~/.dotfiles/i3                    ~/.config/i3
 ln -svTf ~/.dotfiles/ssh/config              ~/.ssh/config
 ln -svTf ~/.dotfiles/unison/dotfiles.prf     ~/.unison/dotfiles.prf
