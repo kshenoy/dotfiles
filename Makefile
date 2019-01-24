@@ -1,6 +1,6 @@
 # Based on https://gitlab.com/to1ne/literate-dotfiles/blob/master/Makefile
 # gnu make functions: https://www.gnu.org/software/make/manual/html_node/Functions.html
-EMACS ?= @echo
+EMACS ?= emacs
 MKLINK := command ln -svTf
 
 docs := README.org
