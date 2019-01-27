@@ -226,15 +226,15 @@ Centralize all hooks instead of configuring them on a per-repository basis
   prompt = false
 
   [difftool "gvim"]
-  cmd = gvim -df -c 'set columns=260|set lines=62|wincmd =' $LOCAL $BASE 2> /dev/null
+  cmd = gvim -df -c 'set columns=260|set lines=62|wincmd =' $LOCAL $REMOTE 2> /dev/null
   trustExitCode = true
 
   [difftool "vim"]
-  cmd = vim -df -c 'set columns=260|set lines=62|wincmd =' $LOCAL $BASE 2> /dev/null
+  cmd = vim -df -c 'set columns=260|set lines=62|wincmd =' $LOCAL $REMOTE 2> /dev/null
   trustExitCode = true
 
   [difftool "meld"]
-  cmd = meld --diff $LOCAL $BASE
+  cmd = meld --diff $LOCAL $REMOTE
 #+end_src
 
 ** merge
