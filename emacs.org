@@ -1,5 +1,5 @@
 #+TITLE: emacs configuration
-#+PROPERTY: header-args+ :results output silent :tangle ~/.emacs.d/init.el :noweb tangle :comments both :mkdirp yes
+#+PROPERTY: header-args :results output silent :tangle ~/.emacs.d/init.el :noweb tangle :comments both :mkdirp yes
 #+TODO: TODO(!) FIXME(!) |
 
 * Literate config
@@ -54,13 +54,14 @@ Setting this gives a backtrace
   ;; If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
 #+end_src
 
-* Bootstrap use-package
+* Bootstrap the package manager
 :PROPERTIES:
 :ID:       7096b5ff-ae33-4474-b732-e17ef0696b58
 :CREATED:  [2019-01-17 Thu 19:47]
 :END:
 [[info:use-package][info:use-package]]
 
+Initialize the packaging system and add the Melpa and Org respositories to get latest versions of packages
 #+begin_src emacs-lisp
   (require 'package)
   (setq-default load-prefer-newer t
@@ -68,14 +69,34 @@ Setting this gives a backtrace
 
   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-  (package-initialize)
 
+  (package-initialize)
+#+end_src
+
+I'm using [[https://github.com/jwiegley/use-package][use-package]] ([[info:use-package#Top][info:use-package]]) to configure my packages.
+
+| <<:ensure>> | Install packages automatically if set to /nil/ or /t/. Passing anything else allows mm to use a different package than the one named in use-package [[org-config][eg.]] |
+| <<:pin>>    | Allows installing a package from a specific archive                                                                                                 |
+
+#+begin_src emacs-lisp
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package t))
+#+end_src
 
+Install packages automatically
+#+begin_src emacs-lisp
   (setq-default use-package-always-ensure t)
 #+end_src
+
+** TODO Switch to package-manager that simplifies using git packages
+:PROPERTIES:
+:ID:       ac3b61db-b6ec-47d4-8dad-1d5182716085
+:END:
+:LOGBOOK:
+- State "TODO"       from              [2019-01-27 Sun 10:59]
+:END:
+quelpa and quelpa-use-package seem to support this
 
 * General
 ** custom file
@@ -312,6 +333,8 @@ So, let's just start a server if one isn't running. A downside of this is that i
 #+end_src
 
 ** Fonts
+[[https://app.programmingfonts.org/][Test Drive Programming Fonts]]; I settled on Iosevka
+
 :PROPERTIES:
 :ID:       bd542328-7d1d-4806-936d-a50673beada6
 :END:
@@ -440,8 +463,7 @@ Use ~(">=" . (?\s (Br . Bl) ?\s (Bc . Bc) ?≥))~ instead of =?≥=
 Use only spaces and no tabs
 #+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil
-                tab-width 2
-                show-trailing-whitespace nil
+                show-trailing-whitespace t
                 sh-basic-offset 2)
 
   (setq sentence-end-double-space nil) ; Count 1 space after a period as the end of a sentence, instead of 2
@@ -1251,17 +1273,22 @@ Use =C-c f= as prefix for all counsel-related keybindings
 #+end_src
 
 ** org
-This solution is by [[https://www.reddit.com/r/emacs/comments/5sx7j0/how_do_i_get_usepackage_to_ignore_the_bundled/ddixpr9/][/u/Wolfer1ne on reddit]].
+:PROPERTIES:
+:ID:       dc10f8d2-0831-4bb6-8775-0f5da3dd8243
+:END:
+I specifically grab [[https://orgmode.org/worg/org-contrib/index.html][org-plus-contrib]] from the org repository instead of the bundled version to be able to
+- get the latest version of org
+- use contributed packages such as [[https://code.orgmode.org/bzg/org-mode/raw/master/contrib/lisp/org-expiry.el][org-expiry]], [[https://orgmode.org/worg/org-contrib/org-drill.html][org-drill]] and org-id
+I do this by leveraging [[:ensure]] and [[:pin]]
+
+Resources: [[http://orgmode.org/worg/org-configs/org-customization-guide.html][Customization guide]], [[https://www.reddit.com/r/emacs/comments/8nvnlu/extending_orgmode/dzz1el9][Extensions]]
+
+#+name: org-config
 #+begin_src emacs-lisp
   (use-package org
     :ensure org-plus-contrib
+    :pin org
 #+end_src
-
-<<ensure_target>>
-I specifically grab =org-plus-contrib= from the org repository instead of the bundled version to be able to use org-expiry
-Passing an argument to =:ensure= (other than t or nil) allows us to use a different package than the one named in use-package
-
-Resources: [[http://orgmode.org/worg/org-configs/org-customization-guide.html][Customization guide]], [[https://www.reddit.com/r/emacs/comments/8nvnlu/extending_orgmode/dzz1el9][Extensions]]
 
 *** :init
 #+begin_src emacs-lisp
@@ -1414,42 +1441,36 @@ This frees up S-left and S-right which I can then use to cycles through the todo
   ;; (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
 #+end_src
 
-**** TODO [[https://orgmode.org/manual/Easy-templates.html][Easy Templates]]
+**** [[https://orgmode.org/manual/Easy-templates.html][Easy Templates]]
 :PROPERTIES:
 :ID:       851ad87b-250e-4c1e-83b1-6b4e1fa6b20d
 :CREATED:  [2019-01-11 Fri 13:03]
 :END:
+:LOGBOOK:
+- State "FIXME"      from "TODO"       [2019-01-27 Sun 20:30]
+:END:
 These should get added only if org-version < 9.2
 =?= in each string controls where the point will be placed after expansion
-#+begin_src emacs-lisp :tangle no
-  (add-to-list 'org-structure-template-alist
-               '("sc" "#+begin_src C++\n  #include <iostream>\n\n  using namespace std;\n\n  int main() {\n    ?cout << \"Hello World!\\n\";\n  }\n#+end_src"))
-
-  (add-to-list 'org-structure-template-alist
-               '("sl" "#+begin_src emacs-lisp\n?\n#+end_src\n" "<src lang=\"?\">\n\n</src>"))
-
-  (add-to-list 'org-structure-template-alist
-               '("sp" "#+begin_src python\n?\n#+end_src\n" "<src lang=\"?\">\n\n</src>"))
-
-  ;; (add-to-list 'org-structure-template-alist
-  ;;              '("sd" "#+begin_src dot :file /tmp/out.png\n?\n#+end_src\n" "<src lang=\"?\">\n\n</src>"))
-
-  (add-to-list 'org-structure-template-alist
-               '("ss" "#+begin_src bash\n?\n#+end_src\n" "<src lang=\"?\">\n\n</src>"))
+#+begin_src emacs-lisp :tangle (if (org-string>= org-version "9.2") "no" "~/.emacs.d/init.el")
+  (add-to-list 'org-structure-template-alist '("sc" "#+begin_src C++\n?\n#+end_src"))
+  (add-to-list 'org-structure-template-alist '("sl" "#+begin_src emacs-lisp\n?\n#+end_src\n"))
+  (add-to-list 'org-structure-template-alist '("sp" "#+begin_src python\n?\n#+end_src\n"))
+  ;; (add-to-list 'org-structure-template-alist '("sd" "#+begin_src dot :file /tmp/out.png\n?\n#+end_src\n"))
+  (add-to-list 'org-structure-template-alist '("ss" "#+begin_src bash\n?\n#+end_src\n"))
 #+end_src
 
 For org-version >= 9.2, we have to use this. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (org-string>= org-version "9.2") "~/.emacs.d/init.el" "no")
   (add-to-list 'org-structure-template-alist '("sc" . "src C++"))
   (add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist '("ss" . "src bash"))
 #+end_src
 
-However, note that since the following start with =s=, it will get clobbered by the default =src= block and not show up in the menu.
 Thus to get it to work as before using =<sc=, we have to add =org-tempo= to =org-modules=
 #+begin_src emacs-lisp
   (add-to-list 'org-modules 'org-tempo)
 #+end_src
+
 
 **** Flatten links
 This is the counterpart to =org-insert-link=. From [[http://emacs.stackexchange.com/a/10714/9690][here]].
@@ -1952,12 +1973,13 @@ Small: ► • ★ ▸
 A good way to find more characters is to use =M-x insert-char=
 
 *** org-drill
-I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ensure_target]].
+[[https://orgmode.org/worg/org-contrib/org-drill.html][org-drill]] is provided by the [[https://orgmode.org/worg/org-contrib/index.html][org-plus-contrib]] from the org repo. Hence I use [[:ensure]] and [[:pin]] to grab it from there.
 #+begin_src emacs-lisp
   (use-package org-drill
     :disabled
     :after org
     :ensure org-plus-contrib
+    :pin org
     :init
     (setq org-drill-learn-fraction 0.4)
     :config
@@ -1971,11 +1993,13 @@ I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ens
 #+end_src
 
 *** org-expiry
+[[https://code.orgmode.org/bzg/org-mode/raw/master/contrib/lisp/org-expiry.el][org-expiry]] is provided by the [[https://orgmode.org/worg/org-contrib/index.html][org-plus-contrib]] from the org repo. Hence I use [[:ensure]] and [[:pin]] to grab it from there.
 This allows me to add a =CREATED= property everytime I create a new org-heading. From [[https://stackoverflow.com/a/13285957/734153][here]].
 #+begin_src emacs-lisp
   (use-package org-expiry
     :after org
     :ensure org-plus-contrib
+    :pin org
     :init
     (setq org-expiry-inactive-timestamps t) ; Don't have everything in the agenda view
     :config
@@ -1983,11 +2007,12 @@ This allows me to add a =CREATED= property everytime I create a new org-heading.
 #+end_src
 
 *** org-id
-I grab the /org-plus-contrib/ version of org-id to match org. Also look at [[ensure_target]].
+I want to grab org-id from the [[https://orgmode.org/worg/org-contrib/index.html][org-plus-contrib]] package from org repo which I do by by specifying [[:ensure]] and [[:pin]]
 #+begin_src emacs-lisp
   (use-package org-id
     :after org
     :ensure org-plus-contrib
+    :pin org
     :init
     (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
     :config
