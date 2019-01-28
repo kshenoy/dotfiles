@@ -59,8 +59,6 @@ Setting this gives a backtrace
 :ID:       7096b5ff-ae33-4474-b732-e17ef0696b58
 :CREATED:  [2019-01-17 Thu 19:47]
 :END:
-[[info:use-package][info:use-package]]
-
 Initialize the packaging system and add the Melpa and Org respositories to get latest versions of packages
 #+begin_src emacs-lisp
   (require 'package)
@@ -526,6 +524,11 @@ Misc info:
 *** Unload all loaded themes before loading new theme
 http://www.greghendershott.com/2017/02/emacs-themes.html
 By default emacs layers the new theme on top of all previously applied themes.
+#+begin_src emacs-lisp
+  (defun my-disable-all-themes ()
+    (interactive)
+    (mapc #'disable-theme custom-enabled-themes))
+#+end_src
 
 *** load-theme hook
 Emacs doesn't have a native hook that is called after a theme has loaded. So we've to create one. (from [[https://www.reddit.com/r/emacs/comments/4v7tcj/does_emacs_have_a_hook_for_when_the_theme_changes/d5wyu1r/][reddit]])
