@@ -1704,21 +1704,6 @@ Show all the hierarchical headlines instead of having to step down them
 
 From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 - Capture 1]] and [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][Using Emacs 24 - Capture 2]]
 
-***** TODO Template generator for TODO captures
-:PROPERTIES:
-:ID:       c9a1dde2-f323-45bd-8129-bc0671ee2131
-:CREATED:  [2019-01-03 Thu 22:50]
-:END:
-#+BEGIN_SRC emacs-lisp
-  (defun my-org-capture-todo-template-generator ()
-    "Create and return a TODO heading template"
-    (interactive)
-    (with-temp-buffer
-      (org-mode)
-      (org-insert-todo-heading (car org-todo-keywords-1))
-      (buffer-string)))
-#+END_SRC
-
 ***** Capture templates
 :PROPERTIES:
 :CREATED:  [2018-12-28 Fri 23:04]
@@ -1727,7 +1712,7 @@ From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 -
   (setq org-capture-templates
         '(("t" "TODO" entry
            (file+headline org-default-notes-file "Inbox")
-           (function my-org-capture-todo-template-generator)
+           "* TODO %?"
            :jump-to-captured t :empty-lines 1)
 
           ("m" "Misc" entry
@@ -1747,16 +1732,6 @@ From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 -
 
           ("sv" "Vim snippets" entry (file "Software/vim.org")
            "* %?"
-           :jump-to-captured t :empty-lines 1)
-
-          ("p" "Protocol" entry
-           (file+headline org-default-notes-file "Inbox")
-           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?"
-           :jump-to-captured t :empty-lines 1)
-
-          ("L" "Protocol Link" entry
-           (file+headline ,(concat org-directory "notes.org") "Inbox")
-           "* %? [[%:link][%:description]]"
            :jump-to-captured t :empty-lines 1)))
 #+end_src
 
