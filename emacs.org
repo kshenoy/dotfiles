@@ -94,7 +94,7 @@ Install packages automatically
 :LOGBOOK:
 - State "TODO"       from              [2019-01-27 Sun 10:59]
 :END:
-quelpa and quelpa-use-package seem to support this
+[[https://framagit.org/steckerhalter/quelpa-use-package][quelpa]] and [[https://github.com/benaiah/quelpa-use-package-bootstrap-config][quelpa-use-package]] seem to support this
 
 * General
 ** custom file
@@ -1729,12 +1729,12 @@ From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 -
            "* TODO %?"
            :jump-to-captured t :empty-lines 1)
 
-          ("c" "Misc" entry
+          ("m" "Misc" entry
            (file+headline org-default-notes-file "Inbox")
            "* %?"
            :jump-to-captured t :empty-lines 1)
 
-          ("s"  "Code snippets")
+          ("s" "Snippets")
 
           ("se" "Emacs snippets" entry (file "Software/emacs.org")
            "* %?"
