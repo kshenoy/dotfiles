@@ -970,12 +970,25 @@ Provides =g~= operator to cycle between snake_case → SCREAMING_SNAKE_CASE → 
 References:
 - https://www.reddit.com/r/emacs/comments/931la6/tip_how_to_adopt_flycheck_as_your_new_best_friend/
 
+Also disable some checks when in org-src-mode
 #+begin_src emacs-lisp
   (use-package flycheck
-    :hook ((prog-mode . flycheck-mode))
+    :hook ((prog-mode . flycheck-mode)
+           (org-src-mode . (lambda() (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))))
     :custom
     (flycheck-gcc-language-standard "c++14")
     (flycheck-clang-language-standard "c++14"))
+#+end_src
+
+** flyspell
+:PROPERTIES:
+:ID:       9520b3bd-2201-468d-b011-036a626410bc
+:CREATED:  [2019-01-30 Wed 10:46]
+:END:
+Deferred by default because I don't use it very often. Can be loaded on demand
+#+begin_src emacs-lisp
+  (use-package flyspell
+    :defer t)
 #+end_src
 
 ** hideshow
@@ -1156,8 +1169,10 @@ eg. To kill multiple buffers
     :after ivy
     :bind* ("C-M-s" . swiper-all)
     :init
-    (when (or (executable-find "grep") (executable-find "rg"))
-      (bind-key* "C-s" 'counsel-grep-or-swiper))
+    (if (or (executable-find "grep") (executable-find "rg"))
+        (bind-key* "C-s" 'counsel-grep-or-swiper)
+      (bind-key* "C-s" 'swiper))
+    :commands (counsel-grep-or-swiper swiper)
     :config
     (when (executable-find "rg")
       (setq counsel-grep-base-command
@@ -1190,7 +1205,8 @@ Use =C-c f= as prefix for all counsel-related keybindings
 #+begin_src emacs-lisp
   :bind (:map my-fuzzy-jumper-command-map
               ("/" . counsel-rg)
-         :map my-s-bindings-map
+              ("k" . counsel-bookmark)
+              :map my-s-bindings-map
               ("v" . counsel-set-variable))
 
   :config
@@ -1822,6 +1838,15 @@ This can then be used to create a capture frame
   emacsclient --create-frame --no-wait --socket-name=capture --frame-parameters='(quote (name . "capture"))' --eval "(my-make-capture-frame)"
 #+END_EXAMPLE
 
+***** TODO Get this running in Windows
+:PROPERTIES:
+:ID:       15dc9482-dc6b-4e44-b3a6-d28f7f12283e
+:CREATED:  [2019-01-30 Wed 09:53]
+:END:
+:LOGBOOK:
+- State "TODO"       from              [2019-01-30 Wed 09:53]
+:END:
+
 *** Keybindings
 :PROPERTIES:
 :ID:       ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7
@@ -2192,7 +2217,8 @@ Placing at end to be called after all packages are loaded
 * After
 ** Private config
 #+begin_src emacs-lisp
-  (when (string-match-p "atlibex" (system-name))
+  (when (or (and (eq system-type 'gnu/linux) (string-match-p "atlibex" (system-name)))
+            (and (eq system-type 'windows-nt) (string-match-p "MHDC" (system-name))))
     (load (expand-file-name "private_work.el" user-emacs-directory) t))
 #+end_src
 
