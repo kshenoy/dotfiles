@@ -18,9 +18,9 @@ $(basename $(orgs))::
 
 emacs::
 	command mkdir -p ~/.emacs.d
-	@$(MKLINK) emacs.d/private_work.el ~/.emacs.d/private_work.el
-	@$(MKLINK) emacs.d/snippets        ~/.emacs.d/snippets
+	@$(MKLINK) $(CURDIR)/emacs.d/private_work.el ~/.emacs.d/private_work.el
+	@$(MKLINK) $(CURDIR)/emacs.d/snippets        ~/.emacs.d/snippets
 
 git::
 	command mkdir -p ~/.config/git
-	@$(MKLINK) gitignore ~/.config/git/ignore
+	@$(MKLINK) $(CURDIR)/gitignore ~/.config/git/ignore
