@@ -521,7 +521,13 @@ Misc info:
 =list-faces-display= - List all faces with colors and sample text
 =list-colors-display= - List all colors with their names
 
-*** Unload all loaded themes before loading new theme
+*** TODO Unload all loaded themes before loading new theme
+:PROPERTIES:
+:CREATED:  [2019-01-24 Thu 22:22]
+:END:
+:LOGBOOK:
+- State "TODO"       from              [2019-01-24 Thu 22:22]
+:END:
 http://www.greghendershott.com/2017/02/emacs-themes.html
 By default emacs layers the new theme on top of all previously applied themes.
 #+begin_src emacs-lisp
@@ -540,9 +546,9 @@ Emacs doesn't have a native hook that is called after a theme has loaded. So we'
     (run-hooks 'after-load-theme-hook))
 #+end_src
 
-#+BEGIN_EXAMPLE
+#+begin_src emacs-lisp :tangle no
   (add-hook 'after-load-theme-hook (lambda() (message "Theme loaded")))
-#+END_EXAMPLE
+#+end_src
 
 #+begin_src emacs-lisp :tangle no
   (add-hook 'after-load-theme-hook
@@ -966,6 +972,16 @@ Provides =g~= operator to cycle between snake_case → SCREAMING_SNAKE_CASE → 
     :config (global-evil-visualstar-mode))
 #+end_src
 
+*** TODO evil TextObjects
+:PROPERTIES:
+:ID:       ec55d8a3-997b-4c81-aeb3-ba7fc1214c43
+:CREATED:  [2019-01-25 Fri 17:44]
+:END:
+:LOGBOOK:
+- State "TODO"       from              [2019-01-25 Fri 17:44]
+:END:
+http://seanbowman.me/blog/emacs-evil-function-objects/
+
 ** flycheck
 References:
 - https://www.reddit.com/r/emacs/comments/931la6/tip_how_to_adopt_flycheck_as_your_new_best_friend/
@@ -1300,7 +1316,7 @@ I specifically grab [[https://orgmode.org/worg/org-contrib/index.html][org-plus-
 - use contributed packages such as [[https://code.orgmode.org/bzg/org-mode/raw/master/contrib/lisp/org-expiry.el][org-expiry]], [[https://orgmode.org/worg/org-contrib/org-drill.html][org-drill]] and org-id
 I do this by leveraging [[:ensure]] and [[:pin]]
 
-Resources: [[http://orgmode.org/worg/org-configs/org-customization-guide.html][Customization guide]], [[https://www.reddit.com/r/emacs/comments/8nvnlu/extending_orgmode/dzz1el9][Extensions]]
+Resources: [[http://doc.norang.ca/org-mode.html][Organize Your Life in Plain Text]], [[http://orgmode.org/worg/org-configs/org-customization-guide.html][Customization guide]], [[https://www.reddit.com/r/emacs/comments/8nvnlu/extending_orgmode/dzz1el9][Extensions]]
 
 #+name: org-config
 #+begin_src emacs-lisp
@@ -1465,9 +1481,6 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 :ID:       851ad87b-250e-4c1e-83b1-6b4e1fa6b20d
 :CREATED:  [2019-01-11 Fri 13:03]
 :END:
-:LOGBOOK:
-- State "FIXME"      from "TODO"       [2019-01-27 Sun 20:30]
-:END:
 These should get added only if org-version < 9.2
 =?= in each string controls where the point will be placed after expansion
 #+begin_src emacs-lisp :tangle (if (org-string>= org-version "9.2") "no" "~/.emacs.d/init.el")
@@ -1595,6 +1608,9 @@ From [[http://emacs.stackexchange.com/questions/38062/configure-key-to-toggle-be
 #+end_src
 
 **** org-refile
+Resources:
+- [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Aaron Bieber - Organizing Notes with Refile]]
+
 By [[https://www.reddit.com/r/emacs/comments/4366f9/how_do_orgrefiletargets_work/czg008y/][/u/awalker4 on reddit]].
 Show upto 3 levels of headings from the current file and two levels of headings from all agenda files
 #+begin_src emacs-lisp
