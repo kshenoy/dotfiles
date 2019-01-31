@@ -1474,7 +1474,6 @@ Thus to get it to work as before using =<sc=, we have to add =org-tempo= to =org
   (add-to-list 'org-modules 'org-tempo)
 #+end_src
 
-
 **** Flatten links
 This is the counterpart to =org-insert-link=. From [[http://emacs.stackexchange.com/a/10714/9690][here]].
 #+begin_src emacs-lisp
@@ -1488,6 +1487,20 @@ This is the counterpart to =org-insert-link=. From [[http://emacs.stackexchange.
                              (org-match-string-no-properties 1))))
           (apply 'delete-region remove)
           (insert description))))
+#+end_src
+
+**** Combining setting and aligning of tags
+:PROPERTIES:
+:ID:       dec6b49c-e37f-40df-9870-769ed0e68d3b
+:CREATED:  [2019-01-29 Tue 22:56]
+:END:
+#+begin_src emacs-lisp
+  (defun my-org-set-align-tags (p)
+    "Set tags by calling counsel-org-tags and align tags as well.
+    If called with a prefix, only align tags"
+    (interactive "P")
+    (unless p (counsel-org-tag))
+    (org-align-tags))
 #+end_src
 
 **** Use ! to toggle timestamp type
@@ -1826,7 +1839,7 @@ Custom keymap for org-mode bindings.
 <<Custom timestamp keymap>>. Also see [[id:d4634d95-be37-4bdf-987e-22da5778e958][Using ! to toggle timestamp type]]
 
 #+begin_src emacs-lisp
-  (bind-key "C-c C-q" 'counsel-org-tag org-mode-map)
+  (bind-key "C-c C-q" 'my-org-set-align-tags org-mode-map)
 #+end_src
 
 Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
