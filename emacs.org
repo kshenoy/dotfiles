@@ -632,6 +632,39 @@ I'm using [[https://www.gnu.org/software/emacs/manual/html_mono/rcirc.html][rcir
     (rcirc-default-nick "kshenoy"))
 #+end_src
 
+*** Don't display names on Join/Leave
+:PROPERTIES:
+:ID:       ce06325b-1e07-476a-8659-6b5dd6d1b4ee
+:CREATED:  [2019-01-31 Thu 08:02]
+:END:
+https://www.emacswiki.org/emacs/rcircNoNamesOnJoin
+
+#+begin_src emacs-lisp
+  (defvar rcirc-hide-names-on-join t
+    "Non-nil if nick names list should be hidden when joining a channel.")
+
+  (defadvice rcirc-handler-353 (around my-aad-rcirc-handler-353 activate)
+    "Do not render NICK list on join when `rcirc-hide-names-on-join' is non-nil.
+   RPL_NAMREPLY."
+    (when (not rcirc-hide-names-on-join)
+      ad-do-it))
+
+  (defadvice rcirc-handler-366 (around my-aad-rcirc-handler-366 activate)
+    "Do not render NICK list on join when `rcirc-hide-names-on-join' is non-nil.
+   RPL_ENDOFNAMES."
+    (when (not rcirc-hide-names-on-join)
+      ad-do-it))
+
+  (defadvice rcirc-handler-JOIN (around my-before-ad-rcirc-handler-join-no-names activate)
+    "Set `rcirc-hide-names-on-join' to `t'."
+    ad-do-it
+    (setq rcirc-hide-names-on-join t))
+
+  (defadvice rcirc-cmd-names (before my-ad-rcirc-cmd-names-no-list activate)
+    "Reset rcirc-hide-names-on-join to nil after the JOIN step."
+    (setq rcirc-hide-names-on-join nil))
+#+end_src
+
 * Packages
 =(featurep 'FEATURE)= can be used to determine if the package has been loaded or not.
 eg. if we do =C-h f ivy-mode=, it says it's defined in /ivy.el/ and at the bottom of the file, we see =(provide 'ivy)=
@@ -640,6 +673,15 @@ Thus, ivy is the feature-name.
 Other examples:
 - /rainbow-mode/ is a mode provided by the file /rainbow-mode.el/ and the feature is also called /rainbow-mode/
 - /yas-minor-mode/ is a mode provided by the file /yasnippet.el/ and the feature is called /yasnippet/
+
+** TODO [[https://gitlab.com/to1ne/use-package-hydra][use-package-hydra]]
+:PROPERTIES:
+:CREATED:  [2019-01-31 Thu 07:55]
+:END:
+:LOGBOOK:
+- State "TODO"       from              [2019-01-31 Thu 07:55]
+:END:
+This is very useful but I think I'll need to switch to using quelpa first
 
 ** aggressive-indent
 #+begin_src emacs-lisp
@@ -1003,16 +1045,48 @@ http://seanbowman.me/blog/emacs-evil-function-objects/
 :ID:       49bd1e79-38fe-4046-86b2-5372e76496a1
 :CREATED:  [2019-01-30 Wed 20:25]
 :END:
-Makes it easy to save and restore windows layout eg. I have one window for rcirc, another for org-agenda and another for by regular buffers.
-I thought about using =gt= and =gT= but there are some buffers which are better used in emacs-state and these won't work there so I'm going to stick with =C-c w= for the moment.
+Makes it easy to save and restore windows layout (kinda like tabs). eg. I have one window for rcirc, another for org-agenda and another for regular buffers etc.
+I thought about using =gt= and =gT= but there are some buffers which are better used in emacs-state and, these won't work there so I'm going to stick with =C-c w= for the moment.
 #+begin_src emacs-lisp
   (use-package eyebrowse
     :init
-    (setq eyebrowse-keymap-prefix (kbd "C-c w"))
+    (setq eyebrowse-keymap-prefix (kbd "C-c W"))
     :custom
     (eyebrowse-wrap-around t)
     :config
-    (eyebrowse-mode t))
+    (eyebrowse-mode t)
+    (bind-key* "C-c w"
+               (defhydra hydra-eyebrowse (:color blue :hint nil)
+                 "
+    Edit       ^^^^|  Cycle      ^^^^|  Switch
+  -------------^^^^+-------------^^^^+----------
+    _c_reate     ^^|  _n_ext       ^^|  _._: _s_witch
+    _C_lose      ^^|  _p_revious   ^^|  [_0_-_9_]
+    _,_: _r_ename  |  _'_/_w_: last  |
+  "
+                 ;; Edit
+                 ("c" eyebrowse-create-window-config)
+                 ("C" eyebrowse-close-window-config)
+                 ("," eyebrowse-rename-window-config)
+                 ("r" eyebrowse-rename-window-config)
+                 ;; Cycle
+                 ("n" eyebrowse-next-window-config :color pink)
+                 ("p" eyebrowse-prev-window-config :color pink)
+                 ("'" eyebrowse-last-window-config)
+                 ("w" eyebrowse-last-window-config)
+                 ;; Switch
+                 ("." eyebrowse-switch-to-window-config)
+                 ("s" eyebrowse-switch-to-window-config)
+                 ("0" eyebrowse-switch-to-window-config-0)
+                 ("1" eyebrowse-switch-to-window-config-1)
+                 ("2" eyebrowse-switch-to-window-config-2)
+                 ("3" eyebrowse-switch-to-window-config-3)
+                 ("4" eyebrowse-switch-to-window-config-4)
+                 ("5" eyebrowse-switch-to-window-config-5)
+                 ("6" eyebrowse-switch-to-window-config-6)
+                 ("7" eyebrowse-switch-to-window-config-7)
+                 ("8" eyebrowse-switch-to-window-config-8)
+                 ("9" eyebrowse-switch-to-window-config-9))))
 #+end_src
 
 ** flycheck
@@ -1164,13 +1238,14 @@ eg. To kill multiple buffers
 
 #+begin_src emacs-lisp
   (bind-key "\C-o"
-    (defhydra soo-ivy (:hint nil :color pink)
+    (defhydra hydra-ivy (:hint nil :color pink)
       "
-   Move     ^^^^^^^^^^ | Call        ^^^^ | Cancel^^ | Options^^ | Action _w_/_s_ _o_: %s(ivy-action-name)
-  ----------^^^^^^^^^^-+-------------^^^^-+-------^^-+--------^^-+---------------------------------
-   _g_ ^ ^ _k_ ^ ^ _u_ | _f_ollow occu_r_ | _i_nsert | _c_alling: %-7s(if ivy-calling \"on\" \"off\") _C_ase-fold: %-10`ivy-case-fold-search
-   ^↕^ _h_ ^+^ _l_ ^↕^ | _RET_ done     ^^| _q_uit   | _m_atcher: %-7s(ivy--matcher-desc)^^^^^^^^^^^^ _t_runcate: %-11`truncate-lines
-   _G_ ^ ^ _j_ ^ ^ _d_ | _TAB_ alt-done ^^| ^ ^      | _<_/_>_: shrink/grow
+   Move       ^^^^^^^^^^|  Call          ^^|  Cancel  ^^|  Options  ^^|  Action _w_/_s_ _a_: %s(ivy-action-name)
+  ------------^^^^^^^^^^+----------------^^+----------^^+-----------^^+-------------------------------
+   _g_ ^ ^ _k_ ^ ^ _u_  |  e_x_ecute       |  _i_nsert  |  _c_alling: %-7s(if ivy-calling \"on\" \"off\")  _C_ase-fold: %-10`ivy-case-fold-search
+   ^↕^ _h_ ^+^ _l_ ^↕^  |  _RET_ done      |  _q_uit    |  _m_atcher: %-7s(ivy--matcher-desc)^^^^^^^^^^^^  _t_runcate: %-11`truncate-lines
+   _G_ ^ ^ _j_ ^ ^ _d_  |  _TAB_ alt-done  |          ^^|  _<_/_>_: shrink/grow
+             ^^^^^^^^^^ |  _o_ccur         |          ^^|
   "
       ;; arrows
       ("j" ivy-next-line)
@@ -1193,17 +1268,17 @@ eg. To kill multiple buffers
       ;; ("d" ivy-done :exit t)
       ("RET" ivy-done :exit t)
       ("C-m" ivy-done :exit t)
-      ("f" ivy-call)
+      ("x" ivy-call)
       ("c" ivy-toggle-calling)
       ("m" ivy-toggle-fuzzy)
       (">" ivy-minibuffer-grow)
       ("<" ivy-minibuffer-shrink)
       ("w" ivy-prev-action)
       ("s" ivy-next-action)
-      ("o" ivy-read-action)
+      ("a" ivy-read-action)
       ("t" (setq truncate-lines (not truncate-lines)))
       ("C" ivy-toggle-case-fold)
-      ("r" ivy-occur :exit t))
+      ("o" ivy-occur :exit t))
     ivy-minibuffer-map)
 #+end_src
 
