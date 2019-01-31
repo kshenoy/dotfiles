@@ -461,7 +461,7 @@ Use ~(">=" . (?\s (Br . Bl) ?\s (Bc . Bc) ?≥))~ instead of =?≥=
 Use only spaces and no tabs
 #+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil
-                show-trailing-whitespace t
+                show-trailing-whitespace nil
                 sh-basic-offset 2)
 
   (setq sentence-end-double-space nil) ; Count 1 space after a period as the end of a sentence, instead of 2
@@ -614,6 +614,22 @@ So, I have to disable this explicitly
 #+begin_src emacs-lisp
   (add-to-list 'default-frame-alist
                '(vertical-scroll-bars . nil))
+#+end_src
+
+** IRC
+:PROPERTIES:
+:ID:       81b84d7b-1c28-4f0a-9039-e80af8063881
+:CREATED:  [2019-01-30 Wed 20:12]
+:END:
+I'm using [[https://www.gnu.org/software/emacs/manual/html_mono/rcirc.html][rcirc]] to ask questions on IRC about... emacs and vim :/
+#+begin_src emacs-lisp
+  (use-package rcirc
+    :commands rcirc
+    :custom
+    (rcirc-time-format "[%H:%M] ")
+    (rcirc-fill-column 'window-text-width)
+    (rcirc-bright-nicks (quote ("kshenoy" "kshenoy42" "Ronin" "Ronin42")))
+    (rcirc-default-nick "kshenoy"))
 #+end_src
 
 * Packages
@@ -981,6 +997,23 @@ Provides =g~= operator to cycle between snake_case → SCREAMING_SNAKE_CASE → 
 - State "TODO"       from              [2019-01-25 Fri 17:44]
 :END:
 http://seanbowman.me/blog/emacs-evil-function-objects/
+
+** [[https://github.com/wasamasa/eyebrowse][eyebrowse]]
+:PROPERTIES:
+:ID:       49bd1e79-38fe-4046-86b2-5372e76496a1
+:CREATED:  [2019-01-30 Wed 20:25]
+:END:
+Makes it easy to save and restore windows layout eg. I have one window for rcirc, another for org-agenda and another for by regular buffers.
+I thought about using =gt= and =gT= but there are some buffers which are better used in emacs-state and these won't work there so I'm going to stick with =C-c w= for the moment.
+#+begin_src emacs-lisp
+  (use-package eyebrowse
+    :init
+    (setq eyebrowse-keymap-prefix (kbd "C-c w"))
+    :custom
+    (eyebrowse-wrap-around t)
+    :config
+    (eyebrowse-mode t))
+#+end_src
 
 ** flycheck
 References:
