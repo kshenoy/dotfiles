@@ -625,11 +625,27 @@ I'm using [[https://www.gnu.org/software/emacs/manual/html_mono/rcirc.html][rcir
 #+begin_src emacs-lisp
   (use-package rcirc
     :commands rcirc
+
     :custom
     (rcirc-time-format "[%H:%M] ")
     (rcirc-fill-column 'window-text-width)
     (rcirc-bright-nicks (quote ("kshenoy" "kshenoy42" "Ronin" "Ronin42")))
-    (rcirc-default-nick "kshenoy"))
+    (rcirc-default-nick "kshenoy")
+#+end_src
+
+Use better colors. I should probably make this a part of the theme but I'm going to keep it here for now
+#+begin_src emacs-lisp
+    :custom-face
+    (rcirc-other-nick ((t (:foreground "#859900"))))
+    (rcirc-bright-nick ((t (:inherit rcirc-other-nick :underline t))))
+    (rcirc-dim-nick ((t (:foreground "#93a1a1"))))
+    (rcirc-my-nick ((t (:foreground "#cb4b16"))))
+    (rcirc-nick-in-message ((t (:inherit rcirc-my-nick))))
+    (rcirc-nick-in-message-full-line ((t (:slant italic))))
+    (rcirc-server ((t (:foreground "#268bd2"))))
+    (rcirc-server-prefix ((t (:inherit rcirc-server))))
+    (rcirc-prompt ((t (:inherit rcirc-server))))
+    (rcirc-url ((t (:foreground "royal blue")))))
 #+end_src
 
 *** Don't display names on Join/Leave
@@ -1050,43 +1066,51 @@ I thought about using =gt= and =gT= but there are some buffers which are better 
 #+begin_src emacs-lisp
   (use-package eyebrowse
     :init
-    (setq eyebrowse-keymap-prefix (kbd "C-c W"))
+    (setq eyebrowse-keymap-prefix (kbd "C-c w"))
     :custom
     (eyebrowse-wrap-around t)
     :config
-    (eyebrowse-mode t)
-    (bind-key* "C-c w"
-               (defhydra hydra-eyebrowse (:color blue :hint nil)
-                 "
+    (eyebrowse-mode t))
+#+end_src
+
+I thought about using a hydra instead of the default keybindings but the default keybindings work just fine. They're similar to tmux's bindings making it easy to remember.
+Besides, the trouble with hydra is if I just want to switch quickly, the hydra display still pops up for a bit which is kinda distracting.
+#+begin_src emacs-lisp :noweb-ref hydra-eyebrowse :tangle no
+  (bind-key* "C-c w" 'hydra-eyebrowse/body)
+
+  (defhydra hydra-eyebrowse (:color blue :hint nil)
+    "
     Edit       ^^^^|  Cycle      ^^^^|  Switch
   -------------^^^^+-------------^^^^+----------
     _c_reate     ^^|  _n_ext       ^^|  _._: _s_witch
     _C_lose      ^^|  _p_revious   ^^|  [_0_-_9_]
     _,_: _r_ename  |  _'_/_w_: last  |
   "
-                 ;; Edit
-                 ("c" eyebrowse-create-window-config)
-                 ("C" eyebrowse-close-window-config)
-                 ("," eyebrowse-rename-window-config)
-                 ("r" eyebrowse-rename-window-config)
-                 ;; Cycle
-                 ("n" eyebrowse-next-window-config :color pink)
-                 ("p" eyebrowse-prev-window-config :color pink)
-                 ("'" eyebrowse-last-window-config)
-                 ("w" eyebrowse-last-window-config)
-                 ;; Switch
-                 ("." eyebrowse-switch-to-window-config)
-                 ("s" eyebrowse-switch-to-window-config)
-                 ("0" eyebrowse-switch-to-window-config-0)
-                 ("1" eyebrowse-switch-to-window-config-1)
-                 ("2" eyebrowse-switch-to-window-config-2)
-                 ("3" eyebrowse-switch-to-window-config-3)
-                 ("4" eyebrowse-switch-to-window-config-4)
-                 ("5" eyebrowse-switch-to-window-config-5)
-                 ("6" eyebrowse-switch-to-window-config-6)
-                 ("7" eyebrowse-switch-to-window-config-7)
-                 ("8" eyebrowse-switch-to-window-config-8)
-                 ("9" eyebrowse-switch-to-window-config-9))))
+    ;; Edit
+    ("c" eyebrowse-create-window-config)
+    ("C" eyebrowse-close-window-config)
+    ("," eyebrowse-rename-window-config)
+    ("r" eyebrowse-rename-window-config)
+
+    ;; Cycle
+    ("n" eyebrowse-next-window-config :color pink)
+    ("p" eyebrowse-prev-window-config :color pink)
+    ("'" eyebrowse-last-window-config)
+    ("w" eyebrowse-last-window-config)
+
+    ;; Switch
+    ("." eyebrowse-switch-to-window-config)
+    ("s" eyebrowse-switch-to-window-config)
+    ("0" eyebrowse-switch-to-window-config-0)
+    ("1" eyebrowse-switch-to-window-config-1)
+    ("2" eyebrowse-switch-to-window-config-2)
+    ("3" eyebrowse-switch-to-window-config-3)
+    ("4" eyebrowse-switch-to-window-config-4)
+    ("5" eyebrowse-switch-to-window-config-5)
+    ("6" eyebrowse-switch-to-window-config-6)
+    ("7" eyebrowse-switch-to-window-config-7)
+    ("8" eyebrowse-switch-to-window-config-8)
+    ("9" eyebrowse-switch-to-window-config-9))
 #+end_src
 
 ** flycheck
@@ -1137,7 +1161,7 @@ Code-folding. From https://github.com/mwfogleman/.emacs.d/blob/master/michael.or
   (use-package hydra)
 #+end_src
 
-Currently I'm using this only for =ivy-hydra=. More ideas in https::/github.com/kana/vim-submode
+More ideas in https::/github.com/kana/vim-submode
 
 ** FIXME COMMENT irony
 :PROPERTIES:
@@ -1237,49 +1261,49 @@ eg. To kill multiple buffers
 - Pressing =f= keeps the hydra menu open to allow selecting other buffers to execute the selected action
 
 #+begin_src emacs-lisp
-  (bind-key "\C-o"
-    (defhydra hydra-ivy (:hint nil :color pink)
-      "
-   Move       ^^^^^^^^^^|  Call          ^^|  Cancel  ^^|  Options  ^^|  Action _w_/_s_ _a_: %s(ivy-action-name)
-  ------------^^^^^^^^^^+----------------^^+----------^^+-----------^^+-------------------------------
-   _g_ ^ ^ _k_ ^ ^ _u_  |  e_x_ecute       |  _i_nsert  |  _c_alling: %-7s(if ivy-calling \"on\" \"off\")  _C_ase-fold: %-10`ivy-case-fold-search
-   ^↕^ _h_ ^+^ _l_ ^↕^  |  _RET_ done      |  _q_uit    |  _m_atcher: %-7s(ivy--matcher-desc)^^^^^^^^^^^^  _t_runcate: %-11`truncate-lines
-   _G_ ^ ^ _j_ ^ ^ _d_  |  _TAB_ alt-done  |          ^^|  _<_/_>_: shrink/grow
-             ^^^^^^^^^^ |  _o_ccur         |          ^^|
+  (bind-key "C-o"
+            (defhydra hydra-ivy (:hint nil :color pink)
+              "
+    Move         ^^^^^^^^^^|  Call           ^^|  Cancel  ^^|  Options  ^^|  Action _w_/_s_ _a_: %s(ivy-action-name)
+  ---------------^^^^^^^^^^+-----------------^^+----------^^+-----------^^+-------------------------------
+    _g_  ^ ^ _k_ ^ ^  _u_  |  e_x_ecute        |  _i_nsert  |  _c_alling: %-7s(if ivy-calling \"on\" \"off\")  _C_ase-fold: %-10`ivy-case-fold-search
+    ^↕^  _h_ ^+^ _l_  ^↕^  |  _RET_: done      |  _q_uit    |  _m_atcher: %-7s(ivy--matcher-desc)^^^^^^^^^^^^  _t_runcate: %-11`truncate-lines
+    _G_  ^ ^ _j_ ^ ^  _d_  |  _TAB_: alt-done  |          ^^|  _<_/_>_: shrink/grow
+                 ^^^^^^^^^^|  _o_ccur          |          ^^|
   "
-      ;; arrows
-      ("j" ivy-next-line)
-      ("k" ivy-previous-line)
-      ("l" ivy-alt-done)
-      ("h" ivy-backward-delete-char)
-      ("g" ivy-beginning-of-buffer)
-      ("G" ivy-end-of-buffer)
-      ("d" ivy-scroll-up-command)
-      ("u" ivy-scroll-down-command)
-      ("e" ivy-scroll-down-command)
-      ;; actions
-      ("q" keyboard-escape-quit :exit t)
-      ("C-g" keyboard-escape-quit :exit t)
-      ("<escape>" keyboard-escape-quit :exit t)
-      ("C-o" nil)
-      ("i" nil)
-      ("TAB" ivy-alt-done :exit nil)
-      ("C-j" ivy-alt-done :exit nil)
-      ;; ("d" ivy-done :exit t)
-      ("RET" ivy-done :exit t)
-      ("C-m" ivy-done :exit t)
-      ("x" ivy-call)
-      ("c" ivy-toggle-calling)
-      ("m" ivy-toggle-fuzzy)
-      (">" ivy-minibuffer-grow)
-      ("<" ivy-minibuffer-shrink)
-      ("w" ivy-prev-action)
-      ("s" ivy-next-action)
-      ("a" ivy-read-action)
-      ("t" (setq truncate-lines (not truncate-lines)))
-      ("C" ivy-toggle-case-fold)
-      ("o" ivy-occur :exit t))
-    ivy-minibuffer-map)
+              ;; arrows
+              ("j" ivy-next-line)
+              ("k" ivy-previous-line)
+              ("l" ivy-alt-done)
+              ("h" ivy-backward-delete-char)
+              ("g" ivy-beginning-of-buffer)
+              ("G" ivy-end-of-buffer)
+              ("d" ivy-scroll-up-command)
+              ("u" ivy-scroll-down-command)
+              ("e" ivy-scroll-down-command)
+              ;; actions
+              ("q" keyboard-escape-quit :exit t)
+              ("C-g" keyboard-escape-quit :exit t)
+              ("<escape>" keyboard-escape-quit :exit t)
+              ("C-o" nil)
+              ("i" nil)
+              ("TAB" ivy-alt-done :exit nil)
+              ("C-j" ivy-alt-done :exit nil)
+              ;; ("d" ivy-done :exit t)
+              ("RET" ivy-done :exit t)
+              ("C-m" ivy-done :exit t)
+              ("x" ivy-call)
+              ("c" ivy-toggle-calling)
+              ("m" ivy-toggle-fuzzy)
+              (">" ivy-minibuffer-grow)
+              ("<" ivy-minibuffer-shrink)
+              ("w" ivy-prev-action)
+              ("s" ivy-next-action)
+              ("a" ivy-read-action)
+              ("t" (setq truncate-lines (not truncate-lines)))
+              ("C" ivy-toggle-case-fold)
+              ("o" ivy-occur :exit t))
+            ivy-minibuffer-map)
 #+end_src
 
 **** /fin/
