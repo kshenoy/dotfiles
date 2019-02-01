@@ -2,6 +2,8 @@
 #+PROPERTY: header-args :results output silent :tangle ~/.emacs.d/init.el :noweb tangle :comments both :mkdirp yes
 #+TODO: TODO(!) FIXME(!) |
 
+/This file is best viewed in org-mode in emacs as github doesn't do a good job of parsing links which use the ID Property/
+
 * Literate config
 [[https://org-babel.readthedocs.io/en/latest/header-args/][header-args]]:
 - =:tangle yes=
@@ -18,14 +20,14 @@ This adds all the non-code related text as comments in the tangled file. It also
 - [[https://www.youtube.com/watch?v=49kBWM3RQQ8&list=PL9KxKa8NpFxIcNQa9js7dQQIHc81b0-Xg][YouTube: Mike Zamansky - Using Emacs]]
 - [[https://www.youtube.com/watch?v=d6iY_1aMzeg&list=PLX2044Ew-UVVv31a0-Qn3dA6Sd_-NyA1n][YouTube: Uncle Dave - Emacs Tutorial]]
 - [[https://www.youtube.com/playlist?list=PLrFss89N5XNw8rTgI2fVhSj9Y62TpphFI][YouTube: Yisrael Dov - Emacs is Great]]
-- https://github.com/caisah/emacs.dz
+- [[https://github.com/caisah/emacs.dz][Curated list of "nice" config files]]
 - [[http://wolfecub.github.io/dotfiles/][Wolfe's Literate Emacs Config]]
 - [[https://huytd.github.io/emacs-from-scratch.html][Emacs from scratch]]
 - [[https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org][AngryBacon]]
 - [[https://to1ne.gitlab.io/literate-dotfiles/][Toon's Literate Dotfiles]]
 - https://brainlessdeveloper.com/2017/12/27/making-emacs-work-like-my-vim-setup/
 
-** COMMENT Debugging
+** Debugging
 :PROPERTIES:
 :ID:       4e219760-3d5e-4a51-9837-8f24298b44d9
 :CREATED:  [2019-01-15 Tue 05:25]
@@ -41,7 +43,7 @@ Use =C-u C-M-x= with the point over the function to debug. This puts us into deb
 | q   | Quit           |
 
 Setting this gives a backtrace
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (setq debug-on-error t)
 #+end_src
 
@@ -53,6 +55,40 @@ Setting this gives a backtrace
   ;; Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
   ;; If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
 #+end_src
+
+** Using noweb references
+:PROPERTIES:
+:ID:       b19befdb-eada-4d1b-b48c-be04122e4ddf
+:CREATED:  [2019-02-01 Fri 08:45]
+:END:
+[[https://necromuralist.github.io/posts/org-babel-noweb-ref/][Inserting text from different blocks]], [[https://org-babel.readthedocs.io/en/latest/header-args/#noweb][noweb header-args]]
+Occasionally I use noweb references to insert text from one source block in another. I do this when I think it's useful to explain a particular section in more detail but at the same time I don't want to clutter the place where it's used at.
+
+There are two ways I go about it:
+1. The first way is to specify =:noweb-ref NAME= in the source block's header-args eg.
+   #+begin_example
+     #+begin_src emacs-lisp :noweb-ref MY_BLK_NAME
+     #+end_src
+   #+end_example
+
+   I can then use this in another block like this
+   #+begin_example
+     #+begin_src emacs-lisp
+       <<MY_BLK_NAME>>
+     #+end_src
+   #+end_example
+
+2. The other way is by specifying an explicit name for the source block
+   #+begin_example
+     #+name: MY_BLK_NAME
+     #+begin_src emacs-lisp
+     #+end_src
+   #+end_example
+
+   and it can be used in the same way. However, this has the added advantage of allowing me to create links to it:
+   #+begin_example
+     [[MY_BLK_NAME][Link to block called MY_BLK_NAME]]
+   #+end_example
 
 * Bootstrap the package manager
 :PROPERTIES:
@@ -2048,12 +2084,11 @@ Syntax highlighting when exporting to HTML? Yes, please!
   (use-package org-agenda
     :after org
     :ensure nil
+    :init
 #+end_src
 
-**** :init
-Don't add some files to the agenda
+**** Don't add some files to the agenda
 #+begin_src emacs-lisp
-  :init
   (setq org-agenda-files
         (seq-filter (lambda (x)
                       (and 'file-exists-p
@@ -2066,23 +2101,34 @@ Don't add some files to the agenda
 **** :config
 #+begin_src emacs-lisp
   :config
-  (setq org-agenda-tags-column -120)          ; Monitors are wide, might as well use it :/
-  (setq org-agenda-skip-scheduled-if-done t)  ; Why isn't this default?
-  (setq org-agenda-skip-deadline-if-done t)
-  (setq org-agenda-window-setup 'only-window)
-  (setq org-agenda-restore-windows-after-quit t)
 #+end_src
 
-Show the previous 7 days as well in the agenda. Also, force agenda to start on a Monday.
-Hence, these two combined always show entries starting from the previous Monday.
-Source: https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/
+This sets up how I want my org-agenda to be displayed - I want it to be the only thing visible.
+I'm using eyebrowse to switch window layouts. One of the layouts is just org-agenda so I don't care about restoring the windows after quitting.
 #+begin_src emacs-lisp
-  (setq org-agenda-start-day "-7d")
-  (setq org-agenda-start-on-weekday 1)
+  (setq org-agenda-window-setup 'only-window
+        ;; org-agenda-restore-windows-after-quit t
+        setq org-agenda-compact-blocks t)
+#+end_src
+
+By default, the agenda only shows the next 7 days. I want to see the previous 7 days as well just in case I missed something.
+Also, force it to start on a Monday as a week starts on a Monday. Sat and Sun are called week-ends.
+Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
+#+name: org-agenda-cfg-span
+#+begin_src emacs-lisp
+  (setq org-agenda-start-day "-7d"
+        org-agenda-start-on-weekday 1
+        org-agenda-span 14)
+#+end_src
+
+I don't want to see completed tasks
+#+begin_src emacs-lisp
+  (setq org-agenda-skip-scheduled-if-done t)  ; Why isn't this default?
+  (setq org-agenda-skip-deadline-if-done t)
 #+end_src
 
 **** org-agenda custom commands
-Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html
+These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html][Aaron Bieber: An agenda for life with org-mode]]
 #+begin_src emacs-lisp
   (defun my-org-skip-subtree-if-habit ()
     "Skip an agenda entry if it has a STYLE property equal to \"habit\"."
@@ -2101,33 +2147,70 @@ Based on https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mod
       (if (= pri-value pri-current)
           subtree-end
         nil)))
+#+end_src
 
+Note that I'm [[id:b19befdb-eada-4d1b-b48c-be04122e4ddf][using a noweb-ref]] here to insert the custom-commands. This allows me to construct each custom-command separately and describe it at length.
+#+begin_src emacs-lisp
   (setq org-agenda-custom-commands
-        '(("d" "Daily agenda and all TODOs"
-           ((tags "PRIORITY=\"A\""
-                  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                   (org-agenda-overriding-header "High-priority unfinished tasks:")))
-            (agenda "" ((org-agenda-span 14)))
-            (alltodo ""
-                     ((org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
-                                                     (my-org-skip-subtree-if-priority ?A)
-                                                     (org-agenda-skip-if nil '(scheduled deadline))))
-                      (org-agenda-overriding-header "ALL normal priority tasks:"))))
-           ((org-agenda-compact-blocks t)))
+        '(
+          <<org-agenda-daily>>
+          <<org-agenda-work>>
+          ))
+#+end_src
 
-          ("w" "Daily agenda and all TODOs for Work"
-           ((tags "PRIORITY=\"A\""
-                  ((org-agenda-tag-filter-preset '("+Work"))
-                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                   (org-agenda-overriding-header "High-priority unfinished tasks:")))
-            (agenda "" ((org-agenda-span 14)))
-            (alltodo ""
-                     ((org-agenda-tag-filter-preset '("+Work"))
-                      (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
-                                                     (my-org-skip-subtree-if-priority ?A)
-                                                     (org-agenda-skip-if nil '(scheduled deadline))))
-                      (org-agenda-overriding-header "ALL normal priority tasks:"))))
-           ((org-agenda-compact-blocks t)))))
+***** Daily agenda
+:PROPERTIES:
+:ID:       63183f4f-4f14-4d99-9403-40233eecab9a
+:CREATED:  [2019-02-01 Fri 08:44]
+:END:
+I want my agenda to consist of 3 sections
+1. all the high priority tasks that are still pending
+2. an agenda showing the previous as well as the current week which I've [[org-agenda-cfg-span][configured]] above.
+3. all the remaining todos (minus the high priority ones because why repeat it)
+#+begin_src emacs-lisp :noweb-ref org-agenda-daily :tangle no
+  ("d" "Daily agenda and all TODOs"
+   (
+    <<org-agenda-daily-high-priority>>
+    (agenda "")
+    <<org-agenda-daily-alltodo>>
+    ))
+#+end_src
+
+#+begin_src emacs-lisp :noweb-ref org-agenda-daily-high-priority :tangle no
+  (tags "PRIORITY=\"A\""
+        ((org-agenda-overriding-header "High-priority unfinished tasks:")
+         (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
+#+end_src
+
+Maybe I'll want to split this later into two sections - normal and low priority but this is good for now
+#+begin_src emacs-lisp :noweb-ref org-agenda-daily-alltodo :tangle no
+  (alltodo ""
+           ((org-agenda-overriding-header "ALL normal priority tasks:")
+            (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
+                                           (my-org-skip-subtree-if-priority ?A)
+                                           (org-agenda-skip-if nil '(scheduled deadline))))))
+#+end_src
+
+***** Work agenda
+:PROPERTIES:
+:ID:       c261a3fe-f9d8-4692-81f7-5de701ad53e9
+:CREATED:  [2019-02-01 Fri 08:44]
+:END:
+My work agenda is very similar to my daily agenda except that it only uses my work related org files as source and I want it show me the next two weeks instead of just the next week.
+So, I'm going to reuse sections from the daily agenda wherever possible. noweb references FTW!
+#+begin_src emacs-lisp :noweb-ref org-agenda-work :tangle no
+  ("w" "Daily agenda and all TODOs for Work"
+   (
+    <<org-agenda-daily-high-priority>>
+    (agenda "" ((org-agenda-span 21)))
+    <<org-agenda-daily-alltodo>>
+   )
+#+end_src
+
+These settings will apply to all the cmd-types in this custom-command so all 3 sections will only pull from my work org files
+#+begin_src emacs-lisp :noweb-ref org-agenda-work :tangle no
+  ((org-agenda-files (list (expand-file-name "Work/" org-directory)))
+   ))
 #+end_src
 
 **** Keybindings
