@@ -629,23 +629,23 @@ I'm using [[https://www.gnu.org/software/emacs/manual/html_mono/rcirc.html][rcir
     :custom
     (rcirc-time-format "[%H:%M] ")
     (rcirc-fill-column 'window-text-width)
-    (rcirc-bright-nicks (quote ("kshenoy" "kshenoy42" "Ronin" "Ronin42")))
     (rcirc-default-nick "kshenoy")
+    (rcirc-prompt "%t> ")
 #+end_src
 
 Use better colors. I should probably make this a part of the theme but I'm going to keep it here for now
 #+begin_src emacs-lisp
-    :custom-face
-    (rcirc-other-nick ((t (:foreground "#859900"))))
-    (rcirc-bright-nick ((t (:inherit rcirc-other-nick :underline t))))
-    (rcirc-dim-nick ((t (:foreground "#93a1a1"))))
-    (rcirc-my-nick ((t (:foreground "#cb4b16"))))
-    (rcirc-nick-in-message ((t (:inherit rcirc-my-nick))))
-    (rcirc-nick-in-message-full-line ((t (:slant italic))))
-    (rcirc-server ((t (:foreground "#268bd2"))))
-    (rcirc-server-prefix ((t (:inherit rcirc-server))))
-    (rcirc-prompt ((t (:inherit rcirc-server))))
-    (rcirc-url ((t (:foreground "royal blue")))))
+  :custom-face
+  (rcirc-other-nick ((t (:foreground "#268bd2"))))
+  (rcirc-bright-nick ((t (:foreground "#d33682"))))
+  (rcirc-dim-nick ((t (:foreground "#93a1a1"))))
+  (rcirc-my-nick ((t (:foreground "#cb4b16"))))
+  (rcirc-nick-in-message ((t (:inherit rcirc-my-nick))))
+  (rcirc-nick-in-message-full-line ((t (:slant italic))))
+  (rcirc-server ((t (:foreground "#859900"))))
+  (rcirc-server-prefix ((t (:inherit rcirc-server))))
+  (rcirc-prompt ((t (:inherit rcirc-my-nick))))
+  (rcirc-url ((t (:inherit org-link)))))
 #+end_src
 
 *** Don't display names on Join/Leave
