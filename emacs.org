@@ -2108,7 +2108,7 @@ I'm using eyebrowse to switch window layouts. One of the layouts is just org-age
 #+begin_src emacs-lisp
   (setq org-agenda-window-setup 'only-window
         ;; org-agenda-restore-windows-after-quit t
-        setq org-agenda-compact-blocks t)
+        org-agenda-compact-blocks t)
 #+end_src
 
 By default, the agenda only shows the next 7 days. I want to see the previous 7 days as well just in case I missed something.
@@ -2164,26 +2164,60 @@ Note that I'm [[id:b19befdb-eada-4d1b-b48c-be04122e4ddf][using a noweb-ref]] her
 :CREATED:  [2019-02-01 Fri 08:44]
 :END:
 I want my agenda to consist of 3 sections
-1. all the high priority tasks that are still pending
-2. an agenda showing the previous as well as the current week which I've [[org-agenda-cfg-span][configured]] above.
-3. all the remaining todos (minus the high priority ones because why repeat it)
 #+begin_src emacs-lisp :noweb-ref org-agenda-daily :tangle no
   ("d" "Daily agenda and all TODOs"
    (
-    <<org-agenda-daily-high-priority>>
-    (agenda "")
-    <<org-agenda-daily-alltodo>>
-    ))
 #+end_src
 
-#+begin_src emacs-lisp :noweb-ref org-agenda-daily-high-priority :tangle no
+1. All the high priority tasks that are still pending
+#+begin_src emacs-lisp :noweb-ref org-agenda-daily :tangle no
   (tags "PRIORITY=\"A\""
         ((org-agenda-overriding-header "High-priority unfinished tasks:")
          (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
 #+end_src
 
-Maybe I'll want to split this later into two sections - normal and low priority but this is good for now
-#+begin_src emacs-lisp :noweb-ref org-agenda-daily-alltodo :tangle no
+2. An agenda showing the previous as well as the current week which I've [[org-agenda-cfg-span][configured]] above.
+#+begin_src emacs-lisp :noweb-ref org-agenda-daily :tangle no
+  (agenda "")
+#+end_src
+
+3. All the remaining todos (minus the high priority ones because why repeat it)
+#+begin_src emacs-lisp :noweb-ref org-agenda-daily :tangle no
+  (alltodo ""
+           ((org-agenda-overriding-header "ALL normal priority tasks:")
+            (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
+                                           (my-org-skip-subtree-if-priority ?A)
+                                           (org-agenda-skip-if nil '(scheduled deadline))))))
+  ))
+#+end_src
+
+Maybe I'll split the last one later into two sections - normal and low priority but this is good for now
+
+***** Work agenda
+:PROPERTIES:
+:ID:       c261a3fe-f9d8-4692-81f7-5de701ad53e9
+:CREATED:  [2019-02-01 Fri 08:44]
+:END:
+My work agenda is very similar to my daily agenda but it only uses my work related org files as source.
+#+begin_src emacs-lisp :noweb-ref org-agenda-work :tangle no
+  ("w" "Daily agenda and all TODOs for Work"
+   (
+#+end_src
+
+1. All the high priority tasks that are still pending
+#+begin_src emacs-lisp :noweb-ref org-agenda-work :tangle no
+  (tags "PRIORITY=\"A\""
+        ((org-agenda-overriding-header "High-priority unfinished tasks:")
+         (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
+#+end_src
+
+2. An agenda showing the previous as well as the next two weeks. This is different from my daily agenda and I have to specify the span explicitly.
+#+begin_src emacs-lisp :noweb-ref org-agenda-work :tangle no
+  (agenda "" ((org-agenda-span 21)))
+#+end_src
+
+3. All the remaining todos (minus the high priority ones because why repeat it)
+#+begin_src emacs-lisp :noweb-ref org-agenda-work :tangle no
   (alltodo ""
            ((org-agenda-overriding-header "ALL normal priority tasks:")
             (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
@@ -2191,34 +2225,15 @@ Maybe I'll want to split this later into two sections - normal and low priority 
                                            (org-agenda-skip-if nil '(scheduled deadline))))))
 #+end_src
 
-***** Work agenda
-:PROPERTIES:
-:ID:       c261a3fe-f9d8-4692-81f7-5de701ad53e9
-:CREATED:  [2019-02-01 Fri 08:44]
-:END:
-My work agenda is very similar to my daily agenda except that it only uses my work related org files as source and I want it show me the next two weeks instead of just the next week.
-So, I'm going to reuse sections from the daily agenda wherever possible. noweb references FTW!
-#+begin_src emacs-lisp :noweb-ref org-agenda-work :tangle no
-  ("w" "Daily agenda and all TODOs for Work"
-   (
-    <<org-agenda-daily-high-priority>>
-    (agenda "" ((org-agenda-span 21)))
-    <<org-agenda-daily-alltodo>>
-   )
-#+end_src
-
 These settings will apply to all the cmd-types in this custom-command so all 3 sections will only pull from my work org files
 #+begin_src emacs-lisp :noweb-ref org-agenda-work :tangle no
+   )
   ((org-agenda-files (list (expand-file-name "Work/" org-directory)))
    ))
 #+end_src
 
 **** Keybindings
 [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][General org keybindings]]
-#+begin_src emacs-lisp
-  :config
-#+end_src
-
 Open the custom "Daily agenda and all TODOs" directly. Based on [[http://emacs.stackexchange.com/a/868/9690][Emacs StackExchange]].
 #+begin_src emacs-lisp
   (bind-key* "<f12>" '(lambda (&optional arg) (interactive "P")(org-agenda arg "w")))
