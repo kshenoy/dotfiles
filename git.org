@@ -11,8 +11,9 @@
 
 ** [[https://git-scm.com/docs/gitglossary][Glossary]]
 A good way to understand git is to think of the repository as a tree where each commit comprises a node.
-This gives rise to the terminology of /trunk/ and /branch/. In git, the trunk is commonly referred to as the /master/.
-Technically, all branches are equal. However, one is designated as the default development branch and called /master/.
+This gives rise to the natural terminology of /trunk/ and /branch/. In git, the trunk is commonly referred to as the /master/.
+Technically, all branches are equal and there's nothing special about /master/.
+The only reason nearly every repository has one is that =git init= creates it by default.
 
 Furthermore, while all nodes are equal, some are used more often than other and we label them for ease of use.
 These labels are nothing but pointers to these nodes the way /head/ and /tail/ are pointers to specific elements of a queue.
@@ -108,6 +109,7 @@ From https://davidwalsh.name/git-remove-submodule
 Refer [[https://briancoyner.github.io/2013/06/05/git-sparse-checkout.html][this]].
 
 ** Branches
+https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell
 Each branch that exists always tracks the master and another branch.
 Eg. in github, when viewing a branch foo, it mentions how many commits ahead and/or behind it is behind something else, say bar.
 In that case, foo is said to be tracking bar
@@ -284,7 +286,7 @@ Open gitconfig file with my default editor
   cl = clone
   ci = commit
   co = checkout
-  br = branch
+  br = branch -a
 #+end_src
 
 Aliases for deleting the branch from various places
