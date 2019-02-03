@@ -681,7 +681,23 @@ Use better colors. I should probably make this a part of the theme but I'm going
   (rcirc-server ((t (:foreground "#859900"))))
   (rcirc-server-prefix ((t (:inherit rcirc-server))))
   (rcirc-prompt ((t (:inherit rcirc-my-nick))))
-  (rcirc-url ((t (:inherit org-link)))))
+  (rcirc-url ((t (:inherit org-link))))
+#+end_src
+
+*** Open rcirc in a new window-layout using eyebrowse
+:PROPERTIES:
+:ID:       b9c529de-8be7-4c3f-96bb-e4143b5d1d2c
+:CREATED:  [2019-02-02 Sat 23:08]
+:END:
+#+begin_src emacs-lisp
+  :config
+  (defun irc ()
+    "Simple wrapper which opens rcirc in a predefined window layout using eyebrowse"
+    (interactive)
+    (eyebrowse-switch-to-window-config 9)
+    (eyebrowse-rename-window-config 9 "IRC")
+    (delete-other-windows)
+    (rcirc nil))
 #+end_src
 
 *** Don't display names on Join/Leave
@@ -714,7 +730,7 @@ https://www.emacswiki.org/emacs/rcircNoNamesOnJoin
 
   (defadvice rcirc-cmd-names (before my-ad-rcirc-cmd-names-no-list activate)
     "Reset rcirc-hide-names-on-join to nil after the JOIN step."
-    (setq rcirc-hide-names-on-join nil))
+    (setq rcirc-hide-names-on-join nil)))
 #+end_src
 
 * Packages
