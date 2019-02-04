@@ -55,8 +55,9 @@ Set the default terminal mode to 256color mode
 #+end_src
 
 Sane scrolling (http://superuser.com/a/314620)
+24-bit color support (https://www.reddit.com/r/emacs/comments/8ndm2x/gnu_emacs_261_24bit_colors_suckless_st_terminal/dzwh4vv/)
 #+begin_src conf
-  set -ga terminal-overrides ',xterm*:smcup@:rmcup@'
+  set -ga terminal-overrides ',xterm*:smcup@:rmcup@,*256col*:Tc'
 #+end_src
 
 #+begin_src conf
@@ -128,8 +129,8 @@ Set the starting pane index to 1
 
 Make the active pane stand-out visually
 #+begin_src conf
-  set -g pane-border-fg        colour18
-  set -g pane-active-border-fg colour18
+  set -g pane-border-fg        colour0
+  set -g pane-active-border-fg colour19
 #+end_src
 
 ** Window configuration
