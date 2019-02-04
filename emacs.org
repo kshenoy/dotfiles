@@ -652,12 +652,12 @@ So, I have to disable this explicitly
                '(vertical-scroll-bars . nil))
 #+end_src
 
-** IRC
+** IRC using [[https://www.gnu.org/software/emacs/manual/html_mono/rcirc.html][rcirc]]
 :PROPERTIES:
 :ID:       81b84d7b-1c28-4f0a-9039-e80af8063881
 :CREATED:  [2019-01-30 Wed 20:12]
 :END:
-I'm using [[https://www.gnu.org/software/emacs/manual/html_mono/rcirc.html][rcirc]] to ask questions on IRC about... emacs and vim :/
+I'm using to rcirc access #emacs and #vim IRC channels on freenode
 #+begin_src emacs-lisp
   (use-package rcirc
     :commands rcirc
@@ -666,10 +666,12 @@ I'm using [[https://www.gnu.org/software/emacs/manual/html_mono/rcirc.html][rcir
     (rcirc-time-format "[%H:%M] ")
     (rcirc-fill-column 'window-text-width)
     (rcirc-default-nick "kshenoy")
+    (rcirc-server-alist '(("irc.freenode.net" :channels ("#emacs" "#vim"))))
     (rcirc-prompt "%t> ")
 #+end_src
 
-Use better colors. I should probably make this a part of the theme but I'm going to keep it here for now
+*** Use better colors
+I should probably make this a part of the theme but I'm going to keep it here for now
 #+begin_src emacs-lisp
   :custom-face
   (rcirc-other-nick ((t (:foreground "#268bd2"))))
@@ -684,13 +686,11 @@ Use better colors. I should probably make this a part of the theme but I'm going
   (rcirc-url ((t (:inherit org-link)))))
 #+end_src
 
-*** Don't display names on Join/Leave
+*** [[https://www.emacswiki.org/emacs/rcircNoNamesOnJoin][Don't display names when joining a channel]]
 :PROPERTIES:
 :ID:       ce06325b-1e07-476a-8659-6b5dd6d1b4ee
 :CREATED:  [2019-01-31 Thu 08:02]
 :END:
-https://www.emacswiki.org/emacs/rcircNoNamesOnJoin
-
 #+begin_src emacs-lisp
   (defvar rcirc-hide-names-on-join t
     "Non-nil if nick names list should be hidden when joining a channel.")
@@ -1257,16 +1257,26 @@ As a result, by default I have to choose one or the other; I can't have both. Th
     (let* ((ivy-use-virtual-buffers t))
       (ivy-switch-buffer)))
 
-  (defun my-p4-files ()
-    "Use fzf with perforce"
-    (let (counsel-fzf-cmd "p4 have $STEM/... | fzf -f \"%s\"")
-      (counsel-fzf)))
+  (defun my-counsel-p4 (&optional initial-input)
+    "Find file in the current Perforce repository.
+  INITIAL-INPUT can be given as the initial minibuffer input."
+    (interactive)
+    (counsel-require-program counsel-p4-cmd)
+    (let* ((default-directory (expand-file-name (counsel-locate-p4-root)))
+           (cands (split-string
+                   (shell-command-to-string counsel-p4-cmd)
+                   "\n"
+                   t)))
+      (ivy-read "Find file: " cands
+                :initial-input initial-input
+                :action #'counsel-git-action
+                :caller 'my-counsel-p4)))
 
   (defun my-file-finder ()
     "Context based file finding"
     (interactive)
     (cond ((locate-dominating-file default-directory ".git") (counsel-git))
-          ((locate-dominating-file default-directory "P4CONFIG") (my-p4-files))
+          ((locate-dominating-file default-directory "P4CONFIG") (my-counsel-p4))
           (t (counsel-fzf))))
 
   (bind-keys :map my-fuzzy-jumper-command-map
