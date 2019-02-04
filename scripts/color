@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+for row in {0..31}; do
+  echo
+
+  for col in {0..7}; do
+    color=$(( $row * 8 + $col ))
+    printf "$(tput setaf $color) %03d $(tput sgr0) " $color
+  done
+
+  printf "  "
+
+  for col in {0..7}; do
+    color=$(( $row * 8 + $col ))
+    printf "$(tput setab $color)      $(tput sgr0) " $color
+  done
+done

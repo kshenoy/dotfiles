@@ -99,13 +99,13 @@ Increase the time between refresh (Default=15)
 On the left we have the Session information
 #+begin_src conf
   set -g status-left-length 50
-  set -g status-left ' #[fg=colour1,bold]#S#[fg=colour7] #[fg=colour8]•'
+  set -g status-left ' #[fg=colour1,bold]#S#[fg=colour7] #[fg=colour20]•'
 #+end_src
 
 On the right I have information about running jobs, both local and on LSF and the clock
 #+begin_src conf
   set -g status-right-length 60
-  set -g status-right "#[fg=colour8]•#[fg=colour4] JOBS: #(command jobs -r 2>/dev/null | wc -l)r #(command jobs -s 2> /dev/null | wc -l)s #[fg=colour8]•#[fg=colour4] LSF: #(command lsf_bjobs -sum | tail -n1 | command awk '{print $1\"r \"$5\"p\"}') #[fg=colour8]• #[fg=colour3]%b %d, %a %H:%M "
+  set -g status-right "#[fg=colour20]•#[fg=colour4] JOBS: #(command jobs -r 2>/dev/null | wc -l)r #(command jobs -s 2> /dev/null | wc -l)s #[fg=colour20]•#[fg=colour4] LSF: #(command lsf_bjobs -sum | tail -n1 | command awk '{print $1\"r \"$5\"p\"}') #[fg=colour20]• #[fg=colour3]%b %d, %a %H:%M "
 #+end_src
 
 Enable activity alerts
