@@ -184,9 +184,14 @@ To delete existing bindings, use =(unbind-key ...)=
   (bind-key* "C-h B" 'describe-personal-keybindings)
 #+end_src
 
-By default C-x = is bound to /what-cursor-position/ but evil maps both =ga= and =g8= to that as well so might as well use it to show something useful.
+By default =C-h c= is bound to =describe-key-briefly= which seems wasted with =describe-key= doing a better job.
 #+begin_src emacs-lisp
-  (bind-key* "C-x =" 'describe-char)
+  (bind-key* "C-h c" 'describe-char)
+#+end_src
+
+By default C-x = is bound to =what-cursor-position=. With evil binding =g a= and =g 8= to the same function, it is wasted. Might as well bind it to calc
+#+begin_src emacs-lisp
+  (bind-key* "C-x =" 'calc)
 #+end_src
 
 In general, if the same binding exists for a key both with and without a modifier, then I try to remap only the one without the modifier.
@@ -1726,16 +1731,20 @@ This is the counterpart to =org-insert-link=. From [[http://emacs.stackexchange.
     (org-align-tags))
 #+end_src
 
-**** Use ! to toggle timestamp type
+**** FIXME Use ! to toggle timestamp type
 :PROPERTIES:
 :ID:       d4634d95-be37-4bdf-987e-22da5778e958
+:CREATED:  [2019-02-08 Fri 11:00]
+:END:
+:LOGBOOK:
+- State "FIXME"      from "TODO"       [2019-02-09 Sat 08:56]
+- State "TODO"       from              [2019-02-09 Sat 08:56]
 :END:
 [[https://orgmode.org/manual/Creating-timestamps.html][By default]], org-mode uses =C-c .= and =C-c != to create active and inactive timestamps respectively.
-However, I also have flycheck installed which uses the C-c ! binding.
+However, I also have flycheck installed which conflicts with the =C-c != binding.
 
-Thus, this allows me to use =C-c .= to insert a timestamp and when prompted to enter the date+time in the minibuffer,
-use =!= to toggle between active and inactive timestamps. Also see [[Custom timestamp keymap]].
-From [[http://emacs.stackexchange.com/questions/38062/configure-key-to-toggle-between-active-and-inactive-timestamps#38065][Emacs StackExchange]]
+This allows me to use =C-c .= to insert a timestamp and when prompted to enter the date+time in the minibuffer, use =!= to toggle between active and inactive timestamps.
+From [[http://emacs.stackexchange.com/questions/38062/configure-key-to-toggle-between-active-and-inactive-timestamps#38065][Emacs StackExchange]]. Also see [[Custom timestamp keymap]].
 
 #+begin_src emacs-lisp
   (defun org-toggle-time-stamp-activity ()
@@ -1789,7 +1798,7 @@ From [[http://emacs.stackexchange.com/questions/38062/configure-key-to-toggle-be
   (define-key org-read-date-minibuffer-local-map "!" #'org-time-stamp-toggle)
 
   (defun my-org-time-stamp (arg)
-    "Like `org-time-stamp' with ARG but toggle activity with character ?!."
+    "Like `org-time-stamp' with ARG but toggle activity with character !."
     (interactive "P")
     (setq my-org-time-stamp-toggle nil)
     (org-time-stamp arg)

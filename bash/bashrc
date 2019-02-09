@@ -289,7 +289,7 @@ for path in "$rubyGemPath" "${HOME}/.local/bin" "${HOME}/bin"; do
 done
 unset rubyGemPath
 
-for path in /usr/man /usr/share/man ${HOME}/.local/man; do
+for path in /usr/man /usr/share/man ${HOME}/.local/share/man; do
   if [[ -d "$path" ]] && [[ ! "$MANPATH" == *$path* ]]; then
     export MANPATH=$path:$MANPATH
   fi
