@@ -599,13 +599,13 @@ call plug#('triglav/vim-visual-increment', {'on': '<Plug>VisualIncrement'})
 
 " wordmotion ------------------------------------------------------------------------------------------------------ {{{1
 let g:wordmotion_mappings = {
-\ 'w':          '<M-w>',
-\ 'b':          '<M-b>',
-\ 'e':          '<M-e>',
-\ 'ge':         'g<M-e>',
-\ 'aw':         'a<M-w>',
-\ 'iw':         'i<M-w>',
-\ '<C-R><C-W>': '<C-R><M-w>'
+\ 'w':          '<A-w>',
+\ 'b':          '<A-b>',
+\ 'e':          '<A-e>',
+\ 'ge':         'g<A-e>',
+\ 'aw':         'a<A-w>',
+\ 'iw':         'i<A-w>',
+\ '<C-R><C-W>': '<C-R><A-w>'
 \ }
 
 call plug#('chaoren/vim-wordmotion')
