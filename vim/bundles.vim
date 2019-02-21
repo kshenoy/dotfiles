@@ -124,8 +124,11 @@ if has('unix')
     \ 'types': {
       \ 1: ['.git', 'cd %s && git ls-files --cached --exclude-standard --others'],
       \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
-      \ 3: ['P4CONFIG', 'p4 have %s/... |' .
-      \     ' command grep -v "/_env/" | command awk "{print \$3}" | command sed "s:$STEM/::"']
+      \ 3: ['P4CONFIG', 'cd $STEM; echo %s; cat ' .
+      \     '<(cd $STEM; p4 have ... 2> /dev/null) ' .
+      \     '<(cd $STEM; p4 opened ... 2> /dev/null | command grep add | command sed "s/#.*//" | ' .
+      \       'command xargs -I{} -n1 p4 where {}) ' .
+      \     '| command awk "{print \$3}"']
     \ },
     \ 'fallback': "find %s -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune -o " .
                         \ "-type f ! \\( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' -o " .
@@ -311,20 +314,20 @@ call plug#('Valloric/ListToggle', {'on': ['LToggle', 'QToggle']})
 
 
 " mark ------------------------------------------------------------------------------------------------------------ {{{1
-map           <leader>m       <Plug>my(Mark)
-nmap <silent> <Plug>my(Mark)m <Plug>MarkSet
-xmap <silent> <Plug>my(Mark)m <Plug>MarkSet
-nmap <silent> <Plug>my(Mark)n <Plug>MarkClear
-nmap <silent> <Plug>my(Mark)x <Plug>MarkRegex
-xmap <silent> <Plug>my(Mark)x <Plug>MarkRegex
-nmap <silent> <Plug>my(Mark)* <Plug>MarkSearchGroupNext
-xmap <silent> <Plug>my(Mark)* <Plug>MarkSearchGroupNext
-nmap <silent> <Plug>my(Mark)# <Plug>MarkSearchGroupPrev
-xmap <silent> <Plug>my(Mark)# <Plug>MarkSearchGroupPrev
-nmap <silent> <Plug>my(Mark)/ <Plug>MarkSearchAnyNext
-xmap <silent> <Plug>my(Mark)/ <Plug>MarkSearchAnyNext
-nmap <silent> <Plug>my(Mark)? <Plug>MarkSearchAnyPrev
-xmap <silent> <Plug>my(Mark)? <Plug>MarkSearchAnyPrev
+map           <leader>m        <Plug>my(Mark)
+nmap <silent> <Plug>my(Mark)m  <Plug>MarkSet
+xmap <silent> <Plug>my(Mark)m  <Plug>MarkSet
+nmap <silent> <Plug>my(Mark)c  <Plug>MarkClear
+nmap <silent> <Plug>my(Mark)x  <Plug>MarkRegex
+xmap <silent> <Plug>my(Mark)x  <Plug>MarkRegex
+nmap <silent> <Plug>my(Mark)*  <Plug>MarkSearchGroupNext
+xmap <silent> <Plug>my(Mark)*  <Plug>MarkSearchGroupNext
+nmap <silent> <Plug>my(Mark)#  <Plug>MarkSearchGroupPrev
+xmap <silent> <Plug>my(Mark)#  <Plug>MarkSearchGroupPrev
+nmap <silent> <Plug>my(Mark)g* <Plug>MarkSearchAnyNext
+xmap <silent> <Plug>my(Mark)g* <Plug>MarkSearchAnyNext
+nmap <silent> <Plug>my(Mark)g# <Plug>MarkSearchAnyPrev
+xmap <silent> <Plug>my(Mark)g# <Plug>MarkSearchAnyPrev
 
 nmap <Plug>IgnoreMarkSearchCurrentNext <Plug>MarkSearchCurrentNext
 xmap <Plug>IgnoreMarkSearchCurrentNext <Plug>MarkSearchCurrentNext
