@@ -1871,7 +1871,9 @@ Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
   (setq org-babel-default-header-args
         '((:results . "verbatim replace")))
 
-  (setq org-babel-C++-compiler "clang++")
+  (cond ((executable-find "clang++") (setq org-babel-C++-compiler "clang++"))
+        ((executable-find "g++") (setq org-babel-C++-compiler "g++")))
+
   (setq org-babel-default-header-args:C++
         '((:flags . "-std=c++14 -Wall -Wextra -Werror ${BOOST_HOME:+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -L${HOME}/.local/lib -I${HOME}/.local/include -Wl,${BOOST_HOME:+-rpath ${BOOST_HOME}/lib}")))
 
