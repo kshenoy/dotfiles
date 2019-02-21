@@ -1834,7 +1834,7 @@ From [[http://emacs.stackexchange.com/questions/38062/configure-key-to-toggle-be
       (org-toggle-time-stamp-activity)
       (forward-char)))
 
-  ;; (org-defkey org-mode-map (kbd "C-c .") #'my-org-time-stamp)
+  (bind-key "C-c ." 'my-org-time-stamp org-mode-map)
 #+end_src
 
 **** org-refile
