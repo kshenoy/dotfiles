@@ -762,6 +762,33 @@ This is very useful but I think I'll need to switch to using quelpa first
     :hook (emacs-lisp-mode . aggressive-indent-mode))
 #+end_src
 
+** COMMENT all-the-icons
+:PROPERTIES:
+:ID:       c753c712-6fcc-4acf-a5c8-f867e2407e76
+:CREATED:  [2019-02-12 Tue 22:07]
+:END:
+#+begin_src emacs-lisp
+  (use-package all-the-icons)
+#+end_src
+
+This needs to be run only after the first install
+#+begin_src emacs-lisp :tangle no
+  (all-the-icons-install-fonts)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package all-the-icons-ivy
+    :after (all-the-icons ivy)
+    :config
+    (all-the-icons-ivy-setup))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package all-the-icons-dired
+    :after all-the-icons
+    :hook (dired-mode . all-the-icons-dired-mode))
+#+end_src
+
 ** avy
 :PROPERTIES:
 :ID:       d5dbbf1c-588b-44ec-be35-5e19dcd6201c
