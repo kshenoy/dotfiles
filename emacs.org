@@ -123,14 +123,67 @@ Install packages automatically
   (setq-default use-package-always-ensure t)
 #+end_src
 
-** TODO Switch to package-manager that simplifies using git packages
+** [[https://github.com/raxod502/straight.el][straight.el]] - For source-based package management
 :PROPERTIES:
 :ID:       ac3b61db-b6ec-47d4-8dad-1d5182716085
 :END:
 :LOGBOOK:
 - State "TODO"       from              [2019-01-27 Sun 10:59]
 :END:
-[[https://framagit.org/steckerhalter/quelpa-use-package][quelpa]] and [[https://github.com/benaiah/quelpa-use-package-bootstrap-config][quelpa-use-package]] seem to support this
+Bootstrap code
+#+begin_src emacs-lisp
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+#+end_src
+
+It provides use-package integration with
+#+begin_src emacs-lisp
+  (straight-use-package 'use-package)
+#+end_src
+
+*** Install packages from the package archives
+#+begin_src emacs-lisp :tangle no
+  (straight-use-package 'el-patch)
+#+end_src
+or
+#+begin_src emacs-lisp :tangle no
+  (use-package el-patch
+    :straight t)
+#+end_src
+
+*** Install from a code repo
+#+begin_src emacs-lisp :tangle no
+  (straight-use-package
+   '(el-patch :type git :host github :repo "raxod502/el-patch")
+#+end_src
+or
+#+begin_src emacs-lisp :tangle no
+  (use-package el-patch
+    :straight (el-patch :type git :host github :repo "raxod502/el-patch"))
+#+end_src
+
+*** Install from a fork of a repo
+#+begin_src emacs-lisp :tangle no
+  (straight-use-package
+   '(el-patch :type git :host github :repo "raxod502/el-patch"
+              :fork (:host github :repo "your-name/el-patch")))
+#+end_src
+or
+#+begin_src emacs-lisp :tangle no
+  (use-package el-patch
+    :straight (el-patch :type git :host github :repo "raxod502/el-patch"
+                        :fork (:host github :repo "your-name/el-patch")))
+#+end_src
 
 * General
 ** custom file
@@ -762,13 +815,15 @@ This is very useful but I think I'll need to switch to using quelpa first
     :hook (emacs-lisp-mode . aggressive-indent-mode))
 #+end_src
 
-** COMMENT all-the-icons
+** all-the-icons
 :PROPERTIES:
 :ID:       c753c712-6fcc-4acf-a5c8-f867e2407e76
 :CREATED:  [2019-02-12 Tue 22:07]
 :END:
 #+begin_src emacs-lisp
-  (use-package all-the-icons)
+  (use-package all-the-icons
+    :straight
+    (:host github :repo "domtronn/all-the-icons.el"))
 #+end_src
 
 This needs to be run only after the first install
@@ -1514,6 +1569,15 @@ Use =C-c f= as prefix for all counsel-related keybindings
     :config
     (ivy-rich-mode t))
 #+end_src
+
+**** TODO Get this to run with all-the-icons
+:PROPERTIES:
+:ID:       ce9a01a4-d7aa-4d74-907d-9ce1e7f759c4
+:CREATED:  [2019-02-23 Sat 10:08]
+:END:
+:LOGBOOK:
+- State "TODO"       from              [2019-02-23 Sat 10:08]
+:END:
 
 ** magit
 :PROPERTIES:
