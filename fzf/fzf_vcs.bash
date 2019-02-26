@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 is_in_git_repo() {                                                                                                 #{{{1
   git rev-parse HEAD &> /dev/null
@@ -90,7 +90,7 @@ __fzf-p4-cd() {                                                                 
     return
   fi
 
-  printf '%q ' $(__fzf-p4-strip-common-ancestors "$dir")
+  printf '%q ' "$dir"
 }
 
 
@@ -103,43 +103,16 @@ fzf-vcs-cd() {                                                                  
 }
 
 
-__fzf-p4-all-files() {                                                                                             #{{{1
-  # Declaring a local post-process function in this manner isn't as clean as being fully-scoped inside this function.
-  # However, the downside of being fully-scoped is that changes to READLINE_LINE and READLINE_POINT are not propagated
-  # outside to the caller of this function. So this is the next best thing.
-  # It does clobber the default post-process function but at least this way I can have some other function define its
-  # own version of post-process and both can work.
-  # The other downside is that I have to restore the post-process function
-
-  __fzf-select-post-process() { __fzf-p4-strip-common-ancestors "$@"; }
-
-  [[ -f $STEM/.filelist ]] || pfls
-
-  # Add the generated files to the list
-  if [[ -d $STEM/build/latest ]] && [[ -f $STEM/build/latest/BUILD_SUCCEEDED ]]; then
-    local gen_list=$STEM/build/latest/generated/.filelist
-    if [[ ! -f $gen_list ]] || [[ $gen_list -ot $STEM/build/latest/BUILD_SUCCEEDED ]]; then
-      command rm $gen_list 2> /dev/null
-      find $STEM/build/latest/generated -mindepth 1 \
-        \( -name '*deps' -o -name '*cache' -o -empty \) -prune -o \
-        -type f -print >| $STEM/build/latest/generated/.filelist
-    fi
-  fi
-
-  FZF_CTRL_T_COMMAND='cat $STEM/.filelist $STEM/build/latest/generated/.filelist 2> /dev/null | command sed s:$STEM/::' \
-  fzf-file-widget
-
-  __fzf-select-post-process() { echo "$@"; }
-}
-
 fzf-vcs-all-files() {                                                                                              #{{{1
   if is_in_git_repo; then
     FZF_CTRL_T_COMMAND='{ git ls-tree --full-tree -r --name-only HEAD || \
       find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//; } 2> /dev/null' \
       fzf-file-widget
   elif is_in_perforce_repo; then
-    # Creating a separate function to allow over-riding this based on a per-project basis
-    __fzf-p4-all-files
+    FZF_CTRL_T_COMMAND='cat <(command p4 have $STEM/... 2> /dev/null | command awk "{print \$3}") \
+                            <(command p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" | \
+                              command xargs -I{} -n1 command p4 where {}) \
+                            $STEM/build/latest/generated/.filelist 2> /dev/null' fzf-file-widget
   else
     fzf-file-widget
   fi
@@ -173,10 +146,8 @@ fzf-vcs-status() {                                                              
       done
     )
   elif is_in_perforce_repo; then
-    # p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" | column -s# -o "    #" -t | column -s- -o- -t' \
-    local _selected=$(p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" -e "s/#.*//" |
-      fzf -m --nth=1 |
-      awk '{print $1}' | __fzf-p4-strip-common-ancestors |
+    local _selected=$(p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" |
+      column -s# -o "    #" -t | column -s- -o- -t | fzf -m --nth=1 | awk '{print $1}' |
       while read -r item; do
         printf '%q ' "$item"
       done
