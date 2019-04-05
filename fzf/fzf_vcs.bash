@@ -111,7 +111,7 @@ fzf-vcs-all-files() {                                                           
   elif is_in_perforce_repo; then
     FZF_CTRL_T_COMMAND='cat <(command p4 have $STEM/... 2> /dev/null | command awk "{print \$3}") \
                             <(command p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" | \
-                              command xargs -I{} -n1 command p4 where {}) \
+                              command xargs -I{} -n1 command p4 where {} | command awk "{print \$3}") \
                             $STEM/build/latest/generated/.filelist 2> /dev/null' fzf-file-widget
   else
     fzf-file-widget
@@ -149,7 +149,7 @@ fzf-vcs-status() {                                                              
     local _selected=$(p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" |
       column -s# -o "    #" -t | column -s- -o- -t | fzf -m --nth=1 | awk '{print $1}' |
       while read -r item; do
-        printf '%q ' "$item"
+        printf '%q ' "$STEM/$item"
       done
     )
   fi

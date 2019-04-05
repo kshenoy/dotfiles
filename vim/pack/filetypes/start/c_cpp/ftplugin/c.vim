@@ -34,4 +34,4 @@ setl isk-=:
 "
 " PLUGIN SETTINGS
 "
-call add(g:switch_custom_definitions, [ '.', '->' ])
+call add(g:switch_custom_definitions, [ '::', '.', '->', '.' ])

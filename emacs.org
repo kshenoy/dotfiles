@@ -1906,7 +1906,7 @@ Show upto 3 levels of headings from the current file and two levels of headings 
 #+begin_src emacs-lisp
   (setq org-refile-targets
         '((nil . (:maxlevel . 3))
-          (org-agenda-files . (:maxlevel . 2))))
+          (org-agenda-files . (:maxlevel . 9))))
 #+end_src
 Each element of the list generates a set of possible targets.
 /nil/ indicates that all the headings in the current buffer will be considered.

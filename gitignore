@@ -127,6 +127,7 @@ flycheck_*.el
 Session.vim
 # temporary
 .netrwhist
+NetrwTreeListing*
 *~
 # auto-generated tag files
 tags

@@ -1,6 +1,30 @@
 " Vim Functions file
 
-function! utils#BuffersList()                                                                                     " {{{1
+function! utils#Bufdo(command)                                                                                     "{{{1
+  " Description: Like bufdo but restore the current buffer
+  let l:curr=bufnr("%")
+  execute 'bufdo ' . a:command
+  execute 'buffer ' . l:curr
+endfunction
+command! -nargs=+ -complete=command Bufdo call utils#Bufdo(<q-args>)
+
+function! utils#Tabdo(command)                                                                                     "{{{1
+  " Description: Like tabdo but restore the current buffer
+  let l:curr=tabpagenr("%")
+  execute 'tabdo ' . a:command
+  execute 'tabnext ' . l:curr
+endfunction
+command! -nargs=+ -complete=command Tabdo call utils#Tabdo(<q-args>)
+
+function! utils#Windo(command)                                                                                     "{{{1
+  " Description: Like windo but restore the current winfer
+  let l:curr=winnr("%")
+  execute 'windo ' . a:command
+  execute l:curr . 'wincmd w'
+endfunction
+command! -nargs=+ -complete=command Windo call utils#Windo(<q-args>)
+
+function! utils#BuffersList()                                                                                      "{{{1
   " Description: Returns a list of open buffers
   let res = []
   for b in range(1, bufnr('$'))
@@ -12,7 +36,7 @@ function! utils#BuffersList()                                                   
 endfunction
 
 
-function! utils#MapKey(rhs, mode)                                                                                 " {{{1
+function! utils#MapKey(rhs, mode)                                                                                  "{{{1
   " Description: Get LHS of a mapping. Inverse of maparg().
   " Note that hasmapto() returns a binary result while MapKey() returns the value of the LHS.
   " Pass in a key sequence and the first letter of a vim mode.
@@ -46,7 +70,7 @@ endfunction
 
 
 " FIXME: Check that this works
-function! utils#Retab(tabsize, ...)                                                                               " {{{1
+function! utils#Retab(tabsize, ...)                                                                                "{{{1
   " Description: Change indentation when tab size is changed.
   "              Primarily used to convert an indentation of eg. 4 to 2 or vice-versa
   " Arguments:
@@ -74,17 +98,26 @@ endfunction
 command! -nargs=* Retab call utils#Retab(<args>)
 
 
-function! utils#UpdateTags()                                                                                      " {{{1
+function! utils#UpdateTags(silent)                                                                                 "{{{1
   " Description: Generate tags (requires exuberant_ctags)
 
   if (empty($REPO_PATH))
-    echoe '$REPO_PATH is not set'
     return
   endif
 
   let l:cmd = "gentags -w $REPO_PATH"
   if v:version >= 800
-    call job_start(l:cmd, {'close_cb': 'utils#UpdateTagsDone'})
+    if exists('s:job') && job_status(s:job) == "run"
+      if !a:silent
+        echom "Another process (" . split(s:job, '\s\+')[1] . ") is already generating tags. Skipping"
+      endif
+      return
+    endif
+    if a:silent
+      let s:job=job_start(l:cmd)
+    else
+      let s:job=job_start(l:cmd, {'close_cb': 'utils#UpdateTagsDone'})
+    endif
   else
     execute "!" . l:cmd
   endif
@@ -98,7 +131,7 @@ function! utils#UpdateTagsDone(...)
 endfunction
 
 
-function! utils#Preserve(expr, ...)                                                                               " {{{1
+function! utils#Preserve(expr, ...)                                                                                "{{{1
   " Description: Function to execute commands without modifying the original settings like cursor position, search string etc.
   " Arguments:   The expression to execute.
   "              TODO: Any settings that must be saved and restored can be supplied in a list as the optional argument
@@ -118,7 +151,7 @@ function! utils#Preserve(expr, ...)                                             
 endfunction
 
 
-function! utils#SynTrace()                                                                                        " {{{1
+function! utils#SynTrace()                                                                                         "{{{1
   " Description: Show syntax highlighting groups for word under cursor
   if !exists("*synstack")
     return
@@ -153,7 +186,7 @@ endfunction
 command! -nargs=0 SynTrace call utils#SynTrace()
 
 
-function! utils#MethodJump(arg)                                                                                   " {{{1
+function! utils#MethodJump(arg)                                                                                    "{{{1
   " Description: Small modification to ]m, [m, ]M, [M to skip over the end of class when using ]m and [m and the start
   "              of the class when using ]M and [M
   " Arguments:
@@ -173,7 +206,7 @@ function! utils#MethodJump(arg)                                                 
 endfunction
 
 
-function! utils#SectionJump(dir, pos)                                                                             " {{{1
+function! utils#SectionJump(dir, pos)                                                                              "{{{1
   " Description: Jump to next/previous start/end of method
   "              Assumes that the end of the function can be identified by a "}" in the first column
   " Arguments:
@@ -220,7 +253,7 @@ function! utils#SectionJump(dir, pos)                                           
 endfunction
 
 
-function! utils#FillTW(...)                                                                                       " {{{1
+function! utils#FillTW(...)                                                                                        "{{{1
   " Description: Insert spaces to make the current line as wide as specified by textwidth or the supplied width
   " Arguments:  If argument is supplied use the provided value instead of textwidth to fill
   let l:filler    = nr2char(getchar())
@@ -232,13 +265,13 @@ function! utils#FillTW(...)                                                     
 endfunction
 
 
-function! utils#EatChar(pat)                                                                                      " {{{1
+function! utils#EatChar(pat)                                                                                       "{{{1
   let c = nr2char(getchar(0))
   return (c =~ a:pat) ? '' : c
 endfunc
 
 
-function! utils#CmdIsk(mode)                                                                                      " {{{1
+function! utils#CmdIsk(mode)                                                                                       "{{{1
   " Description: Modify the value of iskeyword by adding a dot or restoring to original value depending upon input arg
   "              Used mainly to make traversing up the directory tree easier in cmd-mode
   " Arguments:
@@ -255,7 +288,7 @@ endfunction
 
 
 " FIXME: Use ! to save using sudo and replace :WW with :W
-function! utils#MagicSave(sudo, ...)                                                                              " {{{1
+function! utils#MagicSave(sudo, ...)                                                                               "{{{1
   " Description: If directory does not exist, create while saving the file
 
   " echom "DEBUG: Args#=" . a:0
@@ -279,7 +312,7 @@ endfunction
 command! -bang -nargs=+ W call utils#MagicSave(<bang>0, <q-args>)
 
 
-function! utils#CursorBlind()                                                                                     " {{{1
+function! utils#CursorBlind()                                                                                      "{{{1
   " Description: Flash the cursorcolumn and cursorline till the cursor is moved
   if &cuc || &cul
     set nocursorline nocursorcolumn
@@ -296,7 +329,7 @@ function! utils#CursorBlind()                                                   
 endfunction
 
 
-function! utils#FindAndList(scope, mode, ...)                                                                     " {{{1
+function! utils#FindAndList(scope, mode, ...)                                                                      "{{{1
   " Description: Find all the lines that contain the search term and display them in the location list
   " Arguments:
   "   scope (str) "local"    : Find only with the current buffer and display results in a location list
@@ -334,7 +367,7 @@ function! utils#FindAndList(scope, mode, ...)                                   
 endfunction
 
 
-function! utils#WindowSwap()                                                                                      " {{{1
+function! utils#WindowSwap()                                                                                       "{{{1
   " Description: Swap windows. Works similar to tommcdo's vim-exchange plugin but with windows
   "              When only 2 windows are open in the current tab, execute '<C-W>x'
   "              Calling this the first time selects the 1st window of the pair to swap.
@@ -371,14 +404,15 @@ function! utils#WindowSwap()                                                    
 endfunction
 
 
-function! utils#SetDiffFileType()                                                                                 " {{{1
-  let l:filetype=''
-  windo if (l:filetype == '')|let l:filetype=&filetype|endif
-  windo let &filetype=l:filetype
+function! utils#SetFileTypesInDiff()                                                                               "{{{1
+  let g:filetype=''
+  Bufdo if (g:filetype == '' && &filetype != 'conf')|let g:filetype=&filetype|endif
+  " echom "DEBUG: Found filetype=" . g:filetype
+  Bufdo let &filetype=g:filetype
 endfunction
 
 
-function! utils#GetWindowColumnsWidth()                                                                           " {{{1
+function! utils#GetWindowColumnsWidth()                                                                            "{{{1
   " Get the width of the decorative columns of the CURRENT window
 
   let l:width = 0
@@ -418,7 +452,7 @@ function! utils#GetWindowColumnsWidth()                                         
 endfunction
 
 
-function! utils#Journal(cmd, ...)                                                                                 " {{{1
+function! utils#Journal(cmd, ...)                                                                                  "{{{1
   " Description: Execute cmd and return the output as a list of lines.
   "              If an additional argument is provided, use it to filter the output.
   " Arguments:   cmd - The command to execute
@@ -441,7 +475,7 @@ function! utils#Journal(cmd, ...)                                               
 endfunction
 
 
-function! utils#WindowToggleZoom ()                                                                               " {{{1
+function! utils#WindowToggleZoom ()                                                                                "{{{1
   " Description: Zoom/unzoom similar to TMUX
 
   if (winnr('$') == 1)
@@ -461,7 +495,7 @@ function! utils#WindowToggleZoom ()                                             
 endfunction
 
 
-function! utils#Bisect()                                                                                          " {{{1
+function! utils#Bisect()                                                                                           "{{{1
   let l:pos=getpos('.')
   norm %
   let l:pos[1]=(l:pos[1]+line('.'))/2
@@ -470,7 +504,7 @@ function! utils#Bisect()                                                        
 endfunction
 
 
-function! utils#CscopeMap(view, exec, ...)                                                                        " {{{1
+function! utils#CscopeMap(view, exec, ...)                                                                         "{{{1
   " Description: One function to execute cscope commands instead of a ton of mappings
   " Arguments:
   "   view (char) : How to display results (l: Location list, s: Horizontal split, v: Vertical split)
@@ -544,9 +578,9 @@ endfunction
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" VERSION CONTROL                                                                                                 " {{{1
+" VERSION CONTROL                                                                                                  "{{{1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! utils#VcsSetupMergeLayout()                                                                             " {{{2
+function! utils#VcsSetupMergeLayout()                                                                              "{{{2
   " Description: Setup layout for merges
   "              Tab 1: Main window with all 4 panes (Clockwise from top-left)
   "                - Base (Original), Remote (Theirs), Local (Yours) and Merge

@@ -382,7 +382,7 @@ nnoremap <silent> <A-d> "_d
 vnoremap <silent> <A-d> "_d
 
 """ Generate ctags
-nnoremap <F12> :call utils#UpdateTags()<CR>
+nnoremap <F12> :call utils#UpdateTags(0)<CR>
 
 """ Execute selection as vimscript
 vnoremap g: <Esc>:@*<CR>

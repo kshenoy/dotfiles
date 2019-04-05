@@ -26,6 +26,7 @@ call plug#('tpope/vim-abolish')
 " ale ------------------------------------------------------------------------------------------------------------- {{{1
 let g:ale_lint_on_enter=0
 " let g:ale_open_list='never'
+let g:ale_set_loclist=0
 let g:ale_set_quickfix=0
 let g:ale_set_balloons=0
 let g:ale_sign_error='✗ '
@@ -39,7 +40,7 @@ let g:ale_cpp_clangtidy_options = g:ale_cpp_clang_options
 " Initialize list if it doesn't exist
 let g:ale_cpp_clangtidy_checks = get(g:, 'ale_cpp_clangtidy_checks', [])
 call add(g:ale_cpp_clangtidy_checks, '-google-build-using-namespace')
-call add(g:ale_cpp_clangtidy_checks, 'llvm-header-guard')
+call add(g:ale_cpp_clangtidy_checks, '-llvm-header-guard')
 call add(g:ale_cpp_clangtidy_checks, 'modernize-*')
 call add(g:ale_cpp_clangtidy_checks, 'cpp-core-guidelines-*')
 

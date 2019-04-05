@@ -431,7 +431,7 @@ if has('autocmd')
   augroup Diff
     autocmd!
     autocmd BufWritePost * if &diff | diffupdate | endif
-    autocmd VimEnter * if &diff|call utils#SetDiffFileType()|endif
+    autocmd VimEnter * if &diff|call utils#SetFileTypesInDiff()|endif
   augroup END
 endif
 " }}}2
@@ -439,7 +439,6 @@ endif
 
 
 """ Local vimrc
-let s:user = substitute(g:dotvim, '\v/home/(\w+)/.*', '\1', '')
-if filereadable(glob('~' . s:user . '/.vimrc_local'))
-  execute 'source ' . '~' . s:user . '/.vimrc_local'
+if system('hostname') =~ '^atl'
+  packadd work
 endif

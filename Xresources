@@ -89,6 +89,3 @@ Emacs.verticalScrollBars: off
 !! Color 5/13:  Magenta
 !! Color 6/14:  Cyan
 !! Color 7/15:  White
-
-!! Apply base16-colors using the command: color <scheme> <background>
-! #include ".Xresources.d/base16_color"
