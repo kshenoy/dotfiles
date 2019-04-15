@@ -37,7 +37,11 @@ endif
 
 set laststatus=2
 set ruler
-set wildmenu
+set ignorecase smartcase
+set suffixes=.aux,.dvi,.gz,.idx,.ps,.swp,~,.o,.info,.obj,.so                       " Ignore these files when using :edit
+set wildmenu                                                           " Command-line completion shows a list of matches
+set wildmode=list:longest,full                                  " Specifies command line completion to behave like shell
+set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.o,*.obj                 " List of patterns to ignore for file name completion
 
 if !&scrolloff
   set scrolloff=1
