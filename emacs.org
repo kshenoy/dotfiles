@@ -1287,6 +1287,8 @@ Find aspell and hunspell automatically. Try to find hunspell first and, if hunsp
     (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US")))))
 #+end_src
 
+Also see: [[https://emacs.stackexchange.com/a/21379/9690][Using multiple dictionaries with hunspell]]
+
 ** hideshow
 :PROPERTIES:
 :CREATED:  [2018-08-03 Fri 14:09]
@@ -1497,33 +1499,26 @@ NOTE: I'm deferring loading by using the =commands= keyword for =counsel-org-tag
   (use-package counsel
     :after ivy
     :commands (counsel-org-tag counsel-org-goto counsel-semantic-or-imenu)
+
+    :init
+    (defun my-counsel-imenu ()
+      "Use mode-specific commands if available else fallback to counsel-semantic-or-imenu"
+      (interactive)
+      (if (string= major-mode "org-mode")
+          (counsel-org-goto)
+        (counsel-semantic-or-imenu)))
+
     :bind* ("M-x" . counsel-M-x)
     :bind  (:map help-map
                  ("a" . counsel-apropos)
                  ("f" . counsel-describe-function)
-                 ("v" . counsel-describe-variable))
-#+end_src
-
-Use =C-c f= as prefix for all counsel-related keybindings
-#+begin_src emacs-lisp
-  :bind (:map my-fuzzy-jumper-command-map
-              ("/" . counsel-rg)
-              ("k" . counsel-bookmark)
-              :map my-s-bindings-map
-              ("v" . counsel-set-variable))
-
-  :config
-  (defun my-counsel-imenu ()
-    "Use mode-specific commands if available else fallback to counsel-semantic-or-imenu"
-    (interactive)
-    (if (string= major-mode "org-mode")
-        (counsel-org-goto)
-      (counsel-semantic-or-imenu)))
-  (bind-key "o" 'my-counsel-imenu my-fuzzy-jumper-command-map)
-#+end_src
-
-#+begin_src emacs-lisp
-  )
+                 ("v" . counsel-describe-variable)
+                 :map my-fuzzy-jumper-command-map
+                 ("/" . counsel-rg)
+                 ("k" . counsel-bookmark)
+                 ("o" . my-counsel-imenu)
+                 :map my-s-bindings-map
+                 ("v" . counsel-set-variable)))
 #+end_src
 
 *** COMMENT [[https://github.com/Yevgnen/ivy-rich][ivy-rich]]

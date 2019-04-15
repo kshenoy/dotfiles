@@ -4,11 +4,11 @@ function! s:ReadBase16Config()                                                  
   if has('gui_running')
     return
   endif
-  " If Vim doesn't have TrueColor support uses 256 color space
+  " If Vim doesn't have TrueColor support, it uses 256 color space
   " FIXME: Expand this if to include a check for if the Terminal supports it as well
   " if !has('termguicolors')
     " This variable is used by the base16-color plugin
-    let base16colorspace=256
+    " let base16colorspace=256
   " endif
 
   if filereadable(expand('~/.vimrc_background'))
