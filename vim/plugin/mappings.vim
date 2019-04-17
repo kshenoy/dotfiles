@@ -146,7 +146,7 @@ command! -nargs=? FTW call utils#FillTW(<args>)
 nnoremap <silent> <leader>fw :FTW<CR>
 
 """ Toggle ColorColumn
-nnoremap <silent> <expr> cok ':set colorcolumn=' . (&colorcolumn=='0' ? '+1' : 0) . '<CR>'
+nnoremap <silent> <expr> yok ':set colorcolumn=' . (&colorcolumn=='0' ? '+1' : 0) . '<CR>'
 
 
 
