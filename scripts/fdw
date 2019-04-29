@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#
+# Provides a --ext-group option: fd --extension_group=EXT_GROUP
+# where EXT_GROUP must be a type of extension recognized by ripgrep eg. cpp, ruby etc.
+#
+# * fdw --ext-group=cpp [OPTIONS]
+#   - Search for all files which match the type "cpp"
+#
+# * fdw --ext-group=chdr [OPTIONS]
+#   - Search for all files which match the type "chdr"
+
+re=\(-h\|--help\)\\b
+if [[ "$*" =~ $re ]]; then
+  command fd -h
+  echo "
+OPTIONS (added by fdw):
+    -T, --ext-group <ext_group>        Only find files matching type EXT_GROUP.
+                                       The supported types are obtained from ripgrep and can be seen using
+                                       \`ripgrep --type-list\`"
+  exit 0
+elif [[ ! "$*" =~ '--ext-group' ]] && [[ ! "$*" =~ '-T' ]]; then
+  command fd "$@"
+  exit $!
+fi
+
+_opts=()
+while (( $# > 0 )); do
+  if [[ "$1" =~ '--ext-group=' ]]; then
+    _ext_grp=$(sed 's/--ext-group=//' <<< "$1")
+  elif [[ "$1" =~ '--ext-group' ]] || [[ "$1" =~ '-T' ]]; then
+    shift
+    _ext_grp="$1"
+  else
+    _opts+=("$1")
+  fi
+
+  shift
+done
+
+_opts+=("--extension={"$(command rg --type-list | command grep "^${_ext_grp}:" | cut -d' ' -f2- | command sed 's/[{.* }]//g')"}")
+
+# echo "DEBUG: Opts: ${_opts[@]}"
+# echo "DEBUG: ExtGrp: $_ext_grp"
+
+eval command fd "${_opts[@]}"

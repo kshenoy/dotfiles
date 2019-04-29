@@ -56,28 +56,15 @@ nnoremap =sl :ALELint<CR>
 nnoremap =S  :ALEDetail<CR>
 nnoremap yoS :ALEToggle<CR>
 
-call plug#('w0rp/ale')
-
-
-" algorithm-mnemonics --------------------------------------------------------------------------------------------- {{{1
-call plug#('dawikur/algorithm-mnemonics.vim', {'for': 'cpp'})
+" call plug#('w0rp/ale')
 
 
 " argumentative --------------------------------------------------------------------------------------------------- {{{1
 call plug#('PeterRincker/vim-argumentative')
 
 
-" asyncrun -------------------------------------------------------------------------------------------------------- {{{1
-" call plug#('skywind3000/asyncrun.vim')
-
-
-" AutoComplPop ---------------------------------------------------------------------------------------------------- {{{1
-let g:acp_completeoptPreview = 0                                              " Do not show tag previews when completing
-
-
 " base16 ---------------------------------------------------------------------------------------------------------- {{{1
 let g:base16_shell_path=glob('~/.config/base16-shell/scripts/')
-
 call plug#('chriskempson/base16-vim')
 
 
@@ -107,12 +94,10 @@ call plug#('octol/vim-cpp-enhanced-highlight', {'for': 'cpp'})
 
 " CtrlP ----------------------------------------------------------------------------------------------------------- {{{1
 let g:ctrlp_map                 = ''
-let g:ctrlp_buftag_ctags_bin    = '/tool/pandora64/latest/bin/ctags'
 let g:ctrlp_by_filename         = 1
 let g:ctrlp_switch_buffer       = 'H'        " Jump to window anywhere when C-x is pressed. Pressing <CR> will just open
 let g:ctrlp_root_markers        = ['P4CONFIG']
 let g:ctrlp_clear_cache_on_exit = 0
-let g:ctrlp_show_hidden         = 0
 let g:ctrlp_max_files           = 0
 let g:ctrlp_extensions          = [ 'mixed', 'bookmarkdir', 'funky' ]
 let g:ctrlp_follow_symlinks     = 1
@@ -143,10 +128,10 @@ elseif executable('ag')
 endif
 
 let g:ctrlp_prompt_mappings = {
-  \ 'PrtSelectMove("j")':   ['<c-j>', '<c-n>'],
-  \ 'PrtSelectMove("k")':   ['<c-k>', '<c-p>'],
+  \ 'PrtSelectMove("j")':   ['<c-n>'],
+  \ 'PrtSelectMove("k")':   ['<c-p>'],
   \ 'PrtHistory(-1)':       ['<Down>'],
-  \ 'PrtHistory(1)':        ['<Up>'],
+  \ 'PrtHistory(1)':        ['<Up>']
   \ }
 " \ 'CreateNewFile()':      ['<c-y>'],
 " \ 'MarkToOpen()':         ['<c-z>'],
@@ -160,7 +145,6 @@ let g:ctrlp_prompt_mappings = {
 " \ 'ToggleType(1)':        ['<c-l>'],
 
 map      <leader>f <Plug>my(CtrlP)
-nnoremap <silent>  <Plug>my(CtrlP)a :CtrlPSwitchBasic<CR>
 nnoremap <silent>  <Plug>my(CtrlP)b :CtrlPBuffer<CR>
 nnoremap <silent>  <Plug>my(CtrlP)e :CtrlPCurWD<CR>
 nnoremap <silent>  <Plug>my(CtrlP)f :CtrlP<CR>
@@ -178,10 +162,6 @@ call plug#('ctrlpvim/ctrlp.vim')
 call plug#('tacahiroy/ctrlp-funky')
 call plug#('FelikZ/ctrlp-py-matcher', s:PlugCond(has('python')||has('python3')))
 
-if has('python3')
-  call plug#('ivan-cukic/vim-ctrlp-switcher',  {'on': ['CtrlPSwitch', 'CtrlPSwitchBasic', 'CtrlPSwitchFull']})
-endif
-
 
 " delimitMate ----------------------------------------------------------------------------------------------------- {{{1
 augroup delimitMate_my
@@ -196,10 +176,6 @@ call plug#('Raimondi/delimitMate')
 call plug#('chrisbra/vim-diff-enhanced')
 
 
-" dispatch -------------------------------------------------------------------------------------------------------- {{{1
-" call plug#('tpope/vim-dispatch')
-
-
 " DrawIt ---------------------------------------------------------------------------------------------------------- {{{1
 " call plug#('vim-scripts/DrawIt')
 
@@ -209,29 +185,14 @@ nmap ga <Plug>(EasyAlign)
 xmap ga <Plug>(EasyAlign)
 
 let g:easy_align_delimiters = { '>': { 'pattern': '>>\|=>\|>' },
-                            \   '/': {
-                            \       'pattern':         '//\+\|/\*\|\*/',
-                            \       'delimiter_align': 'l',
-                            \       'ignore_groups':   ['!Comment']
-                            \   },
-                            \   ']': {
-                            \       'pattern':       '[[\]]',
-                            \       'left_margin':   0,
-                            \       'right_margin':  0,
-                            \       'stick_to_left': 0
-                            \   },
-                            \   '(': {
-                            \       'pattern':       '[(]',
-                            \       'left_margin':   0,
-                            \       'right_margin':  0,
-                            \       'stick_to_left': 0
-                            \   },
-                            \   ')': {
-                            \       'pattern':       '[)]',
-                            \       'left_margin':   0,
-                            \       'right_margin':  0,
-                            \       'stick_to_left': 0
-                            \   }
+                            \   '/': { 'pattern': '//\+\|/\*\|\*/',
+                            \          'delimiter_align': 'l', 'ignore_groups': ['!Comment'] },
+                            \   ']': { 'pattern': '[[\]]',
+                            \          'left_margin': 0, 'right_margin': 0, 'stick_to_left': 0 },
+                            \   '(': { 'pattern': '[(]',
+                            \          'left_margin': 0, 'right_margin': 0, 'stick_to_left': 0 },
+                            \   ')': { 'pattern': '[)]',
+                            \          'left_margin': 0, 'right_margin': 0, 'stick_to_left': 0 }
                             \ }
 
 call plug#('junegunn/vim-easy-align', {'on': ['EasyAlign', '<Plug>(EasyAlign)']})
@@ -289,8 +250,8 @@ call plug#('derekwyatt/vim-fswitch')
 
 
 " fzf ------------------------------------------------------------------------------------------------------------- {{{1
-Plug $FZF_PATH
-Plug 'junegunn/fzf.vim'
+" Plug $FZF_PATH
+" Plug 'junegunn/fzf.vim'
 
 
 " gundo ----------------------------------------------------------------------------------------------------------- {{{1
@@ -314,6 +275,9 @@ call plug#('Valloric/ListToggle', {'on': ['LToggle', 'QToggle']})
 
 
 " mark ------------------------------------------------------------------------------------------------------------ {{{1
+call plug#('inkarkat/vim-ingo-library')
+call plug#('inkarkat/vim-mark')
+
 map           <leader>m        <Plug>my(Mark)
 nmap <silent> <Plug>my(Mark)m  <Plug>MarkSet
 xmap <silent> <Plug>my(Mark)m  <Plug>MarkSet
@@ -333,8 +297,6 @@ nmap <Plug>IgnoreMarkSearchCurrentNext <Plug>MarkSearchCurrentNext
 xmap <Plug>IgnoreMarkSearchCurrentNext <Plug>MarkSearchCurrentNext
 nmap <Plug>IgnoreMarkSearchCurrentPrev <Plug>MarkSearchCurrentPrev
 xmap <Plug>IgnoreMarkSearchCurrentPrev <Plug>MarkSearchCurrentPrev
-
-call plug#('inkarkat/vim-mark')
 
 
 " mucomplete ------------------------------------------------------------------------------------------------------ {{{1
@@ -400,100 +362,9 @@ call plug#('kshenoy/vim-signature')
 " call plug#('justinmk/vim-sneak')
 
 
-" sol ------------------------------------------------------------------------------------------------------------- {{{1
-" call plug#('kshenoy/vim-sol')
-
-
 " solarized ------------------------------------------------------------------------------------------------------- {{{1
 let g:solarized_underline = 0
 "let g:solarized_visibility = "high"
-
-
-" submode --------------------------------------------------------------------------------------------------------- {{{1
-let g:submode_always_show_submode = 1
-let g:submode_keep_leaving_key    = 1
-
-" if exists('*submode#')
-"   call submode#enter_with( 'WinResize', 'n', '', '<C-W><'      , '<C-W><'       )
-"   call submode#map       ( 'WinResize', 'n', '', '<'           , '<C-W><'       )
-"   call submode#enter_with( 'WinResize', 'n', '', '<C-W>>'      , '<C-W>>'       )
-"   call submode#map       ( 'WinResize', 'n', '', '>'           , '<C-W>>'       )
-"   call submode#enter_with( 'WinResize', 'n', '', '<C-W>+'      , '<C-W>+'       )
-"   call submode#map       ( 'WinResize', 'n', '', '+'           , '<C-W>+'       )
-"   call submode#enter_with( 'WinResize', 'n', '', '<C-W>-'      , '<C-W>-'       )
-"   call submode#map       ( 'WinResize', 'n', '', '-'           , '<C-W>-'       )
-"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W>h'      , '<C-W>h'       )
-"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W>j'      , '<C-W>j'       )
-"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W>k'      , '<C-W>k'       )
-"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W>l'      , '<C-W>l'       )
-"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><C-H>'  , '<C-W><C-H>'   )
-"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><C-J>'  , '<C-W><C-J>'   )
-"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><C-K>'  , '<C-W><C-K>'   )
-"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><C-L>'  , '<C-W><C-L>'   )
-"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><Up>'   , '<C-W><Up>'    )
-"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><Down>' , '<C-W><Down>'  )
-"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><Left>' , '<C-W><Left>'  )
-"   call submode#enter_with( 'WinMove'  , 'n', '', '<C-W><Right>', '<C-W><Right>' )
-"   call submode#map       ( 'WinMove'  , 'n', '', 'h'           , '<C-W>h'       )
-"   call submode#map       ( 'WinMove'  , 'n', '', 'j'           , '<C-W>j'       )
-"   call submode#map       ( 'WinMove'  , 'n', '', 'k'           , '<C-W>k'       )
-"   call submode#map       ( 'WinMove'  , 'n', '', 'l'           , '<C-W>l'       )
-"   call submode#map       ( 'WinMove'  , 'n', '', '<C-H>'       , '<C-W><C-H>'   )
-"   call submode#map       ( 'WinMove'  , 'n', '', '<C-J>'       , '<C-W><C-J>'   )
-"   call submode#map       ( 'WinMove'  , 'n', '', '<C-K>'       , '<C-W><C-K>'   )
-"   call submode#map       ( 'WinMove'  , 'n', '', '<C-L>'       , '<C-W><C-L>'   )
-"   call submode#map       ( 'WinMove'  , 'n', '', '<Up>'        , '<C-W><Up>'    )
-"   call submode#map       ( 'WinMove'  , 'n', '', '<Down>'      , '<C-W><Down>'  )
-"   call submode#map       ( 'WinMove'  , 'n', '', '<Left>'      , '<C-W><Left>'  )
-"   call submode#map       ( 'WinMove'  , 'n', '', '<Right>'     , '<C-W><Right>' )
-"   call submode#enter_with( 'Indent'   , 'n', '', '>>'          , '>>'           )
-"   call submode#enter_with( 'Indent'   , 'n', '', '<<'          , '<<'           )
-"   call submode#map       ( 'Indent'   , 'n', '', '>'           , '>>'           )
-"   call submode#map       ( 'Indent'   , 'n', '', '<'           , '<<'           )
-"   call submode#enter_with( 'WinCycle' , 'n', '', '<C-W><C-W>'  , '<C-W><C-W>'   )
-"   call submode#enter_with( 'WinCycle' , 'n', '', '<C-W>w'      , '<C-W>w'       )
-"   call submode#enter_with( 'WinCycle' , 'n', '', '<C-W>W'      , '<C-W>W'       )
-"   call submode#map       ( 'WinCycle' , 'n', '', '<C-W>'       , '<C-W><C-W>'   )
-"   call submode#map       ( 'WinCycle' , 'n', '', 'w'           , '<C-W>w'       )
-"   call submode#map       ( 'WinCycle' , 'n', '', 'W'           , '<C-W>W'       )
-
-"   call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-N>',   '<Leader>m<C-N>')
-"   call submode#map       ('mark.vim', 'n', '', '<C-N>',            '<Leader>m<C-N>')
-"   call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-P>',   '<Leader>m<C-P>')
-"   call submode#map       ('mark.vim', 'n', '', '<C-P>',            '<Leader>m<C-P>')
-"   call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-A-N>', '<Leader>m<C-A-N>')
-"   call submode#map       ('mark.vim', 'n', '', '<C-A-N>',          '<Leader>m<C-A-N>')
-"   call submode#enter_with('mark.vim', 'n', '', '<Leader>m<C-A-P>', '<Leader>m<C-A-P>')
-"   call submode#map       ('mark.vim', 'n', '', '<C-A-P>',          '<Leader>m<C-A-P>')
-
-"   " Custom Maps
-"   nnoremap <Plug>IncLines :<C-U>let &lines += 1<CR>
-"   nnoremap <Plug>DecLines :<C-U>let &lines -= 1<CR>
-"   call submode#enter_with( 'ResizeLines', 'n', 'r', '>l', '<Plug>IncLines' )
-"   call submode#enter_with( 'ResizeLines', 'n', 'r', '<l', '<Plug>DecLines' )
-"   call submode#map       ( 'ResizeLines', 'n', 'r', '>' , '<Plug>IncLines' )
-"   call submode#map       ( 'ResizeLines', 'n', 'r', '<' , '<Plug>DecLines' )
-"   nnoremap <Plug>IncColumns :<C-U>let &columns += 1<CR>
-"   nnoremap <Plug>DecColumns :<C-U>let &columns -= 1<CR>
-"   call submode#enter_with( 'ResizeColumns', 'n', 'r', '>c', '<Plug>IncColumns' )
-"   call submode#enter_with( 'ResizeColumns', 'n', 'r', '<c', '<Plug>DecColumns' )
-"   call submode#map       ( 'ResizeColumns', 'n', 'r', '>' , '<Plug>IncColumns' )
-"   call submode#map       ( 'ResizeColumns', 'n', 'r', '<' , '<Plug>DecColumns' )
-"   nnoremap <Plug>IncLineSpace :<C-U>let &linespace += 1<CR>
-"   nnoremap <Plug>DecLineSpace :<C-U>let &linespace -= 1<CR>
-"   call submode#enter_with( 'ResizeLsp', 'n', 'r', '>s', '<Plug>IncLineSpace' )
-"   call submode#enter_with( 'ResizeLsp', 'n', 'r', '<s', '<Plug>DecLineSpace' )
-"   call submode#map       ( 'ResizeLsp', 'n', 'r', '>' , '<Plug>IncLineSpace' )
-"   call submode#map       ( 'ResizeLsp', 'n', 'r', '<' , '<Plug>DecLineSpace' )
-"   nnoremap <Plug>IncFontSize :<C-U>IncFontSize<CR>
-"   nnoremap <Plug>DecFontSize :<C-U>DecFontSize<CR>
-"   call submode#enter_with( 'ResizeFont', 'n', 'r', '<f', '<Plug>DecFontSize' )
-"   call submode#enter_with( 'ResizeFont', 'n', 'r', '>f', '<Plug>IncFontSize' )
-"   call submode#map       ( 'ResizeFont', 'n', 'r', '<' , '<Plug>DecFontSize' )
-"   call submode#map       ( 'ResizeFont', 'n', 'r', '>' , '<Plug>IncFontSize' )
-" endif
-
-" call plug#('kana/vim-submode')
 
 
 " surround -------------------------------------------------------------------------------------------------------- {{{1
@@ -519,9 +390,8 @@ call plug#('WeiChungWu/vim-SystemVerilog', {'for': 'systemverilog'})
 
 " table-mode ------------------------------------------------------------------------------------------------------ {{{1
 let g:table_mode_map_prefix = '<Plug>[table]'
-nnoremap yoB :TableModeToggle<CR>
-
-" call plug#('dhruvasagar/vim-table-mode')
+nnoremap yoT :TableModeToggle<CR>
+call plug#('dhruvasagar/vim-table-mode', {'on': ['TableModeToggle']})
 
 
 " Targets --------------------------------------------------------------------------------------------------------- {{{1
@@ -566,10 +436,6 @@ call plug#('kana/vim-textobj-indent',        {'on': '<Plug>(textobj-indent'})
 call plug#('kana/vim-textobj-line',          {'on': '<Plug>(textobj-line'})
 call plug#('saihoooooooo/vim-textobj-space', {'on': '<Plug>(textobj-space'})
 call plug#('rhysd/vim-textobj-word-column',  {'on': '<Plug>(textobj-wordcolumn'})
-
-
-" TWiki-Syntax ---------------------------------------------------------------------------------------------------- {{{1
-call plug#('kshenoy/TWiki-Syntax', {'for': 'twiki'})
 
 
 " ultiSnips ------------------------------------------------------------------------------------------------------- {{{1

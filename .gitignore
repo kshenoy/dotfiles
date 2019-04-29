@@ -6,6 +6,7 @@
 bash/history
 compiz/
 emacs.d/private*.el
+emacs.d/straight/
 fonts/
 unity/
 vim/autoload/plug*

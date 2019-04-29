@@ -83,16 +83,11 @@ alias k9='kill -9'
 
 #=================
 # Search related
-if hash fd 2> /dev/null; then
-  alias ftd='fd --type=d'
-  alias ftcpp='fd -e={hh,hpp,hxx,cc,cpp,cxx,inl,ipp,tpp}'
-  alias ftchdr='fd -e={hh,hpp,hxx}'
-  alias ftcsrc='fd -e={cc,cpp,cxx,inl,ipp,tpp}'
-  alias fthdl='fd -e={v,vh,x,sv,svh}'
-else
+if ! hash fd 2> /dev/null; then
   alias fn='find . -name'
   alias fdd='find . -type d -name'
 fi
+
 psgrep() {
   # From https://askubuntu.com/a/185746/38952
   # Using ww twice ensures that the output is not truncated to the width of the terminal
@@ -110,8 +105,8 @@ if hash rg 2> /dev/null; then
 elif hash ag 2> /dev/null; then
   g()     { command ag "$@"; }
   gtc()   { command ag --cpp "$@"; }
-  gtch()  { command ag -G "\.(h|hh|hpp|tpp)$" "$@"; }
-  gtcc()  { command ag -G "\.(c|cc|cpp|C|CC)$" "$@"; }
+  gtch()  { command ag -G "\.(h,hpp,H,hh,hxx)$" "$@"; }
+  gtcc()  { command ag -G "\.()$" "$@"; }
   gtsbs() { command ag -G "\.sbs$" "$@"; }
   gtsv()  { command ag -G "\.(sv|svh)$" "$@"; }
   gtv()   { command ag -G "\.(v|x)$" "$@"; }

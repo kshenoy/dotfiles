@@ -20,14 +20,15 @@
 
 re=\(-h\|--help\)\\b
 if [[ "$*" =~ $re ]]; then
-  command rg "$@"
+  command rg --help
   echo "
 OPTIONS (added by rgf):
-        --files-from=FILE                   The list of files to be searched is specified in FILE (similar to ack)
-                                            The list of files must be separated by newlines.
-                                            If FILE is "-", the list is loaded from standard input.
-                                            When used together with --type=TYPE, files specified in FILE
-                                            are filtered by TYPE and ripgrep is then run on the filtered output"
+        --files-from=FILE
+            The list of files to be searched is specified in FILE (similar to ack)
+            The list of files must be separated by newlines.
+            If FILE is "-", the list is loaded from standard input.
+            When used together with --type=TYPE, files specified in FILE
+            are filtered by TYPE and ripgrep is then run on the filtered output"
   exit 0
 elif [[ ! "$*" =~ '--files-from' ]]; then
   command rg "$@"
