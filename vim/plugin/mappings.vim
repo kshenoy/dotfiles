@@ -87,7 +87,11 @@ noremap <silent> [M :call utils#MethodJump('[M')<CR>
 nnoremap Y y$
 
 """ Split line (sister to [J]oin lines)
-nnoremap <M-j> i<CR><ESC>:call utils#Preserve('-2s/\s\+$//')<CR>
+if has('gui_running')
+  nnoremap <M-j> i<CR><ESC>:call utils#Preserve('-2s/\s\+$//')<CR>
+else
+  nnoremap j i<CR><ESC>:call utils#Preserve('-2s/\s\+$//')<CR>
+endif
 
 """ Break undo-sequence before deleting till start of line
 inoremap <C-U> <C-G>u<C-U>
@@ -153,9 +157,6 @@ nnoremap <silent> <expr> yok ':set colorcolumn=' . (&colorcolumn=='0' ? '+1' : 0
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " NAVIGATION                                                                                                        {{{1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" % jumps from if-else-end while g% reverse jumps
-nmap <A-%> g%
 
 """ cscope mappings
 " The following maps all invoke one of the following cscope search types:
@@ -371,15 +372,6 @@ imap     <S-F1> <C-\><C-O><S-F1>
 """ Ctrl+S functionality for save
 nnoremap <silent> <C-S> :execute ':silent :wall!'<CR>
 imap     <silent> <C-S> <C-\><C-O><C-S>
-
-""" Copy-paste to system register
-nnoremap <silent> <A-y> "+y
-vnoremap <silent> <A-y> "+y
-nnoremap <silent> <A-p> "+p
-
-""" Deleting to black hole register
-nnoremap <silent> <A-d> "_d
-vnoremap <silent> <A-d> "_d
 
 """ Generate ctags
 nnoremap <F12> :call utils#UpdateTags(0)<CR>

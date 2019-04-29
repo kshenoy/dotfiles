@@ -269,29 +269,26 @@ Move pane to new Window, move existing window to pane (Not using presently)
 #+end_src
 
 *** Window bindings
-I've set xterm to handle Alt/Meta natively and not generate an escape sequence allowing the applications themselves to handle it.
-This allows me to use Meta bindings in terminal vim. However, a downside is that I can't specify my bindings as =M-r= and instead must specify it as =ò=
-
 #+begin_src conf
-  bind -r è previous-window  # M-h
-  bind -r ì next-window      # M-l
-  bind -r ñ last-window      # M-q
+  bind -r M-h previous-window
+  bind -r M-l next-window
+  bind -r M-q last-window
 #+end_src
 
 #+begin_src conf
-  bind -r î new-window  # M-n
+  bind -r M-n new-window
 #+end_src
 
 Kill window without confirmation, kill other windows
 #+begin_src conf
-  bind ã kill-window     # M-c
-  bind ï kill-window -a  # M-o
+  bind M-c kill-window
+  bind M-o kill-window -a
 #+end_src
 
 Move window left
 #+begin_src conf
-  bind -r û swap-window -t -1  # M-{
-  bind -r ý swap-window -t +1  # M-}
+  bind -r M-{ swap-window -t -1
+  bind -r M-} swap-window -t +1
 #+end_src
 
 #+begin_src conf :tangle no

@@ -274,17 +274,16 @@ augroup FSwitch
   autocmd BufEnter *.tpp let b:fswitchdst = 'hpp,h'
 augroup END
 
-map      gof      <Plug>my(FSwitch)
-nnoremap <silent> <Plug>my(FSwitch)f :FSHere<CR>
-nnoremap <silent> <Plug>my(FSwitch)h :FSLeft<CR>
-nnoremap <silent> <Plug>my(FSwitch)j :FSBelow<CR>
-nnoremap <silent> <Plug>my(FSwitch)k :FSAbove<CR>
-nnoremap <silent> <Plug>my(FSwitch)l :FSRight<CR>
-nnoremap <silent> <Plug>my(FSwitch)H <C-W><C-O>:FSSplitLeft<CR>
-nnoremap <silent> <Plug>my(FSwitch)J <C-W><C-O>:FSSplitBelow<CR>
-nnoremap <silent> <Plug>my(FSwitch)K <C-W><C-O>:FSSplitAbove<CR>
-nnoremap <silent> <Plug>my(FSwitch)L <C-W><C-O>:FSSplitRight<CR>
-nnoremap <silent> <S-CR>             :FSHere<CR>
+map      <leader>a <Plug>my(FSwitch)
+nnoremap <silent>  <Plug>my(FSwitch)a :FSHere<CR>
+nnoremap <silent>  <Plug>my(FSwitch)h :FSLeft<CR>
+nnoremap <silent>  <Plug>my(FSwitch)j :FSBelow<CR>
+nnoremap <silent>  <Plug>my(FSwitch)k :FSAbove<CR>
+nnoremap <silent>  <Plug>my(FSwitch)l :FSRight<CR>
+nnoremap <silent>  <Plug>my(FSwitch)H <C-W><C-O>:FSSplitLeft<CR>
+nnoremap <silent>  <Plug>my(FSwitch)J <C-W><C-O>:FSSplitBelow<CR>
+nnoremap <silent>  <Plug>my(FSwitch)K <C-W><C-O>:FSSplitAbove<CR>
+nnoremap <silent>  <Plug>my(FSwitch)L <C-W><C-O>:FSSplitRight<CR>
 
 call plug#('derekwyatt/vim-fswitch')
 
@@ -602,15 +601,27 @@ call plug#('triglav/vim-visual-increment', {'on': '<Plug>VisualIncrement'})
 
 
 " wordmotion ------------------------------------------------------------------------------------------------------ {{{1
-let g:wordmotion_mappings = {
-\ 'w':          '<A-w>',
-\ 'b':          '<A-b>',
-\ 'e':          '<A-e>',
-\ 'ge':         'g<A-e>',
-\ 'aw':         'a<A-w>',
-\ 'iw':         'i<A-w>',
-\ '<C-R><C-W>': '<C-R><A-w>'
-\ }
+if has('gui_running')
+  let g:wordmotion_mappings = {
+  \ 'w':          '<A-w>',
+  \ 'b':          '<A-b>',
+  \ 'e':          '<A-e>',
+  \ 'ge':         'g<A-e>',
+  \ 'aw':         'a<A-w>',
+  \ 'iw':         'i<A-w>',
+  \ '<C-R><C-W>': '<C-R><A-w>'
+  \ }
+else
+  let g:wordmotion_mappings = {
+  \ 'w':          'w',
+  \ 'b':          'b',
+  \ 'e':          'e',
+  \ 'ge':         'ge',
+  \ 'aw':         'aw',
+  \ 'iw':         'iw',
+  \ '<C-R><C-W>': '<C-R>w'
+  \ }
+endif
 
 call plug#('chaoren/vim-wordmotion')
 " }}}1
