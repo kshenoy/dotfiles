@@ -288,11 +288,11 @@ endsnippet
 
 # Modifying sequence operations ------------------------------------------------------------------------------------{{{2
 snippet cpy "std::copy"
-std::copy(begin(${1:${VISUAL:src}}), end($1), std::back_inserter(${2:dest}));
+std::copy(begin(${1:${VISUAL:src}}), end($1), back_inserter(${2:dest}));
 endsnippet
 
 snippet cpi "std::copy_if"
-std::copy_if(begin(${1:${VISUAL:src}}), end($1), std::back_inserter(${2:dest}), [](auto const & ${3:i}) {
+std::copy_if(begin(${1:${VISUAL:src}}), end($1), back_inserter(${2:dest}), [](auto const & ${3:i}) {
   $0
 });
 endsnippet
@@ -319,7 +319,7 @@ endsnippet
 # String/Streams ---------------------------------------------------------------------------------------------------{{{2
 snippet oss "std::ostringstream"
 std::ostringstream ${1:oss};
-oss << ${VISUAL}$0
+$1 << ${VISUAL}$0
 endsnippet
 
 snippet cpj "std::copy into std::make_ostream_joiner"

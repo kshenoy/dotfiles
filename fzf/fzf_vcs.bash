@@ -109,7 +109,7 @@ fzf-vcs-all-files() {                                                           
       find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//; } 2> /dev/null' \
       fzf-file-widget
   elif is_in_perforce_repo; then
-    FZF_CTRL_T_COMMAND='cat <(command p4 have $STEM/... 2> /dev/null | command awk "{print \$3}") \
+    FZF_CTRL_T_COMMAND='cat $STEM/.filelist \
                             <(command p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" | \
                               command xargs -I{} -n1 command p4 where {} | command awk "{print \$3}") \
                             $STEM/build/latest/generated/.filelist 2> /dev/null' fzf-file-widget

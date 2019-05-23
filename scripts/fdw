@@ -25,9 +25,11 @@ fi
 
 _opts=()
 while (( $# > 0 )); do
-  if [[ "$1" =~ '--ext-group=' ]]; then
+  if [[ "$1" =~ --ext-group= ]]; then
     _ext_grp=$(sed 's/--ext-group=//' <<< "$1")
-  elif [[ "$1" =~ '--ext-group' ]] || [[ "$1" =~ '-T' ]]; then
+  elif [[ "$1" =~ -T ]] && [[ "$1" != "-T" ]]; then
+    _ext_grp=$(sed 's/-T//' <<< "$1")
+  elif [[ "$1" =~ --ext-group ]] || [[ "$1" =~ -T ]]; then
     shift
     _ext_grp="$1"
   else

@@ -520,13 +520,14 @@ The =inhibit-compacting-font-caches= stops garbage collect from trying to handle
   (setq prettify-symbols-unprettify-at-point 'right-edge)
 #+end_src
 
-Default symbols that must be applied to all modes
+Default symbols that must be applied to all modes.
+NOTE: Some symbols occupy less space and may affect indendation. In order to avoid this: (From [[http://endlessparentheses.com/using-prettify-symbols-in-clojure-and-elisp-without-breaking-indentation.html][endlessparentheses]])
 #+begin_src emacs-lisp
   (defun my-pretty-symbols-default()
     (mapc (lambda(pair) (push pair prettify-symbols-alist))
-          '(("!=" . ?≠)
-            ("<=" . ?≤)
-            (">=" . ?≥))))
+          '(("!=" . (?\s (Br . Bl) ?\s (Bc . Bc) ?≠))
+            ("<=" . (?\s (Br . Bl) ?\s (Bc . Bc) ?≤))
+            (">=" . (?\s (Br . Bl) ?\s (Bc . Bc) ?≥)))))
 
   (add-hook 'prog-mode-hook (lambda() (my-pretty-symbols-default)))
 #+end_src
@@ -538,12 +539,15 @@ C/C++ specific symbols
                        '(("->" . (?- (Br . Bc) ?- (Br . Bc) ?>))))))
 #+end_src
 
-
-NOTE: Some symbols occupy less space and may affect indendation. In order to avoid this,
-
-**** Using prettify-symbols without breaking indentation
-(From [[http://endlessparentheses.com/using-prettify-symbols-in-clojure-and-elisp-without-breaking-indentation.html][endlessparentheses]])
-Use ~(">=" . (?\s (Br . Bl) ?\s (Bc . Bc) ?≥))~ instead of =?≥=
+Prettier checkboxes in org-mode (From [[https://old.reddit.com/r/emacs/comments/brt0sk/prettifysymbolsmode_is_so_cool/eog9gmg/][reddit]]). Disabled as it doesn't look good with Solarized theme.
+#+begin_src emacs-lisp :tangle no
+  (add-hook 'org-mode-hook (lambda ()
+                             "Beautify Org Checkbox Symbol"
+                             (push '("[ ]" . "☐") prettify-symbols-alist)
+                             (push '("[X]" . "☑" ) prettify-symbols-alist)
+                             (push '("[-]" . "❍" ) prettify-symbols-alist)
+                             (prettify-symbols-mode)))
+#+end_src
 
 ** Tabs, Indentation and Spacing
 :PROPERTIES:
@@ -1821,8 +1825,17 @@ This is the counterpart to =org-insert-link=. From [[http://emacs.stackexchange.
     If called with a prefix, only align tags"
     (interactive "P")
     (unless p (counsel-org-tag))
-    (org-align-tags))
+    (org-align-all-tags))
 #+end_src
+
+***** TODO Use Hydra to select between adding, removing and aligning tags
+:PROPERTIES:
+:ID:       0c1ada5e-77fc-47ba-a177-d7d8c538e933
+:CREATED:  [2019-05-21 Tue 10:41]
+:END:
+:LOGBOOK:
+- State "TODO"       from              [2019-05-21 Tue 10:41]
+:END:
 
 **** FIXME Use ! to toggle timestamp type
 :PROPERTIES:
