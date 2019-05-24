@@ -1,8 +1,8 @@
 #!/bin/bash -f
 # Function to simplify using tmux
 
-unset -f _tmux_attach_or_new_
-_tmux_attach_or_new_() {                                                                                          # {{{1
+unset -f __tmux_pp_attach_or_new
+__tmux_pp_attach_or_new() {                                                                                          # {{{1
   # Attach to existing session or else create a new one
   # Forcing the LANG to en_US.UTF-8 to avoid clobbering LANG=C set at work
   if [[ ! -z "$TMUX" ]]; then return; fi
@@ -24,8 +24,8 @@ _tmux_attach_or_new_() {                                                        
   fi
 }
 
-unset -f _tmux_update_env_
-_tmux_update_env_() {                                                                                             # {{{1
+unset -f __tmux_pp_update_env
+__tmux_pp_update_env() {                                                                                             # {{{1
   # Update environment variables in TMUX
   # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
   echo "Updating to latest tmux environment...";
@@ -44,8 +44,8 @@ _tmux_update_env_() {                                                           
   echo "...done"
 }
 
-unset -f _tmux_send_keys_other_panes_
-_tmux_send_keys_other_panes_() {                                                                                  # {{{1
+unset -f __tmux_pp_send_keys_other_panes
+__tmux_pp_send_keys_other_panes() {                                                                                  # {{{1
   local _pane_current=$(tmux display-message -p '#P')
   for _pane in $(tmux list-panes -F '#P'); do
     if (( "$_pane" != "$_pane_current" )); then
@@ -54,15 +54,15 @@ _tmux_send_keys_other_panes_() {                                                
   done
 }
 
-unset -f _tmux_send_keys_all_panes_
-_tmux_send_keys_all_panes_() {                                                                                    # {{{1
+unset -f __tmux_pp_send_keys_all_panes
+__tmux_pp_send_keys_all_panes() {                                                                                    # {{{1
   for _pane in $(tmux list-panes -F '#P'); do
     tmux send-keys -t ${_pane} "$@"
   done
 }
 
-unset -f _tmux_send_keys_all_
-_tmux_send_keys_all_() {                                                                                          # {{{1
+unset -f __tmux_pp_send_keys_all
+__tmux_pp_send_keys_all() {                                                                                          # {{{1
   for _window in $(tmux list-windows -F '#I'); do
     for _pane in $(tmux list-panes -t ${_window} -F '#P'); do
       tmux send-keys -t ${_window}.${_pane} "$@"
@@ -70,8 +70,8 @@ _tmux_send_keys_all_() {                                                        
   done
 }
 
-unset -f _tmux_select_session_
-_tmux_select_session_() {                                                                                         # {{{1
+unset -f __tmux_pp_select_session
+__tmux_pp_select_session() {                                                                                         # {{{1
   tmux list-sessions | awk -F: '{ print $1 " \"" $2 "\""; }' |\
     xargs dialog --ok-label 'Attach' --cancel-label 'New session' --menu tmux 20 80 20 2>/tmp/tmux-session \
     && tmux attach-session -t $(cat /tmp/tmux-session; rm /tmp/tmux-session) \
@@ -89,7 +89,7 @@ tmux_pp() {                                                                     
   case $cmd in
     attach-new|an)
       # if (( $(command tmux -V) < 2.3 )); then
-        _tmux_attach_or_new_ "$@"
+        __tmux_pp_attach_or_new "$@"
       # else
         # command tmux new-session -A -s "$@"
       # fi
@@ -97,7 +97,7 @@ tmux_pp() {                                                                     
 
     update-env|ue)
       if (( $# > 0 )); then echo "Ignoring extra arguments: '$@'"; fi
-      _tmux_update_env_
+      __tmux_pp_update_env
       ;;
 
     update-env-all-panes|ueap)
@@ -108,20 +108,36 @@ tmux_pp() {                                                                     
       tmux_pp send-keys-all "tmux_pp ue" C-m
       ;;
 
+    resize-pane|resizep)
+      # From https://github.com/tmux/tmux/issues/888#issuecomment-297637138
+      if [[ "$*" =~ -[xy][[:space:]]+[[:digit:]]+% ]]; then
+        local perVal=$(sed -e 's/^.*-[xy]\s*//' -e 's/%.*//' <<< "$*")
+        if [[ "$*" =~ -x ]]; then
+          local absVal=$(( $(command tmux display-message -p "#{window_width}") * $perVal / 100 ))
+        elif [[ "$*" =~ -y ]]; then
+          local absVal=$(( $(command tmux display-message -p "#{window_height}") * $perVal / 100 ))
+        fi
+        echo "tmux resize-pane $(sed "s/${perVal}%/${absVal}/" <<< "$*")"
+        eval "command tmux resize-pane $(sed "s/${perVal}%/${absVal}/" <<< "$*")"
+      else
+        command tmux ${cmd} "$@"
+      fi
+      ;;
+
     sk)
       command tmux send-keys "$@"
       ;;
 
     send-keys-other-panes|skop)
-      _tmux_send_keys_other_panes_ "$@"
+      __tmux_pp_send_keys_other_panes "$@"
       ;;
 
     send-keys-all-panes|skap)
-      _tmux_send_keys_all_panes_ "$@"
+      __tmux_pp_send_keys_all_panes "$@"
       ;;
 
     send-keys-all|ska)
-      _tmux_send_keys_all_ "$@"
+      __tmux_pp_send_keys_all "$@"
       ;;
 
     *)
