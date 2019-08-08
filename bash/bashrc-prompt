@@ -168,6 +168,8 @@ _setprompt_sjlmod_() {
   local _fg_red="\[$(tput setaf 1)\]"
   local _fg_yellow="\[$(tput setaf 3)\]"
   local _fg_green="\[$(tput setaf 2)\]"
+  local _fg_blue="\[$(tput setaf 4)\]"
+  local _fg_purple="\[$(tput setaf 5)\]"
 
   # Set line graphics
   local _dash="─"
@@ -202,15 +204,16 @@ _setprompt_sjlmod_() {
   local _host="$(hostname) "
 
   # VCS specific
-  local _vcs_type=$(_get_vcs_type_)
-  local _vcs_branch=$(_get_vcs_branch_ ${_vcs_type})
+  local _vcs_type=$(vcs__get_type)
+  local _vcs_branch=$(vcs__get_branch ${_vcs_type})
   local _vcs_sep=" on "
 
   if [[ $_vcs_type == "git" ]]; then
     local _user_symbol=" ±"
-
   elif [[ $_vcs_type == "hg" ]]; then
     local _user_symbol=" ☿"
+  elif [[ $_vcs_type == "p4" ]]; then
+    local _vcs_sep=" on "
   else
     #local _user_symbol=" ○"
     #local _user_symbol=" ➤"
@@ -259,7 +262,7 @@ _setprompt_sjlmod_() {
 
   # Colorize vcs:
   if [[ $_vcs_type == "git" ]]; then
-    local _vcs_status=$(_get_vcs_status_ ${_vcs_type} ${_vcs_branch})
+    local _vcs_status=$(vcs__get_status ${_vcs_type} ${_vcs_branch})
     if [[ "${_vcs_status}" == "staged" ]]; then
       _vcs_branch="${_fg_yellow}${_vcs_branch}${_reset}"
     elif [[ "${_vcs_status}" == "modified" ]]; then
@@ -267,6 +270,8 @@ _setprompt_sjlmod_() {
     elif [[ "${_vcs_status}" == "committed" ]]; then
       _vcs_branch="${_bold}${_fg_green}${_vcs_branch}${_reset}"
     fi
+  elif [[ $_vcs_type == "p4" ]]; then
+    _vcs_branch="${_fg_blue}${_vcs_branch}${_reset}"
   fi
 
   # Create exit status indicator based on exit status of last command
@@ -309,68 +314,6 @@ _setprompt_sjlmod_() {
 #=======================================================================================================================
 # Helper functions                                                                                                  {{{1
 #=======================================================================================================================
-_get_vcs_type_() {                                                                                                # {{{2
-  # Description: Check if specified directory is under a Version-controlled system
-  # Arguments: 1 - Variable to return VCS type
-  #            2 - Directory to check. If skipped, defaults to PWD
-
-  local _cwd=$PWD
-  if (( $# > 0 )); then
-    command cd $1
-  fi
-
-  if git rev-parse --git-dir > /dev/null 2>&1; then
-    # Check if PWD is under Git
-    echo "git"
-  elif hg status > /dev/null 2>&1; then
-    # Check if PWD is under Mercurial
-    echo "hg"
-  else
-    # No VCS. Return empty string
-    echo ""
-  fi
-
-  if (( $# > 0 )); then
-    command cd $_cwd
-  fi
-}
-
-
-_get_vcs_branch_() {                                                                                              # {{{2
-  # Description: If PWD is under a VCS, return the branch. If not, return an empty string
-  # Arguments: 1 - The variable into which the branch name must be written
-
-  local _vcs_type=${1}
-
-  if [[ $_vcs_type == "git" ]]; then
-    #echo "Detected git versioning scheme"
-    git symbolic-ref --short HEAD 2> /dev/null
-  elif [[ $_vcs_type == "hg" ]]; then
-    #echo "Detected mercurial versioning scheme"
-    echo "$(hg branch 2> /dev/null)"
-  else
-    echo ""
-  fi
-}
-
-
-_get_vcs_status_() {
-  # Description: Get the status of the VCS - works only for git at the moment
-  local _vcs_type=${1}
-  local _vcs_branch=${2}
-
-  if [[ "${_vcs_type}" == "git" ]]; then
-    if $(echo "$(git log origin/$_vcs_branch..HEAD 2> /dev/null)" | grep '^commit' &> /dev/null); then
-      echo "staged"
-    elif [[ -n $(git status -s --ignore-submodules=dirty  2> /dev/null) ]]; then
-      echo "modified"
-    else
-      echo "committed"
-    fi
-  fi
-}
-
-
 unset -f _get_compact_pwd_
 _get_compact_pwd_() {                                                                                             # {{{2
   # Contract the following:
