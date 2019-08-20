@@ -118,7 +118,7 @@ gv() { g -v "$@"; }
 #=================
 # Editor aliases
 #
-alias v=gvim
+alias v=vim
 vq() { gvim -q <(eval "$(fc -nl -1) $@"); }
 
 # Using -f keeps the window in the foreground and prevents a whole bunch of diffs opening at the same time
@@ -144,9 +144,9 @@ alias vd=gvim_diff
 
 # alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
 alias vi='vim --config NONE'
-alias govb='$VISUAL ~/.vim/bundles.vim'
-alias govm='$VISUAL ~/.vim/plugin/mappings.vim'
-alias govv='$VISUAL ~/.vim/vimrc'
+alias govb='$EDITOR ~/.vim/bundles.vim'
+alias govm='$EDITOR ~/.vim/plugin/mappings.vim'
+alias govv='$EDITOR ~/.vim/vimrc'
 
 alias edbg="emacs --debug-init"
 alias ed="~/bin/emacs_daemon"
@@ -156,11 +156,11 @@ alias e="emacs_func"
 
 #==========
 # Configs
-alias gosc='$VISUAL ~/.bashrc'
-alias gosa='$VISUAL ~/.dotfiles/bash/aliases'
-alias gosf='$VISUAL ~/.dotfiles/bash/bashrc-func'
-alias gost='$VISUAL ~/.dotfiles/tmux/tmux.conf'
-alias gosx='$VISUAL ~/.Xresources'
+alias gosc='$EDITOR ~/.bashrc'
+alias gosa='$EDITOR ~/.dotfiles/bash/aliases'
+alias gosf='$EDITOR ~/.dotfiles/bash/bashrc-func'
+alias gost='$EDITOR ~/.dotfiles/tmux/tmux.conf'
+alias gosx='$EDITOR ~/.Xresources'
 alias sosc='. ~/.bashrc && clnpath && echo Sourced bashrc'
 alias sosa='. ~/.dotfiles/bash/aliases && . ~/.dotfiles/bash/bashrc-func && echo Sourced aliases and functions'
 

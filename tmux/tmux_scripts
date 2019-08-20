@@ -1,8 +1,7 @@
 #!/bin/bash -f
 # Function to simplify using tmux
 
-unset -f __tmux_pp_attach_or_new
-__tmux_pp_attach_or_new() {                                                                                          # {{{1
+__tmux_pp_attach_or_new() {                                                                                        #{{{1
   # Attach to existing session or else create a new one
   # Forcing the LANG to en_US.UTF-8 to avoid clobbering LANG=C set at work
   if [[ ! -z "$TMUX" ]]; then return; fi
@@ -24,8 +23,8 @@ __tmux_pp_attach_or_new() {                                                     
   fi
 }
 
-unset -f __tmux_pp_update_env
-__tmux_pp_update_env() {                                                                                             # {{{1
+
+__tmux_pp_update_env() {                                                                                           #{{{1
   # Update environment variables in TMUX
   # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
   echo "Updating to latest tmux environment...";
@@ -44,8 +43,8 @@ __tmux_pp_update_env() {                                                        
   echo "...done"
 }
 
-unset -f __tmux_pp_send_keys_other_panes
-__tmux_pp_send_keys_other_panes() {                                                                                  # {{{1
+
+__tmux_pp_send_keys_other_panes() {                                                                                #{{{1
   local _pane_current=$(tmux display-message -p '#P')
   for _pane in $(tmux list-panes -F '#P'); do
     if (( "$_pane" != "$_pane_current" )); then
@@ -54,15 +53,15 @@ __tmux_pp_send_keys_other_panes() {                                             
   done
 }
 
-unset -f __tmux_pp_send_keys_all_panes
-__tmux_pp_send_keys_all_panes() {                                                                                    # {{{1
+
+__tmux_pp_send_keys_all_panes() {                                                                                  #{{{1
   for _pane in $(tmux list-panes -F '#P'); do
     tmux send-keys -t ${_pane} "$@"
   done
 }
 
-unset -f __tmux_pp_send_keys_all
-__tmux_pp_send_keys_all() {                                                                                          # {{{1
+
+__tmux_pp_send_keys_all() {                                                                                        #{{{1
   for _window in $(tmux list-windows -F '#I'); do
     for _pane in $(tmux list-panes -t ${_window} -F '#P'); do
       tmux send-keys -t ${_window}.${_pane} "$@"
@@ -70,45 +69,69 @@ __tmux_pp_send_keys_all() {                                                     
   done
 }
 
-unset -f __tmux_pp_select_session
-__tmux_pp_select_session() {                                                                                         # {{{1
-  tmux list-sessions | awk -F: '{ print $1 " \"" $2 "\""; }' |\
-    xargs dialog --ok-label 'Attach' --cancel-label 'New session' --menu tmux 20 80 20 2>/tmp/tmux-session \
-    && tmux attach-session -t $(cat /tmp/tmux-session; rm /tmp/tmux-session) \
-    || tmux
+
+__tmux_pp_select_layout_work() {                                                                                   #{{{1
+  local num_panes=$(command tmux display-message -p "#{window_panes}")
+  local win_width=$(command tmux display-message -p "#{window_width}")
+  local win_width_by2=$(( $win_width / 2 ))
+  local win_width_by4=$(( $win_width / 4 ))
+  local win_height=$(command tmux display-message -p "#{window_height}")
+  local win_height_by2=$(( $win_height / 2 ))
+
+  local curr_pane=$(command tmux display-message -p "#{pane_index}")
+  local curr_path=$(command tmux display-message -p "#{pane_current_path}")
+  for (( i = $num_panes; i < 3; i++ )); do
+    command tmux split-window -h -c "$curr_path"
+  done
+
+  if [[ "$1" == "work-pc" ]]; then
+    command tmux select-layout "1be5,639x73,0,0{319x73,0,0,0,159x73,320,0,1,159x73,480,0,58}"
+    tmux_pp resize-pane -t 1 -x 50% > /dev/null
+    tmux_pp resize-pane -t 2 -x 25% > /dev/null
+  elif [[ "$1" == "work-lp" ]]; then
+    command tmux select-layout "96ed,319x66,0,0{159x66,0,0,0,159x66,160,0[159x32,160,0,1,159x33,160,33,90]}"
+    tmux_pp resize-pane -t 1 -x 50% > /dev/null
+    tmux_pp resize-pane -t 2 -y 50% > /dev/null
+  fi
+
+  command tmux select-pane -t $curr_pane
 }
+# }}}1
 
 
-unset -f tmux_pp
-tmux_pp() {                                                                                                       # {{{1
+tmux_pp() {
   # We can't make the helper functions private because doing so will run tmux_pp in a subshell
   # However, since we can't export variables from a subshell to its parent shell, tmux_update_env won't work
 
   local cmd=$1; shift;
 
   case $cmd in
-    attach-new|an)
+    attach-new|an)                                                                                                 #{{{1
       # if (( $(command tmux -V) < 2.3 )); then
-        __tmux_pp_attach_or_new "$@"
+      __tmux_pp_attach_or_new "$@"
       # else
-        # command tmux new-session -A -s "$@"
+      # command tmux new-session -A -s "$@"
       # fi
       ;;
 
-    update-env|ue)
+    msg)                                                                                                           #{{{1
+      command tmux display-message "$@"
+      ;;
+
+    update-env|ue)                                                                                                 #{{{1
       if (( $# > 0 )); then echo "Ignoring extra arguments: '$@'"; fi
       __tmux_pp_update_env
       ;;
 
-    update-env-all-panes|ueap)
+    update-env-all-panes|ueap)                                                                                     #{{{1
       tmux_pp send-keys-all-panes "tmux_pp ue" C-m
       ;;
 
-    update-env-all|uea)
+    update-env-all|uea)                                                                                            #{{{1
       tmux_pp send-keys-all "tmux_pp ue" C-m
       ;;
 
-    resize-pane|resizep)
+    resize-pane|resizep)                                                                                           #{{{1
       # From https://github.com/tmux/tmux/issues/888#issuecomment-297637138
       if [[ "$*" =~ -[xy][[:space:]]+[[:digit:]]+% ]]; then
         local perVal=$(sed -e 's/^.*-[xy]\s*//' -e 's/%.*//' <<< "$*")
@@ -124,21 +147,35 @@ tmux_pp() {                                                                     
       fi
       ;;
 
-    sk)
+    save-layout)                                                                                                   #{{{1
+      eval $1=$(command tmux display-message -p "#{window_layout}")
+      echo "Saved current layout to $1"
+      ;;
+
+    select-layout|sl)                                                                                              #{{{1
+      if [[ "$1" =~ "work" ]]; then
+        __tmux_pp_select_layout_work "$1"
+      else
+        command tmux ${cmd} "$@"
+      fi
+      ;;
+
+    sk)                                                                                                            #{{{1
       command tmux send-keys "$@"
       ;;
 
-    send-keys-other-panes|skop)
+    send-keys-other-panes|skop)                                                                                    #{{{1
       __tmux_pp_send_keys_other_panes "$@"
       ;;
 
-    send-keys-all-panes|skap)
+    send-keys-all-panes|skap)                                                                                      #{{{1
       __tmux_pp_send_keys_all_panes "$@"
       ;;
 
-    send-keys-all|ska)
+    send-keys-all|ska)                                                                                             #{{{1
       __tmux_pp_send_keys_all "$@"
       ;;
+    #}}}1
 
     *)
       command tmux ${cmd} "$@"

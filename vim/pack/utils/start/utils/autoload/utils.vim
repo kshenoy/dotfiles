@@ -338,7 +338,7 @@ function! utils#FindAndList(scope, mode, ...)                                   
   "               "visual"   : Use the value stored in @* to search
   "               "prev"     : Use the previously searched term
   "   default (a:1, str)     : Default value to be specified at the "Find:" prompt. Meaningful only in "normal" mode
-  let prompt = (a:0 > 0 ? a:1 : "")
+  let prompt = (a:0 > 0 ? a:1 : '\v')
   if a:mode ==? "visual"
     let prompt = escape(@*, '$*[]/')
   elseif a:mode ==? "prev"

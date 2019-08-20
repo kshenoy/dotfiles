@@ -62,9 +62,9 @@ if DISABLE_FROM == 3 | finish | endif
 
 "set taglength=4                                                           " No. of significant characters in a tag name
 set notagrelative                           " Filenames in tag files are relative to the directory where the tag file is
-set tags+=.tags;
-set tags+=tags;
-execute 'set tags+=' . g:dotvim . '/tags/cpp_stl.tags'
+if has('path_extra')
+  execute 'set tags=./tags;,./.tags;,./TAGS;,./.TAGS;,' . g:dotvim . '/tags/cpp_stl.tags'
+endif
 set cscopetag                                                       " Use cscope as well as tags when searching for tags
 "set cscopequickfix=s-,g-,c-,d-,i-,t-,e-            " Show symbols, calls, called, includes, tags and egreps in quickfix
 
@@ -222,7 +222,7 @@ if DISABLE_FROM == 13 | finish | endif
 " Linux/X11 has two clipboards. If Vim is compiled correctly, the selection
 " clipboard is bound to "* while the cut/copy/paste clipboard is bound to "+.
 " Setting cb=unnamed, p and "*p are equivalent but "+p is different.
-"set clipboard=unnamed
+set clipboard=unnamed,autoselect
 
 
 "

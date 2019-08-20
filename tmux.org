@@ -20,7 +20,7 @@ To show options:
 
 ** Main options
 =C-b= is a pain to use when in copy mode as to scroll-up a full screen, we've to press =C-b= twice since upon the first press it's interpreted as a prefix.
-Thus change it to =C-q=. =C-a= is the default prefix used by screen but it collides with collides with emacs readline.
+Thus change it to =C-q=. =C-a= is the default prefix used by screen but it collides with emacs readline.
 #+begin_src conf
   unbind C-b
   set -g prefix C-q
@@ -34,9 +34,9 @@ Disable wait for escape sequence to enable faster command sequence
   set -sg repeat-time 600
 #+end_src
 
-Enable mouse support
+Disable mouse support. I'd rather use mouse to scroll in vim
 #+begin_src conf
-  set -g mouse on
+  set -g mouse off
 #+end_src
 
 Set bash as the default shell
@@ -204,8 +204,38 @@ Use =prefix+]= to paste. =prefix+p= would be the logical choice for paste but it
   bind -T copy-mode-vi 'Y'   send -X copy-pipe-and-cancel
 #+end_src
 
+Use fzf to select and switch sessions. =prefix+s= is tmux's way of doing it (using =choose-tree=)
+So I'm binding this one to =prefix+S=
+#+begin_src conf
+  bind S split-window -l 12 'bash -ci fzf-tmux-select-session > /dev/null'
+#+end_src
+
+*** FIXME COMMENT Mouse bindings
+:PROPERTIES:
+:CREATED:  [2019-08-19 Mon 18:51]
+:END:
+Make mouse more useful (from [[https://old.reddit.com/r/tmux/comments/cpvd02/can_i_pass_only_mousescroll_to_shell/ewtd5a3/][reddit]]). There's also [[https://github.com/NHDaly/tmux-better-mouse-mode][tmux-better-mouse-mode]] which I'm yet to try
+On a wheelup event:
+- if mouse is enabled, send the mouse event,
+- else if we're in an alternate screen program, send the up key,
+- else if pane is in copy mode, send the mouse event,
+- else put the current pane into copy mode and send the mouse event.
+(Nested ifs are not fun)
+
+#+begin_src conf
+  bind -n WheelUpPane if-shell -Ft= "#{mouse_any_flag}" "send-keys -M" "if-shell -Ft= '#{alternate_on}' 'send-keys -t= up' 'if-shell -Ft= \"#{pane_in_mode}\" \"send-keys -M\" \"select-pane -t=; copy-mode -e; send-keys -M\"'"
+#+end_src
+
+On a wheeldown event:
+- if we're in an alternate screen program, send the down key,
+- else, just send the mouse event
+
+#+begin_src conf
+  bind -n WheelDownPane if-shell -Ft= "#{alternate_on}" "send-keys -t= down" "select-pane -t= \; send-keys -M"
+#+end_src
+
 *** Pane bindings
-I tried to use this as a repeatable binding (by using =-r=) but it most of the time it hinders rather than helps.
+I tried to use this as a repeatable binding (by using =-r=) but most of the time it hinders rather than helps.
 I never use more than 2 panes vertically and/or horizontally so most of the time I'm just 1 =C-q= away.
 Making this repeatable means that once I'm in my target pane tmux is still in repeatable binding mode so I've to explicitly press Escape to get out of it.
 #+begin_src conf
@@ -232,8 +262,8 @@ Use h-j-k-l instead of arrow keys
 
 Kill pane without confirmation
 #+begin_src conf
-  bind    c   kill-pane
-  bind    C-o kill-pane -a
+  bind c   kill-pane
+  bind C-o kill-pane -a
 #+end_src
 
 Create Panes. Use vim's bindings to create splits here. It's more intuitive
@@ -250,10 +280,10 @@ bind C-g display-panes
 
 Resize Panes
 #+begin_src conf
-  bind -r S-Up    resize-pane -U 20
-  bind -r S-Down  resize-pane -D 20
-  bind -r S-Left  resize-pane -L 20
-  bind -r S-Right resize-pane -R 20
+  bind -r M-Up    resize-pane -U 6
+  bind -r M-Down  resize-pane -D 6
+  bind -r M-Left  resize-pane -L 24
+  bind -r M-Right resize-pane -R 24
 #+end_src
 
 Swap panes. These are the default bindings
@@ -269,6 +299,11 @@ Move pane to new Window, move existing window to pane (Not using presently)
 #+end_src
 
 *** Window bindings
+#+begin_src conf
+  bind M-8 run-shell 'bash -ci "tmux_pp select-layout work-lp" > /dev/null'
+  bind M-9 run-shell 'bash -ci "tmux_pp select-layout work-pc" > /dev/null'
+#+end_src
+
 #+begin_src conf
   bind -r M-h previous-window
   bind -r M-l next-window

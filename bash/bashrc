@@ -254,12 +254,13 @@ fi
 # SOURCE UTILS                                                                                                      {{{1
 #=======================================================================================================================
 for i in \
+  ~/.bashrc_local                       \
   ~/.dotfiles/bash/bashrc-func          \
   ~/.dotfiles/bash/bashrc-prompt        \
-  ~/.bashrc_local                       \
   ~/.dotfiles/bash/aliases              \
   ~/.dotfiles/fzf/fzf.bash              \
   ~/.dotfiles/tmux/tmux_completion_bash \
+  ~/.bash_aliases                       \
 ; do
   if [[ -f ${i} ]]; then
     echo "  Sourcing ${i} ..."

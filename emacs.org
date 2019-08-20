@@ -447,8 +447,8 @@ After installing a new font refresh the font cache by running
       t))  ; This is required so that we can use this function in a cond block below
 
   (defun my-set-fonts()
-    (my-set-font-if-exists 'default "Iosevka 9")
-    (my-set-font-if-exists 'fixed-pitch "Fira Code Medium-9")
+    (my-set-font-if-exists 'default "Iosevka 10")
+    (my-set-font-if-exists 'fixed-pitch "Fira Code 9")
     (my-set-font-if-exists 'variable-pitch "Iosevka 9")
     ;; (cond ((eq system-type 'gnu/linux) (my-set-font-if-exists 'variable-pitch "Ubuntu Condensed-9"))
     ;;       ((eq system-type 'windows-nt) (my-set-font-if-exists 'variable-pitch "Iosevka SS05-9")))
@@ -667,6 +667,16 @@ Emacs doesn't have a native hook that is called after a theme has loaded. So we'
     (evil-emacs-state-cursor    '("#839496" bar))
     :config
     (load-theme 'solarized-light t))
+#+end_src
+
+*** COMMENT doom themes
+:PROPERTIES:
+:ID:       8bca6e20-a905-41b0-aecf-fb4aa6d64be5
+:CREATED:  [2019-07-25 Thu 11:10]
+:END:
+#+begin_src emacs-lisp
+  (use-package doom-themes
+    :config (load-theme 'doom-tomorrow-night t))
 #+end_src
 
 ** Frame related
@@ -998,6 +1008,24 @@ Disabled for now because it uses images which are huge compared to the font maki
     :config
     (add-to-list 'company-backends '(company-irony :with company-yasnippet)))
 #+end_src
+
+*** FIXME COMMENT company-posframe
+Frame theme is messed up
+:PROPERTIES:
+:ID:       ba04ec48-20ab-40a6-b5af-032f96c440ed
+:CREATED:  [2019-07-23 Tue 09:39]
+:END:
+:LOGBOOK:
+- State "FIXME"      from "TODO"       [2019-07-23 Tue 10:47]
+- State "TODO"       from              [2019-07-23 Tue 10:47]
+:END:
+#+begin_src emacs-lisp
+  (use-package company-posframe
+    :after company
+    :config
+    (company-posframe-mode 1))
+#+end_src
+
 
 ** evil
 Getting started guide: https://github.com/noctuid/evil-guide

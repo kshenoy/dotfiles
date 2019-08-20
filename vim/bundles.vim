@@ -111,10 +111,10 @@ if has('unix')
       \ 1: ['.git', 'cd %s && git ls-files --cached --exclude-standard --others'],
       \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
       \ 3: ['P4CONFIG', 'cd $STEM; echo %s; cat ' .
-      \     '<(cd $STEM; p4 have ... 2> /dev/null) ' .
-      \     '<(cd $STEM; p4 opened ... 2> /dev/null | command grep add | command sed "s/#.*//" | ' .
-      \       'command xargs -I{} -n1 p4 where {}) ' .
-      \     '| command awk "{print \$3}"']
+      \     '<(command p4 have $STEM/... 2> /dev/null) ' .
+      \     '<(command p4 opened | command grep add | command sed "s/#.*//" | ' .
+      \       'command xargs -I{} -n1 p4 where {}) 2> /dev/null |' .
+      \     'command awk "{print \$3}"']
     \ },
     \ 'fallback': "find %s -type d \\( -iname .svn -o -iname .git -o -iname .hg \\) -prune -o " .
                         \ "-type f ! \\( -name '.*' -o -iname '*.log' -o -iname '*.out' -o -iname '*.so' -o " .

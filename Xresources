@@ -30,7 +30,7 @@
 *XTerm*cursorBlink: true
 
 !! From https://unix.stackexchange.com/a/332367/111534
-*XTerm*faceName: Iosevka
+*XTerm*faceName: Iosevka Term
 *XTerm*fontdefault*Label: Size 9 (Default)
 *XTerm*faceSize: 9
 *XTerm*font1*Label: Size 8
@@ -69,7 +69,7 @@ Xft.hintstyle:  hintslight
 ! Emacs settings                                                                                                    {{{1
 !=======================================================================================================================
 Emacs.fontBackend: xft
-Emacs.font: Iosevka-9:weight=book
+Emacs.font: Iosevka Term-9:style=Regular
 Emacs.menuBar: off
 Emacs.toolBar: off
 Emacs.verticalScrollBars: off

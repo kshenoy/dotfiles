@@ -176,6 +176,9 @@ function! ConflictTextObj(ai, ...)                                              
 
   let l:first_line = search('\M' . s:conflict_ORIGINAL, 'bWcn')
   let l:last_line  = search('\M' . s:conflict_END, 'Wcn')
+  if (l:last_line == 0)
+    let l:last_line = line('$')
+  endif
 
   let l:start_pat  = '\M'
   let l:end_pat    = '\M'
@@ -211,7 +214,11 @@ function! ConflictTextObj(ai, ...)                                              
   " Find ending line of block. First search forwards, then backwards
   let l:end = search(l:end_pat, 'Wn', l:last_line)
   if (l:end == 0)
-    let l:end = search(l:end_pat, 'bWn', l:first_line)
+    if (l:end_pat =~ '\V' . s:conflict_END)
+      let l:end = line('$')
+    else
+      let l:end = search(l:end_pat, 'bWn', l:first_line)
+    endif
   endif
   if (l:end == 0)
     echoe "Unable to find the end of the conflict block. Are you in one?"
@@ -244,6 +251,10 @@ function! s:DiffGet(block)                                                      
 
   let l:original_line = search('\M' . s:conflict_ORIGINAL, 'bWc')
   let l:end_line      = search('\M' . s:conflict_END, 'Wcn')
+  if (l:last_line == 0)
+    let l:end_line = line('$')
+  endif
+
   if (  (l:original_line > l:curline)
    \ || (l:end_line      < l:curline)
    \ )

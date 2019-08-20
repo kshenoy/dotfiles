@@ -22,7 +22,7 @@
     set linespace=2
   elseif g:env ==? 'windows'
     set guifont=
-    set guifont+=Iosevka_SS05:h9:cANSI:qDRAFT
+    set guifont+=Iosevka:h9:cANSI:qDRAFT
     set guifont+=Hack:h9:cANSI:qDRAFT
     set guifont+=Consolas:h9:cANSI
     set linespace=2

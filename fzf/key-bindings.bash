@@ -1,4 +1,5 @@
-fzf-recent-dirs() {                                                                                               # {{{1
+#=======================================================================================================================
+fzf-recent-dirs() {                                                                                                #{{{1
   local out=($(command dirs -p | fzf --expect=alt-c "$@"))
 
   case $(head -n1 <<< "$out") in
@@ -17,6 +18,7 @@ fzf-recent-dirs() {                                                             
 }
 
 
+#=======================================================================================================================
 fzf-lsf-bjobs() {                                                                                                  #{{{1
   local selected=$(lsf_bjobs -w |
     FZF_DEFAULT_OPTS="--header-lines=1 --height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
@@ -30,7 +32,8 @@ fzf-lsf-bjobs() {                                                               
 }
 
 
-__fzf_cmd_opts__() {                                                                                               #{{{1
+#=======================================================================================================================
+fzf-cmd-opts() {                                                                                                   #{{{1
   # echo "DEBUG: >>>${READLINE_LINE}<<< Point=${READLINE_POINT}, Char=${READLINE_LINE:$READLINE_POINT:0}"
   local pos=$READLINE_POINT
 
@@ -95,6 +98,28 @@ __fzf_cmd_opts__() {                                                            
 }
 
 
+#=======================================================================================================================
+fzf-tmux-select-session() {                                                                                        #{{{1
+# Create new tmux session, or switch to existing one. Works from within tmux too
+# - Bypass fuzzy finder if there's only one match (--select-1)
+# - Exit if there's no match (--exit-0)
+  if [[ -n "$TMUX" ]]; then
+    local cmd="switch-client"
+  else
+    local cmd="attach-session"
+  fi
+
+  local session=$(tmux list-sessions 2>/dev/null |
+                  sed -e 's/ (created[^)]*)//' -e 's/:/ :/' | column -t -o ' ' |
+                  fzf --select-1 --exit-0 --nth=1 |
+                  awk '{print $1}')
+  if [[ -n "$session" ]]; then
+    tmux $cmd -t "$session"
+  fi
+}
+
+
+#=======================================================================================================================
 # __fzf_bookmarks__() {                                                                                            #{{{1
 #   local _cmd="cat <(command find -L ~/Notes -type f -name '*.org' 2> /dev/null) ~/bookmarks"
 
@@ -120,6 +145,7 @@ __fzf_cmd_opts__() {                                                            
 # }}}1
 
 
+#=======================================================================================================================
 # Info on bind usage: https://stackoverflow.com/a/47878915/734153
 # bind -X : List all key sequences bound to shell commands (using -x)
 #      -S : Display readline key sequences bound to macros and the strings they output
@@ -127,7 +153,9 @@ __fzf_cmd_opts__() {                                                            
 # Unbind C-t as I want to sue C-f instead
 bind '"\C-t": nop'
 
-if [[ -o vi ]]; then                                                                                                #{{{
+
+#=======================================================================================================================
+if [[ -o vi ]]; then                                                                                               #{{{
   # CTRL-F - Paste the selected file path into the command line (changed from default CTRL-T)
   # - FIXME: Selected items are attached to the end regardless of cursor position
   if (( $BASH_VERSINFO > 3 )); then
@@ -140,7 +168,9 @@ if [[ -o vi ]]; then                                                            
   bind -m vi-command '"\C-f\C-f": "i\C-f\C-f"'
 fi # }}}
 
-if [[ -o emacs ]]; then                                                                                             #{{{
+
+#=======================================================================================================================
+if [[ -o emacs ]]; then                                                                                            #{{{
   # CTRL-F - Paste the selected file path into the command line (changed from default CTRL-T)
   if (( $BASH_VERSINFO > 3 )); then
     # bind -x '"\C-f\C-f": "fzf-file-widget"'
@@ -160,10 +190,13 @@ if [[ -o emacs ]]; then                                                         
   bind -x '"\C-f\C-l": "fzf-lsf-bjobs"'
 
   # CTRL-O: Show list of options of the command before the cursor using '<cmd> -h'
-  bind -x '"\C-f\C-o": "__fzf_cmd_opts__"'
+  bind -x '"\C-f\C-o": "fzf-cmd-opts"'
 
   # CTRL-G CTRL-E: Experimental
   # bind -x '"\C-f\C-g\C-e": "__fzf_expt__"'
+
+  # Tmux related bindings: CTRL-F CTRL-T
+  bind -x '"\C-f\C-t": "fzf-tmux-select-session"'
 
   # Version-control related bindings: CTRL-F CTRL-V
   bind -x '"\C-f\C-v\C-e": "fzf-vcs-files"'
