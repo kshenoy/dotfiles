@@ -282,16 +282,16 @@ map           <leader>m        <Plug>my(Mark)
 nmap <silent> <Plug>my(Mark)m  <Plug>MarkSet
 xmap <silent> <Plug>my(Mark)m  <Plug>MarkSet
 nmap <silent> <Plug>my(Mark)c  <Plug>MarkClear
-nmap <silent> <Plug>my(Mark)x  <Plug>MarkRegex
-xmap <silent> <Plug>my(Mark)x  <Plug>MarkRegex
-nmap <silent> <Plug>my(Mark)*  <Plug>MarkSearchGroupNext
-xmap <silent> <Plug>my(Mark)*  <Plug>MarkSearchGroupNext
-nmap <silent> <Plug>my(Mark)#  <Plug>MarkSearchGroupPrev
-xmap <silent> <Plug>my(Mark)#  <Plug>MarkSearchGroupPrev
-nmap <silent> <Plug>my(Mark)g* <Plug>MarkSearchAnyNext
-xmap <silent> <Plug>my(Mark)g* <Plug>MarkSearchAnyNext
-nmap <silent> <Plug>my(Mark)g# <Plug>MarkSearchAnyPrev
-xmap <silent> <Plug>my(Mark)g# <Plug>MarkSearchAnyPrev
+nmap <silent> <Plug>my(Mark)r  <Plug>MarkRegex
+xmap <silent> <Plug>my(Mark)r  <Plug>MarkRegex
+nmap <silent> <Plug>my(Mark)n  <Plug>MarkSearchGroupNext
+xmap <silent> <Plug>my(Mark)n  <Plug>MarkSearchGroupNext
+nmap <silent> <Plug>my(Mark)N  <Plug>MarkSearchGroupPrev
+xmap <silent> <Plug>my(Mark)N  <Plug>MarkSearchGroupPrev
+nmap <silent> <Plug>my(Mark)gn <Plug>MarkSearchAnyNext
+xmap <silent> <Plug>my(Mark)gn <Plug>MarkSearchAnyNext
+nmap <silent> <Plug>my(Mark)gN <Plug>MarkSearchAnyPrev
+xmap <silent> <Plug>my(Mark)gN <Plug>MarkSearchAnyPrev
 
 nmap <Plug>IgnoreMarkSearchCurrentNext <Plug>MarkSearchCurrentNext
 xmap <Plug>IgnoreMarkSearchCurrentNext <Plug>MarkSearchCurrentNext
