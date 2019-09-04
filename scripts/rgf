@@ -20,7 +20,7 @@
 
 re=\(-h\|--help\)\\b
 if [[ "$*" =~ $re ]]; then
-  command rg --help
+  command rg "$@"
   echo "
 OPTIONS (added by rgf):
         --files-from=FILE
