@@ -362,11 +362,6 @@ call plug#('kshenoy/vim-signature')
 " call plug#('justinmk/vim-sneak')
 
 
-" solarized ------------------------------------------------------------------------------------------------------- {{{1
-let g:solarized_underline = 0
-"let g:solarized_visibility = "high"
-
-
 " surround -------------------------------------------------------------------------------------------------------- {{{1
 call plug#('tpope/vim-surround')
 

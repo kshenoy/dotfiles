@@ -1,3 +1,7 @@
+"" Override colors that I don't like
+highlight CursorLineNr guifg=#d33682
+highlight StatusLineNC guibg=#ded8c5
+
 "" Column number
 highlight clear STLColumn
 let s:stl_column=utils#GetHighlightInfo('StatusLine')

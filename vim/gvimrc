@@ -43,4 +43,4 @@
   set browsedir=buffer
 
   set background=light
-  colorscheme solarized
+  colorscheme base16-solarized-light

@@ -4,26 +4,18 @@ function! s:ReadBase16Config()                                                  
   if has('gui_running')
     return
   endif
-  " If Vim doesn't have TrueColor support, it uses 256 color space
-  " FIXME: Expand this if to include a check for if the Terminal supports it as well
-  " if !has('termguicolors')
-    " This variable is used by the base16-color plugin
-    " let base16colorspace=256
-  " endif
 
   if filereadable(expand('~/.vimrc_background'))
     silent! source ~/.vimrc_background
+    call s:After()
   endif
 endfunction
 
 
 function! s:After()                                                                                               " {{{1
   " Description: Find any additional settings related to the current colorscheme in after/colors and load it
-  highlight clear SignColumn
-  highlight link  SignColumn LineNr
-
-  " This order is important. We let statusline set the general colors first based on the colorscheme and then
-  " pick up any specific settings from the after file
+  "              This order is important. We let statusline set the general colors first based on the colorscheme and
+  "              then pick up any specific settings from the after file
   call s:UpdateUserColors()
 
   if (  !exists('g:colors_name')
@@ -32,9 +24,14 @@ function! s:After()                                                             
     return
   endif
 
+  let l:colors_name = g:colors_name
+  if (g:colors_name =~ "solarized")
+    let l:colors_name = "solarized"
+  endif
+
   " This is a deliberate choice to stick the file under after/colors. This is because if it's under after/plugin then
   " the code seems to be run before the colorscheme gets loaded and thus can't be relied upon to run everytime.
-  let l:color_file = g:dotvim . "/pack/settings/start/colors/after/colors/" . g:colors_name . ".vim"
+  let l:color_file = g:dotvim . "/pack/settings/start/colors/after/colors/" . l:colors_name . ".vim"
   if filereadable(l:color_file)
     execute "source " . l:color_file
   endif
@@ -47,11 +44,13 @@ endfunction
 function! s:UpdateUserColors()                                                                                    " {{{1
   " Description: Highlight groups to use in Statusline
 
-  " highlight clear StatusLine
-  " highlight link  StatusLine LineNr
+  highlight clear SignColumn
+  highlight link  SignColumn LineNr
+  highlight clear StatusLine
+  highlight link  StatusLine LineNr
 
   let l:prefix = (has('gui_running') || has('termguicolors') ? 'gui' : 'cterm')
-  let l:stlbg = synIDattr(synIDtrans(hlID('StatusLine')), 'bg', l:prefix)
+  let l:stl_bg=get(utils#GetHighlightInfo('StatusLine'), l:prefix . 'bg')
 
   for i in [
          \   ['STLColumn',   'CursorLineNr'],
@@ -59,12 +58,12 @@ function! s:UpdateUserColors()                                                  
          \   ['STLFilename', 'StatusLine'  ],
          \   ['STLStatus',   'Statement'   ]
          \ ]
-    let l:fg = synIDattr(synIDtrans(hlID(i[1])), 'fg', l:prefix)
-    silent execute 'highlight ' . i[0] . ' ' . l:prefix . 'bg=' . l:stlbg . ' ' . l:prefix . 'fg=' . l:fg
+    let l:fg = get(utils#GetHighlightInfo(i[1]), l:prefix . 'fg')
+    silent execute 'highlight ' . i[0] . ' ' . l:prefix . 'bg=' . l:stl_bg . ' ' . l:prefix . 'fg=' . l:fg
   endfor
   silent execute 'highlight STLFilename ' . l:prefix '=bold'
 
-  let l:norm_bg = synIDattr(synIDtrans(hlID('Normal')), 'bg', l:prefix)
+  let l:norm_bg = get(utils#GetHighlightInfo('Normal'), l:prefix . 'bg')
   silent execute 'highlight STLHelp     ' . l:prefix . 'bg=Red3 ' . l:prefix . 'fg=' . l:norm_bg
 
   if !has('gui_running')
