@@ -437,6 +437,10 @@ call plug#('kana/vim-textobj-line',          {'on': '<Plug>(textobj-line'})
 call plug#('saihoooooooo/vim-textobj-space', {'on': '<Plug>(textobj-space'})
 call plug#('rhysd/vim-textobj-word-column',  {'on': '<Plug>(textobj-wordcolumn'})
 
+" tmux-focus-events ----------------------------------------------------------------------------------------------- {{{1
+if !has('gui_running')
+  call plug#('tmux-plugins/vim-tmux-focus-events')
+endif
 
 " ultiSnips ------------------------------------------------------------------------------------------------------- {{{1
 let g:UltiSnipsEditSplit = "vertical"

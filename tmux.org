@@ -65,6 +65,11 @@ Sane scrolling (http://superuser.com/a/314620)
   setw -g alternate-screen on
 #+end_src
 
+To allow =FocusGained= and =FocusLost= autocmds to work in vim (https://github.com/tmux-plugins/vim-tmux-focus-events)
+#+begin_src conf
+  set -g focus-events on
+#+end_src
+
 ** Status Bar configuration
 #+begin_src conf
   set -g status on
