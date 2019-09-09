@@ -1,6 +1,6 @@
 # Roots of the synchronization
-root = /home/ks/Dropbox
-root = ssh://kshenoy@atlibex-vdi0523//home/kshenoy/Dropbox
+root = /home/kshenoy/Documents
+root = ssh://kshenoy@atlibex-vdi0767//home/kshenoy
 
 #          Causes Unison to double-check, at the end of update detection,
 #          that PATH exists and abort if it does not. This is useful when
@@ -13,8 +13,8 @@ root = ssh://kshenoy@atlibex-vdi0523//home/kshenoy/Dropbox
 #path = current
 #path = common
 #path = .netscape/bookmarks.html
-path = Config
-path = Documents/Notes
+#path = Config
+path = Notes
 
 
 # Some regexps specifying names and paths to ignore
@@ -39,20 +39,19 @@ ignore = Name sync.ffs_db
 ignore = Regex .*/emacs.d/ac-comphist.*
 
 # Ignores the exact path and everything below it
-ignore = BelowPath Config/dotfiles/emacs.d/auto-save-list
-ignore = BelowPath Config/dotfiles/emacs.d/elpa
-ignore = BelowPath Config/dotfiles/emacs.d/bundle
-ignore = BelowPath Config/dotfiles/emacs.d/server
-ignore = BelowPath Config/dotfiles/emacs.d/semanticdb
-ignore = BelowPath Config/dotfiles/emacs.d/tmp
-ignore = BelowPath Config/dotfiles/vim/pack/bundles
-ignore = BelowPath Config/dotfiles/vim/tmp
-ignore = BelowPath Config/dotfiles/compiz
-ignore = BelowPath Config/dotfiles/scripts/ti
-ignore = BelowPath Config/dotfiles/unity
-ignore = BelowPath Config/Fonts/PragmataPro
-ignore = BelowPath Documents/Notes/Personal
-ignore = BelowPath Documents/Notes/TI
+#ignore = BelowPath Config/dotfiles/emacs.d/auto-save-list
+#ignore = BelowPath Config/dotfiles/emacs.d/elpa
+#ignore = BelowPath Config/dotfiles/emacs.d/bundle
+#ignore = BelowPath Config/dotfiles/emacs.d/server
+#ignore = BelowPath Config/dotfiles/emacs.d/semanticdb
+#ignore = BelowPath Config/dotfiles/emacs.d/tmp
+#ignore = BelowPath Config/dotfiles/vim/pack/bundles
+#ignore = BelowPath Config/dotfiles/vim/tmp
+#ignore = BelowPath Config/dotfiles/compiz
+#ignore = BelowPath Config/dotfiles/scripts/ti
+#ignore = BelowPath Config/dotfiles/unity
+#ignore = BelowPath Config/Fonts/PragmataPro
+ignore = BelowPath Notes/Personal
 
 
 #          When set to true, this flag causes the user interface to skip

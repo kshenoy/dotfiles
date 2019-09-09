@@ -210,7 +210,7 @@ export HISTIGNORE='?:??:history*:sosa:sosc:sosf:sosp:cd:que*:lla*'
 export HOSTNAME="$(hostname)"
 # Keeps history forever. Requires PROMPT_COMMAND='history -a; history -r'
 # Moving this to PROMPT_COMMAND to keep the HISTFILE current when sessions span multiple days
-# HISTFILE="${HOME}/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
+# HISTFILE="${HOME}/.bash_history/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
 # mkdir -p $(dirname ${HISTFILE})
 
 ## TERMINAL
@@ -227,6 +227,13 @@ export GREP_COLORS='1;32'
 export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
 
 export LANG=en_US.UTF-8
+
+# Set XDG env vars to their defaults
+[[ -z $XDG_DATA_HOME   ]] && export XDG_DATA_HOME=$HOME/.local/share
+[[ -z $XDG_CONFIG_HOME ]] && export XDG_CONFIG_HOME=$HOME/.config
+[[ -z $XDG_DATA_DIRS   ]] && export XDG_DATA_DIRS=/usr/local/share/:/usr/share/
+[[ -z $XDG_CONFIG_DIRS ]] && export XDG_CONFIG_DIRS=/etc/xdg
+[[ -z $XDG_CACHE_HOME  ]] && export XDG_CACHE_HOME=$HOME/.cache
 
 
 #=======================================================================================================================
@@ -271,10 +278,14 @@ done
 # }}}1
 
 # Base16 Color scheme for terminal
-export BASE16_SHELL=$HOME/.config/base16-shell
+export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
 [[ -n "$PS1" ]] && \
 [[ -s $BASE16_SHELL/profile_helper.sh ]] && \
 eval "$($BASE16_SHELL/profile_helper.sh)"
+
+# FIXME: Find way to automatically apply/update FZF colorscheme
+export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
+. $BASE16_FZF/bash/base16-solarized-light.config
 
 
 #=======================================================================================================================

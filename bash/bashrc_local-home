@@ -10,8 +10,8 @@ alias amd_vpn='sudo openconnect -i AMD -u kshenoy --token-mode=rsa atl-vpn.amd.c
 __histfile_perm_update__() {
   if [[ -f $HISTFILE ]]; then
     echo "Changing permissions of HISTFILE..."
-    chown ks $HISTFILE
-    chgrp ks $HISTFILE
+    chown kshenoy $HISTFILE
+    chgrp kshenoy $HISTFILE
     chmod 640 $HISTFILE
   fi
 }
