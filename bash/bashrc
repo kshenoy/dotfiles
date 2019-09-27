@@ -226,7 +226,7 @@ export VISUAL=gvim
 export GREP_COLORS='1;32'
 export LANG=en_US.UTF-8
 
-# Set XDG env vars to their defaults. I know this is not recommended but it makes it way easier to configure others
+# Set XDG env vars to their defaults. I know this is not recommended but it makes it way easier to configure everything
 [[ -z $XDG_DATA_HOME   ]] && export XDG_DATA_HOME=$HOME/.local/share
 [[ -z $XDG_CONFIG_HOME ]] && export XDG_CONFIG_HOME=$HOME/.config
 [[ -z $XDG_DATA_DIRS   ]] && export XDG_DATA_DIRS=/usr/local/share/:/usr/share/
@@ -266,7 +266,7 @@ eval "$($BASE16_SHELL/profile_helper.sh)"
 
 # base16 fzf colorscheme is applied by SETTING, not appending to the FZF_DEFAULT_OPTS env var
 # Thus, I "set" it first before sourcing fzf.bash which appends to it
-# FIXME: Find way to automatically apply/update FZF colorscheme
+# FIXME: Find a way to automatically apply/update FZF colorscheme
 export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
 . $BASE16_FZF/bash/base16-solarized-light.config
 
@@ -287,7 +287,6 @@ for i in \
     # echo "  ... done"
   fi
 done
-# }}}1
 
 
 #=======================================================================================================================
@@ -308,6 +307,7 @@ for path in /usr/man /usr/share/man ${HOME}/.local/share/man; do
     export MANPATH=$path:$MANPATH
   fi
 done
+# }}}1
 
 # Automatically add completion for all aliases to commands having completion functions. Should be called at the end
 alias_completion

@@ -1,6 +1,6 @@
 "" Override colors that I don't like
 highlight CursorLineNr guifg=#d33682
-highlight StatusLineNC guibg=#ded8c5
+highlight StatusLineNC guibg=#d0d0c4
 
 "" Column number
 highlight clear STLColumn

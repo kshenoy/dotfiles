@@ -1,0 +1,38 @@
+# [[file:~/.dotfiles/bashrc.org::*%5B%5Bhttps://github.com/BurntSushi/ripgrep%5D%5Bripgrep%5D%5D][[[https://github.com/BurntSushi/ripgrep][ripgrep]]:3]]
+# Add to the cpp type.
+--type-add
+cpp:*.ipp,*.tpp
+
+--type-add
+chdr:include:h
+--type-add
+chdr:*.{H,hh,hxx}
+
+--type-add
+csrc:*.{C,cc,cpp,cxx,inl,ipp,tpp}
+
+--type-add
+rdl:*.rdl
+
+--type-add
+sbs:*.sbs
+
+--type-add
+hdl:include:verilog
+
+--type-add
+hdl:*.x
+
+# Because who cares about case!?
+--smart-case
+# [[https://github.com/BurntSushi/ripgrep][ripgrep]]:3 ends here
+
+
+
+# ripgrep config file
+
+# [[file:~/.dotfiles/bashrc.org::*%5B%5Bhttps://github.com/BurntSushi/ripgrep%5D%5Bripgrep%5D%5D][[[https://github.com/BurntSushi/ripgrep][ripgrep]]:2]]
+# This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
+# Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
+# If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
+# [[https://github.com/BurntSushi/ripgrep][ripgrep]]:2 ends here

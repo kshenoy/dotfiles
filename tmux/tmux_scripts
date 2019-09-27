@@ -1,6 +1,12 @@
 #!/bin/bash -f
 # Function to simplify using tmux
 
+__tmux_exec() {                                                                                                    #{{{1
+  # TODO: The only function that directly calls tmux. This allows me to inject any default options
+  echo command tmux "$TMUX_DEFAULT_OPTS ${TMUX_DEFAULT_SOCKET:+-L $TMUX_DEFAULT_SOCKET} $@"
+  command tmux "$TMUX_DEFAULT_OPTS ${TMUX_DEFAULT_SOCKET:+-L $TMUX_DEFAULT_SOCKET} $@"
+}
+
 __tmux_pp_attach_or_new() {                                                                                        #{{{1
   # Attach to existing session or else create a new one
   # Forcing the LANG to en_US.UTF-8 to avoid clobbering LANG=C set at work
