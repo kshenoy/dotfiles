@@ -91,7 +91,7 @@ fi
 psgrep() {
   # From https://askubuntu.com/a/185746/38952
   # Using ww twice ensures that the output is not truncated to the width of the terminal
-  ps wwup $(command pgrep -f "$@")
+  ps wwup $(command pgrep -f "$@") 2> /dev/null
 }
 
 # Explicitly declaring this as a function as without it RHEL7 gets confused and errors out

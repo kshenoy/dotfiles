@@ -2202,7 +2202,7 @@ saving it to a variable and printing it out later in the capture template.
 
 This can then be used to create a capture frame
 #+BEGIN_EXAMPLE
-  emacsclient --create-frame --no-wait --socket-name=capture --frame-parameters='(quote (name . "capture"))' --eval "(my-make-capture-frame)"
+  emacsclient --alternate-editor="" --create-frame --no-wait --socket-name=capture --frame-parameters='(quote (name . "capture"))' --eval "(my-make-capture-frame)"
 #+END_EXAMPLE
 
 ***** TODO Get this running in Windows

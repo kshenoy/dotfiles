@@ -52,6 +52,7 @@ while (( $# > 0 )); do
 
       echo "${_fg_green}Creating emacs daemon${_reset}: ${_socket}"
       if [[ ! -S ${_socket_path}/${_socket} ]]; then
+        echo ${_emacs_path:+${_emacs_path}/bin/}emacs --daemon${_socket:+=${_socket}}
         ${_emacs_path:+${_emacs_path}/bin/}emacs --daemon${_socket:+=${_socket}} 1> /dev/null
       fi
       ;;

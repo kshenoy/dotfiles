@@ -50,7 +50,7 @@ fzf-git-tags() {                                                                
 fzf-git-hashes() {                                                                                                 #{{{1
   vcs__is_in_git_repo || return
   git log --date=short --format="%C(green)%C(bold)%cd %C(auto)%h%d %s (%an)" --graph --color=always |
-  __fzf-down --ansi --no-sort --reverse --multi --bind 'ctrl-s:toggle-sort' \
+  __fzf-down --ansi --no-sort --multi --bind 'ctrl-s:toggle-sort' \
     --header 'Press CTRL-S to toggle sort' \
     --preview 'grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git show --color=always | head -'$LINES |
   grep -o "[a-f0-9]\{7,\}"
@@ -77,7 +77,7 @@ __fzf-p4-cd() {                                                                 
       -path $STEM/powerPro -o -path $STEM/sdpx \) -prune \
     -o -type d -print 2> /dev/null | sed "s:$STEM/::"'
 
-  local dir=$(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m)
+  local dir=$(eval "$cmd" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m)
   if [[ -z "$dir" ]]; then
     return
   fi
@@ -110,7 +110,7 @@ fzf-vcs-all-files() {                                                           
   if vcs__is_in_git_repo; then
     local _top=$(git rev-parse --show-toplevel)
     local _selected=$(git ls-tree --full-tree -r --name-only HEAD |
-      FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m |
+      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m |
       while read -r item; do
         path=${_top}/$item
         printf '%q ' "${path#$(realpath $PWD)/}"

@@ -22,5 +22,5 @@ source $HOME/.dotfiles/fzf/key-bindings.bash
 
 # Customisations
 # --------------
-export FZF_DEFAULT_OPTS='--ansi --reverse --exit-0'
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --bind=ctrl-n:down,ctrl-p:up,alt-n:next-history,alt-p:previous-history --height ${FZF_TMUX_HEIGHT:-40%} --ansi --reverse --exit-0"
 # export FZF_CTRL_T_OPTS='--expect=alt-v,alt-e,alt-c'

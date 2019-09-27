@@ -224,11 +224,9 @@ export VISUAL=gvim
 
 #GREP_OPTIONS="--color=auto"
 export GREP_COLORS='1;32'
-export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
-
 export LANG=en_US.UTF-8
 
-# Set XDG env vars to their defaults
+# Set XDG env vars to their defaults. I know this is not recommended but it makes it way easier to configure others
 [[ -z $XDG_DATA_HOME   ]] && export XDG_DATA_HOME=$HOME/.local/share
 [[ -z $XDG_CONFIG_HOME ]] && export XDG_CONFIG_HOME=$HOME/.config
 [[ -z $XDG_DATA_DIRS   ]] && export XDG_DATA_DIRS=/usr/local/share/:/usr/share/
@@ -260,6 +258,20 @@ fi
 #=======================================================================================================================
 # SOURCE UTILS                                                                                                      {{{1
 #=======================================================================================================================
+# Base16 Color scheme for terminal
+export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
+[[ -n "$PS1" ]] && \
+[[ -s $BASE16_SHELL/profile_helper.sh ]] && \
+eval "$($BASE16_SHELL/profile_helper.sh)"
+
+# base16 fzf colorscheme is applied by SETTING, not appending to the FZF_DEFAULT_OPTS env var
+# Thus, I "set" it first before sourcing fzf.bash which appends to it
+# FIXME: Find way to automatically apply/update FZF colorscheme
+export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
+. $BASE16_FZF/bash/base16-solarized-light.config
+
+export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/.dotfiles/ripgreprc
+
 for i in \
   ~/.bashrc_local                       \
   ~/.dotfiles/bash/bashrc-func          \
@@ -276,16 +288,6 @@ for i in \
   fi
 done
 # }}}1
-
-# Base16 Color scheme for terminal
-export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
-[[ -n "$PS1" ]] && \
-[[ -s $BASE16_SHELL/profile_helper.sh ]] && \
-eval "$($BASE16_SHELL/profile_helper.sh)"
-
-# FIXME: Find way to automatically apply/update FZF colorscheme
-export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
-. $BASE16_FZF/bash/base16-solarized-light.config
 
 
 #=======================================================================================================================
