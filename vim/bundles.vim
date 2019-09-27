@@ -250,8 +250,15 @@ call plug#('derekwyatt/vim-fswitch')
 
 
 " fzf ------------------------------------------------------------------------------------------------------------- {{{1
-" Plug $FZF_PATH
-" Plug 'junegunn/fzf.vim'
+Plug $FZF_PATH
+Plug 'junegunn/fzf.vim'
+
+let g:fzf_layout={'down': '~25%'}
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-s': 'split',
+  \ 'ctrl-v': 'vsplit' }
+let g:fzf_history_dir = '~/.local/share/fzf-history'
 
 
 " gundo ----------------------------------------------------------------------------------------------------------- {{{1
