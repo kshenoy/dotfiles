@@ -270,7 +270,7 @@ eval "$($BASE16_SHELL/profile_helper.sh)"
 export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
 . $BASE16_FZF/bash/base16-solarized-light.config
 
-export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/.dotfiles/ripgreprc
+export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgreprc
 
 for i in \
   ~/.bashrc_local                       \

@@ -1,5 +1,5 @@
 # Roots of the synchronization
-root = /home/kshenoy/Documents
+root = /home/kshenoy
 root = ssh://kshenoy@atlibex-vdi0767//home/kshenoy
 
 #          Causes Unison to double-check, at the end of update detection,
@@ -10,11 +10,8 @@ root = ssh://kshenoy@atlibex-vdi0767//home/kshenoy
 
 
 # Paths to synchronize
-#path = current
-#path = common
-#path = .netscape/bookmarks.html
-#path = Config
-path = Notes
+path = Documents/Notes
+path = .local/share/bash_history
 
 
 # Some regexps specifying names and paths to ignore
@@ -39,18 +36,6 @@ ignore = Name sync.ffs_db
 ignore = Regex .*/emacs.d/ac-comphist.*
 
 # Ignores the exact path and everything below it
-#ignore = BelowPath Config/dotfiles/emacs.d/auto-save-list
-#ignore = BelowPath Config/dotfiles/emacs.d/elpa
-#ignore = BelowPath Config/dotfiles/emacs.d/bundle
-#ignore = BelowPath Config/dotfiles/emacs.d/server
-#ignore = BelowPath Config/dotfiles/emacs.d/semanticdb
-#ignore = BelowPath Config/dotfiles/emacs.d/tmp
-#ignore = BelowPath Config/dotfiles/vim/pack/bundles
-#ignore = BelowPath Config/dotfiles/vim/tmp
-#ignore = BelowPath Config/dotfiles/compiz
-#ignore = BelowPath Config/dotfiles/scripts/ti
-#ignore = BelowPath Config/dotfiles/unity
-#ignore = BelowPath Config/Fonts/PragmataPro
 ignore = BelowPath Notes/Personal
 
 
