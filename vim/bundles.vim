@@ -172,10 +172,6 @@ augroup END
 call plug#('Raimondi/delimitMate')
 
 
-" diff-enhanced --------------------------------------------------------------------------------------------------- {{{1
-call plug#('chrisbra/vim-diff-enhanced')
-
-
 " DrawIt ---------------------------------------------------------------------------------------------------------- {{{1
 " call plug#('vim-scripts/DrawIt')
 
@@ -265,22 +261,23 @@ endif
 
 " gundo ----------------------------------------------------------------------------------------------------------- {{{1
 let g:gundo_preview_bottom=1
-nnoremap yoU :GundoToggle<CR>
-
 call plug#('sjl/gundo.vim', {'on': 'GundoToggle'})
+
+nnoremap yoU :GundoToggle<CR>
 
 
 " IndentLine ------------------------------------------------------------------------------------------------------ {{{1
 let g:indentLine_char = "┊"
+call plug#('Yggdroot/indentLine', s:PlugCond(has('conceal'), {'on': 'IndentLinesToggle'}))
 
-" call plug#('Yggdroot/indentLine', PlugCond(has('conceal'), {'on': 'IndentLinesToggle'}))
+nnoremap yoI :IndentLinesToggle<CR>
 
 
 " ListToggle ------------------------------------------------------------------------------------------------------ {{{1
+call plug#('Valloric/ListToggle', {'on': ['LToggle', 'QToggle']})
+
 nnoremap yoL :LToggle<CR>
 nnoremap yoQ :QToggle<CR>
-
-call plug#('Valloric/ListToggle', {'on': ['LToggle', 'QToggle']})
 
 
 " mark ------------------------------------------------------------------------------------------------------------ {{{1

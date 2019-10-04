@@ -276,6 +276,9 @@ set foldnestmax=2                                      " Maximum fold depth for 
 if DISABLE_FROM == 17 | finish | endif
 
 " set diffopt+=iwhite                                                                                " Ignore whitespace
+if has("patch-8.1.0360")
+  set diffopt+=internal,algorithm:patience
+endif
 
 
 "
