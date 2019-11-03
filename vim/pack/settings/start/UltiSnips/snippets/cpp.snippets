@@ -103,7 +103,7 @@ endsnippet
 
 
 #=======================================================================================================================
-# Smart Pointers                                                                                                          {{{1
+# Smart Pointers                                                                                                    {{{1
 #
 snippet sp "std::shared_ptr" w
 std::shared_ptr<${1:${VISUAL}}>
@@ -205,22 +205,23 @@ std::vector<${1:${VISUAL:T}}>$0
 endsnippet
 
 
-# Idioms -----------------------------------------------------------------------------------------------------------{{{2
-snippet erm ".erase(std::remove(...))"
-${1:${VISUAL:container}}.erase(std::remove(begin($1), end($1), ${2:value}), end($1));
-endsnippet
-
-snippet ermi ".erase(std::remove_if(...))"
-${1:${VISUAL:container}}.erase(std::remove_if(begin($1), end($1), []($0)), end($1));
+# Removing elements ------------------------------------------------------------------------------------------------{{{2
+snippet rm "std::remove"
+auto pos = std::remove(begin(${1:container}), end($1), ${2:value});
 endsnippet
 
 snippet rmi "std::remove_if"
 auto pos = std::remove_if(begin(${1:container}), end($1), []($2) {
   $3
 });
-if (pos != end($1)) {
-  $4
-}
+endsnippet
+
+snippet erm ".erase(std::remove(...))"
+${1:${VISUAL:container}}.erase(std::remove(begin($1), end($1), ${2:value}), end($1));
+endsnippet
+
+snippet ermi ".erase(std::remove_if(...))"
+${1:${VISUAL:container}}.erase(std::remove_if(begin($1), end($1), []($0){}), end($1));
 endsnippet
 
 # Non-modifying sequence operations --------------------------------------------------------------------------------{{{2

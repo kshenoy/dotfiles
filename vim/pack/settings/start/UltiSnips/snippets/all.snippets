@@ -78,12 +78,16 @@ endsnippet
 #=======================================================================================================================
 # FIXMEs
 #
-snippet TODO "TODO"
-`!p snip.rv = get_comment_format()[0]`TODO: ${1:owner=kartik.shenoy@amd.com}
+snippet FIXME "FIXME" b
+`!p snip.rv = get_comment_format()[0]`FIXME${1}: owner=${2:kshenoy} - $0
 endsnippet
 
-snippet FIXME "FIXME"
-`!p snip.rv = get_comment_format()[0]`FIXME${1}: owner=${2:kartik.shenoy@amd.com}
+snippet CLEANUP "CLEANUP"
+`!p snip.rv = get_comment_format()[0]`FIXME_CLEANUP${1}: ${2:owner=kshenoy} - $0
+endsnippet
+
+snippet TODO "TODO"
+`!p snip.rv = get_comment_format()[0]`FIXME_TODO${1}: ${2:owner=kshenoy} - $0
 endsnippet
 
 

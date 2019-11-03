@@ -7,8 +7,8 @@ nnoremap <silent> <leader>so :so $MYVIMRC<BAR>so $MYGVIMRC<CR>
 nnoremap <silent> <leader>sr :reg<CR>
 nnoremap <silent> <leader>sm :marks<CR>
 " Set size
-" nnoremap <silent> <leader>ss :set columns=319<BAR>call system("wmctrl -i -b add,maximized_vert -r " . v:windowid)<CR>
-nnoremap <silent> <leader>ss :set columns=273<BAR>call system("wmctrl -i -b add,maximized_vert -r " . v:windowid)<CR>
+nnoremap <silent> <leader>ss :set columns=319<BAR>call system("wmctrl -i -b add,maximized_vert -r " . v:windowid)<CR>
+" nnoremap <silent> <leader>ss :set columns=273<BAR>call system("wmctrl -i -b add,maximized_vert -r " . v:windowid)<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " GOTO commands                                                                                                     {{{1
@@ -87,11 +87,7 @@ noremap <silent> [M :call utils#MethodJump('[M')<CR>
 nnoremap Y y$
 
 """ Split line (sister to [J]oin lines)
-if has('gui_running')
-  nnoremap <M-j> i<CR><ESC>:call utils#Preserve('-2s/\s\+$//')<CR>
-else
-  nnoremap j i<CR><ESC>:call utils#Preserve('-2s/\s\+$//')<CR>
-endif
+nnoremap <M-j> i<CR><ESC>:call utils#Preserve('-2s/\s\+$//')<CR>
 
 """ Break undo-sequence before deleting till start of line
 inoremap <C-U> <C-G>u<C-U>

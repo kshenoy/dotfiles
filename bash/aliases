@@ -191,7 +191,7 @@ alias gs='git status'
 # Misc Tools
 alias tmux='tmux_pp'
 alias tm='tmux'
-alias tmi=tmuxinator
+# alias tmi=tmuxinator
 alias U='unison dotfiles -terse'
 
 

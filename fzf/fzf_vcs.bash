@@ -148,7 +148,7 @@ fzf-vcs-files() {                                                               
 fzf-vcs-status() {                                                                                                 #{{{1
   if vcs__is_in_git_repo; then
     local _selected=$(git -c color.status=always status --short |
-      fzf -m --nth=2 |
+      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m --nth=2 |
       awk '{print $NF}' |
       while read -r item; do
         printf '%q ' "$item"
@@ -156,7 +156,8 @@ fzf-vcs-status() {                                                              
     )
   elif vcs__is_in_perforce_repo; then
     local _selected=$(p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" |
-      column -s# -o "    #" -t | column -s- -o- -t | fzf -m --nth=1 | awk '{print $1}' |
+      column -s# -o "    #" -t | column -s- -o- -t |
+      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m --nth=1 | awk '{print $1}' |
       while read -r item; do
         path=${STEM}/$item
         printf '%q ' "${path#$(realpath $PWD)/}"

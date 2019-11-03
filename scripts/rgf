@@ -59,7 +59,7 @@ while (( $# > 0 )); do
 done
 # echo "DEBUG: FList: ${_flist[@]}"
 # echo "DEBUG: Types: ${_ft_filt[@]}"
-# echo "DEBUG: rg Opts: ${_rg_opts[@]}"
+# echo "DEBUG: rg Opts: \"${_rg_opts[@]}\""
 
 # Compile list of filetypes to filter filelist by
 _ft_pat=""

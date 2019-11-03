@@ -7,13 +7,10 @@
 " :DD
 
 " Use :DD keyword to look up the given keyword, scoped with the current filetype:
-" :DD Map
+" :DD vector
 
 " Use :DD scope keyword to do the scoping yourself:
-" :DD scss @mixin
-
-" Use the :DD command for keyword look up with the built-in K:
-" setlocal keywordprg=:DD
+" :DD cpp vector
 
 
 if g:env ==? 'darwin'
