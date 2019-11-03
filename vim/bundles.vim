@@ -144,18 +144,15 @@ let g:ctrlp_prompt_mappings = {
 " \ 'ToggleType(1)':        ['<c-f>', '<c-up>'],
 " \ 'ToggleType(1)':        ['<c-l>'],
 
-map      <leader>f <Plug>my(CtrlP)
-nnoremap <silent>  <Plug>my(CtrlP)b :CtrlPBuffer<CR>
-nnoremap <silent>  <Plug>my(CtrlP)e :CtrlPCurWD<CR>
-nnoremap <silent>  <Plug>my(CtrlP)f :CtrlP<CR>
-nnoremap <silent>  <Plug>my(CtrlP)j :CtrlPMixed<CR>
-nnoremap <silent>  <Plug>my(CtrlP)r :CtrlPMRU<CR>
-nnoremap <silent>  <Plug>my(CtrlP)q :CtrlPQuickfix<CR>
-nnoremap <silent>  <Plug>my(CtrlP)t :CtrlPTag<CR>
-nnoremap <silent>  <Plug>my(CtrlP)o :CtrlPFunky<CR>
-xnoremap <silent>  <Plug>my(CtrlP)o :<C-U>CtrlPFunky <C-R>*<CR>
-nnoremap <silent>  <Plug>my(CtrlP)] :CtrlPtjump<CR>
-vnoremap <silent>  <Plug>my(CtrlP)] :CtrlPtjumpVisual<CR>
+map      <leader>f <Plug>my(Finder)
+nnoremap <silent>  <Plug>my(Finder)b :CtrlPBuffer<CR>
+nnoremap <silent>  <Plug>my(Finder)e :CtrlPCurWD<CR>
+nnoremap <silent>  <Plug>my(Finder)f :CtrlP<CR>
+nnoremap <silent>  <Plug>my(Finder)j :CtrlPMixed<CR>
+nnoremap <silent>  <Plug>my(Finder)r :CtrlPMRU<CR>
+nnoremap <silent>  <Plug>my(Finder)q :CtrlPQuickfix<CR>
+nnoremap <silent>  <Plug>my(Finder)o :CtrlPFunky<CR>
+xnoremap <silent>  <Plug>my(Finder)o :<C-U>CtrlPFunky <C-R>*<CR>
 nnoremap <silent>  <leader><leader> :CtrlPBuffer<CR>
 
 call plug#('ctrlpvim/ctrlp.vim')
@@ -248,14 +245,20 @@ call plug#('derekwyatt/vim-fswitch')
 " fzf ------------------------------------------------------------------------------------------------------------- {{{1
 if ($FZF_PATH != "")
   Plug $FZF_PATH
-  Plug 'kshenoy/fzf.vim'
+  Plug 'junegunn/fzf.vim'
 
   let g:fzf_layout={'down': '~30%'}
   let g:fzf_action = {
     \ 'ctrl-t': 'tab split',
     \ 'ctrl-s': 'split',
-    \ 'ctrl-v': 'vsplit' }
+    \ 'ctrl-v': 'vsplit'
+    \ }
   let g:fzf_history_dir = '~/.local/share/fzf-history'
+  let $FZF_DEFAULT_OPTS='--noreverse'
+
+  nnoremap <silent> <Plug>my(Finder)t :Tags<CR>
+  nnoremap <silent> <Plug>my(Finder)y :Snippet<CR>
+  nnoremap <silent> <Plug>my(Finder)m :call fzf#vim#marks()<CR>
 endif
 
 
