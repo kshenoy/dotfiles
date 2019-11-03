@@ -12,6 +12,8 @@
 #
 # Output of the crontab jobs (including errors) is sent through
 # email to the user the crontab file belongs to (unless redirected).
+# Logs for cron jobs will be dumped to /var/log/syslog and can be found with
+# grep CRON /var/log/syslog
 #
 # For example, you can run a backup of all your user accounts
 # at 5 a.m every week with:
@@ -28,4 +30,4 @@
 # *  *  *  *  *  command to be executed
 
 # Every 5 minutes: sync dotfiles if connected to AMD VPN
-  */5  *  *  *  *  nmcli con show --active | grep AMD > /dev/null && /usr/local/bin/unison -ui text dotfiles
+  */5  *  *  *  *  nmcli con show --active | grep gpd0 > /dev/null && /usr/local/bin/unison -ui text dotfiles 2>&1 >| /home/kshenoy/.local/share/unison/dotfiles.log

@@ -1026,7 +1026,6 @@ Frame theme is messed up
     (company-posframe-mode 1))
 #+end_src
 
-
 ** evil
 Getting started guide: https://github.com/noctuid/evil-guide
 evil can be toggled using =C-z=
@@ -1652,7 +1651,7 @@ Resources: [[http://doc.norang.ca/org-mode.html][Organize Your Life in Plain Tex
 *** :init
 #+begin_src emacs-lisp
   :init
-  (setq org-directory "~/Notes/")
+  (setq org-directory "~/Documents/Notes/")
   (setq org-default-notes-file (expand-file-name "Inbox.org" org-directory))
 
   (setq org-M-RET-may-split-line '((item) (default . t)))
