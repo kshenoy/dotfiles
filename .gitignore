@@ -4,13 +4,16 @@
 .nfs*
 *sync.ffs_db
 bash/history
+bash/work
 compiz/
-emacs.d/private*.el
+emacs.d/work.el
 emacs.d/straight/
 fonts/
+scripts/amd
 unity/
 vim/autoload/plug*
 vim/pack/bundles
+vim/pack/rc_local
 vim/pack/settings/start/UltiSnips/pythonx/UltiSnips_globals.pyc
 vim/pack/settings/start/UltiSnips/pythonx/vimsnippets.pyc
 vim/pack/settings/start/UltiSnips/pythonx/__pycache__
