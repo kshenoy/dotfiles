@@ -1,7 +1,15 @@
 # bashrc file for home
 
 # Aliases
-alias amd_vpn='sudo openconnect -i AMD -u kshenoy --token-mode=rsa atl-vpn.amd.com'
+amd_vpn() {
+  # if command grep Connected <<< $(globalprotect show --status); then
+  if command grep gpd0 <<< $(ifconfig -s) >& /dev/null; then
+    echo "VPN is already connected"
+  else
+    globalprotect connect --portal vpn.amd.com --username kshenoy
+    unison dotfiles
+  fi
+}
 
 # fzf: https://github.com/junegunn/fzf
 [[ -d /opt/fzf ]] && export FZF_PATH=/opt/fzf
