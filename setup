@@ -7,11 +7,10 @@ _xdg_data_home=${XDG_DATA_HOME:-$HOME/.local/share}
 [[ ! -d ${_xdg_config_home}/dotfiles-priv ]] && \
   git clone https://github.com/kshenoy/dotfiles-priv ${_xdg_config_home}/dotfiles-priv
 ln -svTf ${_xdg_config_home}/dotfiles{-priv,}/bash/work
-ln -svTf ${_xdg_config_home}/dotfiles{-priv,}/emacs.d/work.el
 ln -svTf ${_xdg_config_home}/dotfiles{-priv,}/scripts/amd
 ln -svTf ${_xdg_config_home}/dotfiles{-priv,}/vim/pack/rc_local
 
-mkdir -p ${_xdg_config_home}{,/git}
+mkdir -p ${_xdg_config_home}
 ln -svTf ${_xdg_config_home}/dotfiles     ~/.dotfiles
 ln -svTf ${_xdg_config_home}/dotfiles/bash/bashrc           ~/.bashrc
 ln -svTf ${_xdg_config_home}/dotfiles/ctags                 ~/.ctags
@@ -22,6 +21,11 @@ ln -svTf ${_xdg_config_home}/dotfiles/Xresources            ~/.Xresources
 ln -svTf ${_xdg_config_home}/dotfiles/fzf/fzf.bash          ~/.fzf.bash
 # ln -svTf ${_xdg_config_home}/dotfiles/awesome             ~/.config/awesome
 # ln -svTf ${_xdg_config_home}/dotfiles/i3                  ~/.config/i3
+
+mkdir -p ~/.emacs.d
+ln -svTf ${_xdg_config_home}/dotfiles/emacs.d/custom.el     ~/.emacs.d/custom.el
+ln -svTf ${_xdg_config_home}/dotfiles/emacs.d/snippets      ~/.emacs.d/snippets
+ln -svTf ${_xdg_config_home}/dotfiles-priv/emacs.d/work.el  ~/.emacs.d/work.el
 
 [[ ! -d ${_xdg_config_home}/base16-shell ]] && \
   git clone https://github.com/chriskempson/base16-shell.git ${_xdg_config_home}/base16-shell
