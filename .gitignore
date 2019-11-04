@@ -21,5 +21,7 @@ vim/tmp
 nvim/autoload/plug*
 nvim/bundles
 wallpapers/
+xfce4/desktop/
+xfce4/panel/
 zsh/history
 zsh/oh-my-zsh/
