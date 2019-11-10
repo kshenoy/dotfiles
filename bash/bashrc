@@ -266,9 +266,8 @@ eval "$($BASE16_SHELL/profile_helper.sh)"
 
 # base16 fzf colorscheme is applied by SETTING, not appending to the FZF_DEFAULT_OPTS env var
 # Thus, I "set" it first before sourcing fzf.bash which appends to it
-# FIXME: Find a way to automatically apply/update FZF colorscheme
 export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
-. $BASE16_FZF/bash/base16-solarized-light.config
+[[ -n "$BASE16_THEME" ]] && source "${BASE16_FZF}/bash/base16-${BASE16_THEME}.config"
 
 export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgreprc
 
