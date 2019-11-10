@@ -1,6 +1,7 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # Kartik Shenoy (kartik.shenoy@amd.com)
+echo "$(tput setaf 2)Sourcing$(tput sgr0) ${BASH_SOURCE[0]} ..."
 
 # shopt -q login_shell && echo "Login shell" || echo "Not a login shell"
 # [[ $- == *i* ]] && echo "This is an interactive shell" || echo "This is a script"
@@ -278,10 +279,8 @@ for i in \
   ~/.dotfiles/bash/aliases              \
   ~/.dotfiles/fzf/fzf.bash              \
   ~/.dotfiles/tmux/tmux_completion_bash \
-  ~/.bash_aliases                       \
 ; do
   if [[ -f ${i} ]]; then
-    echo "  Sourcing ${i} ..."
     source ${i}
     # echo "  ... done"
   fi

@@ -31,6 +31,7 @@
   # 29 : Strike-out Off
 #
 # Always use tput to generate these codes.
+echo "$(tput setaf 2)Sourcing$(tput sgr0) ${BASH_SOURCE[0]} ..."
 
 # This should always point to whatever prompt is desired.
 PROMPT_COMMAND=_setprompt_sjlmod_

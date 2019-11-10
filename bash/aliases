@@ -14,6 +14,7 @@
 # To avoid this, I use functions for my most commonly used aliases so that they work everywhere and,
 # aliases only if I'm sure that they won't be used in the middle of a command.
 
+echo "$(tput setaf 2)Sourcing$(tput sgr0) ${BASH_SOURCE[0]} ..."
 
 # Identify the current shell
 MYSHELL=$(basename $(ps h p $$ | awk '{ print $NF }' | sed 's/-//g'))
@@ -161,8 +162,8 @@ alias gosa='$EDITOR ~/.dotfiles/bash/aliases'
 alias gosf='$EDITOR ~/.dotfiles/bash/bashrc-func'
 alias gost='$EDITOR ~/.dotfiles/tmux/tmux.conf'
 alias gosx='$EDITOR ~/.Xresources'
-alias sosc='. ~/.bashrc && clnpath && echo Sourced bashrc'
-alias sosa='. ~/.dotfiles/bash/aliases && . ~/.dotfiles/bash/bashrc-func && echo Sourced aliases and functions'
+alias sosc='. ~/.bashrc && clnpath'
+alias sosa='. ~/.dotfiles/bash/aliases && . ~/.dotfiles/bash/bashrc-func'
 
 
 #=======

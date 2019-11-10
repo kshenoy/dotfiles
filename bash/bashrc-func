@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Description: Functions for BASH
+echo "$(tput setaf 2)Sourcing$(tput sgr0) ${BASH_SOURCE[0]} ..."
 
 #typeset -A lsfjobs
 
