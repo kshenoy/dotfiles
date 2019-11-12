@@ -8,19 +8,20 @@ jumper() {
   if (($# == 0)); then
     echo "ERROR: Insufficient number of arguments"
     echo "SYNTAX: path_jump <dir>[/subdir]"
+    return;
   fi
 
   # Jumping to a subdirectory of the parent dir in the path
   local _targ=${1%%/*}
   local _subdir="${1/${_targ}/}"
-  # echo "Targ:$_targ, SubDir:$_subdir" >> log
+  # echo "Targ:$_targ, SubDir:$_subdir"
 
   # Plain-old jumping, no fuzziness
   # local _dir=$(echo $PWD | sed "s,\(^.*${_targ}[^/]*\)/.*$,\1,")
 
   # Remove spaces, escape any bare dots and add fuzzy magic
-  local _rx=$(ruby -e "print '${_targ}'.gsub(/\s+/,'').split('').join('.*?').gsub(/\.(?!\*\?)/,'\.')")
-  local _dir=$(echo $PWD | ruby -e "print STDIN.read.sub(/(.*?\/${_rx}[^\/]*).*/,'\1')")
+  local _regex=$(ruby -e "print '${_targ}'.gsub(/\s+/,'').split('').join('.*?').gsub(/\.(?!\*\?)/,'\.')")
+  local _dir=$(echo $PWD | ruby -e "print STDIN.read.sub(/(.*?${_regex}[^\/]*).*/,'\1')")
 
   echo ${_dir}/${_subdir}
 }
