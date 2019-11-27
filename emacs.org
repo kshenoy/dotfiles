@@ -1952,8 +1952,8 @@ By [[https://www.reddit.com/r/emacs/comments/4366f9/how_do_orgrefiletargets_work
 Show upto 3 levels of headings from the current file and two levels of headings from all agenda files
 #+begin_src emacs-lisp
   (setq org-refile-targets
-        '((nil . (:maxlevel . 3))
-          (org-agenda-files . (:maxlevel . 9))))
+        '((nil . (:maxlevel . 9))
+          (org-agenda-files . (:maxlevel . 5))))
 #+end_src
 Each element of the list generates a set of possible targets.
 /nil/ indicates that all the headings in the current buffer will be considered.
@@ -2655,7 +2655,7 @@ Placing at end to be called after all packages are loaded
 #+begin_src emacs-lisp
   (when (or (and (eq system-type 'gnu/linux) (string-match-p "atlibex" (system-name)))
             (and (eq system-type 'windows-nt) (string-match-p "MHDC" (system-name))))
-    (load (expand-file-name "private_work.el" user-emacs-directory) t))
+    (load (expand-file-name "work.el" user-emacs-directory) t))
 #+end_src
 
 * Local variables

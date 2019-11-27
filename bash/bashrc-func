@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Description: Functions for BASH
+echo "$(tput setaf 2)Sourcing$(tput sgr0) ${BASH_SOURCE[0]} ..."
 
 #typeset -A lsfjobs
 
@@ -165,11 +166,36 @@ unix2dos() {
 }
 
 
-# spin - Spin till input predicate succeeds
-# unset -f spin
-# spin() {
-#   eval "until $@; do sleep 5; done"
-# }
+# base16 wrapper to set theme for shell+fzf etc. in one go
+unset -f base16
+base16() {
+  if (( $# == 0 )); then
+    return
+  fi
+  local _theme="$1"
+
+  if [[ -n "$BASE16_SHELL" ]]; then
+    _base16 "${BASE16_SHELL}/scripts/base16-${_theme}.sh" "$_theme"
+  fi
+
+  if [[ -n "$BASE16_FZF" ]]; then
+    source "${BASE16_FZF}/bash/base16-${_theme}.config"
+  fi
+}
+__base16_completions() {
+  [[ -z "$BASE16_SHELL" ]] && return
+
+  # Prevent completion if we've already picked something
+  (( ${#COMP_WORDS[@]} != 2 )) && return
+
+  local _themes=()
+  for fname in ${BASE16_SHELL}/scripts/base16-*; do
+    _themes+=($(sed 's/^base16-//' <<< "$(basename $fname .sh)"))
+  done
+
+  COMPREPLY+=($(compgen -W "${_themes[*]}" "${COMP_WORDS[1]}"))
+}
+complete -F __base16_completions base16
 
 # Automatically add completion for all aliases to commands having completion functions                              {{{1
 # Call this at the end
