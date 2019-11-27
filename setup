@@ -11,7 +11,7 @@ ln -svTf ${_xdg_config_home}/dotfiles{-priv,}/scripts/amd
 ln -svTf ${_xdg_config_home}/dotfiles{-priv,}/vim/pack/rc_local
 
 mkdir -p ${_xdg_config_home}
-ln -svTf ${_xdg_config_home}/dotfiles     ~/.dotfiles
+ln -svTf ${_xdg_config_home}/dotfiles                       ~/.dotfiles
 ln -svTf ${_xdg_config_home}/dotfiles/bash/bashrc           ~/.bashrc
 ln -svTf ${_xdg_config_home}/dotfiles/ctags                 ~/.ctags
 ln -svTf ${_xdg_config_home}/dotfiles/vim                   ~/.config/nvim
@@ -37,7 +37,7 @@ mkdir -p ${_xdg_config_home}/git
 ln -svTf ${_xdg_config_home}/dotfiles/gitignore             ${_xdg_config_home}/git/ignore
 
 mkdir -p ~/.ssh
-ln -svTf ${_xdg_config_home}/dotfiles/ssh/config            ~/.ssh/config
+ln -svTf ${_xdg_config_home}/dotfiles-priv/ssh/config       ~/.ssh/config
 
 mkdir -p ~/.unison
 ln -svTf ~${_xdg_config_home}/dotfiles/unison/dotfiles.prf  ~/.unison/dotfiles.prf
