@@ -19,20 +19,13 @@
      (org-src-preserve-indentation . t)
      (org-enforce-todo-dependencies)
      (org-enforce-todo-checkbox-dependencies)
-     (eval add-hook
-           (quote after-save-hook)
-           (lambda nil
-             (org-babel-tangle))
-           nil t)
-     (org-refile-targets
-      (nil :maxlevel . 9))
+     (org-refile-targets (nil :maxlevel . 9))
      (org-confirm-babel-evaluate)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(erc-my-nick-prefix-face ((t (:inherit erc-current-nick-face :weight bold))))
  '(rcirc-bright-nick ((t (:inherit rcirc-other-nick :underline t))))
  '(rcirc-dim-nick ((t (:foreground "#93a1a1"))))
  '(rcirc-my-nick ((t (:foreground "#cb4b16"))))

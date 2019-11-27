@@ -7,8 +7,8 @@ amd_vpn() {
     echo "VPN is already connected"
   else
     globalprotect connect --portal vpn.amd.com --username kshenoy
-    unison dotfiles
   fi
+  /usr/NX/bin/nxplayer --session leostream.nxs &
 }
 
 # fzf: https://github.com/junegunn/fzf

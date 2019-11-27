@@ -1237,9 +1237,7 @@ I thought about using =gt= and =gT= but there are some buffers which are better 
     :custom
     (eyebrowse-wrap-around t)
     :config
-    (eyebrowse-mode t)
-    (bind-keys :map eyebrowse-mode-map
-               ("C-c w w" . eyebrowse-last-window-config)))
+    (eyebrowse-mode t))
 #+end_src
 
 I thought about using a hydra instead of the default keybindings but the default keybindings work just fine. They're similar to tmux's bindings making it easy to remember.
@@ -1798,6 +1796,7 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 #+begin_src emacs-lisp
   :config
   (setq org-clock-idle-time nil)
+  (setq org-archive-location "::* ARCHIVE")
   ;; (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
 #+end_src
 
