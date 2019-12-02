@@ -20,8 +20,8 @@ fi
 # ------------
 # Note the order is important because some functions get overridden
 source $FZF_PATH/shell/key-bindings.bash
-source $HOME/.dotfiles/fzf/fzf_vcs.bash
-source $HOME/.dotfiles/fzf/key-bindings.bash
+source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf_vcs.bash
+source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/key-bindings.bash
 
 # Customisations
 # --------------

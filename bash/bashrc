@@ -1,10 +1,9 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
+[[ $- == *i* ]] || return
+
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # Kartik Shenoy (kartik.shenoy@amd.com)
 echo "$(tput setaf 2)Sourcing$(tput sgr0) ${BASH_SOURCE[0]} ..."
-
-# shopt -q login_shell && echo "Login shell" || echo "Not a login shell"
-# [[ $- == *i* ]] && echo "This is an interactive shell" || echo "This is a script"
 
 umask 002
 
@@ -227,14 +226,6 @@ export VISUAL=gvim
 export GREP_COLORS='1;32'
 export LANG=en_US.UTF-8
 
-# Set XDG env vars to their defaults. I know this is not recommended but it makes it way easier to configure everything
-[[ -z $XDG_DATA_HOME   ]] && export XDG_DATA_HOME=$HOME/.local/share
-[[ -z $XDG_CONFIG_HOME ]] && export XDG_CONFIG_HOME=$HOME/.config
-[[ -z $XDG_DATA_DIRS   ]] && export XDG_DATA_DIRS=/usr/local/share/:/usr/share/
-[[ -z $XDG_CONFIG_DIRS ]] && export XDG_CONFIG_DIRS=/etc/xdg
-[[ -z $XDG_CACHE_HOME  ]] && export XDG_CACHE_HOME=$HOME/.cache
-
-
 #=======================================================================================================================
 # MISC SETTINGS                                                                                                     {{{1
 #=======================================================================================================================
@@ -264,6 +255,7 @@ export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
 [[ -n "$PS1" ]] && \
 [[ -s $BASE16_SHELL/profile_helper.sh ]] && \
 eval "$($BASE16_SHELL/profile_helper.sh)"
+base16_solarized-light
 
 # base16 fzf colorscheme is applied by SETTING, not appending to the FZF_DEFAULT_OPTS env var
 # Thus, I "set" it first before sourcing fzf.bash which appends to it
@@ -273,12 +265,12 @@ export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
 export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgreprc
 
 for i in \
-  ~/.bashrc_local                       \
-  ~/.dotfiles/bash/bashrc-func          \
-  ~/.dotfiles/bash/bashrc-prompt        \
-  ~/.dotfiles/bash/aliases              \
-  ~/.dotfiles/fzf/fzf.bash              \
-  ~/.dotfiles/tmux/tmux_completion_bash \
+  ~/.bashrc_local                                                      \
+  ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/bashrc-func          \
+  ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/bashrc-prompt        \
+  ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/aliases              \
+  ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf.bash              \
+  ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/tmux/tmux_completion_bash \
 ; do
   if [[ -f ${i} ]]; then
     source ${i}
