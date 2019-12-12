@@ -1,6 +1,7 @@
 # bashrc file for home
 
 # Aliases
+alias gp=globalprotect
 amd_vpn() {
   # if command grep Connected <<< $(globalprotect show --status); then
   if command grep gpd0 <<< $(ifconfig -s) >& /dev/null; then
