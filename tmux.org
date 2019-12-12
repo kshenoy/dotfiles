@@ -87,13 +87,9 @@ Left-justify the window list
 
 Colors!
 #+begin_src conf
-  set -g status-fg colour7
-  set -g status-bg colour18
-  #set -g status-left-fg white
-  #set -g status-left-bg colour25
-  set -g message-fg colour7
-  set -g message-bg colour0
-  set -g message-attr bright
+  set -g status-style fg=colour7,bg=colour18
+  #set -g status-left-style fg=white,bg=colour25
+  set -g message-style fg=colour7,bg=colour0,bright
 #+end_src
 
 Increase the time between refresh (Default=15)
@@ -134,8 +130,8 @@ Set the starting pane index to 1
 
 Make the active pane stand-out visually
 #+begin_src conf
-  set -g pane-border-fg        colour0
-  set -g pane-active-border-fg colour19
+  set -g pane-border-style fg=colour0
+  set -g pane-active-border-style fg=colour19
 #+end_src
 
 ** Window configuration
@@ -153,14 +149,14 @@ Make active pane stand out
 Status Bar display
 #+begin_src conf
   setw -g window-status-format "#[fg=colour20] #I:#W "
-  setw -g window-status-attr bright
+  setw -g window-status-style bright
   setw -g window-status-current-format "#[attr=bright]#[fg=colour5] #I:#W "
-  setw -g window-status-current-attr bright
+  setw -g window-status-current-style bright
 #+end_src
 
 Blink the pane tab in case of any activity
 #+begin_src conf
-  setw -g window-status-activity-attr blink
+  setw -g window-status-activity-style blink
 #+end_src
 
 Window is only constrained in size if a smaller client is actively looking at it
