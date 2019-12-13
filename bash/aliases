@@ -157,13 +157,15 @@ alias e="emacs_func"
 
 #==========
 # Configs
+alias gosa='$EDITOR ~/.config/dotfiles/bash/aliases'
 alias gosc='$EDITOR ~/.bashrc'
-alias gosa='$EDITOR ~/.dotfiles/bash/aliases'
-alias gosf='$EDITOR ~/.dotfiles/bash/bashrc-func'
-alias gost='$EDITOR ~/.dotfiles/tmux/tmux.conf'
+alias gosf='$EDITOR ~/.config/dotfiles/bash/bashrc-func'
+alias gosl='$EDITOR ~/.bashrc_local'
+alias gosp='$EDITOR ~/.config/dotfiles/bash/bashrc-prompt'
+alias gost='$EDITOR ~/.config/dotfiles/tmux/tmux.conf'
 alias gosx='$EDITOR ~/.Xresources'
-alias sosc='. ~/.bashrc && clnpath'
 alias sosa='. ~/.dotfiles/bash/aliases && . ~/.dotfiles/bash/bashrc-func'
+alias sosc='. ~/.bashrc && clnpath'
 
 
 #=======
@@ -194,8 +196,3 @@ alias tmux='tmux_pp'
 alias tm='tmux'
 # alias tmi=tmuxinator
 alias U='unison dotfiles -terse'
-
-
-#================
-# Local aliases
-[[ -f ~/.aliases_local ]] && . ~/.aliases_local

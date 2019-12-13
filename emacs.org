@@ -690,17 +690,6 @@ Frame parameters for all frames, regardless of window-system.
         (vertical-scroll-bars . nil)))
 #+end_src
 
-Per window-system overrides and additions to default-frame-alist.
-=window-system-default-frame-alist= uses symbols of type =window-system= and not =system-type=
-#+begin_src emacs-lisp
-  ;; Set frame size pixelwise instead of characterwise
-  (setq frame-resize-pixelwise t)
-
-  (setq window-system-default-frame-alist
-        '((x . ((top . 0) (left . 0) (width . 319) (height . 74)))
-          (w32 . ((fullscreen . maximized)))))
-#+end_src
-
 Set frame size programatically
 #+begin_src emacs-lisp
   (bind-keys :map my-s-bindings-map
@@ -712,13 +701,6 @@ Set frame size programatically
                       (interactive)
                       (set-frame-position (selected-frame) 1919 0)
                       (set-frame-size     (selected-frame) 1910 1150 t))))
-#+end_src
-
-For reasons I don't understand, when I start a server and create a frame it still shows scroll-bars.
-So, I have to disable this explicitly
-#+begin_src emacs-lisp
-  (add-to-list 'default-frame-alist
-               '(vertical-scroll-bars . nil))
 #+end_src
 
 ** IRC using [[https://www.gnu.org/software/emacs/manual/html_mono/rcirc.html][rcirc]]
@@ -1237,7 +1219,9 @@ I thought about using =gt= and =gT= but there are some buffers which are better 
     :custom
     (eyebrowse-wrap-around t)
     :config
-    (eyebrowse-mode t))
+    (eyebrowse-mode t)
+    (bind-keys :map eyebrowse-mode-map
+               ("C-c w w" . eyebrowse-last-window-config)))
 #+end_src
 
 I thought about using a hydra instead of the default keybindings but the default keybindings work just fine. They're similar to tmux's bindings making it easy to remember.
@@ -1796,7 +1780,6 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 #+begin_src emacs-lisp
   :config
   (setq org-clock-idle-time nil)
-  (setq org-archive-location "::* ARCHIVE")
   ;; (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
 #+end_src
 
@@ -2439,8 +2422,8 @@ Small: ► • ★ ▸
 #+begin_src emacs-lisp
   (use-package org-bullets
     :after org
-    :config
-    (add-hook 'org-mode-hook (lambda() (org-bullets-mode 1))))
+    :hook (org-mode . (lambda() (org-bullets-mode 1)))
+    :custom (org-bullets-bullet-list '("✜")))
 #+end_src
 
 A good way to find more characters is to use =M-x insert-char=

@@ -20,17 +20,23 @@ __help() {
 SYNTAX:
   $_name FILE1[#rev1/@cl1] [FILE2[#rev2/@cl2]]
 
+DESCRIPTION:
+  Diff any two files under perforce revision control.
+  Accepts the default revision specifiers ('p4 help revisions') and also the following:
+    #-1 : Refers to the latest version in the repo (#head)
+    #-N : Nth most-recent revision (#head - N + 1)
+
 EXAMPLES:
   With 1 argument:
   ----------------
   * $_name ch/verif/l3/arch_l3/arch_lci.cc
-      Run regular p4 diff comparing the current state (with edits) against the HEAD
+      Run regular p4 diff comparing the current state (with edits) against the version in the repo (#head)
 
   * $_name ch/verif/l3/arch_l3/arch_lci.cc#42
-      Diff the current state (with edits) against rev#42 in the repo
+      Diff the current state (with all edits) against rev#42 in the repo
 
   * $_name ch/verif/l3/arch_l3/arch_lci.cc@112358
-      Diff the current state (with edits) against the latest rev as of changelist 112358 in the repo
+      Diff the current state (with all edits) against the latest rev as of changelist 112358 in the repo
 
   With 2 arguments:
   -----------------
@@ -45,7 +51,8 @@ EXAMPLES:
       Diff rev#42 of arch_lci.cc with the latest rev as of changelist 112358 in the repo
 
   * $_name ch/verif/l3/arch_l3/arch_lci.cc ch/verif/l3/arch_l3/arch_lci.cc#-1
-      If file is open for edits: Diff the current state with the head revision in the repo"
+      If file is open for edits: Diff the current state with the latest revision on the client
+"
 }
 
 ## Enable debug logging
@@ -80,37 +87,12 @@ if [[ -z "${_cmd}" ]]; then
 fi
 
 ##======================================================================================================================
-__cl_to_rev() {
-  ## Convert changelist to a file revision
-  ## * __cl_to_rev ch/verif/l3/arch_l3/arch_lci/arch_lci.h@123456
-  ##   returns: ch/verif/l3/arch_l3/arch_lci/arch_lci.h#42
-
-  (( $# != 1 )) && die "Incorrect number of arguments supplied (Line $LINENO, ${FUNCNAME[0]})"
-  [[ ! "$1" =~ @[[:digit:]]+ ]] && die "'$1' does not have a valid changelist specifier (Line $LINENO, ${FUNCNAME[0]})"
-
-  local _in=$1
-  local _fname=${_in%%@*}
-  local _targ_cl=${_in##*@}
-
-  while read -r line; do
-    local _cl=$(awk '{print $4}' <<< "$line");
-    if (( $_cl <= $_targ_cl )); then
-      local _rev=$(awk '{print $2}' <<< "$line");
-      _out="$_fname$_rev"
-      return;
-    fi;
-  done < <(p4 filelog -sL $_in | grep '^\.\.\. #')
-
-  die "Unable to convert changelist to a revision for '$_in' (Line $LINENO, ${FUNCNAME[0]})"
-}
-
-##======================================================================================================================
-__sane_rev() {
+__pos_rev() {
   ## Convert negative file revisions to positive ones
   ## Assuming #42 is the head revision for ch/verif/l3/arch_l3/arch_lci/arch_lci.h
-  ## * __sane_rev ch/verif/l3/arch_l3/arch_lci/arch_lci.h#-1
+  ## * __pos_rev ch/verif/l3/arch_l3/arch_lci/arch_lci.h#-1
   ##   returns: ch/verif/l3/arch_l3/arch_lci/arch_lci.h#42
-  ## * __sane_rev ch/verif/l3/arch_l3/arch_lci/arch_lci.h#-3
+  ## * __pos_rev ch/verif/l3/arch_l3/arch_lci/arch_lci.h#-3
   ##   returns: ch/verif/l3/arch_l3/arch_lci/arch_lci.h#40
 
   (( $# != 1 )) && die "Incorrect number of arguments supplied (Line $LINENO, ${FUNCNAME[0]})"
@@ -121,23 +103,11 @@ __sane_rev() {
   local _rev=${_in##*#}
   local _headrev=$(p4 fstat $_fname | grep -Po '(?<=headRev )\d+')
 
-  echo "DEBUG: Input=$_in, Filename=$_fname, Rev=$_rev, HeadRev=$_headrev" >> /tmp/debug.out
+  # echo "DEBUG: Input=$_in, Filename=$_fname, Rev=$_rev, HeadRev=$_headrev" >> /tmp/debug.out
 
-  if [[ "$_in" =~ \#[[:digit:]]+ ]]; then
-    # file was specified with a positive revision => check that rev is valid and return as is
-    if (( $_rev == 0 )); then
-      die "File revision should be non-zero in '$_in' (Line $LINENO, ${FUNCNAME[0]})"
-    elif (( $_rev > $_headrev )); then
-      die "File revision is invalid in '$_in'. It should be less than the Head revision=$_headrev (Line $LINENO, ${FUNCNAME[0]})"
-    fi
-
-    _out="$_in"
-    return;
-  elif [[ "$_in" =~ "#-" ]]; then
-    local _final_rev=$(( $_headrev + $_rev + 1 ))
-    _out="$_fname#$_final_rev"
-    return
-  fi
+  local _final_rev=$(( $_headrev + $_rev + 1 ))
+  echo "$_fname#$_final_rev"
+  return
 
   die "Unable to determine revision specifier for '$_in' (Line $LINENO, ${FUNCNAME[0]})"
 }
@@ -153,24 +123,14 @@ else
 fi
 
 ##======================================================================================================================
-## Here, I try to figure out which rev of the files to use. This script accepts inputs in the form of changelists,
-## relative revisions (negative) so I've to convert them to positive values that perforce understands.
-if [[ "$_file1" =~ "@" ]]; then
-  __cl_to_rev $_file1
-  _file1=$_out
-fi
-if [[ "$_file1" =~ "#" ]]; then
-  __sane_rev $_file1
-  _file1=$_out
+## Here, I try to figure out which rev of the files to use. This script accepts inputs in the form of relative revisions
+## (negative revisions) that I've to convert to positive values that perforce understands.
+if [[ "$_file1" =~ "#-" ]]; then
+  _file1=$(__pos_rev $_file1)
 fi
 
-if [[ "$_file2" =~ "@" ]]; then
-  __cl_to_rev $_file2
-  _file2=$_out
-fi
-if [[ "$_file2" =~ "#" ]]; then
-  __sane_rev $_file2
-  _file2=$_out
+if [[ "$_file2" =~ "#-" ]]; then
+  _file2=$(__pos_rev $_file2)
 fi
 
 ##======================================================================================================================
@@ -182,13 +142,13 @@ fi
 # If the file refers to a revision on the depot then we can use process substitution since we wouldn't want to edit it.
 # However, if the file is local to the workarea then using process substitution will prevent us from editing it.
 # Thus, I check if the file belongs to the local workarea or the depot and use process substitution accordingly.
-if [[ "$_file1" =~ "#" ]]; then
+if [[ "$_file1" =~ [#@] ]]; then
   _fname=$(basename $_file1)
   p4 print -q "$_file1" >| "/tmp/$_fname"
   _file1="/tmp/$_fname"
 fi
 
-if [[ "$_file2" =~ "#" ]]; then
+if [[ "$_file2" =~ [#@] ]]; then
   _fname=$(basename $_file2)
   p4 print -q "$_file2" >| "/tmp/$_fname"
   _file2="/tmp/$_fname"

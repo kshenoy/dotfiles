@@ -203,7 +203,7 @@ complete -f -o default -X '!*.gif'  kview
 export HISTSIZE=65535
 export HISTFILESIZE=65535
 # Show timestamps in history
-export HISTTIMEFORMAT="%F %T  "
+export HISTTIMEFORMAT="%F %H:%M  :  "
 export HISTCONTROL=ignoreboth #same as export HISTCONTROL=ignoredups:ignorespace
 # Ignore duplicates and trivial one- and two-char commands
 export HISTIGNORE='?:??:history*:sosa:sosc:sosf:sosp:cd:que*:lla*'
@@ -265,10 +265,10 @@ export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
 export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgreprc
 
 for i in \
-  ~/.bashrc_local                                                      \
   ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/bashrc-func          \
   ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/bashrc-prompt        \
   ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/aliases              \
+  ~/.bashrc_local                                                      \
   ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf.bash              \
   ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/tmux/tmux_completion_bash \
 ; do

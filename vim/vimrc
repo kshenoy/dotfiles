@@ -316,9 +316,9 @@ set autoread
 "
 if DISABLE_FROM == 20 | finish | endif
 
-execute 'set directory=' . g:dotvim . '/tmp/swaps'
 " List of directories to use for the swap file
-if !isdirectory(&directory) | call mkdir(&directory, 'p') | endif
+" execute 'set directory=' . g:dotvim . '/tmp/swaps'
+" if !isdirectory(&directory) | call mkdir(&directory, 'p') | endif
 set noswapfile
 set updatetime=1000             " Time in msec after which the swap file will be updated/CursorHold autocmd is triggered
 

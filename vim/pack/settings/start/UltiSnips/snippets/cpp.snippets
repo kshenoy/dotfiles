@@ -192,12 +192,20 @@ snippet map "std::map" w
 std::map<${1:key}, ${2:value}>$0
 endsnippet
 
+snippet umap "std::unordered_map" w
+std::unordered_map<${1:key}, ${2:value}>$0
+endsnippet
+
 snippet opt "std::experimental::optional" w
 std::experimental::optional<${1:${VISUAL:T}}>$0
 endsnippet
 
-snippet umap "std::unordered_map" w
-std::unordered_map<${1:key}, ${2:value}>$0
+snippet set "std::set" w
+std::set<${1:key}>$0
+endsnippet
+
+snippet uset "std::unordered_set" w
+std::unordered_set<${1:key}>$0
 endsnippet
 
 snippet vec "std::vector" w
@@ -326,6 +334,11 @@ endsnippet
 snippet cpj "std::copy into std::make_ostream_joiner"
 std::ostringstream ${1:oss};
 std::copy(begin(${2:${VISUAL:src}}), end($2), std::experimental::make_ostream_joiner($1, ','));
+endsnippet
+
+snippet coutdbg "std::cout with File and Line specifiers"
+std::cout << $0
+  << " (" << __FILE__ << ":" << __LINE__ << ")\n";
 endsnippet
 
 

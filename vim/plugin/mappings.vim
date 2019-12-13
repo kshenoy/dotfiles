@@ -21,12 +21,13 @@ execute 'nnoremap <silent> govm :e ' . g:dotvim . '/plugin/mappings.vim<CR>'
 execute 'nnoremap <silent> govb :e ' . g:dotvim . '/bundles.vim<CR>'
 nnoremap <silent> govl :e ~/.vimrc_local<CR>
 
-nnoremap <silent> gosa :e ~/.dotfiles/bash/aliases<CR>
-nnoremap <silent> gosf :e ~/.dotfiles/bash/bashrc-func<CR>
-nnoremap <silent> gosp :e ~/.dotfiles/bash/bashrc-prompt<CR>
+nnoremap <silent> gosa :e ~/.config/dotfiles/bash/aliases<CR>
 nnoremap <silent> gosc :e ~/.bashrc<CR>
-nnoremap <silent> gost :e ~/.dotfiles/tmux/tmux.conf<CR>
-nnoremap <silent> gosl :e ~/.dotfiles/bash/work/aliases<CR>
+nnoremap <silent> gosf :e ~/.config/dotfiles/bash/bashrc-func<CR>
+nnoremap <silent> gosl :e ~/.bashrc_local<CR>
+nnoremap <silent> gosp :e ~/.config/dotfiles/bash/bashrc-prompt<CR>
+nnoremap <silent> gost :e ~/.config/dotfiles/tmux/tmux.conf<CR>
+nnoremap <silent> gosx :e ~/.Xresources<CR>
 
 """ Redirect F1 to list of all commands which is more useful than the default help page
 noremap <F1> :vert bo h index<CR>
@@ -145,8 +146,10 @@ nnoremap =f :set guifont=*<CR>
 command! -nargs=? FTW call utils#FillTW(<args>)
 nnoremap <silent> <leader>fw :FTW<CR>
 
-""" Toggle ColorColumn
-nnoremap <silent> <expr> yok ':set colorcolumn=' . (&colorcolumn=='0' ? '+1' : 0) . '<CR>'
+""" Toggle Commands
+""" This are inspired and similar to vim-unimpaired. That uses "yo" to toggle stuff using setlocal
+""" However sometimes I want to toggle things globally. For these, I use "yO" if the option supports setting it globally
+nnoremap <expr> yok ':setlocal colorcolumn=' . (&colorcolumn=='0' ? '+1' : 0) . '<CR>'
 
 
 
