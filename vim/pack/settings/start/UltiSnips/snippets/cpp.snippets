@@ -325,6 +325,12 @@ std::minmax_element(begin(${1:${VISUAL:container}}), end($1));
 endsnippet
 
 
+# Numeric operations -----------------------------------------------------------------------------------------------{{{2
+snippet acc "std::accumulate"
+std::accumulate(begin(${1:${VISUAL:container}}), end($1), ${2:0});
+endsnippet
+
+
 # String/Streams ---------------------------------------------------------------------------------------------------{{{2
 snippet oss "std::ostringstream"
 std::ostringstream ${1:oss};

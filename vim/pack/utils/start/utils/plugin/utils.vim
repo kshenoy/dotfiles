@@ -60,13 +60,15 @@ function! utils#GuiTabLabel()                                                   
 
   let label = ''
   let bufnrlist = tabpagebuflist(v:lnum)
+
   " Add '+' if one of the buffers in the tab page is modified
-  for bufnr in bufnrlist
-    if getbufvar(bufnr, "&modified")
-      let label = '+'
-      break
-    endif
-  endfor
+  " for bufnr in bufnrlist
+  "   if getbufvar(bufnr, "&modified")
+  "     let label = '+'
+  "     break
+  "   endif
+  " endfor
+
   " Append the tab number
   let label .= v:lnum.': '
   " Append the buffer name
@@ -83,9 +85,12 @@ function! utils#GuiTabLabel()                                                   
     let name = fnamemodify(name,":t")
   endif
   let label .= name
+
   " Append the number of windows in the tab page
-  let wincount = tabpagewinnr(v:lnum, '$')
-  return label . '  [' . wincount . ']'
+  " let wincount = tabpagewinnr(v:lnum, '$')
+  " let label .= ' [' . wincount . ']'
+
+  return label
 endfunction
 
 
@@ -190,4 +195,3 @@ function! utils#_RemoveAllErrInBut_(num)                                        
   " Delete everything but the entry we're interested in just the ErrIn field
   silent! execute '%g/cErrPkt/ .s/\vErrIn(\w*)\=\[(\w+,\s*){' . a:num . '}(\w+)(,\s*\w+)*\]/ErrIn\1[' . a:num . ']=\3/g'
 endfunction
-"nnoremap K :<C-U>call utils#TestFunc(v:count, v:count1)<CR>

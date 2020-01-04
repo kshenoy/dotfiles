@@ -254,7 +254,7 @@ if ($FZF_PATH != "")
     \ 'ctrl-v': 'vsplit'
     \ }
   let g:fzf_history_dir = '~/.local/share/fzf-history'
-  let $FZF_DEFAULT_OPTS='--noreverse'
+  let $FZF_DEFAULT_OPTS='--no-reverse'
 
   nnoremap <silent> <Plug>my(Finder)t :Tags<CR>
   nnoremap <silent> <Plug>my(Finder)y :Snippet<CR>
@@ -382,7 +382,10 @@ let g:switch_custom_definitions = [
                                 \   [ 'TRUE', 'FALSE' ],
                                 \   [ 'pass', 'fail'  ],
                                 \   [ 'Pass', 'Fail'  ],
-                                \   [ 'PASS', 'FAIL'  ]
+                                \   [ 'PASS', 'FAIL'  ],
+                                \   [ 'shared_ptr', 'make_shared' ],
+                                \   [ 'unique_ptr', 'make_unique' ],
+                                \   [ 'weak_ptr',   'make_weak' ]
                                 \ ]
 
 call plug#('AndrewRadev/switch.vim', {'on': 'Switch'})
@@ -446,7 +449,10 @@ if !has('gui_running')
   call plug#('tmux-plugins/vim-tmux-focus-events')
 endif
 
-" ultiSnips ------------------------------------------------------------------------------------------------------- {{{1
+" Twiki ----------------------------------------------------------------------------------------------------------- {{{1
+call plug#('vim-scripts/TWiki-Syntax', {'for': 'twiki'})
+
+" UltiSnips ------------------------------------------------------------------------------------------------------- {{{1
 let g:UltiSnipsEditSplit = "vertical"
 " Location of snippets
 execute 'let g:UltiSnipsSnippetDirectories=["' . g:dotvim . '/pack/settings/start/UltiSnips/snippets"]'

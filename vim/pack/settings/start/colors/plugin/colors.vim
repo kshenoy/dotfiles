@@ -16,7 +16,9 @@ function! s:After()                                                             
   " Description: Find any additional settings related to the current colorscheme in after/colors and load it
   "              This order is important. We let statusline set the general colors first based on the colorscheme and
   "              then pick up any specific settings from the after file
-  call s:UpdateUserColors()
+  " Loading a colorscheme blows away old highlights breaking the behavior of vim-mark and other plugins which setup
+  " custom highlight groups so this function tries to restore them
+  call s:RestoreCustomHLGroups()
 
   if (  !exists('g:colors_name')
    \ || (g:colors_name == '')
@@ -35,13 +37,10 @@ function! s:After()                                                             
   if filereadable(l:color_file)
     execute "source " . l:color_file
   endif
-
-  " Is this required?
-  " call statusline#Refresh
 endfunction
 
 
-function! s:UpdateUserColors()                                                                                    " {{{1
+function! s:RestoreCustomHLGroups()                                                                                    " {{{1
   " Description: Highlight groups to use in Statusline
 
   highlight clear SignColumn
@@ -77,6 +76,9 @@ function! s:UpdateUserColors()                                                  
   silent execute 'highlight VisualCursor  guibg=Orange3     guifg=' . l:norm_bg
   silent execute 'highlight CommandCursor guibg=Magenta3    guifg=' . l:norm_bg
   silent execute 'highlight NormalCursor  guibg=Green' . (&background == 'light' ? '3' : '4') . ' guifg=' . l:norm_bg
+
+  " Setup vim-mark's highlights
+  MarkPalette original
 endfunction
 " }}}1
 

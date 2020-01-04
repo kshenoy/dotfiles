@@ -149,6 +149,9 @@ nnoremap <silent> <leader>fw :FTW<CR>
 """ Toggle Commands
 """ This are inspired and similar to vim-unimpaired. That uses "yo" to toggle stuff using setlocal
 """ However sometimes I want to toggle things globally. For these, I use "yO" if the option supports setting it globally
+nnoremap yOc :tabdo windo set cursorline!<CR>
+nnoremap yOu :tabdo windo set cursorcolumn!<CR>
+nnoremap yOx :tabdo windo set cursorline! cursorcolumn!<CR>
 nnoremap <expr> yok ':setlocal colorcolumn=' . (&colorcolumn=='0' ? '+1' : 0) . '<CR>'
 
 
