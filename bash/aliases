@@ -164,7 +164,7 @@ alias gosl='$EDITOR ~/.bashrc_local'
 alias gosp='$EDITOR ~/.config/dotfiles/bash/bashrc-prompt'
 alias gost='$EDITOR ~/.config/dotfiles/tmux/tmux.conf'
 alias gosx='$EDITOR ~/.Xresources'
-alias sosa='. ~/.dotfiles/bash/aliases && . ~/.dotfiles/bash/bashrc-func'
+alias sosa='. ~/.config/dotfiles/bash/aliases && . ~/.config/dotfiles/bash/bashrc-func'
 alias sosc='. ~/.bashrc && clnpath'
 
 

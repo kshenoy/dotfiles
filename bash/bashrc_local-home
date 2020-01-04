@@ -12,6 +12,8 @@ amd_vpn() {
   /usr/NX/bin/nxplayer --session leostream.nxs &
 }
 
+alias fd=fdfind
+
 # fzf: https://github.com/junegunn/fzf
 [[ -d /opt/fzf ]] && export FZF_PATH=/opt/fzf
 
