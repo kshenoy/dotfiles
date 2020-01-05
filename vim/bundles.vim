@@ -254,11 +254,13 @@ if ($FZF_PATH != "")
     \ 'ctrl-v': 'vsplit'
     \ }
   let g:fzf_history_dir = '~/.local/share/fzf-history'
-  let $FZF_DEFAULT_OPTS='--no-reverse'
+  let $FZF_DEFAULT_OPTS=substitute($FZF_DEFAULT_OPTS, '--reverse', '--no-reverse', '')
 
   nnoremap <silent> <Plug>my(Finder)t :Tags<CR>
   nnoremap <silent> <Plug>my(Finder)y :Snippet<CR>
   nnoremap <silent> <Plug>my(Finder)m :call fzf#vim#marks()<CR>
+  imap              <C-X><C-F>        <plug>(fzf-complete-file)
+  imap              <C-X><C-L>        <plug>(fzf-complete-line)
 endif
 
 
@@ -457,9 +459,9 @@ let g:UltiSnipsEditSplit = "vertical"
 " Location of snippets
 execute 'let g:UltiSnipsSnippetDirectories=["' . g:dotvim . '/pack/settings/start/UltiSnips/snippets"]'
 let g:UltiSnipsEnableSnipMate=0
-" <C-X> is insert-mode completion so using <C-X><C-S> feels natural for snippets
-let g:UltiSnipsExpandTrigger='<C-X><C-S>'
-let g:UltiSnipsListSnippets='<C-X>g<C-S>'
+" <C-X> is insert-mode completion so using <C-X><C-Y> feels natural for snippets
+let g:UltiSnipsExpandTrigger='<C-X><C-Y>'
+let g:UltiSnipsListSnippets='<C-X><C-G><C-Y>'
 let g:UltiSnipsJumpForwardTrigger='<Tab>'
 let g:UltiSnipsJumpBackwardTrigger='<S-Tab>'
 
