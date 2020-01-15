@@ -2,9 +2,13 @@
 #+PROPERTY: header-args+ :results output silent :noweb tangle :comments both :mkdirp yes
 #+TODO: TODO FIXME |
 
+* Resources
+- https://thevaluable.dev/tmux-boost-productivity-terminal/
+
 * tmux.conf
 :PROPERTIES:
 :header-args+: :tangle ~/.tmux.conf
+:ID:       6753e99d-778e-452e-bb61-017101cf3c6e
 :END:
 #+begin_src conf :export none
   # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
@@ -20,12 +24,12 @@ To show options:
 
 ** Main options
 =C-b= is a pain to use when in copy mode as to scroll-up a full screen, we've to press =C-b= twice since upon the first press it's interpreted as a prefix.
-Thus change it to =C-q=. =C-a= is the default prefix used by screen but it collides with emacs readline.
+Thus change it to =C-Space=. =C-a= is the default prefix used by screen but it collides with emacs readline
 #+begin_src conf
   unbind C-b
-  set -g prefix C-q
+  set -g prefix C-Space
   # For nested Tmux sessions
-  # bind C-q send-prefix
+  # bind C-Space send-prefix
 #+end_src
 
 Disable wait for escape sequence to enable faster command sequence
