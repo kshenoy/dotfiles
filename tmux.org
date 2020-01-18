@@ -27,6 +27,8 @@ To show options:
 Thus change it to =C-Space=. =C-a= is the default prefix used by screen but it collides with emacs readline
 #+begin_src conf
   unbind C-b
+  unbind C-Space
+  unbind -T copy-mode 'C-Space'
   set -g prefix C-Space
   # For nested Tmux sessions
   # bind C-Space send-prefix
@@ -188,12 +190,6 @@ Remove suspend-client binding
   unbind C-z
 #+end_src
 
-I'm using 'C-Space' as my insert-mode leader in vim so I'll unbind that everywhere as well
-#+begin_src bash
-  unbind -T copy-mode 'C-Space'
-  unbind C-Space
-#+end_src
-
 Allows fast scrolling through a pane's history. -e specifies that scrolling to the bottom exits copy-mode
 #+begin_src conf
   bind PageUp copy-mode -eu
@@ -339,7 +335,7 @@ Move window left
   bind M-g command-prompt -p "Goto Window:" "select-window -t '%%'"
 #+end_src
 
-* Local variables
+* Local variables                                                                         :noexport:
 :PROPERTIES:
 :header-args: :tangle no
 :END:
