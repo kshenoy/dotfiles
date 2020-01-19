@@ -34,40 +34,17 @@ fzf-lsf-bjobs() {                                                               
 
 #=======================================================================================================================
 fzf-cmd-opts() {                                                                                                   #{{{1
-  # echo "DEBUG: >>>${READLINE_LINE}<<< Point=${READLINE_POINT}, Char=${READLINE_LINE:$READLINE_POINT:0}"
+  # echo "DEBUG: '${READLINE_LINE}' Point=${READLINE_POINT}, Char='${READLINE_LINE:$READLINE_POINT:1}'"
   local pos=$READLINE_POINT
 
   # If cursor is on a non-whitespace char assume it's on the cmd that needs to be parsed and move pos to its end
-  while [[ ${READLINE_LINE:$pos:0} != " " ]] && [[ $pos != ${#READLINE_LINE} ]]; do
+  while [[ ${READLINE_LINE:$pos:1} != " " ]] && [[ $pos != ${#READLINE_LINE} ]]; do
     pos=$(( pos + 1 ))
   done
-
-  # Try to get the command behind all aliases
   local cmd=$(awk '{print $NF}' <<< "${READLINE_LINE:0:$pos}")
-  # echo "DEBUG: Cmd=$cmd"
-
-  local sanityCount=1
-  for sanityCount in {1..20}; do
-    command alias | command which --read-alias $cmd | while read line; do
-      if [[ $line =~ ^alias ]]; then
-        cmd=$(cut -d"'" -f2 <<< "$line" | awk '{print $1}');
-      else
-        cmd=$(awk '{print $1}' <<< "$line")
-        echo "DEBUG: Cmd=$cmd"
-      fi
-    done
-    echo "DEBUG: Cmd=$cmd"
-    if [[ -x $cmd ]]; then
-      break
-    fi
-  done
-  # echo "DEBUG: Cmd=$cmd"
-  if [[ ! -x $cmd ]]; then
-    return
-  fi
 
   local selected=$(eval "${cmd} --help || ${cmd} -h || ${cmd} -help || ${cmd} help" | \
-    FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf +x -m "$@" | \
+    FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf --height 100% +x -m "$@" | \
     while read -r item; do
       # Auto-split on whitespace
       local words=($item)
@@ -93,8 +70,7 @@ fzf-cmd-opts() {                                                                
   fi
 
   READLINE_LINE="${READLINE_LINE:0:pos}${selected}${READLINE_LINE:$pos}"
-  # Not moving the READLINE_POINT makes it easier to launch this again
-  # READLINE_POINT=$((READLINE_POINT + ${#selected}))
+  # Note that the READLINE_POINT has not moved; this makes it easier to launch this again
 }
 
 
