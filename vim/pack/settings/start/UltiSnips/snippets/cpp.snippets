@@ -343,7 +343,7 @@ std::copy(begin(${2:${VISUAL:src}}), end($2), std::experimental::make_ostream_jo
 endsnippet
 
 snippet coutdbg "std::cout with File and Line specifiers"
-std::cout << $0
+std::cout << "DEBUG: " << $0
   << " (" << __FILE__ << ":" << __LINE__ << ")\n";
 endsnippet
 

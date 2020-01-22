@@ -34,6 +34,11 @@ Thus change it to =C-Space=. =C-a= is the default prefix used by screen but it c
   # bind C-Space send-prefix
 #+end_src
 
+Unbind that everywhere as well
+#+begin_src bash
+  unbind -T copy-mode 'C-Space'
+#+end_src
+
 Disable wait for escape sequence to enable faster command sequence
 #+begin_src conf
   set -sg escape-time 0
@@ -237,10 +242,10 @@ On a wheeldown event:
 
 *** Pane bindings
 I tried to use this as a repeatable binding (by using =-r=) but most of the time it hinders rather than helps.
-I never use more than 2 panes vertically and/or horizontally so most of the time I'm just 1 =C-q= away.
+I never use more than 2 panes vertically and/or horizontally so most of the time I'm just 1 prefix away.
 Making this repeatable means that once I'm in my target pane tmux is still in repeatable binding mode so I've to explicitly press Escape to get out of it.
 #+begin_src conf
-  bind C-q last-pane
+  bind C-w last-pane
 #+end_src
 
 Use h-j-k-l instead of arrow keys

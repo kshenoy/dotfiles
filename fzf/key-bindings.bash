@@ -59,7 +59,6 @@ fzf-cmd-opts() {                                                                
 
   if [[ "${READLINE_LINE:$(($pos-1)):1}" != " " ]]; then
     # If cursor doesn't have a space before it, add one
-    # echo "Needs space before cursor"
     selected=" ${selected}"
   fi
 

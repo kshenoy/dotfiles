@@ -447,9 +447,9 @@ After installing a new font refresh the font cache by running
       t))  ; This is required so that we can use this function in a cond block below
 
   (defun my-set-fonts()
-    (my-set-font-if-exists 'default "Iosevka 10")
-    (my-set-font-if-exists 'fixed-pitch "Fira Code 9")
-    (my-set-font-if-exists 'variable-pitch "Iosevka 9")
+    (my-set-font-if-exists 'default "Iosevka-10")
+    (my-set-font-if-exists 'fixed-pitch "Iosevka-10")
+    (my-set-font-if-exists 'variable-pitch "Iosevka-10")
     ;; (cond ((eq system-type 'gnu/linux) (my-set-font-if-exists 'variable-pitch "Ubuntu Condensed-9"))
     ;;       ((eq system-type 'windows-nt) (my-set-font-if-exists 'variable-pitch "Iosevka SS05-9")))
   )
@@ -696,11 +696,11 @@ Set frame size programatically
              ("l" . (lambda () "Set emacs frame size to fit the left desktop monitor"
                       (interactive)
                       (set-frame-position (selected-frame) 0    0)
-                      (set-frame-size     (selected-frame) 1910 1150 t)))
+                      (set-frame-size     (selected-frame) 1914 1165 t)))
              ("r" . (lambda () "Set emacs frame size to fit the right desktop monitor"
                       (interactive)
-                      (set-frame-position (selected-frame) 1919 0)
-                      (set-frame-size     (selected-frame) 1910 1150 t))))
+                      (set-frame-position (selected-frame) 1920 0)
+                      (set-frame-size     (selected-frame) 1914 1165 t))))
 #+end_src
 
 ** IRC using [[https://www.gnu.org/software/emacs/manual/html_mono/rcirc.html][rcirc]]
@@ -2264,7 +2264,7 @@ Syntax highlighting when exporting to HTML? Yes, please!
                            (not (string= "Spanish.org" x))
                            (not (string-match-p "Orgzly" x))))
                     (mapcar (lambda (x) (expand-file-name x org-directory))
-                            '("Inbox.org" "Software/" "Personal/" "Work/"))))
+                            '("Inbox.org" "Software/" "Personal/"))))
 #+end_src
 
 **** :config
@@ -2280,8 +2280,8 @@ I'm using eyebrowse to switch window layouts. One of the layouts is just org-age
         org-agenda-compact-blocks t)
 #+end_src
 
-By default, the agenda only shows the next 7 days. I want to see the previous 7 days as well just in case I missed something.
-Also, force it to start on a Monday as a week starts on a Monday. Sat and Sun are called week-ends.
+Force agenda to start on a Monday as a week starts on a Monday. Sat and Sun are called week-ends for a reason :)
+Also, by default, the agenda only shows the next 7 days. I want to see the last two 7 days as well just in case I missed something.
 Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
 #+name: org-agenda-cfg-span
 #+begin_src emacs-lisp
