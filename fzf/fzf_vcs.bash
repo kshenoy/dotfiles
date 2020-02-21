@@ -89,10 +89,9 @@ __fzf-p4-cd() {                                                                 
 # Creating a separate function to allow overriding it from a project-specific rc file
 __fzf-vcs-all-files-p4() {
   FZF_CTRL_T_COMMAND='cat \
-      <(command p4 have ${STEM:+$STEM/}...) \
-      <(command p4 opened | command grep add | command sed "s/#.*//" |
-        command xargs -I{} -n1 command p4 where {}) 2> /dev/null |
-    command awk "{print \$3}" | command sort -u' \
+    <(command p4 have ${STEM:+$STEM/}...) \
+    <(p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" | command xargs -I{} -n1 command p4 where {}) \
+    | command awk "{print \$3}"' \
   fzf-file-widget
 }
 
