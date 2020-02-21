@@ -120,7 +120,7 @@ gv() { g -v "$@"; }
 # Editor aliases
 #
 alias v=vim
-vq() { gvim -q <(eval "$(fc -nl -1) $@"); }
+vq() { vim -q <(eval "$(fc -nl -1) $@"); }
 
 # Using -f keeps the window in the foreground and prevents a whole bunch of diffs opening at the same time
 gvim_diff() {
