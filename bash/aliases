@@ -195,4 +195,3 @@ alias gs='git status'
 alias tmux='tmux_pp'
 alias tm='tmux'
 # alias tmi=tmuxinator
-alias U='unison dotfiles -terse'

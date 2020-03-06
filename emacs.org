@@ -1783,7 +1783,7 @@ This frees up S-left and S-right which I can then use to cycles through the todo
   ;; (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
 #+end_src
 
-**** [[https://orgmode.org/manual/Easy-templates.html][Easy Templates]]
+**** [[info:org#Structure%20Templates][Easy Templates]]
 :PROPERTIES:
 :ID:       851ad87b-250e-4c1e-83b1-6b4e1fa6b20d
 :CREATED:  [2019-01-11 Fri 13:03]
@@ -1848,14 +1848,10 @@ This is the counterpart to =org-insert-link=. From [[http://emacs.stackexchange.
 - State "TODO"       from              [2019-05-21 Tue 10:41]
 :END:
 
-**** FIXME Use ! to toggle timestamp type
+**** Use ! to toggle timestamp type
 :PROPERTIES:
 :ID:       d4634d95-be37-4bdf-987e-22da5778e958
 :CREATED:  [2019-02-08 Fri 11:00]
-:END:
-:LOGBOOK:
-- State "FIXME"      from "TODO"       [2019-02-09 Sat 08:56]
-- State "TODO"       from              [2019-02-09 Sat 08:56]
 :END:
 [[https://orgmode.org/manual/Creating-timestamps.html][By default]], org-mode uses =C-c .= and =C-c != to create active and inactive timestamps respectively.
 However, I also have flycheck installed which conflicts with the =C-c != binding.
@@ -2082,7 +2078,9 @@ From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 -
            "* TODO %?\n:LOGBOOK:\n- State \"TODO\"       from              %U\n:END:"
            :jump-to-captured t :empty-lines 1)
 
-          ("x" "Misc" entry
+          ("r" "Recommendation" item (file "Personal/Recommendations.org") "" :jump-to-captured t)
+
+          ("x" "Misc etc." entry
            (file org-default-notes-file)
            "* %?"
            :jump-to-captured t :empty-lines 1)
@@ -2122,43 +2120,6 @@ From https://stackoverflow.com/a/16247032/734153
             (lambda() (org-expiry-insert-created)(org-id-get-create)))
 #+end_src
 
-***** Capture template for learning Spanish
-#+begin_src emacs-lisp
-  (setq org-capture-templates
-        (append org-capture-templates
-                '(("l"  "Spanish")
-
-                  ("lv" "Spanish: Verb" table-line
-                   (file+headline "Personal/Languages/Spanish.org" "Verbs")
-                   "| %? | | |"
-                   :jump-to-captured t :empty-lines 1))))
-#+end_src
-
-#+begin_src emacs-lisp :tangle no
-  (setq org-capture-templates
-        (append org-capture-templates
-                '(("l"  "Spanish")
-
-                  ("ls" "Item" entry
-                   (file+headline "Personal/Spanish.org" "Misc")
-                   "\n* %?%(setq my-spanish-capture (read-string \"Spanish: \")) :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"hide1_firstmore\")\n\nSpanish: [%(message my-spanish-capture)]\nEnglish: [%^{English}]"
-                   :jump-to-captured t :empty-lines 1)
-
-                  ("ln" "Noun" entry
-                   (file+headline "Personal/Spanish.org" "Nouns")
-                   "\n* %?[%(setq my-spanish-capture (read-string \"Spanish: \"))] :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"twosided\")\n\nTranslate this noun.\n\n** Spanish\n/%(message my-spanish-capture)/\n\n** English\n%^{English}"
-                   :jump-to-captured t :empty-lines 1)
-
-                  ("lv" "Verb" entry
-                   (file+headline "Personal/Spanish.org" "Verbs")
-                   "\n* %(setq my-spanish-capture (read-string \"Spanish: \")) :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"hide1cloze\")%(org-set-property \"VERB_INFINITIVE\" (concat \"\\\"\" my-spanish-capture \"\\\"\"))%(org-set-property \"VERB_TRANSLATION\" (concat \"\\\"to \" (setq my-english-capture (read-from-minibuffer \"English: to \")) \"\\\"\"))%(org-set-property \"VERB_INFINITIVE_HINT\" (concat \"\\\"\" (substring my-spanish-capture 0 1) \"...\\\"\"))\n\nSpanish: [%(message my-spanish-capture)]\nEnglish: [to %(message my-english-capture)]\n\n** Notes\n** Examples\n** Simple Present Tense :drill:%(org-set-property \"DRILL_CARD_TYPE\" \"conjugate\")%(org-set-property \"VERB_TENSE\" \"\\\"simple present\\\"\")\n\n| yo               | %?  |\n| tú               |   |\n| él/ella/Ud.      |   |\n| nosotros         |   |\n| vosotros         |   |\n| ellos/ellas/Uds. |   |"
-                   :jump-to-captured t :empty-lines 1))))
-#+end_src
-
-****** TODO Using %^{prompt} in org-capture template doesn't allow specifying accented characters with =C-x 8=
-Hence, I'm using a hacky way of explicitly prompting for input (since I can specify accented characters that way),
-saving it to a variable and printing it out later in the capture template.
-
 ***** Create frames for easy org-capture directly from the OS
 (credit: [[http://cestlaz.github.io/posts/using-emacs-24-capture-2/][here]])
 #+begin_src emacs-lisp
@@ -2190,7 +2151,6 @@ This can then be used to create a capture frame
   emacsclient --alternate-editor="" --create-frame --no-wait --socket-name=capture --frame-parameters='(quote (name . "capture"))' --eval "(my-make-capture-frame)"
 #+END_EXAMPLE
 
-***** TODO Creating TODOs doesn't log it as a state change
 ***** TODO Get this running in Windows
 :PROPERTIES:
 :ID:       15dc9482-dc6b-4e44-b3a6-d28f7f12283e

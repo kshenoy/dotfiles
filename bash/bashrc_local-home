@@ -9,7 +9,7 @@ amd_vpn() {
   else
     globalprotect connect --portal vpn.amd.com --username kshenoy
   fi
-  /usr/NX/bin/nxplayer --session leostream.nxs &
+  # /usr/NX/bin/nxplayer --session leostream.nxs &
 }
 
 alias fd=fdfind
