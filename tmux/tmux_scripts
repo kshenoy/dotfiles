@@ -90,14 +90,18 @@ __tmux_pp_select_layout_work() {                                                
     command tmux split-window -h -c "$curr_path"
   done
 
-  if [[ "$1" == "work-pc" ]]; then
+  if [[ "$1" == "work-max" ]]; then
     command tmux select-layout "1be5,639x73,0,0{319x73,0,0,0,159x73,320,0,1,159x73,480,0,58}"
     tmux_pp resize-pane -t 2 -x 100% > /dev/null
     tmux_pp resize-pane -t 1 -x 50% > /dev/null
+  elif [[ "$1" == "work-pc" ]]; then
+    command tmux select-layout "1be5,639x73,0,0{319x73,0,0,0,159x73,320,0,1,159x73,480,0,58}"
+    tmux_pp resize-pane -t 1 -x 50% > /dev/null
+    tmux_pp resize-pane -t 2 -x 25% > /dev/null
   elif [[ "$1" == "work-lp" ]]; then
     command tmux select-layout "96ed,319x66,0,0{159x66,0,0,0,159x66,160,0[159x32,160,0,1,159x33,160,33,90]}"
     tmux_pp resize-pane -t 1 -x 50% > /dev/null
-    tmux_pp resize-pane -t 2 -y 100% > /dev/null
+    tmux_pp resize-pane -t 2 -y 50% > /dev/null
   fi
 
   command tmux select-pane -t $curr_pane

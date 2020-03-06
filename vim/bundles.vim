@@ -259,8 +259,10 @@ if ($FZF_PATH != "")
   nnoremap <silent> <Plug>my(Finder)t :Tags<CR>
   nnoremap <silent> <Plug>my(Finder)y :Snippet<CR>
   nnoremap <silent> <Plug>my(Finder)m :call fzf#vim#marks()<CR>
-  imap              <C-X><C-F>        <plug>(fzf-complete-file)
   imap              <C-X><C-L>        <plug>(fzf-complete-line)
+
+  inoremap <expr> <plug>(fzf-complete-file-fd) fzf#vim#complete#path('fd --color=never --follow --hidden --exclude .git --type f')
+  " imap     <C-X><C-F> <plug>(fzf-complete-file-fd)
 endif
 
 
