@@ -25,7 +25,7 @@ source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/key-bindings.bash
 
 # Customisations
 # --------------
-if hash fd || hash fdfind 2> /dev/null; then
+if hash fd 2> /dev/null || hash fdfind 2> /dev/null; then
   export FZF_DEFAULT_COMMAND='fd --color=never --follow --hidden --exclude .git --type f'
   export FZF_ALT_C_COMMAND='fd --color=never --follow --hidden --exclude .git --type d'
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
