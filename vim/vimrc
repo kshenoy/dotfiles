@@ -61,12 +61,8 @@ set smartcase                                               " Override ignorecas
 if DISABLE_FROM == 3 | finish | endif
 
 "set taglength=4                                                           " No. of significant characters in a tag name
-set notagrelative                           " Filenames in tag files are relative to the directory where the tag file is
-if has('path_extra')
-  execute 'set tags=./tags;,./.tags;,./TAGS;,./.TAGS;,' . g:dotvim . '/tags/cpp_stl.tags'
-endif
-set cscopetag                                                       " Use cscope as well as tags when searching for tags
-"set cscopequickfix=s-,g-,c-,d-,i-,t-,e-            " Show symbols, calls, called, includes, tags and egreps in quickfix
+
+" More tag related settings in pack/utils/start/intellisensish_ctags/plugin/intellisensish_ctags.vim
 
 
 "

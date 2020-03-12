@@ -98,39 +98,6 @@ endfunction
 command! -nargs=* Retab call utils#Retab(<args>)
 
 
-function! utils#UpdateTags(silent)                                                                                 "{{{1
-  " Description: Generate tags (requires exuberant_ctags)
-
-  if (empty($REPO_PATH))
-    return
-  endif
-
-  let l:cmd = "gentags -w $REPO_PATH"
-  if v:version >= 800
-    if exists('s:job') && job_status(s:job) == "run"
-      if !a:silent
-        echom "Another process (" . split(s:job, '\s\+')[1] . ") is already generating tags. Skipping"
-      endif
-      return
-    endif
-    if a:silent
-      let s:job=job_start(l:cmd)
-    else
-      let s:job=job_start(l:cmd, {'close_cb': 'utils#UpdateTagsDone'})
-    endif
-  else
-    execute "!" . l:cmd
-  endif
-endfunction
-
-
-function! utils#UpdateTagsDone(...)
-  " Description: Dumb function that uses echom to notify that job is done
-  silent cs reset
-  echom "Tags successfully generated"
-endfunction
-
-
 function! utils#Preserve(expr, ...)                                                                                "{{{1
   " Description: Function to execute commands without modifying the original settings like cursor position, search string etc.
   " Arguments:   The expression to execute.
@@ -520,78 +487,6 @@ function! utils#BaseConverter(n, obase)                                         
   let l:obase_fmt = get({ 2:'%b',  8:'%o',  10:'%d',  16:'%x'  }, a:obase)
 
   return printf(l:obase_str . "(%s) = " . l:obase_fmt, a:n, a:n)
-endfunction
-
-
-function! utils#CscopeMap(view, exec, ...)                                                                         "{{{1
-  " Description: One function to execute cscope commands instead of a ton of mappings
-  " Arguments:
-  "   view (char) : How to display results (l: Location list, s: Horizontal split, v: Vertical split)
-  "   exec (bool) : Whether to (0) use <cword> or <cfile> appropriately or
-  "                            (1) obtain search term from user
-  "   a:1         : Text to search for. If nothing is specified when exec=0, user has to input on the command line
-  "
-  " Find type is determined by a getchar() call. Both bare-chars and control-chars (s / <C-S>) etc. are supported
-  " If v/<C-V> or s/<C-S> is entered, the results will be displayed in a vertical/horizontal split and
-  " getchar() will be invoked again to deterine the find type.
-  "
-  "   'y'   symbol:       find all references to the token under cursor
-  "   'g'   global:       find global definition(s) of the token under cursor
-  "   'c'   calls:        find all calls to the function name under cursor
-  "   't'   text:         find all instances of the text under cursor
-  "   'e'   egrep:        egrep search for the word under cursor
-  "   'f'   file:         open the filename under cursor
-  "   'i'   includes:     find files that include the filename under cursor
-  "   'd'   called:       find functions that the function under cursor calls
-
-  if !has('cscope')
-    return
-  endif
-
-  let l:type = getchar()
-  let l:type = nr2char(l:type <= 26 ? l:type + 96 : l:type)
-
-  let l:regetchar = 1
-  if l:type ==# 'v'
-    let cmd = 'vert s'
-  elseif l:type ==# 's'
-    let cmd = 's'
-  else
-    let l:regetchar = 0
-  endif
-
-  if l:regetchar
-    let l:type = getchar()
-    let l:type = nr2char(l:type <= 26 ? l:type + 96 : l:type)
-  else
-    if (a:view ==# 'v')
-      let cmd = 'vert s'
-    else
-      let cmd = a:view
-    endif
-  endif
-
-  let l:type = (l:type ==# 'y' ? 's' : l:type)
-  let cmd .= 'cscope find ' . l:type
-
-  if a:exec
-    call feedkeys(':' . cmd . ' ')
-    return
-  endif
-
-  if (a:0 > 0)
-    let l:str = a:1
-  elseif (l:type == 'f')
-    let l:str = expand('<cfile>')
-  elseif (l:type == 'i')
-    let l:str = '^' . expand('<cfile>') . '$'
-  else
-    let l:str = expand('<cword>')
-  endif
-
-  let cmd .= ' ' . l:str
-  "echom '>>' . cmd . '<<'
-  execute cmd
 endfunction
 " }}}1
 

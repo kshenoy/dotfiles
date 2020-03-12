@@ -161,19 +161,6 @@ nnoremap <expr> yok ':setlocal colorcolumn=' . (&colorcolumn=='0' ? '+1' : 0) . 
 " NAVIGATION                                                                                                        {{{1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-""" cscope mappings
-" The following maps all invoke one of the following cscope search types:
-"   'y'   symbol:   find all references to the token under cursor
-"   'g'   global:   find global definition(s) of the token under cursor
-"   'c'   calls:    find all calls to the function name under cursor
-"   't'   text:     find all instances of the text under cursor
-"   'e'   egrep:    egrep search for the word under cursor
-"   'f'   file:     open the filename under cursor
-"   'i'   includes: find files that include the filename under cursor
-"   'd'   called:   find functions that the function under cursor calls
-nnoremap <silent>  <C-\> :call utils#CscopeMap('l', 0)<CR>
-nnoremap <silent> g<C-\> :call utils#CscopeMap('l', 1)<CR>
-
 """ Move by visual lines
 noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
 noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
@@ -375,9 +362,6 @@ imap     <S-F1> <C-\><C-O><S-F1>
 """ Ctrl+S functionality for save
 nnoremap <silent> <C-S> :execute ':silent :wall!'<CR>
 imap     <silent> <C-S> <C-\><C-O><C-S>
-
-""" Generate ctags
-nnoremap <F12> :call utils#UpdateTags(0)<CR>
 
 """ Execute selection as vimscript
 vnoremap g: <Esc>:@*<CR>
