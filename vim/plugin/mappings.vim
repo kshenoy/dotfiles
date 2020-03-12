@@ -385,3 +385,9 @@ vnoremap g: <Esc>:@*<CR>
 """ Run perforce diff on current file
 nnoremap <silent> <leader>pd :call perforce#DiffCurrentFile()<CR>
 nnoremap <silent> <leader>pe :call perforce#Checkout()<CR>
+
+""" Convert the base of the number below the cursor
+nnoremap <silent> gAb :echo utils#BaseConverter(expand('<cword>'), 2)<CR>
+nnoremap <silent> gAo :echo utils#BaseConverter(expand('<cword>'), 8)<CR>
+nnoremap <silent> gAd :echo utils#BaseConverter(expand('<cword>'), 10)<CR>
+nnoremap <silent> gAx :echo utils#BaseConverter(expand('<cword>'), 16)<CR>

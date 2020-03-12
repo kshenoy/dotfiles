@@ -504,6 +504,25 @@ function! utils#Bisect()                                                        
 endfunction
 
 
+function! utils#BaseConverter(n, obase)                                                                            "{{{1
+  " Description: Convert the word under the cursor to the specified base
+  " Arguments:
+  "   n     (string) : The number to convert
+  "   obase (int)    : The output base to convert it to
+  " echo "DEBUG: n=" . a:n . ", obase=" . a:obase
+
+  let l:obase_str = get({ 2:'bin', 8:'oct', 10:'dec', 16:'hex' }, a:obase, "")
+  if (l:obase_str == "")
+    echo "Unable to represent " . a:n . " in base " . a:obase
+    return
+  endif
+
+  let l:obase_fmt = get({ 2:'%b',  8:'%o',  10:'%d',  16:'%x'  }, a:obase)
+
+  return printf(l:obase_str . "(%s) = " . l:obase_fmt, a:n, a:n)
+endfunction
+
+
 function! utils#CscopeMap(view, exec, ...)                                                                         "{{{1
   " Description: One function to execute cscope commands instead of a ton of mappings
   " Arguments:
