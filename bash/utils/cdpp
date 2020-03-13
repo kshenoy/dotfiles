@@ -56,13 +56,24 @@ cdpp() {
       fi
       ;;&  # This will cause it to get evaluated against *) as well
 
-    ,*)
+    ..*)
       # echo "Jumping to a parent dir in the path ($_dir)"
-      _dir=$(jumper ${_dir:1})
+      # * If the arg is a number (..n), jump up n levels
+      # * If the arg is a path (../...), go to it
+      # * else try to find a match anywhere in the path and jump there
+
+      _targ=${_dir:2}
+      if [[ "$_targ" =~ ^[0-9]+$ ]]; then
+        _dir=$(eval "printf '%0.s../' {1..$_targ}")
+      elif [[ ! -d "$_dir" ]]; then
+        _dir=$(jumper $_targ)
+      fi
+      # echo "DEBUG: In=$_targ, Dir=$_dir"
+
       ;;&  # This will cause it to get evaluated against *) as well
 
     *)
-      #echo "Pushing $_dir onto the stack"
+      # echo "Pushing $_dir onto the stack"
       command pushd ${_dir} > /dev/null
       if [[ $? != 0 ]]; then return; fi
 

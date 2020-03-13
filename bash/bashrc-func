@@ -49,11 +49,7 @@ popd()  { command popd  "$@" > /dev/null ; }
 # Intelligent ..                                                                                                    {{{1
 ..() {
   local _levels=${1:-1};
-  if (( $_levels <= 0 )); then
-    _levels=1;
-  fi;
-
-  cd $(printf '../%.0s' $(seq 1 ${_levels}))
+  cd ..${_levels}
 }
 
 
