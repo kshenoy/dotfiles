@@ -9,7 +9,7 @@
  '(evil-operator-state-cursor (quote ("#dc322f" hollow)) t)
  '(evil-replace-state-cursor (quote ("#dc322f" bar)) t)
  '(evil-visual-state-cursor (quote ("#b58900" box)) t)
- '(org-bullets-bullet-list (quote ("○" "○" "○" "○")))
+ '(org-bullets-bullet-list (quote ("✜")))
  '(package-selected-packages
    (quote
     (use-package-hydra eyebrowse pos-tip popup s magit-popup git-commit with-editor async pkg-info epl string-inflection goto-chg org-protocol-capture-html quelpa-use-package quelpa company-tng try magit company-box delight yasnippet which-key rainbow-mode rainbow-delimiters popup-kill-ring pcre2el org-bullets noflet modern-cpp-font-lock ivy-rich counsel swiper ivy-hydra ivy hydra flycheck evil-visualstar evil-surround evil-string-inflection evil-numbers evil-matchit evil-exchange evil-commentary evil-args evil company-irony company beacon avy aggressive-indent org-plus-contrib use-package)))

@@ -12,11 +12,11 @@ fonts/
 scripts/amd
 unity/
 vim/autoload/plug*
-vim/pack/bundles
+vim/bundles
 vim/pack/rc_local
-vim/pack/settings/start/UltiSnips/pythonx/UltiSnips_globals.pyc
-vim/pack/settings/start/UltiSnips/pythonx/vimsnippets.pyc
-vim/pack/settings/start/UltiSnips/pythonx/__pycache__
+vim/pack/bundles/opt/UltiSnips/pythonx/UltiSnips_globals.pyc
+vim/pack/bundles/opt/UltiSnips/pythonx/vimsnippets.pyc
+vim/pack/bundles/opt/UltiSnips/pythonx/__pycache__
 vim/tmp
 nvim/autoload/plug*
 nvim/bundles
