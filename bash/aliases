@@ -111,6 +111,8 @@ elif hash ag 2> /dev/null; then
   gtsbs() { command ag -G "\.sbs$" "$@"; }
   gtsv()  { command ag -G "\.(sv|svh)$" "$@"; }
   gtv()   { command ag -G "\.(v|x)$" "$@"; }
+else
+  alias g=grep
 fi
 gi() { g -i "$@"; }
 gv() { g -v "$@"; }
