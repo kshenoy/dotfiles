@@ -1,6 +1,6 @@
 let s:config_file = glob('~/.vimrc_background')
 
-function! s:ReadBase16Config()                                                                                    " {{{1
+function! s:ReadBase16Config()                                                                                     "{{{1
   if has('gui_running')
     return
   endif
@@ -12,7 +12,7 @@ function! s:ReadBase16Config()                                                  
 endfunction
 
 
-function! s:After()                                                                                               " {{{1
+function! s:After()                                                                                                "{{{1
   " Description: Find any additional settings related to the current colorscheme in after/colors and load it
   "              This order is important. We let statusline set the general colors first based on the colorscheme and
   "              then pick up any specific settings from the after file
@@ -20,9 +20,7 @@ function! s:After()                                                             
   " custom highlight groups so this function tries to restore them
   call s:RestoreCustomHLGroups()
 
-  if (  !exists('g:colors_name')
-   \ || (g:colors_name == '')
-   \ )
+  if !exists('g:colors_name') || (g:colors_name == '')
     return
   endif
 
@@ -40,7 +38,7 @@ function! s:After()                                                             
 endfunction
 
 
-function! s:RestoreCustomHLGroups()                                                                                    " {{{1
+function! s:RestoreCustomHLGroups()                                                                                "{{{1
   " Description: Highlight groups to use in Statusline
 
   highlight clear SignColumn
@@ -49,7 +47,7 @@ function! s:RestoreCustomHLGroups()                                             
   highlight link  StatusLine LineNr
 
   let l:prefix = (has('gui_running') || has('termguicolors') ? 'gui' : 'cterm')
-  let l:stl_bg=get(utils#GetHighlightInfo('StatusLine'), l:prefix . 'bg')
+  let l:stl_bg=get(utils#GetHighlightInfo('StatusLine'), l:prefix . 'bg', '')
 
   for i in [
          \   ['STLColumn',   'CursorLineNr'],
@@ -57,13 +55,18 @@ function! s:RestoreCustomHLGroups()                                             
          \   ['STLFilename', 'StatusLine'  ],
          \   ['STLStatus',   'Statement'   ]
          \ ]
-    let l:fg = get(utils#GetHighlightInfo(i[1]), l:prefix . 'fg')
-    silent execute 'highlight ' . i[0] . ' ' . l:prefix . 'bg=' . l:stl_bg . ' ' . l:prefix . 'fg=' . l:fg
+    if l:stl_bg != ""
+      silent execute 'highlight ' . i[0] . ' ' . l:prefix . 'bg=' . l:stl_bg
+    endif
+    let l:fg = get(utils#GetHighlightInfo(i[1]), l:prefix . 'fg', '')
+    if l:fg != ""
+      silent execute 'highlight ' . i[0] . ' ' . l:prefix . 'fg=' . l:fg
+    endif
   endfor
   silent execute 'highlight STLFilename ' . l:prefix '=bold'
 
-  let l:norm_bg = get(utils#GetHighlightInfo('Normal'), l:prefix . 'bg')
-  silent execute 'highlight STLHelp     ' . l:prefix . 'bg=Red3 ' . l:prefix . 'fg=' . l:norm_bg
+  let l:norm_bg = get(utils#GetHighlightInfo('Normal'), l:prefix . 'bg', '')
+  silent execute 'highlight STLHelp     ' . l:prefix . 'bg=Red3 ' . (l:norm_bg == "" ? "" : l:prefix . 'fg=' . l:norm_bg)
 
   if !has('gui_running')
     return
@@ -71,11 +74,18 @@ function! s:RestoreCustomHLGroups()                                             
 
   " Approximations of the colors I want: Insert - Blue, Replace - Red, Visual - Orange, etc.
   " Colorscheme specific colors, if any, will be set from .vim/after/colors/<colorscheme>.vim
-  silent execute 'highlight InsertCursor  guibg=DodgerBlue3 guifg=' . l:norm_bg
-  silent execute 'highlight ReplaceCursor guibg=Red3        guifg=' . l:norm_bg
-  silent execute 'highlight VisualCursor  guibg=Orange3     guifg=' . l:norm_bg
-  silent execute 'highlight CommandCursor guibg=Magenta3    guifg=' . l:norm_bg
-  silent execute 'highlight NormalCursor  guibg=Green' . (&background == 'light' ? '3' : '4') . ' guifg=' . l:norm_bg
+  silent execute 'highlight InsertCursor  guibg=DodgerBlue3'
+  silent execute 'highlight ReplaceCursor guibg=Red3'
+  silent execute 'highlight VisualCursor  guibg=Orange3'
+  silent execute 'highlight CommandCursor guibg=Magenta3'
+  silent execute 'highlight NormalCursor  guibg=Green' . (&background == 'light' ? '3' : '4')
+  if l:norm_bg != ""
+    silent execute 'highlight InsertCursor  guifg=' . l:norm_bg
+    silent execute 'highlight ReplaceCursor guifg=' . l:norm_bg
+    silent execute 'highlight VisualCursor  guifg=' . l:norm_bg
+    silent execute 'highlight CommandCursor guifg=' . l:norm_bg
+    silent execute 'highlight NormalCursor  guifg=' . l:norm_bg
+  endif
 
   " Setup vim-mark's highlights
   MarkPalette original
