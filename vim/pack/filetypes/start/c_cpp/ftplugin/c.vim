@@ -6,12 +6,6 @@ setl cindent                                                                    
 
 
 "
-" 16. FOLDING
-"
-setl commentstring=//\ %s
-
-
-"
 " 22. EXECUTING EXTERNAL COMMANDS
 "
 if &formatprg == ""

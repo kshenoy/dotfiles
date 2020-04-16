@@ -1,3 +1,9 @@
+"
+" 16. FOLDING
+"
+setl commentstring=//\ %s
+
+
 " Let the matchit plugin know what items can be matched.
 if exists("loaded_matchit")
   let b:match_ignorecase=0
