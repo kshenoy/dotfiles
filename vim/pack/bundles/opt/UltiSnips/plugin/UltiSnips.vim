@@ -3,9 +3,15 @@
 """ By: Kartik Shenoy
 """
 
+" UltiSnips needs Python3!
+if !has('python3')
+  " echoe "Not loading UltiSnips as python3 is not available"
+  finish
+endif
+
 let g:UltiSnipsEditSplit = "vertical"
 " Location of snippets
-execute 'let g:UltiSnipsSnippetDirectories=["' . g:dotvim . '/pack/settings/start/UltiSnips/snippets"]'
+execute 'let g:UltiSnipsSnippetDirectories=["' . g:dotvim . '/pack/bundles/opt/UltiSnips/snippets"]'
 let g:UltiSnipsEnableSnipMate=0
 " <C-X> is insert-mode completion so using <C-X><C-Y> feels natural for snippets
 let g:UltiSnipsExpandTrigger='<C-X><C-Y>'
@@ -13,6 +19,4 @@ let g:UltiSnipsListSnippets='<C-X><C-G><C-Y>'
 let g:UltiSnipsJumpForwardTrigger='<Tab>'
 let g:UltiSnipsJumpBackwardTrigger='<S-Tab>'
 
-if has('python3')
-  call plug#('SirVer/ultisnips')
-endif
+call plug#('SirVer/ultisnips')

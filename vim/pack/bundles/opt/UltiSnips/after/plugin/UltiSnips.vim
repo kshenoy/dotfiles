@@ -1,5 +1,5 @@
-" UltiSnips needs Python!
-if !has('python') && !has('python3')
+" UltiSnips needs Python3!
+if !has('python3')
   finish
 endif
 
