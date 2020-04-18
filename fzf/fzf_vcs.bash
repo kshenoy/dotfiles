@@ -16,7 +16,7 @@ __fzf-p4-strip-common-ancestors() {                                             
 }
 
 __fzf-down() {                                                                                                     #{{{1
-  fzf --height 50% "$@" --border
+  fzf "$@" --border
 }
 
 
@@ -49,10 +49,10 @@ fzf-git-tags() {                                                                
 
 fzf-git-hashes() {                                                                                                 #{{{1
   vcs__is_in_git_repo || return
-  git log --date=short --format="%C(green)%C(bold)%cd %C(auto)%h%d %s (%an)" --graph --color=always |
+  git log --graph --color --all --date=short --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cd) %C(red)%d%C(reset)' |
   __fzf-down --ansi --no-sort --multi --bind 'ctrl-s:toggle-sort' \
     --header 'Press CTRL-S to toggle sort' \
-    --preview 'grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git show --color=always | head -'$LINES |
+    --preview 'grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git show --color=always' |
   grep -o "[a-f0-9]\{7,\}"
 }
 

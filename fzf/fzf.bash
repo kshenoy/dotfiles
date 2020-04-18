@@ -30,6 +30,5 @@ if hash fd 2> /dev/null || hash fdfind 2> /dev/null; then
   export FZF_ALT_C_COMMAND='fd --color=never --follow --hidden --exclude .git --type d'
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 fi
-# export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --bind=ctrl-n:down,ctrl-p:up,alt-n:next-history,alt-p:previous-history --height ${FZF_TMUX_HEIGHT:-40%} --ansi --exit-0"
-export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --height ${FZF_TMUX_HEIGHT:-40%} --ansi --exit-0 --reverse --bind=ctrl-n:down,ctrl-p:up"
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --ansi --exit-0 --reverse --bind=ctrl-n:down,ctrl-p:up"
 # export FZF_CTRL_T_OPTS='--expect=alt-v,alt-e,alt-c'

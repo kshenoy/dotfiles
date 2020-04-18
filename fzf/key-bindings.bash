@@ -21,7 +21,7 @@ fzf-recent-dirs() {                                                             
 #=======================================================================================================================
 fzf-lsf-bjobs() {                                                                                                  #{{{1
   local selected=$(lsf_bjobs -w |
-    FZF_DEFAULT_OPTS="--header-lines=1 --height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
+    FZF_DEFAULT_OPTS="--header-lines=1 $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
     cut -d' ' -f1 | while read -r item; do
       printf '%q ' "$item"
     done
@@ -44,7 +44,7 @@ fzf-cmd-opts() {                                                                
   local cmd=$(awk '{print $NF}' <<< "${READLINE_LINE:0:$pos}")
 
   local selected=$(eval "${cmd} --help || ${cmd} -h || ${cmd} -help || ${cmd} help" | \
-    FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf --height 100% +x -m "$@" | \
+    FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf +x -m "$@" | \
     while read -r item; do
       # Auto-split on whitespace
       local words=($item)
@@ -167,11 +167,11 @@ if [[ -o emacs ]]; then                                                         
   # CTRL-O: Show list of options of the command before the cursor using '<cmd> -h'
   bind -x '"\C-f\C-o": "fzf-cmd-opts"'
 
-  # CTRL-G CTRL-E: Experimental
-  # bind -x '"\C-f\C-g\C-e": "__fzf_expt__"'
+  # CTRL-X: Experimental
+  # bind -x '"\C-f\C-x": "__fzf_expt__"'
 
   # Tmux related bindings: CTRL-F CTRL-T
-  bind -x '"\C-f\C-t": "fzf-tmux-select-session"'
+  bind -x '"\C-f\C-t\C-s": "fzf-tmux-select-session"'
 
   # Version-control related bindings: CTRL-F CTRL-V
   bind -x '"\C-f\C-v\C-e": "fzf-vcs-files"'
@@ -182,12 +182,12 @@ if [[ -o emacs ]]; then                                                         
   bind    '"\C-f\C-v\C-d": "$(fzf-git-diffs)\e\C-e\er"'
   bind    '"\C-f\C-v\C-b": "$(fzf-git-branches)\e\C-e\er"'
   bind    '"\C-f\C-v\C-t": "$(fzf-git-tags)\e\C-e\er"'
-  bind    '"\C-f\C-v\C-h": "$(fzf-git-hashes)\e\C-e\er"'
+  bind    '"\C-f\C-v\C-x": "$(fzf-git-hashes)\e\C-e\er"'
   bind    '"\C-f\C-v\C-r": "$(fzf-git-remotes)\e\C-e\er"'
 
   bind '"\er": redraw-current-line'
 
   # Alt-/: Repeat last command and pipe result to FZF
   # From http://brettterpstra.com/2015/07/09/shell-tricks-inputrc-binding-fun/
-  bind '"\C-f\e/": "!!|FZF_DEFAULT_OPTS=\"--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS\" fzf -m\C-m\C-m"'
+  bind '"\C-f\e/": "!! | fzf -m\C-m\C-m"'
 fi #}}}
