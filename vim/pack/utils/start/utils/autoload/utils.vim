@@ -422,15 +422,16 @@ endfunction
 function! utils#Journal(cmd, ...)                                                                                  "{{{1
   " Description: Execute cmd and return the output as a list of lines.
   "              If an additional argument is provided, use it to filter the output.
-  " Arguments:   cmd - The command to execute
-  "              a:1 - The filter to apply on the output of the command
-  "              a:2 - Whether to pretty-print (no a:2) or just return the output (provide a:2)
+  " Arguments:   cmd : The command to execute
+  "              a:1 : The filter to apply on the output of the command
+  "              a:2 : 0 = Pretty-print the array (default, if not specified)
+  "                    1 = Return raw array
   redir => l:out
   silent! execute a:cmd
   redir END
   let l:out_arr = split(l:out, '\n')
   if a:0
-    execute "call filter(l:out_arr, 'v:val " . a:1 "')"
+    execute "call filter(l:out_arr, '" . a:1 . "')"
   endif
   if (a:0 > 1)
     return l:out_arr

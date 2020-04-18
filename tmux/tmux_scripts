@@ -94,6 +94,10 @@ __tmux_pp_select_layout_work() {                                                
     command tmux select-layout "1be5,639x73,0,0{319x73,0,0,0,159x73,320,0,1,159x73,480,0,58}"
     tmux_pp resize-pane -t 2 -x 100% > /dev/null
     tmux_pp resize-pane -t 1 -x 50% > /dev/null
+  elif [[ "$1" == "work-home" ]]; then
+    command tmux select-layout "1be5,639x73,0,0{319x73,0,0,0,159x73,320,0,1,159x73,480,0,58}"
+    tmux_pp resize-pane -t 1 -x 25% > /dev/null
+    tmux_pp resize-pane -t 2 -x 50% > /dev/null
   elif [[ "$1" == "work-pc" ]]; then
     command tmux select-layout "1be5,639x73,0,0{319x73,0,0,0,159x73,320,0,1,159x73,480,0,58}"
     tmux_pp resize-pane -t 1 -x 50% > /dev/null
@@ -141,7 +145,7 @@ tmux_pp() {
       tmux_pp send-keys-all "tmux_pp ue" C-m
       ;;
 
-    resize-pane|resizep)                                                                                           #{{{1
+    resize-p*|resizep)                                                                                             #{{{1
       # From https://github.com/tmux/tmux/issues/888#issuecomment-297637138
       if [[ "$*" =~ -[xy][[:space:]]+[[:digit:]]+% ]]; then
         local perVal=$(sed -e 's/^.*-[xy]\s*//' -e 's/%.*//' <<< "$*")

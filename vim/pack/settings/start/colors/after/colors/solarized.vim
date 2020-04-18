@@ -81,13 +81,21 @@ highlight! link SignatureMarkerText CursorLineNr
 
 " vim-mark
 let g:mwPalettes['solarized'] = [
-  \ { 'ctermbg' : utils#GetHighlightInfo('base16_09').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_09').guifg },
-  \ { 'ctermbg' : utils#GetHighlightInfo('base16_0B').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_0B').guifg },
-  \ { 'ctermbg' : utils#GetHighlightInfo('base16_0D').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_0D').guifg },
-  \ { 'ctermbg' : utils#GetHighlightInfo('base16_0A').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_0A').guifg },
-  \ { 'ctermbg' : utils#GetHighlightInfo('base16_0F').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_0F').guifg },
-  \ { 'ctermbg' : utils#GetHighlightInfo('base16_0C').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_0C').guifg },
-  \ { 'ctermbg' : utils#GetHighlightInfo('base16_0E').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_0E').guifg },
-  \ { 'ctermbg' : utils#GetHighlightInfo('base16_02').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_02').guifg },
+  \ { 'ctermbg' : utils#GetHighlightInfo('base16_09').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_09').guifg,
+  \   'ctermfg' : utils#GetHighlightInfo('base16_01').ctermfg, 'guifg' : utils#GetHighlightInfo('base16_01').guifg },
+  \ { 'ctermbg' : utils#GetHighlightInfo('base16_0B').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_0B').guifg,
+  \   'ctermfg' : utils#GetHighlightInfo('base16_01').ctermfg, 'guifg' : utils#GetHighlightInfo('base16_01').guifg },
+  \ { 'ctermbg' : utils#GetHighlightInfo('base16_0D').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_0D').guifg,
+  \   'ctermfg' : utils#GetHighlightInfo('base16_01').ctermfg, 'guifg' : utils#GetHighlightInfo('base16_01').guifg },
+  \ { 'ctermbg' : utils#GetHighlightInfo('base16_0A').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_0A').guifg,
+  \   'ctermfg' : utils#GetHighlightInfo('base16_01').ctermfg, 'guifg' : utils#GetHighlightInfo('base16_01').guifg },
+  \ { 'ctermbg' : utils#GetHighlightInfo('base16_0F').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_0F').guifg,
+  \   'ctermfg' : utils#GetHighlightInfo('base16_01').ctermfg, 'guifg' : utils#GetHighlightInfo('base16_01').guifg },
+  \ { 'ctermbg' : utils#GetHighlightInfo('base16_0C').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_0C').guifg,
+  \   'ctermfg' : utils#GetHighlightInfo('base16_01').ctermfg, 'guifg' : utils#GetHighlightInfo('base16_01').guifg },
+  \ { 'ctermbg' : utils#GetHighlightInfo('base16_0E').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_0E').guifg,
+  \   'ctermfg' : utils#GetHighlightInfo('base16_01').ctermfg, 'guifg' : utils#GetHighlightInfo('base16_01').guifg },
+  \ { 'ctermbg' : utils#GetHighlightInfo('base16_02').ctermfg, 'guibg' : utils#GetHighlightInfo('base16_02').guifg,
+  \   'ctermfg' : utils#GetHighlightInfo('base16_01').ctermfg, 'guifg' : utils#GetHighlightInfo('base16_01').guifg }
   \ ]
 MarkPalette solarized

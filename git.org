@@ -151,8 +151,8 @@ This scrubs away all local branches that are merged.
 #+end_src
 
 #+begin_src conf
-  lg = log --color --graph --pretty=format:' %C(yellow)%h %C(bold blue)<%an>%C(reset) %s %C(green)(%cr)%C(reset)%C(red)%d%C(reset)' --abbrev-commit
-  ls = log --oneline --decorate
+  lg = log --color --graph --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(red)%d%C(reset)' --abbrev-commit --all
+  ls = log --color --graph --pretty=format:' %C(yellow)%h%C(reset) %s %C(red)%d%C(reset)' --abbrev-commit --all
 #+end_src
 
 Pull changes from the remote. Any local commits will be rebased to come after the commits from remote. =--prune= option removes remote-tracking branches that no longer exist on the remote.
