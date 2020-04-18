@@ -174,16 +174,17 @@ if [[ -o emacs ]]; then                                                         
   bind -x '"\C-f\C-t\C-s": "fzf-tmux-select-session"'
 
   # Version-control related bindings: CTRL-F CTRL-V
+  bind -x '"\C-f\C-v\C-b": "fzf-git-branches"'
+  bind -x '"\C-f\C-v\C-d": "fzf-git-diffs"'
   bind -x '"\C-f\C-v\C-e": "fzf-vcs-files"'
   bind -x '"\C-f\C-v\C-f": "fzf-vcs-all-files"'
-  bind -x '"\C-f\C-v\C-s": "fzf-vcs-status"'
   bind    '"\C-f\C-v\C-g": " \C-e\C-u`fzf-vcs-cd`\e\C-e\er\C-m"'
+  bind -x '"\C-f\C-v\C-k": "fzf-vcs-commits"'
+  bind -x '"\C-f\C-v\C-l": "fzf-vcs-filelog"'
+  bind -x '"\C-f\C-v\C-r": "fzf-git-remotes"'
+  bind -x '"\C-f\C-v\C-s": "fzf-vcs-status"'
+  bind -x '"\C-f\C-v\C-t": "fzf-git-tags"'
   bind    '"\C-f\C-v\C-w": " \C-e\C-u`__fzf_p4_walist__`\e\C-e\er\C-m"'
-  bind    '"\C-f\C-v\C-d": "$(fzf-git-diffs)\e\C-e\er"'
-  bind    '"\C-f\C-v\C-b": "$(fzf-git-branches)\e\C-e\er"'
-  bind    '"\C-f\C-v\C-t": "$(fzf-git-tags)\e\C-e\er"'
-  bind    '"\C-f\C-v\C-x": "$(fzf-git-hashes)\e\C-e\er"'
-  bind    '"\C-f\C-v\C-r": "$(fzf-git-remotes)\e\C-e\er"'
 
   bind '"\er": redraw-current-line'
 
