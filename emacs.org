@@ -97,7 +97,7 @@ There are two ways I go about it:
 :END:
 I'm using [[https://github.com/jwiegley/use-package][use-package]] ([[info:use-package#Top][info:use-package]]) to configure my packages. It is a macro that provides convenient syntactic sugar for many common tasks related to installing and configuring Emacs packages.
 
-| <<:ensure>> | Install packages automatically if set to /nil/ or /t/. Passing anything else allows mm to use a different package than the one named in use-package [[org-config][eg.]] |
+| <<:ensure>> | Install packages automatically if set to /nil/ or /t/. Passing anything else allows me to use a different package than the one named in use-package [[org-config][eg.]] |
 | <<:pin>>    | Allows installing a package from a specific archive                                                                                                 |
 
 It doesn't install packages by itself and defers that task to a package manager like package.el and [[https://github.com/raxod502/straight.el][straight.el]]. I'm currently using both.
@@ -1444,7 +1444,7 @@ eg. To kill multiple buffers
     Move         ^^^^^^^^^^|  Call           ^^|  Cancel  ^^|  Options  ^^|  Action _w_/_s_ _a_: %s(ivy-action-name)
   ---------------^^^^^^^^^^+-----------------^^+----------^^+-----------^^+-------------------------------
     _g_  ^ ^ _k_ ^ ^  _u_  |  e_x_ecute        |  _i_nsert  |  _c_alling: %-7s(if ivy-calling \"on\" \"off\")  _C_ase-fold: %-10`ivy-case-fold-search
-    ^↕^  _h_ ^+^ _l_  ^↕^  |  _RET_: done      |  _q_uit    |  _m_atcher: %-7s(ivy--matcher-desc)^^^^^^^^^^^^  _t_runcate: %-11`truncate-lines
+    ^ ^  _h_ ^+^ _l_  ^ ^  |  _RET_: done      |  _q_uit    |  _m_atcher: %-7s(ivy--matcher-desc)^^^^^^^^^^^^  _t_runcate: %-11`truncate-lines
     _G_  ^ ^ _j_ ^ ^  _d_  |  _TAB_: alt-done  |          ^^|  _<_/_>_: shrink/grow
                  ^^^^^^^^^^|  _o_ccur          |          ^^|
   "
@@ -1647,7 +1647,7 @@ Resources: [[http://doc.norang.ca/org-mode.html][Organize Your Life in Plain Tex
   (setq org-use-property-inheritance t)
   (setq org-tags-column -100)
   (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
-  (setq org-blank-before-new-entry '((heading . t) (plain-list-item . nil)))
+  (setq org-blank-before-new-entry '((heading . t) (plain-list-item . t)))
   (setq org-link-search-must-match-exact-headline nil)
   (setq org-startup-with-inline-images t)
   (setq org-imenu-depth 10)
