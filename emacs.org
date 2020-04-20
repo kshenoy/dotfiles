@@ -679,17 +679,6 @@ Emacs doesn't have a native hook that is called after a theme has loaded. So we'
     :config (load-theme 'doom-tomorrow-night t))
 #+end_src
 
-** Frame related
-Frame parameters for all frames, regardless of window-system.
-#+begin_src emacs-lisp
-(setq default-frame-alist
-      '((tool-bar-lines 0)
-        (left-fringe . nil)
-        (right-fringe . 0)
-        (menu-bar-lines . 0)
-        (vertical-scroll-bars . nil)))
-#+end_src
-
 Set frame size programatically
 #+begin_src emacs-lisp
   (bind-keys :map my-s-bindings-map
