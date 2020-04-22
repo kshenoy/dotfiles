@@ -16,9 +16,11 @@ if [[ ! -d ${_xdg_config_home}/dotfiles-priv ]]; then
   fi
 fi
 
-ln -svTf ${_xdg_config_home}/dotfiles{-priv,}/bash/work
-ln -svTf ${_xdg_config_home}/dotfiles{-priv,}/scripts/amd
-ln -svTf ${_xdg_config_home}/dotfiles{-priv,}/vim/pack/rc_local
+if (( $UID != 0 )); then
+  ln -svTf ${_xdg_config_home}/dotfiles{-priv,}/bash/work
+  ln -svTf ${_xdg_config_home}/dotfiles{-priv,}/scripts/amd
+  ln -svTf ${_xdg_config_home}/dotfiles{-priv,}/vim/pack/rc_local
+fi
 
 mkdir -p ${_xdg_config_home}
 ln -svTf ${_xdg_config_home}/dotfiles/bash/bashrc           ~/.bashrc
