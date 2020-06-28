@@ -7,7 +7,7 @@
 
 * tmux.conf
 :PROPERTIES:
-:header-args+: :tangle ~/.tmux.conf
+:header-args+: :tangle tmux.conf
 :ID:       6753e99d-778e-452e-bb61-017101cf3c6e
 :END:
 #+begin_src conf :export none

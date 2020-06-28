@@ -1,0 +1,178 @@
+# config
+# :PROPERTIES:
+# :header-args+: :tangle config
+# :END:
+
+# [[file:~/.config/dotfiles/git/git.org::*config][config:1]]
+# This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
+# Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
+# If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
+# config:1 ends here
+
+# user
+
+# [[file:~/.config/dotfiles/git/git.org::*user][user:1]]
+[user]
+name  = Kartik Shenoy
+email = theresmorethanoneway@gmail.com
+# user:1 ends here
+
+# core
+
+# [[file:~/.config/dotfiles/git/git.org::*core][core:1]]
+[core]
+editor   = gvim --nofork
+fileMode = false
+# core:1 ends here
+
+
+
+# Centralize all hooks instead of configuring them on a per-repository basis
+
+# [[file:~/.config/dotfiles/git/git.org::*core][core:3]]
+hooksPath = ~/.config/git/hooks/
+# core:3 ends here
+
+# color
+
+# [[file:~/.config/dotfiles/git/git.org::*color][color:1]]
+[color]
+ui     = auto
+branch = auto
+diff   = auto
+status = auto
+
+[color "branch"]
+current = green
+remote  = red
+
+[color "diff"]
+meta = yellow
+frag = magenta
+old = red bold
+new = green
+plain = white
+
+[color "status"]
+added = yellow
+changed = red
+untracked = cyan
+# color:1 ends here
+
+# diff
+
+# [[file:~/.config/dotfiles/git/git.org::*diff][diff:1]]
+[diff]
+tool = gvim
+
+[difftool]
+prompt = false
+
+[difftool "gvim"]
+cmd = gvim -df -c 'set columns=260|set lines=62|wincmd =' $LOCAL $REMOTE 2> /dev/null
+trustExitCode = true
+
+[difftool "vim"]
+cmd = vim -df -c 'set columns=260|set lines=62|wincmd =' $LOCAL $REMOTE 2> /dev/null
+trustExitCode = true
+
+[difftool "meld"]
+cmd = meld --diff $LOCAL $REMOTE
+# diff:1 ends here
+
+# merge
+
+# [[file:~/.config/dotfiles/git/git.org::*merge][merge:1]]
+[merge]
+tool = gvim
+conflictstyle = diff3
+
+[mergetool "meld"]
+cmd = meld --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $MERGED $REMOTE
+
+[mergetool "gvim"]
+cmd = vim_merge $BASE $REMOTE $LOCAL $MERGED
+trustExitCode = true
+# merge:1 ends here
+
+# misc
+
+# [[file:~/.config/dotfiles/git/git.org::*misc][misc:1]]
+[credential]
+helper = cache --timeout=3600
+
+[push]
+default = matching
+# misc:1 ends here
+
+# aliases
+# - https://gitlab.com/to1ne/literate-dotfiles/blob/master/git.org
+# - https://haacked.com/archive/2014/07/28/github-flow-aliases/
+
+# Using =!= as prefix allows running any command in the shell and it doesn't have to be a git command.
+# Thus, if we want to create an alias to run multiple commands by chaining them together, we have to use =!=
+
+# [[file:~/.config/dotfiles/git/git.org::*aliases][aliases:1]]
+[alias]
+alias = !git config -l | grep alias | cut -c 7-
+# aliases:1 ends here
+
+
+
+# Open gitconfig file with my default editor
+
+# [[file:~/.config/dotfiles/git/git.org::*aliases][aliases:2]]
+ec = config --global -e
+# aliases:2 ends here
+
+# [[file:~/.config/dotfiles/git/git.org::*aliases][aliases:3]]
+d  = diff
+dw = diff --word-diff
+dt = difftool
+mt = mergetool
+cl = clone
+ci = commit
+co = checkout
+br = branch -a
+# aliases:3 ends here
+
+
+
+# Aliases for deleting the branch from various places
+
+# [[file:~/.config/dotfiles/git/git.org::*aliases][aliases:4]]
+br-rm-remote = !"f() { branch=${1-$(git symbolic-ref --short HEAD)}; git push origin :$branch; }; f"
+br-rm-local  = !"f() { branch=${1-$(git symbolic-ref --short HEAD)}; git branch -D $branch; }; f"
+br-rm-all    = !"f() { branch=${1-$(git symbolic-ref --short HEAD)}; git push origin :$branch; git branch -D $branch; }; f"
+# aliases:4 ends here
+
+
+
+# This scrubs away all local branches that are merged.
+
+# [[file:~/.config/dotfiles/git/git.org::*aliases][aliases:5]]
+br-scrub = !git branch --merged | egrep -v '(^\\*|master)' | xargs git branch -d
+# aliases:5 ends here
+
+# [[file:~/.config/dotfiles/git/git.org::*aliases][aliases:6]]
+lg = log --color --graph --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(red)%d%C(reset)' --abbrev-commit --all
+ls = log --color --graph --pretty=format:' %C(yellow)%h%C(reset) %s %C(red)%d%C(reset)' --abbrev-commit --all
+# aliases:6 ends here
+
+
+
+# Pull changes from the remote. Any local commits will be rebased to come after the commits from remote. =--prune= option removes remote-tracking branches that no longer exist on the remote.
+
+# [[file:~/.config/dotfiles/git/git.org::*aliases][aliases:7]]
+sync = !git pull --rebase --prune && git submodule update --init --recursive
+# aliases:7 ends here
+
+
+
+# Safer wipes. Using =git reset HEAD --hard= leaves no room for undoing anything.
+# This commits everything and then does a hard reset to remove that commit. The nice thing is, the commit is still there, but it’s just unreachable. Unreachable commits are a bit inconvenient to restore, but at least they are still there.
+# I can run the =git reflog= command and find the SHA of the commit if I realize later that I made a mistake with the reset. The commit message will be “WIPE SAVEPOINT” in this case.
+
+# [[file:~/.config/dotfiles/git/git.org::*aliases][aliases:8]]
+wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
+# aliases:8 ends here

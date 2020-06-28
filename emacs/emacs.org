@@ -1,5 +1,5 @@
 #+TITLE: emacs configuration
-#+PROPERTY: header-args :results output silent :tangle ~/.emacs.d/init.el :noweb tangle :comments both :mkdirp yes
+#+PROPERTY: header-args :results output silent :tangle init.el :noweb tangle :comments both :mkdirp yes
 #+TODO: TODO(!) FIXME(!) |
 
 /This file is best viewed in org-mode in emacs as github doesn't do a good job of parsing links which use the ID Property/
