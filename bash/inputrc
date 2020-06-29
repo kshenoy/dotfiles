@@ -11,6 +11,12 @@ set output-meta on
 #"\eC-h": unix-filename-rubout
 #$endif
 
+# Don't beep!
+set bell-style none
+
+# Case-insensitive filename matching and completion
+set completion-ignore-case on
+
 set keymap emacs
 # Switch to vi mode
 "\C-x\C-t": vi-editing-mode

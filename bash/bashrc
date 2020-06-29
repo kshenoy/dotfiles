@@ -138,7 +138,6 @@ shopt -s shift_verbose
 
 set -o noclobber
 #set -o vi
-set bell-style none
 # Otherwise some completions will fail
 set +o nounset
 
