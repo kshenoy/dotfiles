@@ -1,7 +1,7 @@
 # bashrc file for home-wsl
 
 # Start by grabbing all the regular settings that I use at home
-. bashrc_local-home
+. ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/bashrc_local-home
 
 # Now, add more stuff specific to the WSL
 export DISPLAY=:0
