@@ -1,5 +1,7 @@
 ## Readline settings
-set show-mode-in-prompt-on
+
+# prepends a symbol to PS1 to indicate whether we're in emacs/vi mode
+# set show-mode-in-prompt-on
 
 # Handle Meta (Alt) correctly
 set meta-flag on

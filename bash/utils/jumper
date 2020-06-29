@@ -14,14 +14,17 @@ jumper() {
   # Jumping to a subdirectory of the parent dir in the path
   local _targ=${1%%/*}
   local _subdir="${1/${_targ}/}"
-  # echo "Targ:$_targ, SubDir:$_subdir"
 
   # Plain-old jumping, no fuzziness
   # local _dir=$(echo $PWD | sed "s,\(^.*${_targ}[^/]*\)/.*$,\1,")
 
   # Remove spaces, escape any bare dots and add fuzzy magic
-  local _regex=$(ruby -e "print '${_targ}'.gsub(/\s+/,'').split('').join('.*?').gsub(/\.(?!\*\?)/,'\.')")
-  local _dir=$(echo $PWD | ruby -e "print STDIN.read.sub(/(.*?${_regex}[^\/]*).*/,'\1')")
+  local _regex=$(ruby -e "print '${_targ}'.gsub(/\s+/,'').split('').join('.*').gsub(/\.(?!\*)/,'\.')")
+
+  # I'm using $PWD instead of Dir.pwd because I want to operate on the logical dir without resolving the symlinks
+  # Dir.pwd resolves the symlinks and shows the real path
+  local _dir=$(ruby -e "print STDIN.read.sub(/(.*?${_regex}[^\/]*).*/,'\1')" <<< "$PWD")
+  # echo "Targ:$_targ, SubDir:$_subdir, Regex='$_regex', Dir=$_dir" >| /tmp/out
 
   echo ${_dir}/${_subdir}
 }

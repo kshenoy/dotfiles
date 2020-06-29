@@ -148,19 +148,18 @@ fi # }}}
 if [[ -o emacs ]]; then                                                                                            #{{{
   # CTRL-F - Paste the selected file path into the command line (changed from default CTRL-T)
   if (( $BASH_VERSINFO > 3 )); then
-    # bind -x '"\C-f\C-f": "fzf-file-widget"'
-    bind -x '"\C-f\C-f": "fzf-vcs-all-files"'
+    bind -x '"\C-f\C-f": "fzf-file-widget"'
   elif __fzf_use_tmux__; then
     bind '"\C-f\C-f": " \C-u \C-a\C-k`__fzf_select_tmux__`\e\C-e\C-y\C-a\C-d\C-y\ey\C-h"'
   else
     bind '"\C-f\C-f": " \C-u \C-a\C-k`__fzf_select__`\e\C-e\C-y\C-a\C-y\ey\C-h\C-e\er \C-h"'
   fi
 
-  # cd into the selected directory. C-g to match VCS' binding C-v C-g. C-d because it operates on output of dirs command
+  # cd into the selected directory
   # Unbind the default one first and then create new bindings
   bind '"\ec": nop'
-  bind '"\C-f\C-g": " \C-e\C-u`__fzf_cd__`\e\C-e\er\C-m"'
-  bind -x '"\C-f\C-d": "fzf-recent-dirs"'
+  bind '"\C-f\C-d": " \C-e\C-u`__fzf_cd__`\e\C-e\er\C-m"'
+  bind -x '"\C-f\C-g": "fzf-recent-dirs"'
 
   bind -x '"\C-f\C-l": "fzf-lsf-bjobs"'
 

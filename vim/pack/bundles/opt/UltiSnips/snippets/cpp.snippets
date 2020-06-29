@@ -276,25 +276,25 @@ auto count = std::count_if(begin(${1:${VISUAL:container}}), end($1), [](auto con
 endsnippet
 
 snippet fnd "std::find"
-auto searchIt = std::find(begin(${1:${VISUAL:container}}), end($1), ${2:<value>});
-if (searchIt != end($1)) {
+auto const k_searchIt = std::find(begin(${1:${VISUAL:container}}), end($1), ${2:<value>});
+if (k_searchIt != end($1)) {
   $0
 }
 endsnippet
 
 snippet fni "std::find_if"
-auto searchIt = std::find_if(begin(${1:${VISUAL:container}}), end($1), [](auto const & ${2:i}) {
+auto const k_searchIt = std::find_if(begin(${1:${VISUAL:container}}), end($1), [](auto const & ${2:i}) {
   $0
 });
-if (searchIt != end($1)) {
+if (k_searchIt != end($1)) {
 }
 endsnippet
 
 snippet fin "std::find_if_not"
-auto searchIt = std::find_if_not(begin(${1:${VISUAL:container}}), end($1), [](auto const & ${2:i}) {
+auto const k_searchIt = std::find_if_not(begin(${1:${VISUAL:container}}), end($1), [](auto const & ${2:i}) {
   $0
 });
-if (searchIt != end($1)) {
+if (k_searchIt != end($1)) {
 }
 endsnippet
 
@@ -368,7 +368,7 @@ snippet _skel "Template for new files" b
 
 using namespace std;
 
-int main(${1:int argc, const char *argv[]}){
+int main(${1:int argc, const char *argv[]}) {
 $0
 }
 endsnippet

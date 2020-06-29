@@ -426,9 +426,7 @@ function! utils#Journal(cmd, ...)                                               
   "              a:1 : The filter to apply on the output of the command
   "              a:2 : 0 = Pretty-print the array (default, if not specified)
   "                    1 = Return raw array
-  redir => l:out
-  silent! execute a:cmd
-  redir END
+  redir => l:out|silent! execute a:cmd|redir END
   let l:out_arr = split(l:out, '\n')
   if a:0
     execute "call filter(l:out_arr, '" . a:1 . "')"
