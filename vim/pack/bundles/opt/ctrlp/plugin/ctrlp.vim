@@ -32,6 +32,9 @@ if has('unix')
                         \ "| while read filename; do echo ${#filename} $filename; done " .
                         \ "| sort -n | awk '{print $2}'"
   \ }
+  if executable('fd')
+    let g:ctrlp_user_command.fallback="fd --follow --hidden --exclude '.git' --type f"
+  endif
 
 elseif executable('ag')
   let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
@@ -64,6 +67,11 @@ nnoremap <silent>  <Plug>my(Finder)q :CtrlPQuickfix<CR>
 nnoremap <silent>  <Plug>my(Finder)o :CtrlPFunky<CR>
 xnoremap <silent>  <Plug>my(Finder)o :<C-U>CtrlPFunky <C-R>*<CR>
 nnoremap <silent>  <leader><leader> :CtrlPBuffer<CR>
+
+let g:ctrlp_funky_after_jump = {
+      \ 'default' : 'zxzt'
+      \ }
+let g:ctrlp_funky_nolim = 1
 
 call plug#('ctrlpvim/ctrlp.vim')
 call plug#('tacahiroy/ctrlp-funky')

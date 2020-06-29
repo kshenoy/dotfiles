@@ -142,13 +142,6 @@ call plug#('tommcdo/vim-exchange', {'on': '<Plug>(Exchange'})
 " call plug#('tommcdo/vim-express')
 
 
-" gundo ----------------------------------------------------------------------------------------------------------- {{{1
-let g:gundo_preview_bottom=1
-call plug#('sjl/gundo.vim', {'on': 'GundoToggle'})
-
-nnoremap yoU :GundoToggle<CR>
-
-
 " IndentLine ------------------------------------------------------------------------------------------------------ {{{1
 let g:indentLine_char = "┊"
 if has('conceal')
@@ -282,6 +275,15 @@ call plug#('dhruvasagar/vim-table-mode', {'on': ['TableModeToggle']})
 if !has('gui_running')
   call plug#('tmux-plugins/vim-tmux-focus-events')
 endif
+
+
+" undotree -------------------------------------------------------------------------------------------------------- {{{1
+let g:undotree_WindowLayout=2
+let g:undotree_ShortIndicators=1
+let g:undotree_SetFocusWhenToggle=1
+call plug#('mbbill/undotree', {'on': 'UndotreeToggle'})
+nnoremap yoU :UndotreeToggle<CR>
+
 
 " vinegar --------------------------------------------------------------------------------------------------------- {{{1
 nnoremap - <Plug>VinegarUp
