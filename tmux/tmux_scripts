@@ -161,6 +161,11 @@ tmux_pp() {
       fi
       ;;
 
+    respawn)
+      # From https://github.com/tmux/tmux/issues/1036
+      pkill -USR1 tmux
+      ;;
+
     save-layout)                                                                                                   #{{{1
       eval $1=$(command tmux display-message -p "#{window_layout}")
       echo "Saved current layout to $1"
