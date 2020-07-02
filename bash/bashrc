@@ -242,7 +242,7 @@ fi
 # ls uses the value of the environment variable LS_COLORS to display
 # dircolors is a tool to set LS_COLORS
 if [[ -x /usr/bin/dircolors ]]; then
-  [[ -r ~/.dircolors ]] && eval "$(/usr/bin/dircolors -b ${HOME}/.dircolors)" || eval "$(/usr/bin/dircolors -b)"
+  [[ -r ~/.dircolors ]] && eval "$(/usr/bin/dircolors -b ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/dircolors)" || eval "$(/usr/bin/dircolors -b)"
 fi
 
 

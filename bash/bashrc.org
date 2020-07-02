@@ -4,7 +4,7 @@
 
 * bashrc
 :PROPERTIES:
-:header-args+: :tangle ~/test/.bashrc
+:header-args+: :tangle /tmp/bashrc
 :CREATED:  [2019-01-18 Fri 21:17]
 :END:
 #+begin_src bash :export none
@@ -260,7 +260,7 @@ Make less more friendly for non-text input files, see lesspipe(1)
 #+begin_src bash
   #GREP_OPTIONS="--color=auto"
   export GREP_COLORS='1;32'
-  export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
+  export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgreprc
 #+end_src
 
 ** misc
@@ -286,7 +286,7 @@ If not running interactively, don't do anything
 See [[id:2823d31a-572c-44ec-80e1-84acbbb6412e][dircolors]]
 #+begin_src bash
   if [[ -x /usr/bin/dircolors ]]; then
-    [[ -r ~/.dircolors ]] && eval "$(/usr/bin/dircolors -b ${HOME}/.dircolors)" || eval "$(/usr/bin/dircolors -b)"
+    [[ -r ~/.dircolors ]] && eval "$(/usr/bin/dircolors -b ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/dircolors)" || eval "$(/usr/bin/dircolors -b)"
   fi
 #+end_src
 
@@ -736,9 +736,9 @@ Show top N (default=10) changes
 #+end_src
 
 *** local - work
-#+begin_src bash :tangle (when (string-match "\\^atl" (system-name)) "~/test/.bashrc")
-#+end_src
-
+:PROPERTIES:
+:header-args+: :tangle (when (string-match "\\^atl" (system-name)) "/tmp/bashrc")
+:END:
 #+begin_src bash
   alias e="emacs_func ${STEM+--socket-name=${STEM//\//_}}"
 
@@ -1368,7 +1368,7 @@ Use like this: =sleep 10 && alert=
 
 *** [[https://github.com/ggreer/the_silver_searcher][ag - SilverSearcher]]
 :PROPERTIES:
-:header-args+: :tangle (when (and (executable-find "ag") (not (executable-find "rg"))) "~/test/.bashrc")
+:header-args+: :tangle (when (and (executable-find "ag") (not (executable-find "rg"))) "/tmp/bashrc")
 :END:
 Use this only if =ag= exists and =rg= doesn't
 #+begin_src bash
@@ -1763,7 +1763,7 @@ Smarter =..= eg. =.. 3= will jump up 3 levels. Also take a look at [[id:19b2ef22
 
 *** [[https://github.com/sharkdp/fd][fd]]
 :PROPERTIES:
-:header-args+: :tangle (when (executable-find "fd") "~/test/.bashrc")
+:header-args+: :tangle (when (executable-find "fd") "/tmp/bashrc")
 :END:
 If =fd= is installed, prefer it to find (some aliases will get over-written)
 #+begin_src bash
@@ -1775,11 +1775,11 @@ If =fd= is installed, prefer it to find (some aliases will get over-written)
 #+end_src
 
 *** TODO [[https://github.com/junegunn/fzf][fzf]]
-#+begin_src bash :tangle (when (string-match "budgie" (system-name)) "~/test/.bashrc")
+#+begin_src bash :tangle (when (string-match "budgie" (system-name)) "/tmp/bashrc")
   [[ -d /opt/fzf ]] && export FZF_PATH=/opt/fzf
 #+end_src
 
-#+begin_src bash :tangle (when (string-match "\\^atl" (system-name)) "~/test/.bashrc")
+#+begin_src bash :tangle (when (string-match "\\^atl" (system-name)) "/tmp/bashrc")
   [[ -d $HOME/.local/install/fzf ]] && export FZF_PATH="$HOME/.local/install/fzf"
 #+end_src
 
@@ -2092,21 +2092,21 @@ Since this function deals with aliases, it cannot be made into a stand-alone scr
 
 *** [[https://github.com/BurntSushi/ripgrep][ripgrep]]
 :PROPERTIES:
-:header-args+: :tangle (when (executable-find "rg") "~/test/.bashrc")
+:header-args+: :tangle (when (executable-find "rg") (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/dotfiles/ripgreprc"))
 :END:
 Tangle this only if =rg= exists. =rgf= is my wrapper around =rg= which provides a --files-from-option similar to ack
-#+begin_src bash
+#+begin_src bash :tangle (when (executable-find "rg") "/tmp/bashrc")
   alias g=rgf
 #+end_src
 
 ripgrep config file
-#+begin_src bash :export none :tangle ~/.ripgreprc
+#+begin_src bash :export none
   # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
   # Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
   # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
 #+end_src
 
-#+begin_src conf :tangle ~/.ripgreprc
+#+begin_src conf
   # Add to the cpp type.
   --type-add
   cpp:*.ipp,*.tpp
@@ -2365,7 +2365,7 @@ Using -f keeps the window in the foreground and prevents a whole bunch of diffs 
 ** local bashrc
 *** home
 :PROPERTIES:
-:header-args: :tangle (when (string-match "budgie" (system-name)) "~/test/.bashrc")
+:header-args: :tangle (when (string-match "budgie" (system-name)) "/tmp/bashrc")
 :END:
 #+begin_src bash
   alias amd_vpn='sudo openconnect -u kshenoy --token-mode=rsa atl-vpn.amd.com'
@@ -2389,7 +2389,7 @@ Update permissions of the history when exiting as root
 
 *** work
 :PROPERTIES:
-:header-args: :tangle (when (string-match "\\^atl" (system-name)) "~/test/.bashrc")
+:header-args: :tangle (when (string-match "\\^atl" (system-name)) "/tmp/bashrc")
 :END:
 #+begin_src bash
   export TZ="US/Mountain"
@@ -2473,7 +2473,7 @@ See http://cmdwww/sysadmin/modules for more information
 #+end_src
 
 Completion for custom tools at work
-#+begin_src bash :tangle (when (string-match "\\^atl" (system-name)) "~/test/.bashrc")
+#+begin_src bash :tangle (when (string-match "\\^atl" (system-name)) "/tmp/bashrc")
   complete -f -o default -X '!*.xml' ljd
   complete -f -o default -X '!*.vv' vv
 #+end_src
@@ -2722,7 +2722,7 @@ Automatically add completion for all aliases to commands having completion funct
 * LS_COLORS/dircolors
 :PROPERTIES:
 :ID:       2823d31a-572c-44ec-80e1-84acbbb6412e
-:header-args+: :tangle ~/.dircolors
+:header-args+: :tangle dircolors
 :END:
 #+begin_src bash :export none
   # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.

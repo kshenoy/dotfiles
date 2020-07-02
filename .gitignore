@@ -4,12 +4,8 @@
 .nfs*
 *sync.ffs_db
 bash/history
-bash/work
 compiz/
-emacs.d/work.el
-emacs.d/straight/
 fonts/
-scripts/amd
 unity/
 vim/autoload/plug*
 vim/bundles
@@ -21,7 +17,5 @@ vim/tmp
 nvim/autoload/plug*
 nvim/bundles
 wallpapers/
-xfce4/desktop/
-xfce4/panel/
 zsh/history
 zsh/oh-my-zsh/

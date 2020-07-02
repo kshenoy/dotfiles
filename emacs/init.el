@@ -308,12 +308,19 @@
     t))  ; This is required so that we can use this function in a cond block below
 
 (defun my-set-fonts()
-  (my-set-font-if-exists 'default "Iosevka-10")
-  (my-set-font-if-exists 'fixed-pitch "Iosevka-10")
-  (my-set-font-if-exists 'variable-pitch "Iosevka-10")
-  ;; (cond ((eq system-type 'gnu/linux) (my-set-font-if-exists 'variable-pitch "Ubuntu Condensed-9"))
-  ;;       ((eq system-type 'windows-nt) (my-set-font-if-exists 'variable-pitch "Iosevka SS05-9")))
-)
+  (cond
+   ;; ((and (eq system-type 'windows-nt) (my-set-font-if-exists 'default "Consolas-9")) t)
+   (t (my-set-font-if-exists 'default "Iosevka-10")))
+
+  (cond
+   ;; ((and (eq system-type 'gnu/linux) (my-set-font-if-exists 'fixed-pitch "DejaVu Sans Mono-10")) t)
+   (t (set-face-attribute 'fixed-pitch nil :family 'unspecified :inherit 'default)))
+
+  (cond
+   ;; ((and (eq system-type 'gnu/linux) (my-set-font-if-exists 'variable-pitch "DejaVu Sans-10")) t)
+   (t (set-face-attribute 'variable-pitch nil :family 'unspecified :inherit 'default)))
+  )
+
 (my-set-fonts)
 ;; Fonts:3 ends here
 
@@ -518,7 +525,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 (use-package solarized-theme
   :init
   (setq solarized-distinct-fringe-background t
-        solarized-use-variable-pitch nil)
+        solarized-use-variable-pitch t)
   :custom
   (evil-normal-state-cursor   '("#859900" box))
   (evil-visual-state-cursor   '("#b58900" box))
@@ -1544,12 +1551,26 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 (bind-key "C-c ." 'my-org-time-stamp org-mode-map)
 ;; Use ! to toggle timestamp type:1 ends here
 
+;; Custom priorities
+;; :PROPERTIES:
+;; :ID:       30e03c98-7190-48ad-99fb-49e28afa50e9
+;; :CREATED:  [2020-04-20 Mon 22:12]
+;; :END:
+
+;; Increase the no. of priority levels from 3 to 5 and change default priority to 'C'
+
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*Custom%20priorities][Custom priorities:1]]
+(setq org-default-priority 67
+      org-highest-priority 65
+      org-lowest-priority 69)
+;; Custom priorities:1 ends here
+
 ;; org-refile
 ;; Resources:
 ;; - [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Aaron Bieber - Organizing Notes with Refile]]
 
 ;; By [[https://www.reddit.com/r/emacs/comments/4366f9/how_do_orgrefiletargets_work/czg008y/][/u/awalker4 on reddit]].
-;; Show upto 3 levels of headings from the current file and two levels of headings from all agenda files
+;; Show upto 9 levels of headings from the current file and 5 levels of headings from all agenda files
 
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*org-refile][org-refile:1]]
 (setq org-refile-targets
@@ -1811,14 +1832,15 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 
 
 ;; Force agenda to start on a Monday as a week starts on a Monday. Sat and Sun are called week-ends for a reason :)
-;; Also, by default, the agenda only shows the next 7 days. I want to see the last two 7 days as well just in case I missed something.
+;; Also, by default, the agenda only shows the next 7 days. I want to see the previous 7 days as well just in case I missed something.
 ;; Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
 ;; #+name: org-agenda-cfg-span
 
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::org-agenda-cfg-span][org-agenda-cfg-span]]
 (setq org-agenda-start-day "-7d"
       org-agenda-start-on-weekday 1
-      org-agenda-span 14)
+      org-agenda-span 14
+      org-agenda-show-all-dates nil)
 ;; org-agenda-cfg-span ends here
 
 
@@ -1826,9 +1848,17 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 ;; I don't want to see completed tasks
 
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*:config][:config:4]]
-(setq org-agenda-skip-scheduled-if-done t)  ; Why isn't this default?
-(setq org-agenda-skip-deadline-if-done t)
+(setq org-agenda-skip-scheduled-if-done t  ; Why isn't this default?
+      org-agenda-skip-deadline-if-done t)
 ;; :config:4 ends here
+
+
+
+;; Right-align the tags along column 150 in the agenda
+
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*:config][:config:5]]
+(setq org-agenda-tags-column -150)
+;; :config:5 ends here
 
 ;; org-agenda custom commands
 ;; These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html][Aaron Bieber: An agenda for life with org-mode]]
@@ -2000,7 +2030,6 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
 
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*Use%20org-id%20globally%20across%20all%20files][Use org-id globally across all files:1]]
 (setq org-id-track-globally t)
-(setq org-id-extra-files '("~/.emacs.d/config.org"))
 ;; Use org-id globally across all files:1 ends here
 
 ;; /fin/
@@ -2130,7 +2159,7 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
 ;; Private config
 
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*Private%20config][Private config:1]]
-(when (or (and (eq system-type 'gnu/linux) (string-match-p "atlibex" (system-name)))
+(when (or (and (eq system-type 'gnu/linux) (string-match-p "atl" (system-name)))
           (and (eq system-type 'windows-nt) (string-match-p "MHDC" (system-name))))
   (load (expand-file-name "work.el" user-emacs-directory) t))
 ;; Private config:1 ends here

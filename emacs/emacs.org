@@ -451,13 +451,13 @@ After installing a new font refresh the font cache by running
      ;; ((and (eq system-type 'windows-nt) (my-set-font-if-exists 'default "Consolas-9")) t)
      (t (my-set-font-if-exists 'default "Iosevka-10")))
 
-    ;; (cond
-    ;;  ((and (eq system-type 'gnu/linux) (my-set-font-if-exists 'fixed-pitch "DejaVu Sans Mono-10")) t)
-    ;;  (t (my-set-font-if-exists 'fixed-pitch "Iosevka-10")))
+    (cond
+     ;; ((and (eq system-type 'gnu/linux) (my-set-font-if-exists 'fixed-pitch "DejaVu Sans Mono-10")) t)
+     (t (set-face-attribute 'fixed-pitch nil :family 'unspecified :inherit 'default)))
 
-    ;; (cond
-    ;;  ((and (eq system-type 'gnu/linux) (my-set-font-if-exists 'variable-pitch "DejaVu Sans-10")) t)
-    ;;  (t (my-set-font-if-exists 'variable-pitch "Iosevka-10")))
+    (cond
+     ;; ((and (eq system-type 'gnu/linux) (my-set-font-if-exists 'variable-pitch "DejaVu Sans-10")) t)
+     (t (set-face-attribute 'variable-pitch nil :family 'unspecified :inherit 'default)))
     )
 
   (my-set-fonts)
@@ -2484,7 +2484,6 @@ Details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
 Example on [[http://stackoverflow.com/a/27158715/734153][Emacs StackExchange]]
 #+begin_src emacs-lisp
   (setq org-id-track-globally t)
-  (setq org-id-extra-files '("~/.emacs.d/config.org"))
 #+end_src
 
 **** /fin/
@@ -2611,7 +2610,7 @@ Placing at end to be called after all packages are loaded
 * After
 ** Private config
 #+begin_src emacs-lisp
-  (when (or (and (eq system-type 'gnu/linux) (string-match-p "atlibex" (system-name)))
+  (when (or (and (eq system-type 'gnu/linux) (string-match-p "atl" (system-name)))
             (and (eq system-type 'windows-nt) (string-match-p "MHDC" (system-name))))
     (load (expand-file-name "work.el" user-emacs-directory) t))
 #+end_src
