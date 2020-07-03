@@ -147,9 +147,9 @@ alias vd=gvim_diff
 
 # alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
 alias vi='vim --config NONE'
-alias govb='$EDITOR ~/.vim/bundles.vim'
-alias govm='$EDITOR ~/.vim/plugin/mappings.vim'
-alias govv='$EDITOR ~/.vim/vimrc'
+alias vkvb='$EDITOR ~/.vim/bundles.vim'
+alias vkvm='$EDITOR ~/.vim/plugin/mappings.vim'
+alias vkvv='$EDITOR ~/.vim/vimrc'
 
 alias edbg="emacs --debug-init"
 alias ed="~/bin/emacs_daemon"
@@ -159,13 +159,13 @@ alias e="emacs_func"
 
 #==========
 # Configs
-alias gosa='$EDITOR ~/.config/dotfiles/bash/aliases'
-alias gosc='$EDITOR ~/.bashrc'
-alias gosf='$EDITOR ~/.config/dotfiles/bash/bashrc-func'
-alias gosl='$EDITOR ~/.bashrc_local'
-alias gosp='$EDITOR ~/.config/dotfiles/bash/bashrc-prompt'
-alias gost='$EDITOR ~/.config/dotfiles/tmux/tmux.conf'
-alias gosx='$EDITOR ~/.Xresources'
+alias vksa='$EDITOR ~/.config/dotfiles/bash/aliases'
+alias vksc='$EDITOR ~/.bashrc'
+alias vksf='$EDITOR ~/.config/dotfiles/bash/bashrc-func'
+alias vksl='$EDITOR ~/.bashrc_local'
+alias vksp='$EDITOR ~/.config/dotfiles/bash/bashrc-prompt'
+alias vkt='$EDITOR ~/.config/dotfiles/tmux/tmux.conf'
+alias vkx='$EDITOR ~/.Xresources'
 alias sosa='. ~/.config/dotfiles/bash/aliases && . ~/.config/dotfiles/bash/bashrc-func'
 alias sosc='. ~/.bashrc && clnpath'
 
