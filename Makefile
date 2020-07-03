@@ -7,8 +7,18 @@ XDG_DATA_HOME ?= $(HOME)/.local/share
 MKLINK := ln -svTf
 
 
-bash: bash/bashrc bash_links
-bash/bashrc: bash/bashrc.org
+# I have two things per target that I want to do
+# - the tangling which I can do as a pattern and,
+# - other recipes that are specific to the target
+all: bash emacs git tmux links
+
+
+clean:
+	rm bash/dircolors ripgreprc emacs/init.el git/config tmux/tmux.conf
+
+
+bash: bash/bashrc bash/dircolors ripgreprc bash_links
+bash/bashrc bash/dircolors ripgreprc: bash/bashrc.org
 	$(TANGLE) $<
 bash_links: force
 	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/bash/bashrc           ~/.bashrc
@@ -41,11 +51,6 @@ tmux_links: force
 	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/tmux/tmux.conf ~/.tmux.conf
 
 
-# I have two things per target that I want to do
-# - the tangling which I can do as a pattern and,
-# - other recipes that are specific to the target
-all: bash emacs git tmux links
-
 links: force
 	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles-priv/ssh/config       ~/.ssh/config
 	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/Xresources            ~/.Xresources
@@ -70,4 +75,4 @@ else
 endif
 
 
-.PHONY: force bash emacs git tmux
+.PHONY: force clean bash emacs git tmux
