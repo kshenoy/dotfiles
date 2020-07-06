@@ -336,11 +336,12 @@ Kill window without confirmation, kill other windows
 
 * Local variables                                                                         :noexport:
 :PROPERTIES:
-:header-args: :tangle no
+:header-args: :tangle no :export none
 :END:
 Use =add-file-local-variable= or =add-file-local-variable-prop-line= instead of adding these manually
 
 # Local Variables:
+# [[https://www.reddit.com/r/emacs/comments/372nxd/how_to_move_init_to_orgbabel/crjicdv/][Auto-tangle on save]]
 # eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
 # org-enforce-todo-checkbox-dependencies: nil
 # org-enforce-todo-dependencies: nil

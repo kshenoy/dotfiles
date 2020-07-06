@@ -14,7 +14,16 @@
     (use-package-hydra eyebrowse pos-tip popup s magit-popup git-commit with-editor async pkg-info epl string-inflection goto-chg org-protocol-capture-html quelpa-use-package quelpa company-tng try magit company-box delight yasnippet which-key rainbow-mode rainbow-delimiters popup-kill-ring pcre2el org-bullets noflet modern-cpp-font-lock ivy-rich counsel swiper ivy-hydra ivy hydra flycheck evil-visualstar evil-surround evil-string-inflection evil-numbers evil-matchit evil-exchange evil-commentary evil-args evil company-irony company beacon avy aggressive-indent org-plus-contrib use-package)))
  '(safe-local-variable-values
    (quote
-    ((eval ispell-hunspell-add-multi-dic "en_US,es_MX")
+    ((eval add-hook
+           (quote after-save-hook)
+           (lambda nil
+             (org-babel-tangle))
+           nil t)
+     (org-refile-targets
+      (nil :maxlevel . 9))
+     (org-enforce-todo-dependencies)
+     (org-enforce-todo-checkbox-dependencies)
+     (eval ispell-hunspell-add-multi-dic "en_US,es_MX")
      (eval ispell-set-spellchecker-params)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
