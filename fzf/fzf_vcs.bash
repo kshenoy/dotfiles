@@ -152,7 +152,7 @@ fzf-vcs-commits() {                                                             
     if [[ ! "$*" =~ -m\ \[0-9]+ ]]; then
       local _limit="-m 1000"
     fi
-    p4 changes $_limit "$@" $STEM/... | sed -r 's/@\S*//' |
+    p4 changes $_limit -t "$@" $STEM/... | sed -r 's/@\S*//' |
       __fzf-down --ansi --multi --no-sort --with-nth='..6' \
       --preview 'p4 describe -s {2}' --preview-window right:70% |
       cut -d' ' -f2

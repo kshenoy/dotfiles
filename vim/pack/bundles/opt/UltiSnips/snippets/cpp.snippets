@@ -22,7 +22,8 @@ endglobal
 #
 snippet inc "#include <>" b
 #include ${2/>/</}$1`!p
-opts = ['algorithm', 'array', 'cassert', 'cstdint', 'experimental/optional', 'fstream', 'iostream', 'iterator', 'list',
+opts = ['boost/optional.hpp', 'boost/range/adaptors.hpp',
+        'algorithm', 'array', 'cassert', 'cstdint', 'experimental/optional', 'fstream', 'iostream', 'iterator', 'list',
         'map', 'memory', 'set', 'sstream', 'string', 'tuple', 'unordered_map', 'unordered_set', 'utility', 'vector']
 opts.sort()
 if snip.basename:
@@ -48,9 +49,8 @@ snip.rv = "anonymous " if (len(t[1]) == 0) else ""
 `namespace${1/.+/ /m}$1
 endsnippet
 
-
 snippet uns "using namespace ..." b
-using namespace ${1:std};
+using namespace $1`!p snip.rv = complete(t[1], ['std', 'std::literals::string_literals'])`;
 endsnippet
 
 
@@ -240,6 +240,13 @@ snippet ermi ".erase(std::remove_if(...))"
 ${1:${VISUAL:container}}.erase(std::remove_if(begin($1), end($1), []($0){}), end($1));
 endsnippet
 
+
+# Sorting operations -----------------------------------------------------------------------------------------------{{{2
+snippet srt "std::sort"
+std::sort(begin(${1:${VISUAL:container}}), end($1))
+endsnippet
+
+
 # Non-modifying sequence operations --------------------------------------------------------------------------------{{{2
 snippet alo "std::all_of"
 std::all_of(begin(${1:${VISUAL:container}}), end($1), [](auto const & ${2:i}) {
@@ -354,9 +361,12 @@ std::ostringstream ${1:oss};
 std::copy(begin(${2:${VISUAL:src}}), end($2), std::experimental::make_ostream_joiner($1, ','));
 endsnippet
 
-snippet coutdbg "std::cout with File and Line specifiers"
-std::cout << "DEBUG: " << $0
-  << " (" << __FILE__ << ":" << __LINE__ << ")\n";
+snippet codbg "std::cout with File and Line specifiers"
+std::cout << "DEBUG: " << $0" (" << __FILE__ << ":" << std::dec << __LINE__ << ")\n";
+endsnippet
+
+snippet sshx "std::hex << std::showbase"
+std::hex << std::showbase << $0
 endsnippet
 
 

@@ -15,11 +15,9 @@ nnoremap <silent> <leader>ss :set columns=319<BAR>call system("wmctrl -i -b add,
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 execute 'nnoremap <silent> govv :e ' . g:dotvim . '/vimrc<CR>'
-execute 'nnoremap <silent> govg :e ' . g:dotvim . '/gvimrc<CR>'
 execute 'nnoremap <silent> govf :e ' . g:dotvim . '/pack/utils/start/utils/plugin/utils.vim<CR>'
 execute 'nnoremap <silent> govm :e ' . g:dotvim . '/plugin/mappings.vim<CR>'
 execute 'nnoremap <silent> govb :e ' . g:dotvim . '/bundles.vim<CR>'
-nnoremap <silent> govl :e ~/.vimrc_local<CR>
 
 nnoremap <silent> gosa :e ~/.config/dotfiles/bash/aliases<CR>
 nnoremap <silent> gosc :e ~/.bashrc<CR>
@@ -149,7 +147,7 @@ nnoremap <silent> <leader>fw :FTW<CR>
 """ Toggle Commands
 """ This are inspired and similar to vim-unimpaired. That uses "yo" to toggle stuff using setlocal
 """ However sometimes I want to toggle things globally. For these, I use "yO" if the option supports setting it globally
-nnoremap yOc :tabdo windo set cursorline!<CR>
+nnoremap yOc :call utils#Preserve("tabdo windo set cursorline!")<CR>
 nnoremap yOu :tabdo windo set cursorcolumn!<CR>
 nnoremap yOw :tabdo windo set wrap!<CR>
 nnoremap yOx :tabdo windo set cursorline! cursorcolumn!<CR>

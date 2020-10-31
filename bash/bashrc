@@ -5,7 +5,7 @@
 # Kartik Shenoy (kartik.shenoy@amd.com)
 echo "$(tput setaf 2)Sourcing$(tput sgr0) ${BASH_SOURCE[0]} ..."
 
-umask 022
+umask 027
 
 #=======================================================================================================================
 # SHELL CONFIGURATION                                                                                               {{{1

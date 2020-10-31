@@ -37,3 +37,9 @@ noremap <silent> gk k
 
 """ Copy the file name to unix visual select buffer
 nnoremap <expr> y<C-G> ':let @' . (has('win_32') ? '+' : '*') . '="' . expand("%:p") . '"<CR>'
+
+
+""" Local vimrc
+if system('hostname') =~ '^atl'
+  packadd work
+endif

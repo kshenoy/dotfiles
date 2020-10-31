@@ -104,8 +104,9 @@ function! utils#Preserve(expr, ...)                                             
   "              TODO: Any settings that must be saved and restored can be supplied in a list as the optional argument
   "              SYNTAX of Optional Args: [ (argname1, argval1), ... ]
 
-  " Save last search, and cursor position.
-  let currview = winsaveview()
+  " Save window and cursor position.
+  let l:win_id = win_getid()
+  let l:currview = winsaveview()
 
   " Do the business
   let l:keep_cmds = ""
@@ -114,7 +115,8 @@ function! utils#Preserve(expr, ...)                                             
   silent! execute l:keep_cmds . a:expr
 
   " Restore previous search history, and cursor position
-  call winrestview(currview)
+  call winrestview(l:currview)
+  call win_gotoid(l:win_id)
 endfunction
 
 
