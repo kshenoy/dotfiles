@@ -1807,11 +1807,11 @@ For org-version >= 9.2, we have to use this. =C-c C-,= was also added in 9.2 and
 :CREATED:  [2019-01-29 Tue 22:56]
 :END:
 #+begin_src emacs-lisp
-  (defun my-org-set-align-tags (p)
+  (defun my-org-modify-tags (p)
     "Set tags by calling counsel-org-tags and align tags as well.
     If called with a prefix, only align tags"
     (interactive "P")
-    (unless p (counsel-org-tag))
+    (unless p (org-set-tags-command))
     (org-align-all-tags))
 #+end_src
 
@@ -1823,6 +1823,10 @@ For org-version >= 9.2, we have to use this. =C-c C-,= was also added in 9.2 and
 :LOGBOOK:
 - State "TODO"       from              [2019-05-21 Tue 10:41]
 :END:
+Maybe use something like this
+#+begin_src emacs-lisp :tangle no
+  (ivy-add-actions 'counsel-org-tag '(("a" org-align-all-tags "align all tags")))
+#+end_src
 
 **** Use ! to toggle timestamp type
 :PROPERTIES:
@@ -2056,6 +2060,8 @@ Show all the hierarchical headlines instead of having to step down them
 
 From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 - Capture 1]] and [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][Using Emacs 24 - Capture 2]]
 
+[[id:f9b19f45-ee3a-4f40-b8af-0e5966e4df35][Add CREATED property to captured items]]
+
 ***** Capture templates
 :PROPERTIES:
 :CREATED:  [2018-12-28 Fri 23:04]
@@ -2096,18 +2102,6 @@ NOTE:
 - When using several keys, keys using the same prefix key must be sequential in the list and preceded by a 2-element entry explaining the prefix key.
   [[http://orgmode.org/manual/Template-elements.html#Template-elements][Template elements]], [[http://orgmode.org/manual/Template-elements.html#Template-expansion][Template expansion]]
 - Quick notes related to current state can be taken using =C-c C-z= and get added to the =LOGBOOK=
-
-***** Add properties to captured items
-:PROPERTIES:
-:CREATED:  [2018-12-28 Fri 23:04]
-:ID:       f9b19f45-ee3a-4f40-b8af-0e5966e4df35
-:END:
-This adds the CREATED and ID property to all captures
-From https://stackoverflow.com/a/16247032/734153
-#+begin_src emacs-lisp
-  (add-hook 'org-capture-prepare-finalize-hook
-            (lambda() (org-expiry-insert-created)(org-id-get-create)))
-#+end_src
 
 ***** Create frames for easy org-capture directly from the OS
 (credit: [[http://cestlaz.github.io/posts/using-emacs-24-capture-2/][here]])
@@ -2166,7 +2160,7 @@ Custom keymap for org-mode bindings.
 <<Custom timestamp keymap>>. Also see [[id:d4634d95-be37-4bdf-987e-22da5778e958][Using ! to toggle timestamp type]]
 
 #+begin_src emacs-lisp
-  (bind-key "C-c C-q" 'my-org-set-align-tags org-mode-map)
+  (bind-key "C-c C-q" 'my-org-modify-tags org-mode-map)
 #+end_src
 
 Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
@@ -2392,9 +2386,21 @@ This allows me to add a =CREATED= property everytime I create a new org-heading.
     :ensure org-plus-contrib
     :pin org
     :init
-    (setq org-expiry-inactive-timestamps t) ; Don't have everything in the agenda view
+    (setq org-expiry-inactive-timestamps t)  ; Don't put everything in the agenda view
     :config
-    (org-expiry-insinuate))
+    (org-expiry-insinuate)
+    <<org-expiry-captures>>
+  )
+#+end_src
+
+**** Add CREATED property to captured items
+:PROPERTIES:
+:CREATED:  [2018-12-28 Fri 23:04]
+:ID:       f9b19f45-ee3a-4f40-b8af-0e5966e4df35
+:END:
+From https://stackoverflow.com/a/16247032/734153
+#+begin_src emacs-lisp :noweb-ref org-expiry-captures :tangle no
+  (add-hook 'org-capture-prepare-finalize-hook 'org-expiry-insert-created)
 #+end_src
 
 *** org-id
@@ -2405,46 +2411,22 @@ I want to grab org-id from the [[https://orgmode.org/worg/org-contrib/index.html
     :ensure org-plus-contrib
     :pin org
     :init
-    (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
+    ; Setting this to true will create an ID for every entry which could become expensive when org-id-track-globally is enabled
+    (setq org-id-link-to-org-use-id 'create-if-interactive)
     :config
+    <<org-id-ins-compl>>
+  )
 #+end_src
 
-To effectively use custom ID, refer [[https://writequit.org/articles/emacs-org-mode-generate-ids.html#update-2016-09-07][this]].
-Note that =org-id= has been updated since then and now supports a method =org-id-get-create= which creates an ID if one is not present.
-Also, it uses the identifier /ID/ instead of /CUSTOM_ID/
-
-**** Automatically add ID to newly created headings
-:PROPERTIES:
-:CREATED:  [2018-12-28 Fri 23:59]
-:END:
-#+begin_src emacs-lisp
-  (add-hook 'org-insert-heading-hook 'org-id-get-create)
-#+end_src
-
-**** Completion while inserting link
-:PROPERTIES:
-:ID:       be086bdd-ffcf-4f4e-beb2-a948191895eb
-:END:
 To use completion, insert link using =C-c C-l= and select =id:= as type and completion should trigger.
 =org-id-get-with-outline-path-completion= returns the ID of the selected heading and creates it if it doesn't have one already.
 Details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb-ref org-id-ins-compl :tangle no
   (defun org-id-complete-link (&optional arg)
     "Create an id: link using completion"
     (concat "id:" (org-id-get-with-outline-path-completion org-refile-targets)))
 
-  (eval-after-load 'org '(org-link-set-parameters "id" :complete 'org-id-complete-link))
-#+end_src
-
-**** TODO Use org-id globally across all files
-Example on [[http://stackoverflow.com/a/27158715/734153][Emacs StackExchange]]
-#+begin_src emacs-lisp
-  (setq org-id-track-globally t)
-#+end_src
-
-**** /fin/
-#+begin_src emacs-lisp
-  )
+  (org-link-set-parameters "id" :complete 'org-id-complete-link)
 #+end_src
 
 ** pcre2el
