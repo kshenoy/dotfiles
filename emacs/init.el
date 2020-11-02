@@ -1749,7 +1749,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 (bind-key "u" 'my-org-babel-goto-block-corner org-babel-map)
 ;; Keybindings:4 ends here
 
-;; /fin/
+ ;; /fin/
 
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*/fin/][/fin/:1]]
 )
@@ -1856,41 +1856,45 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
       nil)))
 ;; org-agenda custom commands:1 ends here
 
-
-
-;; Note that I'm [[id:b19befdb-eada-4d1b-b48c-be04122e4ddf][using a noweb-ref]] here to insert the custom-commands. This allows me to construct each custom-command separately and describe it at length.
-
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*org-agenda%20custom%20commands][org-agenda custom commands:2]]
 (setq org-agenda-custom-commands
-      '(
-        ("d" "Daily agenda and all TODOs"
+      '(("d" "Daily agenda and all TODOs"
          (
-        (tags "PRIORITY=\"A\""
-              ((org-agenda-overriding-header "High-priority unfinished tasks:")
-               (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
-        (agenda "")
-        (alltodo ""
-                 ((org-agenda-overriding-header "ALL normal priority tasks:")
-                  (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
-                                                 (my-org-skip-subtree-if-priority ?A)
-                                                 (org-agenda-skip-if nil '(scheduled deadline))))))
-        ))
-        ("w" "Daily agenda and all TODOs for Work"
-         (
-        (tags "PRIORITY=\"A\""
-              ((org-agenda-overriding-header "High-priority unfinished tasks:")
-               (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
-        (agenda "" ((org-agenda-span 21)))
-        (alltodo ""
-                 ((org-agenda-overriding-header "ALL normal priority tasks:")
-                  (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
-                                                 (my-org-skip-subtree-if-priority ?A)
-                                                 (org-agenda-skip-if nil '(scheduled deadline))))))
-         )
-        ((org-agenda-files (list (expand-file-name "Work/" org-directory)))
-         ))
-        ))
 ;; org-agenda custom commands:2 ends here
+
+
+
+;; All the high priority tasks that are still pending
+
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*org-agenda%20custom%20commands][org-agenda custom commands:3]]
+(tags "PRIORITY=\"A\""
+      ((org-agenda-overriding-header "High-priority unfinished tasks:")
+       (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
+;; org-agenda custom commands:3 ends here
+
+
+
+;; An agenda showing the previous as well as the current week which I've [[org-agenda-cfg-span][configured]] above.
+
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*org-agenda%20custom%20commands][org-agenda custom commands:4]]
+(agenda "")
+;; org-agenda custom commands:4 ends here
+
+
+
+;; All the remaining todos (minus the high priority ones because why repeat it)
+
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*org-agenda%20custom%20commands][org-agenda custom commands:5]]
+(alltodo ""
+         ((org-agenda-overriding-header "ALL normal priority tasks:")
+          (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
+                                         (my-org-skip-subtree-if-priority ?A)
+                                         (org-agenda-skip-if nil '(scheduled deadline))))))
+;; org-agenda custom commands:5 ends here
+
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*org-agenda%20custom%20commands][org-agenda custom commands:7]]
+))))
+;; org-agenda custom commands:7 ends here
 
 ;; Keybindings
 ;; [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][General org keybindings]]
@@ -1900,7 +1904,7 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
 (bind-key* "<f12>" '(lambda (&optional arg) (interactive "P")(org-agenda arg "w")))
 ;; Keybindings:1 ends here
 
-;; /fin/
+ ;; /fin/
 
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*/fin/][/fin/:1]]
 )

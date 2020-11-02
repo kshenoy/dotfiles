@@ -2267,75 +2267,26 @@ These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/
         nil)))
 #+end_src
 
-Note that I'm [[id:b19befdb-eada-4d1b-b48c-be04122e4ddf][using a noweb-ref]] here to insert the custom-commands. This allows me to construct each custom-command separately and describe it at length.
 #+begin_src emacs-lisp
   (setq org-agenda-custom-commands
-        '(
-          <<org-agenda-daily>>
-          <<org-agenda-work>>
-          ))
+        '(("d" "Daily agenda and all TODOs"
+           (
 #+end_src
 
-***** Daily agenda
-:PROPERTIES:
-:ID:       63183f4f-4f14-4d99-9403-40233eecab9a
-:CREATED:  [2019-02-01 Fri 08:44]
-:END:
-I want my agenda to consist of 3 sections
-#+begin_src emacs-lisp :noweb-ref org-agenda-daily :tangle no
-  ("d" "Daily agenda and all TODOs"
-   (
-#+end_src
-
-1. All the high priority tasks that are still pending
-#+begin_src emacs-lisp :noweb-ref org-agenda-daily :tangle no
+All the high priority tasks that are still pending
+#+begin_src emacs-lisp
   (tags "PRIORITY=\"A\""
         ((org-agenda-overriding-header "High-priority unfinished tasks:")
          (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
 #+end_src
 
-2. An agenda showing the previous as well as the current week which I've [[org-agenda-cfg-span][configured]] above.
-#+begin_src emacs-lisp :noweb-ref org-agenda-daily :tangle no
+An agenda showing the previous as well as the current week which I've [[org-agenda-cfg-span][configured]] above.
+#+begin_src emacs-lisp
   (agenda "")
 #+end_src
 
-3. All the remaining todos (minus the high priority ones because why repeat it)
-#+begin_src emacs-lisp :noweb-ref org-agenda-daily :tangle no
-  (alltodo ""
-           ((org-agenda-overriding-header "ALL normal priority tasks:")
-            (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
-                                           (my-org-skip-subtree-if-priority ?A)
-                                           (org-agenda-skip-if nil '(scheduled deadline))))))
-  ))
-#+end_src
-
-Maybe I'll split the last one later into two sections - normal and low priority but this is good for now
-
-***** Work agenda
-:PROPERTIES:
-:ID:       c261a3fe-f9d8-4692-81f7-5de701ad53e9
-:CREATED:  [2019-02-01 Fri 08:44]
-:END:
-My work agenda is very similar to my daily agenda but it only uses my work related org files as source.
-#+begin_src emacs-lisp :noweb-ref org-agenda-work :tangle no
-  ("w" "Daily agenda and all TODOs for Work"
-   (
-#+end_src
-
-1. All the high priority tasks that are still pending
-#+begin_src emacs-lisp :noweb-ref org-agenda-work :tangle no
-  (tags "PRIORITY=\"A\""
-        ((org-agenda-overriding-header "High-priority unfinished tasks:")
-         (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
-#+end_src
-
-2. An agenda showing the previous as well as the next two weeks. This is different from my daily agenda and I have to specify the span explicitly.
-#+begin_src emacs-lisp :noweb-ref org-agenda-work :tangle no
-  (agenda "" ((org-agenda-span 21)))
-#+end_src
-
-3. All the remaining todos (minus the high priority ones because why repeat it)
-#+begin_src emacs-lisp :noweb-ref org-agenda-work :tangle no
+All the remaining todos (minus the high priority ones because why repeat it)
+#+begin_src emacs-lisp
   (alltodo ""
            ((org-agenda-overriding-header "ALL normal priority tasks:")
             (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
@@ -2343,11 +2294,15 @@ My work agenda is very similar to my daily agenda but it only uses my work relat
                                            (org-agenda-skip-if nil '(scheduled deadline))))))
 #+end_src
 
-These settings will apply to all the cmd-types in this custom-command so all 3 sections will only pull from my work org files
-#+begin_src emacs-lisp :noweb-ref org-agenda-work :tangle no
-   )
-  ((org-agenda-files (list (expand-file-name "Work/" org-directory)))
-   ))
+Maybe I'll split this into two sections - normal and low priority but this is good for now
+
+TODO: Restrict agenda to non-work files
+#+begin_src emacs-lisp :tangle no
+  ((org-agenda-files (mapcar (lambda (x) (expand-file-name x org-directory)) '("Inbox.org" "Software/" "Personal/"))))
+#+end_src
+
+#+begin_src emacs-lisp
+  ))))
 #+end_src
 
 **** Keybindings
