@@ -16,8 +16,7 @@ __fzf-p4-strip-common-ancestors() {                                             
 }
 
 __fzf-down() {                                                                                                     #{{{1
-  # fzf "$@" --height 50% --border
-  fzf "$@"
+  fzf "$@" --height 50% --border
 }
 
 
@@ -32,11 +31,15 @@ fzf-git-diffs() {                                                               
 
 fzf-git-branches() {                                                                                               #{{{1
   vcs__is_in_git_repo || return
+
+  local _selected=$(
   git branch -a --color=always | grep -v '/HEAD\s' | sort |
   __fzf-down --ansi --multi --tac --preview-window right:70% \
     --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1) | head -'$LINES |
-  sed 's/^..//' | cut -d' ' -f1 |
-  sed 's#^remotes/##'
+  sed 's/^..//' | cut -d' ' -f1 | sed 's#^remotes/##')
+
+  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$_selected${READLINE_LINE:$READLINE_POINT}"
+  READLINE_POINT=$(( READLINE_POINT + ${#_selected} ))
 }
 
 
@@ -45,16 +48,6 @@ fzf-git-tags() {                                                                
   git tag --sort -version:refname |
   __fzf-down --multi --preview-window right:70% \
     --preview 'git show --color=always {} | head -'$LINES
-}
-
-
-fzf-git-hashes() {                                                                                                 #{{{1
-  vcs__is_in_git_repo || return
-  git log --graph --color --all --date=short --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cd) %C(red)%d%C(reset)' |
-  __fzf-down --ansi --no-sort --multi --bind 'ctrl-s:toggle-sort' \
-    --header 'Press CTRL-S to toggle sort' \
-    --preview 'grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git show --color=always' |
-  command grep -o "[a-f0-9]\{7,\}"
 }
 
 
@@ -147,16 +140,23 @@ fzf-vcs-files() {                                                               
 
 fzf-vcs-commits() {                                                                                                #{{{1
   if vcs__is_in_git_repo; then
-    fzf-git-hashes "$@"
+    local _selected=$(git log --graph --color --all --date=short --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cd) %C(red)%d%C(reset)' |
+    __fzf-down --ansi --no-sort --multi --bind 'ctrl-s:toggle-sort' \
+      --header 'Press CTRL-S to toggle sort' \
+      --preview 'grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git show --color=always' |
+      command grep -o "[a-f0-9]\{7,\}" | head -n 1)
   elif vcs__is_in_perforce_repo; then
     if [[ ! "$*" =~ -m\ \[0-9]+ ]]; then
       local _limit="-m 1000"
     fi
-    p4 changes $_limit -t "$@" $STEM/... | sed -r 's/@\S*//' |
-      __fzf-down --ansi --multi --no-sort --with-nth='..6' \
+    local -selected=$(p4 changes $_limit -t "$@" $STEM/... | sed -r 's/@\S*//' |
+      fzf --ansi --multi --no-sort --with-nth='..6' \
       --preview 'p4 describe -s {2}' --preview-window right:70% |
-      cut -d' ' -f2
+      cut -d' ' -f2)
   fi
+
+  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$_selected${READLINE_LINE:$READLINE_POINT}"
+  READLINE_POINT=$(( READLINE_POINT + ${#_selected} ))
 }
 
 
@@ -177,7 +177,7 @@ fzf-vcs-filelog() {                                                             
 
   p4 filelog -s "$@" $_file |
     grep '^\.\.\.' | column -s' ' -o' ' -t | sed -r 's/@\S*//' |
-    __fzf-down --ansi --header='filelog for '$(basename $_file) --multi --no-sort --with-nth='2..9' \
+    fzf --ansi --header='filelog for '$(basename $_file) --multi --no-sort --with-nth='2..9' \
     --preview 'p4 describe -s {4}' --preview-window right:70% |
     cut -d' ' -f4
 }
@@ -186,12 +186,7 @@ fzf-vcs-filelog() {                                                             
 fzf-vcs-status() {                                                                                                 #{{{1
   if vcs__is_in_git_repo; then
     local _selected=$(git -c color.status=always status --short |
-      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m --nth=2 |
-      awk '{print $NF}' |
-      while read -r item; do
-        printf '%q ' "$item"
-      done
-    )
+      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m --nth=2 | awk '{print $NF}')
   elif vcs__is_in_perforce_repo; then
     local _selected=$(p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" |
       column -s# -o "    #" -t | column -s- -o- -t |
