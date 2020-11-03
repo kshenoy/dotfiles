@@ -186,7 +186,7 @@ fzf-vcs-filelog() {                                                             
 fzf-vcs-status() {                                                                                                 #{{{1
   if vcs__is_in_git_repo; then
     local _selected=$(git -c color.status=always status --short |
-      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m --nth=2 | awk '{print $NF}')
+      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m --nth=2 | awk '{print $NF}' | paste -s -d ' ')
   elif vcs__is_in_perforce_repo; then
     local _selected=$(p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" |
       column -s# -o "    #" -t | column -s- -o- -t |
