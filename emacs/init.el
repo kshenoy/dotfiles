@@ -169,7 +169,7 @@
 ;; Change default location of backups to avoid littering PWD
 
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*Autosave,%20Backup%20and%20History][Autosave, Backup and History:1]]
-(defvar backup-directory (concat user-emacs-directory "/tmp/backups"))
+(defvar backup-directory (concat user-emacs-directory "tmp/backups"))
 (unless (file-exists-p backup-directory)
   (make-directory backup-directory t))
 ;; Autosave, Backup and History:1 ends here
@@ -234,18 +234,17 @@
 ;; Better defaults
 
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*Better%20defaults][Better defaults:1]]
-(setq-default
- mouse-wheel-follow-mouse t          ; Mouse-wheel acts on the hovered window instead of where the typing focus is
- echo-keystrokes 0.1                 ; Let emacs react faster to keystrokes
- confirm-kill-emacs 'y-or-n-p        ; Confirm before quitting
- ring-bell-function 'ignore          ; Disable anoying beep
- redisplay-dont-pause t              ; Improve rendering performance
- indicate-empty-lines t              ; Display a special glyph in the fringe of each empty line at the end of the buffer
- help-window-select t                ; Jump to the help window when it's opened.
- right-margin-width 1
- uniquify-buffer-name-style 'forward ; Better unique buffer names
- window-combination-resize t         ; Resize windows proportionally
- x-stretch-cursor t)                 ; Stretch cursor to the glyph width
+(setq-default mouse-wheel-follow-mouse t          ; Mouse-wheel acts on the hovered window instead of where the cursor is
+              echo-keystrokes 0.1                 ; Let emacs react faster to keystrokes
+              confirm-kill-emacs 'y-or-n-p        ; Confirm before quitting
+              ring-bell-function 'ignore          ; Disable anoying beep
+              redisplay-dont-pause t              ; Improve rendering performance
+              indicate-empty-lines t              ; Display a glyph in the fringe of each empty line at the end of the buffer
+              help-window-select t                ; Jump to the help window when it's opened.
+              right-margin-width 1
+              uniquify-buffer-name-style 'forward ; Better unique buffer names
+              window-combination-resize t         ; Resize windows proportionally
+              x-stretch-cursor t)                 ; Stretch cursor to the glyph width
 
 (column-number-mode t)               ; Show column no. in mode-line
 (global-visual-line-mode t)          ; Enable editing by visual lines
@@ -289,9 +288,6 @@
 ;; Font madness in Emacs: https://idiocy.org/emacs-fonts-and-fontsets.html
 ;; [[https://app.programmingfonts.org/][Test Drive Programming Fonts]]; I settled on Iosevka
 
-;; :PROPERTIES:
-;; :ID:       bd542328-7d1d-4806-936d-a50673beada6
-;; :END:
 ;; Scale font size using =C-x C-+= and =C-x C--=. =C-x C-0= resets it.
 ;; =text-scale-mode-step= controls the scaling factor. For obvious reasons, don't set it to 1 else it won't change at all
 
@@ -324,16 +320,18 @@
 (my-set-fonts)
 ;; Fonts:3 ends here
 
-;; UTF-8 Please
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*UTF-8%20Please][UTF-8 Please:1]]
+
+;; Use UTF-8 wherever possible
+
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*Fonts][Fonts:4]]
 (setq locale-coding-system   'utf-8)
 (set-terminal-coding-system  'utf-8)
 (set-keyboard-coding-system  'utf-8)
 (set-selection-coding-system 'utf-8)
 (set-language-environment    "UTF-8")
 (prefer-coding-system        'utf-8)
-;; UTF-8 Please:1 ends here
+;; Fonts:4 ends here
 
 ;; Intelligent narrowing and widening
 ;; From [[http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html][endless parentheses]]
@@ -423,7 +421,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; :END:
 ;; Use only spaces and no tabs
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Tabs,%20Indentation%20and%20Spacing][Tabs, Indentation and Spacing:1]]
+;; [[id:8d72d9c2-5b52-454f-892a-107b009563fa][Tabs, Indentation and Spacing:1]]
 (setq-default indent-tabs-mode nil
               show-trailing-whitespace nil
               sh-basic-offset 2)
@@ -544,7 +542,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; :END:
 ;; I'm using to rcirc access #emacs and #vim IRC channels on freenode
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*IRC%20using%20%5B%5Bhttps://www.gnu.org/software/emacs/manual/html_mono/rcirc.html%5D%5Brcirc%5D%5D][IRC using [[https://www.gnu.org/software/emacs/manual/html_mono/rcirc.html][rcirc]]:1]]
+;; [[id:81b84d7b-1c28-4f0a-9039-e80af8063881][IRC using [[https://www.gnu.org/software/emacs/manual/html_mono/rcirc.html][rcirc]]:1]]
 (use-package rcirc
   :commands rcirc
 
@@ -579,7 +577,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; :CREATED:  [2019-02-02 Sat 23:08]
 ;; :END:
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Open%20rcirc%20in%20a%20new%20window-layout%20using%20eyebrowse][Open rcirc in a new window-layout using eyebrowse:1]]
+;; [[id:b9c529de-8be7-4c3f-96bb-e4143b5d1d2c][Open rcirc in a new window-layout using eyebrowse:1]]
 :config
 (defun irc ()
   "Simple wrapper which opens rcirc in a predefined window layout using eyebrowse"
@@ -596,7 +594,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; :CREATED:  [2019-01-31 Thu 08:02]
 ;; :END:
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*%5B%5Bhttps://www.emacswiki.org/emacs/rcircNoNamesOnJoin%5D%5BDon't%20display%20names%20when%20joining%20a%20channel%5D%5D][[[https://www.emacswiki.org/emacs/rcircNoNamesOnJoin][Don't display names when joining a channel]]:1]]
+;; [[id:ce06325b-1e07-476a-8659-6b5dd6d1b4ee][[[https://www.emacswiki.org/emacs/rcircNoNamesOnJoin][Don't display names when joining a channel]]:1]]
 (defvar rcirc-hide-names-on-join t
   "Non-nil if nick names list should be hidden when joining a channel.")
 
@@ -635,20 +633,20 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; :CREATED:  [2019-02-12 Tue 22:07]
 ;; :END:
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*all-the-icons][all-the-icons:1]]
+;; [[id:c753c712-6fcc-4acf-a5c8-f867e2407e76][all-the-icons:1]]
 (use-package all-the-icons
   :straight
   (:host github :repo "domtronn/all-the-icons.el"))
 ;; all-the-icons:1 ends here
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*all-the-icons][all-the-icons:3]]
+;; [[id:c753c712-6fcc-4acf-a5c8-f867e2407e76][all-the-icons:3]]
 (use-package all-the-icons-ivy
   :after (all-the-icons ivy)
   :config
   (all-the-icons-ivy-setup))
 ;; all-the-icons:3 ends here
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*all-the-icons][all-the-icons:4]]
+;; [[id:c753c712-6fcc-4acf-a5c8-f867e2407e76][all-the-icons:4]]
 (use-package all-the-icons-dired
   :after all-the-icons
   :hook (dired-mode . all-the-icons-dired-mode))
@@ -663,30 +661,13 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; Besides, =M-g M-g= is still bound to =goto-line= by default as well as the =<N>G= binding from evil.
 
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*avy][avy:1]]
+;; [[id:d5dbbf1c-588b-44ec-be35-5e19dcd6201c][avy:1]]
 (use-package avy
   :after evil
   :bind* (("C-'" . avy-goto-char-timer)
           ("M-g g" . avy-goto-line))
   :bind (:map my-goto-map ("o" . avy-org-goto-heading-timer)))
 ;; avy:1 ends here
-
-;; beacon
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*beacon][beacon:1]]
-(use-package beacon
-  :custom
-  (beacon-blink-when-focused t)
-  (beacon-blink-when-window-scrolls t)
-  (beacon-size 80)
-  (beacon-color "#eee8d5")
-  :config
-  (beacon-mode 1)
-  (add-hook 'after-load-theme-hook
-            (lambda()
-              "Update beacon's background color once a theme is loaded"
-              (setq beacon-color (face-attribute 'fringe :background)))))
-;; beacon:1 ends here
 
 ;; company
 ;; Provides auto-completion.
@@ -778,14 +759,8 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
     (append (if (consp backend) backend (list backend))
             '(:with company-yasnippet))))
 
-(setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+(setq company-backends (mapcar #'company-mode/backend-with-yas company-backends)))
 ;; Enable yasnippet for all backends:1 ends here
-
-;; /fin/
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*/fin/][/fin/:1]]
-)
-;; /fin/:1 ends here
 
 ;; evil
 ;; Getting started guide: https://github.com/noctuid/evil-guide
@@ -832,7 +807,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; :ID:       f42c3dc8-c2f6-4f22-9f47-0c578479ef67
 ;; :END:
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Keybindings][Keybindings:1]]
+;; [[id:f42c3dc8-c2f6-4f22-9f47-0c578479ef67][Keybindings:1]]
 (defun my-unimpaired-insert-line-before ()
   "Insert blank line line before the current one"
   (interactive)
@@ -853,7 +828,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
            ("[ Q"   . first-error))
 ;; Keybindings:1 ends here
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Keybindings][Keybindings:2]]
+;; [[id:f42c3dc8-c2f6-4f22-9f47-0c578479ef67][Keybindings:2]]
 (add-hook 'org-mode-hook (lambda() (bind-key "z v" 'org-reveal evil-normal-state-map)))
 ;; Keybindings:2 ends here
 
@@ -861,7 +836,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 
 ;; <<Make Escape quit everything>>
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Keybindings][Keybindings:3]]
+;; [[id:f42c3dc8-c2f6-4f22-9f47-0c578479ef67][Keybindings:3]]
 (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
 ;; Keybindings:3 ends here
 
@@ -906,14 +881,8 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*Sensible%20rebindings][Sensible rebindings:2]]
 (bind-keys :map evil-window-map
            ("u" . winner-undo)
-           ("U" . winner-redo))
+           ("U" . winner-redo)))
 ;; Sensible rebindings:2 ends here
-
-;; /fin/
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*/fin/][/fin/:1]]
-)
-;; /fin/:1 ends here
 
 ;; evil-args
 
@@ -1009,7 +978,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; Makes it easy to save and restore windows layout (kinda like tabs). eg. I have one window for rcirc, another for org-agenda and another for regular buffers etc.
 ;; I thought about using =gt= and =gT= but there are some buffers which are better used in emacs-state and, these won't work there so I'm going to stick with =C-c w= for the moment.
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*%5B%5Bhttps://github.com/wasamasa/eyebrowse%5D%5Beyebrowse%5D%5D][[[https://github.com/wasamasa/eyebrowse][eyebrowse]]:1]]
+;; [[id:49bd1e79-38fe-4046-86b2-5372e76496a1][[[https://github.com/wasamasa/eyebrowse][eyebrowse]]:1]]
 (use-package eyebrowse
   :init
   (setq eyebrowse-keymap-prefix (kbd "C-c w"))
@@ -1018,71 +987,10 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
   :config
   (eyebrowse-mode t)
   (bind-keys :map eyebrowse-mode-map
-             ("C-c w w" . eyebrowse-last-window-config)))
+             ("w" . eyebrowse-last-window-config)
+             ("C" . eyebrowse-close-window-config)
+             ("N" . eyebrowse-create-window-config)))
 ;; [[https://github.com/wasamasa/eyebrowse][eyebrowse]]:1 ends here
-
-;; flycheck
-;; References:
-;; - https://www.reddit.com/r/emacs/comments/931la6/tip_how_to_adopt_flycheck_as_your_new_best_friend/
-
-;; Also disable some checks when in org-src-mode
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*flycheck][flycheck:1]]
-(use-package flycheck
-  :hook ((prog-mode . flycheck-mode)
-         (org-src-mode . (lambda() (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))))
-  :custom
-  (flycheck-gcc-language-standard "c++14")
-  (flycheck-clang-language-standard "c++14"))
-;; flycheck:1 ends here
-
-;; flyspell
-;; :PROPERTIES:
-;; :ID:       9520b3bd-2201-468d-b011-036a626410bc
-;; :CREATED:  [2019-01-30 Wed 10:46]
-;; :END:
-;; Deferred by default because I don't use it very often. Can be loaded on demand
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*flyspell][flyspell:1]]
-(use-package flyspell
-  :defer t
-;; flyspell:1 ends here
-
-
-
-;; Find aspell and hunspell automatically. Try to find hunspell first and, if hunspell does NOT exist use aspell
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*flyspell][flyspell:2]]
-:config
-(cond
- ((executable-find "hunspell")
-  (setq ispell-program-name "hunspell")
-  (setq ispell-dictionary "en_US"))
-
- ((executable-find "aspell")
-  (setq ispell-program-name "aspell")
-  ;; Please note ispell-extra-args contains ACTUAL parameters passed to aspell
-  (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US")))))
-;; flyspell:2 ends here
-
-;; hideshow
-;; :PROPERTIES:
-;; :CREATED:  [2018-08-03 Fri 14:09]
-;; :END:
-;; Code-folding. From https://github.com/mwfogleman/.emacs.d/blob/master/michael.org#cold-folding and [[https://www.reddit.com/r/emacs/comments/746cd0/which_code_folding_package_do_you_use/dnwi2x1/][reddit]]
-
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*hideshow][hideshow:1]]
-(use-package hideshow
-  :hook ((prog-mode . hs-minor-mode))
-  :config
-  (defun my-toggle-fold ()
-    (interactive)
-    (save-excursion
-      (end-of-line)
-      (hs-toggle-hiding)))
-  (bind-key "f" 'my-toggle-fold my-settings-toggle-map))
-;; hideshow:1 ends here
 
 ;; hydra
 
@@ -1120,7 +1028,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; Show mix of buffers, recent files and bookmarks
 ;; There is a variable =ivy-use-virtual-buffers= that does this. However, it is static and when set, dumps everything in =ivy-switch-buffer=.
 ;; As a result, by default I have to choose one or the other; I can't have both. This fixes that.
-;; =C-c j j= will show buffers, recent files and bookmarks while =C-c j b= will only show buffers
+;; =C-c f j= will show buffers, recent files and bookmarks while =C-c f b= will only show buffers
 
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*Show%20mix%20of%20buffers,%20recent%20files%20and%20bookmarks][Show mix of buffers, recent files and bookmarks:1]]
 (defun my-ivy-switch-virtual-buffer ()
@@ -1154,14 +1062,8 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 (bind-keys :map my-fuzzy-jumper-command-map
            ("b" . ivy-switch-buffer)
            ("f" . my-file-finder)
-           ("j" . my-ivy-switch-virtual-buffer))
+           ("j" . my-ivy-switch-virtual-buffer)))
 ;; Show mix of buffers, recent files and bookmarks:1 ends here
-
-;; /fin/
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*/fin/][/fin/:1]]
-)
-;; /fin/:1 ends here
 
 ;; ivy-hydra
 
@@ -1224,14 +1126,8 @@ INITIAL-INPUT can be given as the initial minibuffer input."
             ("t" (setq truncate-lines (not truncate-lines)))
             ("C" ivy-toggle-case-fold)
             ("o" ivy-occur :exit t))
-          ivy-minibuffer-map)
+          ivy-minibuffer-map))
 ;; Customize the default ivy-hydra:1 ends here
-
-;; /fin/
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*/fin/][/fin/:1]]
-)
-;; /fin/:1 ends here
 
 ;; swiper
 
@@ -1284,19 +1180,6 @@ INITIAL-INPUT can be given as the initial minibuffer input."
                ("v" . counsel-set-variable)))
 ;; counsel:1 ends here
 
-;; magit
-;; :PROPERTIES:
-;; :ID:       e68b0e9c-3ca5-4e9b-a22c-45f3a041e90d
-;; :CREATED:  [2019-01-21 Mon 23:17]
-;; :END:
-;; [[https://www.reddit.com/r/emacs/comments/abt3dp/its_magit_john_weigley_emacssf/][It's Magit! - John Wiegley]]
-;; [[https://cestlaz.github.io/posts/using-emacs-47-magit][Using Emacs 47: Magit - Mike Zamansky]]
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*magit][magit:1]]
-(use-package magit
-  :bind* ("C-x g" . magit-status))
-;; magit:1 ends here
-
 ;; modern-c++-font-lock
 
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*modern-c++-font-lock][modern-c++-font-lock:1]]
@@ -1317,7 +1200,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 
 ;; #+name: org-config
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::org-config][org-config]]
+;; [[id:dc10f8d2-0831-4bb6-8775-0f5da3dd8243][org-config]]
 (use-package org
   :ensure org-plus-contrib
   :pin org
@@ -1438,27 +1321,14 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 
 
 
-;; Thus to get it to work as before using =<sc=, we have to add =org-tempo= to =org-modules=
+;; For org-version >= 9.2, we have to use this. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*%5B%5Binfo:org#Structure%2520Templates%5D%5BEasy%20Templates%5D%5D][[[info:org#Structure%20Templates][Easy Templates]]:3]]
-(add-to-list 'org-modules 'org-tempo)
-;; [[info:org#Structure%20Templates][Easy Templates]]:3 ends here
-
-;; Flatten links
-;; This is the counterpart to =org-insert-link=. From [[http://emacs.stackexchange.com/a/10714/9690][here]].
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Flatten%20links][Flatten links:1]]
-(defun my-org-flatten-link (&optional replace-with-description)
-  "Replace an org link with its description if REPLACE-WITH-DESCRIPTION is true. If not or if description doesn't exist, replace with its url"
-  (interactive)
-  (if (org-in-regexp org-bracket-link-regexp 1)
-      (let ((remove (list (match-beginning 0) (match-end 0)))
-            (description (if (match-end 3)
-                             (org-match-string-no-properties 3)
-                           (org-match-string-no-properties 1))))
-        (apply 'delete-region remove)
-        (insert description))))
-;; Flatten links:1 ends here
+;; [[id:851ad87b-250e-4c1e-83b1-6b4e1fa6b20d][[[info:org#Structure%20Templates][Easy Templates]]:2]]
+(add-to-list 'org-structure-template-alist '("sc" . "src c++"))
+(add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
+(add-to-list 'org-structure-template-alist '("sp" . "src python"))
+(add-to-list 'org-structure-template-alist '("ss" . "src bash"))
+;; [[info:org#Structure%20Templates][Easy Templates]]:2 ends here
 
 ;; Combine setting and aligning of tags
 ;; :PROPERTIES:
@@ -1466,12 +1336,12 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 ;; :CREATED:  [2019-01-29 Tue 22:56]
 ;; :END:
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Combine%20setting%20and%20aligning%20of%20tags][Combine setting and aligning of tags:1]]
-(defun my-org-set-align-tags (p)
+;; [[id:dec6b49c-e37f-40df-9870-769ed0e68d3b][Combine setting and aligning of tags:1]]
+(defun my-org-modify-tags (p)
   "Set tags by calling counsel-org-tags and align tags as well.
   If called with a prefix, only align tags"
   (interactive "P")
-  (unless p (counsel-org-tag))
+  (unless p (org-set-tags-command))
   (org-align-all-tags))
 ;; Combine setting and aligning of tags:1 ends here
 
@@ -1487,7 +1357,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 ;; From [[http://emacs.stackexchange.com/questions/38062/configure-key-to-toggle-between-active-and-inactive-timestamps#38065][Emacs StackExchange]]. Also see [[Custom timestamp keymap]].
 
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Use%20!%20to%20toggle%20timestamp%20type][Use ! to toggle timestamp type:1]]
+;; [[id:d4634d95-be37-4bdf-987e-22da5778e958][Use ! to toggle timestamp type:1]]
 (defun org-toggle-time-stamp-activity ()
   "Toggle activity of time stamp or range at point."
   (interactive)
@@ -1559,7 +1429,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 
 ;; Increase the no. of priority levels from 3 to 5 and change default priority to 'C'
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Custom%20priorities][Custom priorities:1]]
+;; [[id:30e03c98-7190-48ad-99fb-49e28afa50e9][Custom priorities:1]]
 (setq org-default-priority 67
       org-highest-priority 65
       org-lowest-priority 69)
@@ -1639,7 +1509,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 ;; :END:
 ;; =org-babel-goto-src-block-head= jumps to the beginning of a source block. This is super useful! Why restrict it only to source blocks?
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Jump%20to%20head/tail%20of%20any%20block,%20not%20just%20src%20blocks][Jump to head/tail of any block, not just src blocks:1]]
+;; [[id:964101eb-3077-411d-b9e5-9011c055c4ff][Jump to head/tail of any block, not just src blocks:1]]
 (defun my-org-babel-goto-block-corner (p)
   "Go to the beginning of the current block.
   If called with a prefix, go to the end of the block"
@@ -1696,20 +1566,8 @@ INITIAL-INPUT can be given as the initial minibuffer input."
          :jump-to-captured t :empty-lines 1)))
 ;; Capture templates:1 ends here
 
-;; Add properties to captured items
-;; :PROPERTIES:
-;; :CREATED:  [2018-12-28 Fri 23:04]
-;; :ID:       f9b19f45-ee3a-4f40-b8af-0e5966e4df35
-;; :END:
-;; This adds the CREATED and ID property to all captures
-;; From https://stackoverflow.com/a/16247032/734153
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Add%20properties%20to%20captured%20items][Add properties to captured items:1]]
-(add-hook 'org-capture-prepare-finalize-hook
-          (lambda() (org-expiry-insert-created)(org-id-get-create)))
-;; Add properties to captured items:1 ends here
-
 ;; Create frames for easy org-capture directly from the OS
+
 ;; (credit: [[http://cestlaz.github.io/posts/using-emacs-24-capture-2/][here]])
 
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*Create%20frames%20for%20easy%20org-capture%20directly%20from%20the%20OS][Create frames for easy org-capture directly from the OS:1]]
@@ -1742,7 +1600,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 ;; :END:
 ;; Custom keymap for org-mode bindings.
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Keybindings][Keybindings:1]]
+;; [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][Keybindings:1]]
 (bind-keys :prefix-map my-org-bindings-map
            :prefix-docstring "This map is used to group together all org-mode settings"
            :prefix "C-c o"
@@ -1756,15 +1614,15 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 ;; <<Custom timestamp keymap>>. Also see [[id:d4634d95-be37-4bdf-987e-22da5778e958][Using ! to toggle timestamp type]]
 
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Keybindings][Keybindings:2]]
-(bind-key "C-c C-q" 'my-org-set-align-tags org-mode-map)
+;; [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][Keybindings:2]]
+(bind-key "C-c C-q" 'my-org-modify-tags org-mode-map)
 ;; Keybindings:2 ends here
 
 
 
 ;; Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Keybindings][Keybindings:3]]
+;; [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][Keybindings:3]]
 (define-key key-translation-map (kbd "C-c C-v C-k") (kbd "C-c C-v k"))
 ;; Keybindings:3 ends here
 
@@ -1772,24 +1630,9 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 
 ;; Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is left untouched to only jump to top of src blocks
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Keybindings][Keybindings:4]]
-(bind-key "u" 'my-org-babel-goto-block-corner org-babel-map)
+;; [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][Keybindings:4]]
+(bind-key "u" 'my-org-babel-goto-block-corner org-babel-map))
 ;; Keybindings:4 ends here
-
-;; /fin/
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*/fin/][/fin/:1]]
-)
-;; /fin/:1 ends here
-
-;; htmlize
-;; Syntax highlighting when exporting to HTML? Yes, please!
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*htmlize][htmlize:1]]
-(use-package htmlize
-  :disabled
-  :after org)
-;; htmlize:1 ends here
 
 ;; org-agenda
 
@@ -1800,7 +1643,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
   :init
 ;; org-agenda:1 ends here
 
-;; Don't add some files to the agenda
+;; TODO Don't add some files to the agenda
 
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*Don't%20add%20some%20files%20to%20the%20agenda][Don't add some files to the agenda:1]]
 (setq org-agenda-files
@@ -1883,55 +1726,53 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
       nil)))
 ;; org-agenda custom commands:1 ends here
 
-
-
-;; Note that I'm [[id:b19befdb-eada-4d1b-b48c-be04122e4ddf][using a noweb-ref]] here to insert the custom-commands. This allows me to construct each custom-command separately and describe it at length.
-
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*org-agenda%20custom%20commands][org-agenda custom commands:2]]
 (setq org-agenda-custom-commands
-      '(
-        ("d" "Daily agenda and all TODOs"
+      '(("d" "Daily agenda and all TODOs"
          (
-        (tags "PRIORITY=\"A\""
-              ((org-agenda-overriding-header "High-priority unfinished tasks:")
-               (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
-        (agenda "")
-        (alltodo ""
-                 ((org-agenda-overriding-header "ALL normal priority tasks:")
-                  (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
-                                                 (my-org-skip-subtree-if-priority ?A)
-                                                 (org-agenda-skip-if nil '(scheduled deadline))))))
-        ))
-        ("w" "Daily agenda and all TODOs for Work"
-         (
-        (tags "PRIORITY=\"A\""
-              ((org-agenda-overriding-header "High-priority unfinished tasks:")
-               (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
-        (agenda "" ((org-agenda-span 21)))
-        (alltodo ""
-                 ((org-agenda-overriding-header "ALL normal priority tasks:")
-                  (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
-                                                 (my-org-skip-subtree-if-priority ?A)
-                                                 (org-agenda-skip-if nil '(scheduled deadline))))))
-         )
-        ((org-agenda-files (list (expand-file-name "Work/" org-directory)))
-         ))
-        ))
 ;; org-agenda custom commands:2 ends here
+
+
+
+;; All the high priority tasks that are still pending
+
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*org-agenda%20custom%20commands][org-agenda custom commands:3]]
+(tags "PRIORITY=\"A\""
+      ((org-agenda-overriding-header "High-priority unfinished tasks:")
+       (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
+;; org-agenda custom commands:3 ends here
+
+
+
+;; An agenda showing the previous as well as the current week which I've [[org-agenda-cfg-span][configured]] above.
+
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*org-agenda%20custom%20commands][org-agenda custom commands:4]]
+(agenda "")
+;; org-agenda custom commands:4 ends here
+
+
+
+;; All the remaining todos (minus the high priority ones because why repeat it)
+
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*org-agenda%20custom%20commands][org-agenda custom commands:5]]
+(alltodo ""
+         ((org-agenda-overriding-header "ALL normal priority tasks:")
+          (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
+                                         (my-org-skip-subtree-if-priority ?A)
+                                         (org-agenda-skip-if nil '(scheduled deadline))))))
+;; org-agenda custom commands:5 ends here
+
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*org-agenda%20custom%20commands][org-agenda custom commands:7]]
+))))
+;; org-agenda custom commands:7 ends here
 
 ;; Keybindings
 ;; [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][General org keybindings]]
 ;; Open the custom "Daily agenda and all TODOs" directly. Based on [[http://emacs.stackexchange.com/a/868/9690][Emacs StackExchange]].
 
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*Keybindings][Keybindings:1]]
-(bind-key* "<f12>" '(lambda (&optional arg) (interactive "P")(org-agenda arg "w")))
+(bind-key* "<f12>" '(lambda (&optional arg) (interactive "P")(org-agenda arg "w"))))
 ;; Keybindings:1 ends here
-
-;; /fin/
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*/fin/][/fin/:1]]
-)
-;; /fin/:1 ends here
 
 ;; org-bullets
 ;; Other bullets to consider:
@@ -1947,31 +1788,6 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
   :custom (org-bullets-bullet-list '("✜")))
 ;; org-bullets:1 ends here
 
-;; org-drill
-;; [[https://orgmode.org/worg/org-contrib/org-drill.html][org-drill]] is provided by the [[https://orgmode.org/worg/org-contrib/index.html][org-plus-contrib]] from the org repo. Hence I use [[:ensure]] and [[:pin]] to grab it from there.
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*org-drill][org-drill:1]]
-(use-package org-drill
-  :after org
-  :ensure org-plus-contrib
-  :pin org
-  :commands org-drill
-  :init
-  (setq org-drill-learn-fraction 0.4)
-  :config
-  (add-to-list 'org-modules 'org-drill)
-  (setq org-drill-add-random-noise-to-intervals-p t)
-  (setq org-drill-hide-item-headings-p t))
-;; org-drill:1 ends here
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*org-drill][org-drill:2]]
-(use-package org-drill-table
-  :after org-drill
-  :disabled
-  :straight
-  (:host github :repo "kshenoy/org-drill-table"))
-;; org-drill:2 ends here
-
 ;; org-expiry
 ;; [[https://code.orgmode.org/bzg/org-mode/raw/master/contrib/lisp/org-expiry.el][org-expiry]] is provided by the [[https://orgmode.org/worg/org-contrib/index.html][org-plus-contrib]] from the org repo. Hence I use [[:ensure]] and [[:pin]] to grab it from there.
 ;; This allows me to add a =CREATED= property everytime I create a new org-heading. From [[https://stackoverflow.com/a/13285957/734153][here]].
@@ -1982,10 +1798,23 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
   :ensure org-plus-contrib
   :pin org
   :init
-  (setq org-expiry-inactive-timestamps t) ; Don't have everything in the agenda view
+  (setq org-expiry-inactive-timestamps t)  ; Don't put everything in the agenda view
   :config
-  (org-expiry-insinuate))
+  (org-expiry-insinuate)
 ;; org-expiry:1 ends here
+
+
+
+;; Add CREATED property to captured items
+;; :PROPERTIES:
+;; :CREATED:  [2018-12-28 Fri 23:04]
+;; :ID:       f9b19f45-ee3a-4f40-b8af-0e5966e4df35
+;; :END:
+;; From https://stackoverflow.com/a/16247032/734153
+
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*org-expiry][org-expiry:2]]
+(add-hook 'org-capture-prepare-finalize-hook 'org-expiry-insert-created))
+;; org-expiry:2 ends here
 
 ;; org-id
 ;; I want to grab org-id from the [[https://orgmode.org/worg/org-contrib/index.html][org-plus-contrib]] package from org repo which I do by by specifying [[:ensure]] and [[:pin]]
@@ -1996,47 +1825,24 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
   :ensure org-plus-contrib
   :pin org
   :init
-  (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
+  ; Setting this to true will create an ID for every entry which could become expensive when org-id-track-globally is enabled
+  (setq org-id-link-to-org-use-id 'create-if-interactive)
   :config
 ;; org-id:1 ends here
 
-;; Automatically add ID to newly created headings
-;; :PROPERTIES:
-;; :CREATED:  [2018-12-28 Fri 23:59]
-;; :END:
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Automatically%20add%20ID%20to%20newly%20created%20headings][Automatically add ID to newly created headings:1]]
-(add-hook 'org-insert-heading-hook 'org-id-get-create)
-;; Automatically add ID to newly created headings:1 ends here
 
-;; Completion while inserting link
-;; :PROPERTIES:
-;; :ID:       be086bdd-ffcf-4f4e-beb2-a948191895eb
-;; :END:
 ;; To use completion, insert link using =C-c C-l= and select =id:= as type and completion should trigger.
 ;; =org-id-get-with-outline-path-completion= returns the ID of the selected heading and creates it if it doesn't have one already.
 ;; Details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
 
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Completion%20while%20inserting%20link][Completion while inserting link:1]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*org-id][org-id:2]]
 (defun org-id-complete-link (&optional arg)
   "Create an id: link using completion"
   (concat "id:" (org-id-get-with-outline-path-completion org-refile-targets)))
 
-(eval-after-load 'org '(org-link-set-parameters "id" :complete 'org-id-complete-link))
-;; Completion while inserting link:1 ends here
-
-;; TODO Use org-id globally across all files
-;; Example on [[http://stackoverflow.com/a/27158715/734153][Emacs StackExchange]]
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*Use%20org-id%20globally%20across%20all%20files][Use org-id globally across all files:1]]
-(setq org-id-track-globally t)
-;; Use org-id globally across all files:1 ends here
-
-;; /fin/
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*/fin/][/fin/:1]]
-)
-;; /fin/:1 ends here
+(org-link-set-parameters "id" :complete 'org-id-complete-link))
+;; org-id:2 ends here
 
 ;; pcre2el
 ;; From [[https://www.reddit.com/r/emacs/comments/60nb8b/favorite_builtin_emacs_commands/df8h8hm/][/u/Irkry on reddit]]
@@ -2070,26 +1876,6 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
   (set-face-attribute 'rainbow-delimiters-depth-7-face nil :foreground "spring green")
   (set-face-attribute 'rainbow-delimiters-depth-8-face nil :foreground "sienna1"))
 ;; rainbow-delimiters:1 ends here
-
-;; rainbow-mode
-;; When a color is specified as a hex code or with its name, set the background of the face to the value of the color itself
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*rainbow-mode][rainbow-mode:1]]
-(use-package rainbow-mode
-  :defer t)
-;; rainbow-mode:1 ends here
-
-;; [[https://github.com/larstvei/Try][try]]
-;; :PROPERTIES:
-;; :ID:       4edba4e7-7920-47bf-b6c1-9221bc5a0841
-;; :CREATED:  [2019-01-21 Mon 23:12]
-;; :END:
-;; Try packages without installing them
-
-;; [[file:~/.config/dotfiles/emacs/emacs.org::*%5B%5Bhttps://github.com/larstvei/Try%5D%5Btry%5D%5D][[[https://github.com/larstvei/Try][try]]:1]]
-(use-package try
-  :commands (try try-and-refresh))
-;; [[https://github.com/larstvei/Try][try]]:1 ends here
 
 ;; undo-tree
 ;; This lets us visually walk through the changes we've made, undo back to a certain point (or redo), and go down different branches.
@@ -2143,14 +1929,10 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
   :config
   (delight '((abbrev-mode nil t)
              (aggressive-indent-mode nil aggressive-indent)
-             (beacon-mode nil beacon)
              (company-mode nil company)
-             (flycheck-mode nil flycheck)
-             ;; (irony-mode nil irony)
              (ivy-mode nil ivy)
              (org-indent-mode nil org-indent)
              (pcre-mode nil pcre2el)
-             (rainbow-mode)
              (undo-tree-mode nil undo-tree)
              (yas-minor-mode nil yasnippet)
              (which-key-mode nil which-key))))
