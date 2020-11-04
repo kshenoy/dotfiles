@@ -286,7 +286,7 @@ eg. =(my-describe-keymap 'evil-window-map)=
 ** Autosave, Backup and History
 Change default location of backups to avoid littering PWD
 #+begin_src emacs-lisp
-  (defvar backup-directory (concat user-emacs-directory "/tmp/backups"))
+  (defvar backup-directory (concat user-emacs-directory "tmp/backups"))
   (unless (file-exists-p backup-directory)
     (make-directory backup-directory t))
 #+end_src
@@ -328,8 +328,7 @@ Save mini-buffer history
     (savehist-mode t))
 #+end_src
 
-** QoL changes
-*** Remove visual clutter
+** Remove visual clutter
 #+begin_src emacs-lisp
   (setq inhibit-startup-message t)
   (setq initial-scratch-message "")
@@ -345,27 +344,26 @@ We can also put something like this into =~/.Xresources= to enable/disable certa
   Emacs.toolBar: off
 #+END_EXAMPLE
 
-*** Better defaults
+** Better defaults
 #+begin_src emacs-lisp
-  (setq-default
-   mouse-wheel-follow-mouse t          ; Mouse-wheel acts on the hovered window instead of where the typing focus is
-   echo-keystrokes 0.1                 ; Let emacs react faster to keystrokes
-   confirm-kill-emacs 'y-or-n-p        ; Confirm before quitting
-   ring-bell-function 'ignore          ; Disable anoying beep
-   redisplay-dont-pause t              ; Improve rendering performance
-   indicate-empty-lines t              ; Display a special glyph in the fringe of each empty line at the end of the buffer
-   help-window-select t                ; Jump to the help window when it's opened.
-   right-margin-width 1
-   uniquify-buffer-name-style 'forward ; Better unique buffer names
-   window-combination-resize t         ; Resize windows proportionally
-   x-stretch-cursor t)                 ; Stretch cursor to the glyph width
+  (setq-default mouse-wheel-follow-mouse t          ; Mouse-wheel acts on the hovered window instead of where the cursor is
+                echo-keystrokes 0.1                 ; Let emacs react faster to keystrokes
+                confirm-kill-emacs 'y-or-n-p        ; Confirm before quitting
+                ring-bell-function 'ignore          ; Disable anoying beep
+                redisplay-dont-pause t              ; Improve rendering performance
+                indicate-empty-lines t              ; Display a glyph in the fringe of each empty line at the end of the buffer
+                help-window-select t                ; Jump to the help window when it's opened.
+                right-margin-width 1
+                uniquify-buffer-name-style 'forward ; Better unique buffer names
+                window-combination-resize t         ; Resize windows proportionally
+                x-stretch-cursor t)                 ; Stretch cursor to the glyph width
 
   (column-number-mode t)               ; Show column no. in mode-line
   (global-visual-line-mode t)          ; Enable editing by visual lines
   (fset 'yes-or-no-p 'y-or-n-p)        ; Simpler y/n answers
 #+end_src
 
-*** Winner mode - Undo/redo window layouts
+** Winner mode - Undo/redo window layouts
 Undo and Redo changes in window configuration. Use =C-c right=, =C-c left= (default bindings) to switch between different layouts.
 This is useful when I close a window by mistake to undo it and restore the window layout.
 #+begin_src emacs-lisp
@@ -424,9 +422,6 @@ So, let's just start a server if one isn't running. A downside of this is that i
 Font madness in Emacs: https://idiocy.org/emacs-fonts-and-fontsets.html
 [[https://app.programmingfonts.org/][Test Drive Programming Fonts]]; I settled on Iosevka
 
-:PROPERTIES:
-:ID:       bd542328-7d1d-4806-936d-a50673beada6
-:END:
 Scale font size using =C-x C-+= and =C-x C--=. =C-x C-0= resets it.
 =text-scale-mode-step= controls the scaling factor. For obvious reasons, don't set it to 1 else it won't change at all
 #+begin_src emacs-lisp
@@ -463,7 +458,7 @@ After installing a new font refresh the font cache by running
   (my-set-fonts)
 #+end_src
 
-*** UTF-8 Please
+Use UTF-8 wherever possible
 #+begin_src emacs-lisp
   (setq locale-coding-system   'utf-8)
   (set-terminal-coding-system  'utf-8)
@@ -789,15 +784,6 @@ Other examples:
 - /rainbow-mode/ is a mode provided by the file /rainbow-mode.el/ and the feature is also called /rainbow-mode/
 - /yas-minor-mode/ is a mode provided by the file /yasnippet.el/ and the feature is called /yasnippet/
 
-** TODO [[https://gitlab.com/to1ne/use-package-hydra][use-package-hydra]]
-:PROPERTIES:
-:CREATED:  [2019-01-31 Thu 07:55]
-:END:
-:LOGBOOK:
-- State "TODO"       from              [2019-01-31 Thu 07:55]
-:END:
-This is very useful but I think I'll need to switch to using quelpa first
-
 ** aggressive-indent
 #+begin_src emacs-lisp
   (use-package aggressive-indent
@@ -847,22 +833,6 @@ Besides, =M-g M-g= is still bound to =goto-line= by default as well as the =<N>G
     :bind* (("C-'" . avy-goto-char-timer)
             ("M-g g" . avy-goto-line))
     :bind (:map my-goto-map ("o" . avy-org-goto-heading-timer)))
-#+end_src
-
-** beacon
-#+begin_src emacs-lisp
-  (use-package beacon
-    :custom
-    (beacon-blink-when-focused t)
-    (beacon-blink-when-window-scrolls t)
-    (beacon-size 80)
-    (beacon-color "#eee8d5")
-    :config
-    (beacon-mode 1)
-    (add-hook 'after-load-theme-hook
-              (lambda()
-                "Update beacon's background color once a theme is loaded"
-                (setq beacon-color (face-attribute 'fringe :background)))))
 #+end_src
 
 ** company
@@ -948,12 +918,7 @@ Keeping this at the end to be run after we've added all backends
       (append (if (consp backend) backend (list backend))
               '(:with company-yasnippet))))
 
-  (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
-#+end_src
-
-*** /fin/
-#+begin_src emacs-lisp
-)
+  (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends)))
 #+end_src
 
 *** FIXME COMMENT [[https://github.com/sebastiencs/company-box][company-box]]
@@ -1105,12 +1070,7 @@ More intuitive keybindings for winner-mode
 #+begin_src emacs-lisp
   (bind-keys :map evil-window-map
              ("u" . winner-undo)
-             ("U" . winner-redo))
-#+end_src
-
-*** /fin/
-#+begin_src emacs-lisp
-  )
+             ("U" . winner-redo)))
 #+end_src
 
 *** evil-args
@@ -1217,106 +1177,9 @@ I thought about using =gt= and =gT= but there are some buffers which are better 
     :config
     (eyebrowse-mode t)
     (bind-keys :map eyebrowse-mode-map
-               ("C-c w w" . eyebrowse-last-window-config)))
-#+end_src
-
-I thought about using a hydra instead of the default keybindings but the default keybindings work just fine. They're similar to tmux's bindings making it easy to remember.
-Besides, the trouble with hydra is if I just want to switch quickly, the hydra display still pops up for a bit which is kinda distracting.
-#+begin_src emacs-lisp :noweb-ref hydra-eyebrowse :tangle no
-  (bind-key* "C-c w" 'hydra-eyebrowse/body)
-
-  (defhydra hydra-eyebrowse (:color blue :hint nil)
-    "
-    Edit       ^^^^|  Cycle      ^^^^|  Switch
-  -------------^^^^+-------------^^^^+----------
-    _c_reate     ^^|  _n_ext       ^^|  _._: _s_witch
-    _C_lose      ^^|  _p_revious   ^^|  [_0_-_9_]
-    _,_: _r_ename  |  _'_/_w_: last  |
-  "
-    ;; Edit
-    ("c" eyebrowse-create-window-config)
-    ("C" eyebrowse-close-window-config)
-    ("," eyebrowse-rename-window-config)
-    ("r" eyebrowse-rename-window-config)
-
-    ;; Cycle
-    ("n" eyebrowse-next-window-config :color pink)
-    ("p" eyebrowse-prev-window-config :color pink)
-    ("'" eyebrowse-last-window-config)
-    ("w" eyebrowse-last-window-config)
-
-    ;; Switch
-    ("." eyebrowse-switch-to-window-config)
-    ("s" eyebrowse-switch-to-window-config)
-    ("0" eyebrowse-switch-to-window-config-0)
-    ("1" eyebrowse-switch-to-window-config-1)
-    ("2" eyebrowse-switch-to-window-config-2)
-    ("3" eyebrowse-switch-to-window-config-3)
-    ("4" eyebrowse-switch-to-window-config-4)
-    ("5" eyebrowse-switch-to-window-config-5)
-    ("6" eyebrowse-switch-to-window-config-6)
-    ("7" eyebrowse-switch-to-window-config-7)
-    ("8" eyebrowse-switch-to-window-config-8)
-    ("9" eyebrowse-switch-to-window-config-9))
-#+end_src
-
-** flycheck
-References:
-- https://www.reddit.com/r/emacs/comments/931la6/tip_how_to_adopt_flycheck_as_your_new_best_friend/
-
-Also disable some checks when in org-src-mode
-#+begin_src emacs-lisp
-  (use-package flycheck
-    :hook ((prog-mode . flycheck-mode)
-           (org-src-mode . (lambda() (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))))
-    :custom
-    (flycheck-gcc-language-standard "c++14")
-    (flycheck-clang-language-standard "c++14"))
-#+end_src
-
-** flyspell
-:PROPERTIES:
-:ID:       9520b3bd-2201-468d-b011-036a626410bc
-:CREATED:  [2019-01-30 Wed 10:46]
-:END:
-Deferred by default because I don't use it very often. Can be loaded on demand
-#+begin_src emacs-lisp
-  (use-package flyspell
-    :defer t
-#+end_src
-
-Find aspell and hunspell automatically. Try to find hunspell first and, if hunspell does NOT exist use aspell
-#+begin_src emacs-lisp
-  :config
-  (cond
-   ((executable-find "hunspell")
-    (setq ispell-program-name "hunspell")
-    (setq ispell-dictionary "en_US"))
-
-   ((executable-find "aspell")
-    (setq ispell-program-name "aspell")
-    ;; Please note ispell-extra-args contains ACTUAL parameters passed to aspell
-    (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US")))))
-#+end_src
-
-Also see: [[https://emacs.stackexchange.com/a/21379/9690][Using multiple dictionaries with hunspell]]
-
-** hideshow
-:PROPERTIES:
-:CREATED:  [2018-08-03 Fri 14:09]
-:END:
-Code-folding. From https://github.com/mwfogleman/.emacs.d/blob/master/michael.org#cold-folding and [[https://www.reddit.com/r/emacs/comments/746cd0/which_code_folding_package_do_you_use/dnwi2x1/][reddit]]
-
-#+begin_src emacs-lisp
-  (use-package hideshow
-    :hook ((prog-mode . hs-minor-mode))
-    :config
-    (defun my-toggle-fold ()
-      (interactive)
-      (save-excursion
-        (end-of-line)
-        (hs-toggle-hiding)))
-    (bind-key "f" 'my-toggle-fold my-settings-toggle-map))
+               ("w" . eyebrowse-last-window-config)
+               ("C" . eyebrowse-close-window-config)
+               ("N" . eyebrowse-create-window-config)))
 #+end_src
 
 ** hydra
@@ -1325,20 +1188,6 @@ Code-folding. From https://github.com/mwfogleman/.emacs.d/blob/master/michael.or
 #+end_src
 
 More ideas in https::/github.com/kana/vim-submode
-
-** FIXME COMMENT irony
-:PROPERTIES:
-:CREATED:  [2019-01-22 Tue 23:14]
-:END:
-:LOGBOOK:
-- State "FIXME"      from "TODO"       [2019-01-22 Tue 23:14]
-- State "TODO"       from              [2019-01-22 Tue 23:14]
-:END:
-#+begin_src emacs-lisp
-  (use-package irony
-    :hook ((c-mode c++-mode) . irony-mode)
-    :config (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
-#+end_src
 
 ** ivy et al.
 #+begin_src emacs-lisp
@@ -1376,7 +1225,7 @@ Do not add a =^= (beginning of line anchor) while completing. Refer [[https://gi
 **** Show mix of buffers, recent files and bookmarks
 There is a variable =ivy-use-virtual-buffers= that does this. However, it is static and when set, dumps everything in =ivy-switch-buffer=.
 As a result, by default I have to choose one or the other; I can't have both. This fixes that.
-=C-c j j= will show buffers, recent files and bookmarks while =C-c j b= will only show buffers
+=C-c f j= will show buffers, recent files and bookmarks while =C-c f b= will only show buffers
 #+begin_src emacs-lisp
   (defun my-ivy-switch-virtual-buffer ()
     "Show recent files and bookmarks in the buffer list"
@@ -1409,12 +1258,7 @@ As a result, by default I have to choose one or the other; I can't have both. Th
   (bind-keys :map my-fuzzy-jumper-command-map
              ("b" . ivy-switch-buffer)
              ("f" . my-file-finder)
-             ("j" . my-ivy-switch-virtual-buffer))
-#+end_src
-
-*** /fin/
-#+begin_src emacs-lisp
-  )
+             ("j" . my-ivy-switch-virtual-buffer)))
 #+end_src
 
 *** ivy-hydra
@@ -1476,12 +1320,7 @@ eg. To kill multiple buffers
               ("t" (setq truncate-lines (not truncate-lines)))
               ("C" ivy-toggle-case-fold)
               ("o" ivy-occur :exit t))
-            ivy-minibuffer-map)
-#+end_src
-
-**** /fin/
-#+begin_src emacs-lisp
-  )
+            ivy-minibuffer-map))
 #+end_src
 
 *** swiper
@@ -1592,18 +1431,6 @@ NOTE: I'm deferring loading by using the =commands= keyword for =counsel-org-tag
 - State "TODO"       from              [2019-02-23 Sat 10:08]
 :END:
 
-** magit
-:PROPERTIES:
-:ID:       e68b0e9c-3ca5-4e9b-a22c-45f3a041e90d
-:CREATED:  [2019-01-21 Mon 23:17]
-:END:
-[[https://www.reddit.com/r/emacs/comments/abt3dp/its_magit_john_weigley_emacssf/][It's Magit! - John Wiegley]]
-[[https://cestlaz.github.io/posts/using-emacs-47-magit][Using Emacs 47: Magit - Mike Zamansky]]
-#+begin_src emacs-lisp
-  (use-package magit
-    :bind* ("C-x g" . magit-status))
-#+end_src
-
 ** modern-c++-font-lock
 #+begin_src emacs-lisp
   (use-package modern-cpp-font-lock
@@ -1697,29 +1524,6 @@ A safer way to go about it is by enabling it on a file-by-file basis using the f
   (setq org-ellipsis " ▼")
 #+end_src
 
-***** TODO Hide the < and > around targets
-From [[http://emacs.stackexchange.com/a/19239/9690][Emacs StackExchange]]
-At the moment, it hides not just the angle braces but also the text between them.
-#+begin_src emacs-lisp :tangle no
-  (defcustom org-hidden-links-additional-re "<<[<]?[[:alnum:]]+>>[>]?"
-    "Regular expression that matches strings where the invisible-property is set to org-link."
-    :type '(choice (const :tag "Off" nil) regexp)
-    :group 'org-link)
-  (make-variable-buffer-local 'org-hidden-links-additional-re)
-
-  (defun org-activate-hidden-links-additional (limit)
-    "Put invisible-property org-link on strings matching `org-hide-links-additional-re'."
-    (if org-hidden-links-additional-re
-        (re-search-forward org-hidden-links-additional-re limit t)
-      (goto-char limit)
-      nil))
-
-  (add-hook 'org-font-lock-set-keywords-hook (lambda ()
-                                               (add-to-list 'org-font-lock-extra-keywords
-                                                            '(org-activate-hidden-links-additional
-                                                              (0 '(face org-target invisible org-link))))))
-#+end_src
-
 ***** TODO Show the emphasis and target markers on point
 #+begin_src emacs-lisp :tangle no
   (defun org-show-emphasis-markers-at-point ()
@@ -1796,8 +1600,9 @@ These should get added only if org-version < 9.2
 
 For org-version >= 9.2, we have to use this. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
 #+begin_src emacs-lisp :tangle (if (org-string>= org-version "9.2") "init.el" "no")
-  (add-to-list 'org-structure-template-alist '("sc" . "src C++"))
+  (add-to-list 'org-structure-template-alist '("sc" . "src c++"))
   (add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("sp" . "src python"))
   (add-to-list 'org-structure-template-alist '("ss" . "src bash"))
 #+end_src
 
@@ -2104,6 +1909,7 @@ NOTE:
 - Quick notes related to current state can be taken using =C-c C-z= and get added to the =LOGBOOK=
 
 ***** Create frames for easy org-capture directly from the OS
+
 (credit: [[http://cestlaz.github.io/posts/using-emacs-24-capture-2/][here]])
 #+begin_src emacs-lisp
   (use-package noflet
@@ -2170,26 +1976,13 @@ Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-ke
 
 Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is left untouched to only jump to top of src blocks
 #+begin_src emacs-lisp
-  (bind-key "u" 'my-org-babel-goto-block-corner org-babel-map)
-#+end_src
-
-*** /fin/
-#+begin_src emacs-lisp
-  )
+  (bind-key "u" 'my-org-babel-goto-block-corner org-babel-map))
 #+end_src
 
 *** TODO Archive subtrees hierarchically
 Archive subtrees under the same hierarchy as the original in the archive files
 https://gist.github.com/Fuco1/e86fb5e0a5bb71ceafccedb5ca22fcfb
 https://fuco1.github.io/2017-04-20-Archive-subtrees-under-the-same-hierarchy-as-original-in-the-archive-files.html
-
-*** htmlize
-Syntax highlighting when exporting to HTML? Yes, please!
-#+begin_src emacs-lisp
-  (use-package htmlize
-    :disabled
-    :after org)
-#+end_src
 
 *** org-agenda
 #+begin_src emacs-lisp
@@ -2199,7 +1992,7 @@ Syntax highlighting when exporting to HTML? Yes, please!
     :init
 #+end_src
 
-**** Don't add some files to the agenda
+**** TODO Don't add some files to the agenda
 #+begin_src emacs-lisp
   (setq org-agenda-files
         (seq-filter (lambda (x)
@@ -2309,12 +2102,7 @@ TODO: Restrict agenda to non-work files
 [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][General org keybindings]]
 Open the custom "Daily agenda and all TODOs" directly. Based on [[http://emacs.stackexchange.com/a/868/9690][Emacs StackExchange]].
 #+begin_src emacs-lisp
-  (bind-key* "<f12>" '(lambda (&optional arg) (interactive "P")(org-agenda arg "w")))
-#+end_src
-
-**** /fin/
-#+begin_src emacs-lisp
-  )
+  (bind-key* "<f12>" '(lambda (&optional arg) (interactive "P")(org-agenda arg "w"))))
 #+end_src
 
 *** org-bullets
@@ -2344,18 +2132,16 @@ This allows me to add a =CREATED= property everytime I create a new org-heading.
     (setq org-expiry-inactive-timestamps t)  ; Don't put everything in the agenda view
     :config
     (org-expiry-insinuate)
-    <<org-expiry-captures>>
-  )
 #+end_src
 
-**** Add CREATED property to captured items
+Add CREATED property to captured items
 :PROPERTIES:
 :CREATED:  [2018-12-28 Fri 23:04]
 :ID:       f9b19f45-ee3a-4f40-b8af-0e5966e4df35
 :END:
 From https://stackoverflow.com/a/16247032/734153
-#+begin_src emacs-lisp :noweb-ref org-expiry-captures :tangle no
-  (add-hook 'org-capture-prepare-finalize-hook 'org-expiry-insert-created)
+#+begin_src emacs-lisp
+  (add-hook 'org-capture-prepare-finalize-hook 'org-expiry-insert-created))
 #+end_src
 
 *** org-id
@@ -2369,19 +2155,17 @@ I want to grab org-id from the [[https://orgmode.org/worg/org-contrib/index.html
     ; Setting this to true will create an ID for every entry which could become expensive when org-id-track-globally is enabled
     (setq org-id-link-to-org-use-id 'create-if-interactive)
     :config
-    <<org-id-ins-compl>>
-  )
 #+end_src
 
 To use completion, insert link using =C-c C-l= and select =id:= as type and completion should trigger.
 =org-id-get-with-outline-path-completion= returns the ID of the selected heading and creates it if it doesn't have one already.
 Details at [[http://emacs.stackexchange.com/a/12434/9690][Emacs StackExchange]]
-#+begin_src emacs-lisp :noweb-ref org-id-ins-compl :tangle no
+#+begin_src emacs-lisp
   (defun org-id-complete-link (&optional arg)
     "Create an id: link using completion"
     (concat "id:" (org-id-get-with-outline-path-completion org-refile-targets)))
 
-  (org-link-set-parameters "id" :complete 'org-id-complete-link)
+  (org-link-set-parameters "id" :complete 'org-id-complete-link))
 #+end_src
 
 ** pcre2el
@@ -2412,24 +2196,6 @@ Use brighter colors
     (set-face-attribute 'rainbow-delimiters-depth-6-face nil :foreground "orchid")
     (set-face-attribute 'rainbow-delimiters-depth-7-face nil :foreground "spring green")
     (set-face-attribute 'rainbow-delimiters-depth-8-face nil :foreground "sienna1"))
-#+end_src
-
-** rainbow-mode
-When a color is specified as a hex code or with its name, set the background of the face to the value of the color itself
-#+begin_src emacs-lisp
-  (use-package rainbow-mode
-    :defer t)
-#+end_src
-
-** [[https://github.com/larstvei/Try][try]]
-:PROPERTIES:
-:ID:       4edba4e7-7920-47bf-b6c1-9221bc5a0841
-:CREATED:  [2019-01-21 Mon 23:12]
-:END:
-Try packages without installing them
-#+begin_src emacs-lisp
-  (use-package try
-    :commands (try try-and-refresh))
 #+end_src
 
 ** undo-tree
@@ -2487,14 +2253,10 @@ Placing at end to be called after all packages are loaded
     :config
     (delight '((abbrev-mode nil t)
                (aggressive-indent-mode nil aggressive-indent)
-               (beacon-mode nil beacon)
                (company-mode nil company)
-               (flycheck-mode nil flycheck)
-               ;; (irony-mode nil irony)
                (ivy-mode nil ivy)
                (org-indent-mode nil org-indent)
                (pcre-mode nil pcre2el)
-               (rainbow-mode)
                (undo-tree-mode nil undo-tree)
                (yas-minor-mode nil yasnippet)
                (which-key-mode nil which-key))))
