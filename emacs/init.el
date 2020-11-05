@@ -421,7 +421,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; :END:
 ;; Use only spaces and no tabs
 
-;; [[id:8d72d9c2-5b52-454f-892a-107b009563fa][Tabs, Indentation and Spacing:1]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*Tabs,%20Indentation%20and%20Spacing][Tabs, Indentation and Spacing:1]]
 (setq-default indent-tabs-mode nil
               show-trailing-whitespace nil
               sh-basic-offset 2)
@@ -542,7 +542,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; :END:
 ;; I'm using to rcirc access #emacs and #vim IRC channels on freenode
 
-;; [[id:81b84d7b-1c28-4f0a-9039-e80af8063881][IRC using [[https://www.gnu.org/software/emacs/manual/html_mono/rcirc.html][rcirc]]:1]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*IRC%20using%20%5B%5Bhttps://www.gnu.org/software/emacs/manual/html_mono/rcirc.html%5D%5Brcirc%5D%5D][IRC using [[https://www.gnu.org/software/emacs/manual/html_mono/rcirc.html][rcirc]]:1]]
 (use-package rcirc
   :commands rcirc
 
@@ -577,7 +577,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; :CREATED:  [2019-02-02 Sat 23:08]
 ;; :END:
 
-;; [[id:b9c529de-8be7-4c3f-96bb-e4143b5d1d2c][Open rcirc in a new window-layout using eyebrowse:1]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*Open%20rcirc%20in%20a%20new%20window-layout%20using%20eyebrowse][Open rcirc in a new window-layout using eyebrowse:1]]
 :config
 (defun irc ()
   "Simple wrapper which opens rcirc in a predefined window layout using eyebrowse"
@@ -594,7 +594,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; :CREATED:  [2019-01-31 Thu 08:02]
 ;; :END:
 
-;; [[id:ce06325b-1e07-476a-8659-6b5dd6d1b4ee][[[https://www.emacswiki.org/emacs/rcircNoNamesOnJoin][Don't display names when joining a channel]]:1]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*%5B%5Bhttps://www.emacswiki.org/emacs/rcircNoNamesOnJoin%5D%5BDon't%20display%20names%20when%20joining%20a%20channel%5D%5D][[[https://www.emacswiki.org/emacs/rcircNoNamesOnJoin][Don't display names when joining a channel]]:1]]
 (defvar rcirc-hide-names-on-join t
   "Non-nil if nick names list should be hidden when joining a channel.")
 
@@ -633,20 +633,20 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; :CREATED:  [2019-02-12 Tue 22:07]
 ;; :END:
 
-;; [[id:c753c712-6fcc-4acf-a5c8-f867e2407e76][all-the-icons:1]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*all-the-icons][all-the-icons:1]]
 (use-package all-the-icons
   :straight
   (:host github :repo "domtronn/all-the-icons.el"))
 ;; all-the-icons:1 ends here
 
-;; [[id:c753c712-6fcc-4acf-a5c8-f867e2407e76][all-the-icons:3]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*all-the-icons][all-the-icons:3]]
 (use-package all-the-icons-ivy
   :after (all-the-icons ivy)
   :config
   (all-the-icons-ivy-setup))
 ;; all-the-icons:3 ends here
 
-;; [[id:c753c712-6fcc-4acf-a5c8-f867e2407e76][all-the-icons:4]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*all-the-icons][all-the-icons:4]]
 (use-package all-the-icons-dired
   :after all-the-icons
   :hook (dired-mode . all-the-icons-dired-mode))
@@ -661,7 +661,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; Besides, =M-g M-g= is still bound to =goto-line= by default as well as the =<N>G= binding from evil.
 
 
-;; [[id:d5dbbf1c-588b-44ec-be35-5e19dcd6201c][avy:1]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*avy][avy:1]]
 (use-package avy
   :after evil
   :bind* (("C-'" . avy-goto-char-timer)
@@ -807,7 +807,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; :ID:       f42c3dc8-c2f6-4f22-9f47-0c578479ef67
 ;; :END:
 
-;; [[id:f42c3dc8-c2f6-4f22-9f47-0c578479ef67][Keybindings:1]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*Keybindings][Keybindings:1]]
 (defun my-unimpaired-insert-line-before ()
   "Insert blank line line before the current one"
   (interactive)
@@ -828,7 +828,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
            ("[ Q"   . first-error))
 ;; Keybindings:1 ends here
 
-;; [[id:f42c3dc8-c2f6-4f22-9f47-0c578479ef67][Keybindings:2]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*Keybindings][Keybindings:2]]
 (add-hook 'org-mode-hook (lambda() (bind-key "z v" 'org-reveal evil-normal-state-map)))
 ;; Keybindings:2 ends here
 
@@ -836,7 +836,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 
 ;; <<Make Escape quit everything>>
 
-;; [[id:f42c3dc8-c2f6-4f22-9f47-0c578479ef67][Keybindings:3]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*Keybindings][Keybindings:3]]
 (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
 ;; Keybindings:3 ends here
 
@@ -978,7 +978,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; Makes it easy to save and restore windows layout (kinda like tabs). eg. I have one window for rcirc, another for org-agenda and another for regular buffers etc.
 ;; I thought about using =gt= and =gT= but there are some buffers which are better used in emacs-state and, these won't work there so I'm going to stick with =C-c w= for the moment.
 
-;; [[id:49bd1e79-38fe-4046-86b2-5372e76496a1][[[https://github.com/wasamasa/eyebrowse][eyebrowse]]:1]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*%5B%5Bhttps://github.com/wasamasa/eyebrowse%5D%5Beyebrowse%5D%5D][[[https://github.com/wasamasa/eyebrowse][eyebrowse]]:1]]
 (use-package eyebrowse
   :init
   (setq eyebrowse-keymap-prefix (kbd "C-c w"))
@@ -1200,7 +1200,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 
 ;; #+name: org-config
 
-;; [[id:dc10f8d2-0831-4bb6-8775-0f5da3dd8243][org-config]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::org-config][org-config]]
 (use-package org
   :ensure org-plus-contrib
   :pin org
@@ -1258,7 +1258,8 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 ;; Clean View
 
 ;; [[file:~/.config/dotfiles/emacs/emacs.org::*Clean%20View][Clean View:1]]
-(setq org-startup-indented t)
+(setq org-startup-indented 'indented)
+(setq org-startup-folded 'content)
 (setq org-hide-leading-stars t)
 (setq org-odd-level-only nil)
 
@@ -1319,16 +1320,21 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 ;; (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
 ;; :config:1 ends here
 
+;; [[info:org#Structure%20Templates][Easy Templates]]
+;; :PROPERTIES:
+;; :ID:       851ad87b-250e-4c1e-83b1-6b4e1fa6b20d
+;; :CREATED:  [2019-01-11 Fri 13:03]
+;; :END:
+;; These should get added only if org-version < 9.2
+;; =?= in each string controls where the point will be placed after expansion
 
-
-;; For org-version >= 9.2, we have to use this. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
-
-;; [[id:851ad87b-250e-4c1e-83b1-6b4e1fa6b20d][[[info:org#Structure%20Templates][Easy Templates]]:2]]
-(add-to-list 'org-structure-template-alist '("sc" . "src c++"))
-(add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
-(add-to-list 'org-structure-template-alist '("sp" . "src python"))
-(add-to-list 'org-structure-template-alist '("ss" . "src bash"))
-;; [[info:org#Structure%20Templates][Easy Templates]]:2 ends here
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*%5B%5Binfo:org#Structure%2520Templates%5D%5BEasy%20Templates%5D%5D][[[info:org#Structure%20Templates][Easy Templates]]:1]]
+(add-to-list 'org-structure-template-alist '("sc" "#+begin_src C++\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("sl" "#+begin_src emacs-lisp\n?\n#+end_src\n"))
+(add-to-list 'org-structure-template-alist '("sp" "#+begin_src python\n?\n#+end_src\n"))
+;; (add-to-list 'org-structure-template-alist '("sd" "#+begin_src dot :file /tmp/out.png\n?\n#+end_src\n"))
+(add-to-list 'org-structure-template-alist '("ss" "#+begin_src bash\n?\n#+end_src\n"))
+;; [[info:org#Structure%20Templates][Easy Templates]]:1 ends here
 
 ;; Combine setting and aligning of tags
 ;; :PROPERTIES:
@@ -1336,7 +1342,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 ;; :CREATED:  [2019-01-29 Tue 22:56]
 ;; :END:
 
-;; [[id:dec6b49c-e37f-40df-9870-769ed0e68d3b][Combine setting and aligning of tags:1]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*Combine%20setting%20and%20aligning%20of%20tags][Combine setting and aligning of tags:1]]
 (defun my-org-modify-tags (p)
   "Set tags by calling counsel-org-tags and align tags as well.
   If called with a prefix, only align tags"
@@ -1357,7 +1363,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 ;; From [[http://emacs.stackexchange.com/questions/38062/configure-key-to-toggle-between-active-and-inactive-timestamps#38065][Emacs StackExchange]]. Also see [[Custom timestamp keymap]].
 
 
-;; [[id:d4634d95-be37-4bdf-987e-22da5778e958][Use ! to toggle timestamp type:1]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*Use%20!%20to%20toggle%20timestamp%20type][Use ! to toggle timestamp type:1]]
 (defun org-toggle-time-stamp-activity ()
   "Toggle activity of time stamp or range at point."
   (interactive)
@@ -1429,7 +1435,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 
 ;; Increase the no. of priority levels from 3 to 5 and change default priority to 'C'
 
-;; [[id:30e03c98-7190-48ad-99fb-49e28afa50e9][Custom priorities:1]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*Custom%20priorities][Custom priorities:1]]
 (setq org-default-priority 67
       org-highest-priority 65
       org-lowest-priority 69)
@@ -1509,7 +1515,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 ;; :END:
 ;; =org-babel-goto-src-block-head= jumps to the beginning of a source block. This is super useful! Why restrict it only to source blocks?
 
-;; [[id:964101eb-3077-411d-b9e5-9011c055c4ff][Jump to head/tail of any block, not just src blocks:1]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*Jump%20to%20head/tail%20of%20any%20block,%20not%20just%20src%20blocks][Jump to head/tail of any block, not just src blocks:1]]
 (defun my-org-babel-goto-block-corner (p)
   "Go to the beginning of the current block.
   If called with a prefix, go to the end of the block"
@@ -1600,7 +1606,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 ;; :END:
 ;; Custom keymap for org-mode bindings.
 
-;; [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][Keybindings:1]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*Keybindings][Keybindings:1]]
 (bind-keys :prefix-map my-org-bindings-map
            :prefix-docstring "This map is used to group together all org-mode settings"
            :prefix "C-c o"
@@ -1614,7 +1620,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 ;; <<Custom timestamp keymap>>. Also see [[id:d4634d95-be37-4bdf-987e-22da5778e958][Using ! to toggle timestamp type]]
 
 
-;; [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][Keybindings:2]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*Keybindings][Keybindings:2]]
 (bind-key "C-c C-q" 'my-org-modify-tags org-mode-map)
 ;; Keybindings:2 ends here
 
@@ -1622,7 +1628,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 
 ;; Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
 
-;; [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][Keybindings:3]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*Keybindings][Keybindings:3]]
 (define-key key-translation-map (kbd "C-c C-v C-k") (kbd "C-c C-v k"))
 ;; Keybindings:3 ends here
 
@@ -1630,7 +1636,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 
 ;; Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is left untouched to only jump to top of src blocks
 
-;; [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][Keybindings:4]]
+;; [[file:~/.config/dotfiles/emacs/emacs.org::*Keybindings][Keybindings:4]]
 (bind-key "u" 'my-org-babel-goto-block-corner org-babel-map))
 ;; Keybindings:4 ends here
 

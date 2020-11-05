@@ -32,3 +32,5 @@ trap __histfile_perm_update__ EXIT
 if [[ "$SHLVL" = 1 ]]; then
   [[ -x /usr/bin/clear_console ]] && /usr/bin/clear_console -q
 fi
+
+alias doomacs='emacs --with-profile doom'

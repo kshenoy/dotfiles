@@ -1516,7 +1516,8 @@ A safer way to go about it is by enabling it on a file-by-file basis using the f
 
 **** Clean View
 #+begin_src emacs-lisp
-  (setq org-startup-indented t)
+  (setq org-startup-indented 'indented)
+  (setq org-startup-folded 'content)
   (setq org-hide-leading-stars t)
   (setq org-odd-level-only nil)
 
