@@ -54,9 +54,76 @@ You can either set `doom-theme' or manually load a theme with the `load-theme' f
 #+begin_src emacs-lisp
   (setq doom-theme 'doom-one)
 #+end_src
+** Keybindings
+TODO
 
 * Org
+
+Startup options
 #+begin_src emacs-lisp
-  (setq org-directory "~/Documents/Notes"
-        org-default-notes-file (expand-file-name "Inbox.org" org-directory))
+(setq org-startup-align-all-tables t
+      org-startup-folded t
+      org-startup-with-inline-images t)
+#+end_src
+
+Prettify
+#+begin_src emacs-lisp
+  (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
+#+end_src
+
+#+begin_src emacs-lisp
+(setq org-directory "~/Documents/Notes"
+      org-default-notes-file (expand-file-name "Inbox.org" org-directory))
+#+end_src
+
+** ToDo related
+FIXME: Custom keywords
+#+begin_src emacs-lisp :tangle no
+(setq org-todo-keywords '((sequence "TODO(t!)" "WAITING(w@/!)" "|" "DONE(d@/!)" "DEFER(f@/!)" "CANCEL(c@)")))
+#+end_src
+
+=@=   - Log timestamp and note
+=!=   - Log timestamp only
+=x/y= - =x= takes affect when entering the state and
+      =y= takes affect when exiting if the state being entered doesn't have any logging
+Refer [[http://orgmode.org/manual/Tracking-TODO-state-changes.html][Tracking-TODO-state-changes]] for details
+
+Add logging when task state changes
+#+begin_src emacs-lisp
+  (setq org-log-redeadline 'note
+        org-log-into-drawer t  ; Save state changes into LOGBOOK drawer instead of in the body
+        org-treat-insert-todo-heading-as-state-change t
+        org-enforce-todo-dependencies t)  ; Prevent parent task from being marked complete till all child TODOS are marked as complete
+#+end_src
+
+Change from any todo state to any other state using =C-c C-t KEY=, provided selection keys have been defined
+#+begin_src emacs-lisp
+  (setq org-use-fast-todo-selection 'auto)
+#+end_src
+
+This frees up S-left and S-right which I can then use to cycles through the todo states but skip setting timestamps and entering notes which is very convenient when all I want to do is change the status of an entry without changing its timestamps
+#+begin_src emacs-lisp
+  (setq org-treat-S-cursor-todo-selection-as-state-change nil)
+#+end_src
+
+FIXME: Need to figure out what's the difference between this and the hl-todo package
+#+begin_src emacs-lisp :tangle no
+(setq org-todo-key  word-faces
+      (quote (("TODO" :foreground "red" :weight bold)
+              ("WAIT" :foreground "orange" :weight bold)
+              ("DONE" :foreground "forest green" bold)
+              ("CANCEL" :foreground "forest green" bold))))
+#+end_src
+** Source blocks
+#+begin_src emacs-lisp
+(setq org-src-window-setup 'current-window)
+#+end_src
+
+Easy templates for org-version >= 9.2. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
+#+begin_src emacs-lisp
+(after! org
+  (add-to-list 'org-structure-template-alist '("sc" . "src c++"))
+  (add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("sp" . "src python"))
+  (add-to-list 'org-structure-template-alist '("ss" . "src bash")))
 #+end_src
