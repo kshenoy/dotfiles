@@ -1177,9 +1177,9 @@ I thought about using =gt= and =gT= but there are some buffers which are better 
     :config
     (eyebrowse-mode t)
     (bind-keys :map eyebrowse-mode-map
-               ("w" . eyebrowse-last-window-config)
-               ("C" . eyebrowse-close-window-config)
-               ("N" . eyebrowse-create-window-config)))
+               ("C-c w w" . eyebrowse-last-window-config)
+               ("C-c w C" . eyebrowse-close-window-config)
+               ("C-c w N" . eyebrowse-create-window-config)))
 #+end_src
 
 ** hydra
@@ -1461,19 +1461,13 @@ Resources: [[http://doc.norang.ca/org-mode.html][Organize Your Life in Plain Tex
   (setq org-directory "~/Documents/Notes/")
   (setq org-default-notes-file (expand-file-name "Inbox.org" org-directory))
 
-  (setq org-M-RET-may-split-line '((item) (default . t)))
-  ;; (setq org-special-ctrl-a/e t)
-  ;; (setq org-return-follows-link nil)
   (setq org-use-speed-commands nil)
-  ;; (setq org-speed-commands-user nil)
-  (setq org-startup-align-all-tables nil)
-  (setq org-use-property-inheritance t)
-  (setq org-tags-column -100)
+  (setq org-startup-align-all-tables t)
+  (setq org-tags-column 'auto)
   (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
-  (setq org-blank-before-new-entry '((heading . t) (plain-list-item . t)))
   (setq org-link-search-must-match-exact-headline nil)
   (setq org-startup-with-inline-images t)
-  (setq org-imenu-depth 10)
+  (setq org-imenu-depth 8)
 #+end_src
 
 **** org-babel source blocks
@@ -1484,7 +1478,6 @@ Also, strip leading and trailing empty lines if any.
   (setq org-src-fontify-natively                       t
         org-src-window-setup                           'current-window
         org-src-strip-leading-and-trailing-blank-lines t
-        ;; org-src-preserve-indentation                t
         org-src-tab-acts-natively                      t)
 #+end_src
 
@@ -1516,8 +1509,8 @@ A safer way to go about it is by enabling it on a file-by-file basis using the f
 
 **** Clean View
 #+begin_src emacs-lisp
-  (setq org-startup-indented 'indented)
-  (setq org-startup-folded 'content)
+  (setq org-startup-indented t)
+  (setq org-startup-folded t)
   (setq org-hide-leading-stars t)
   (setq org-odd-level-only nil)
 
@@ -2116,7 +2109,7 @@ Small: ► • ★ ▸
   (use-package org-bullets
     :after org
     :hook (org-mode . (lambda() (org-bullets-mode 1)))
-    :custom (org-bullets-bullet-list '("✜")))
+    :custom (org-bullets-bullet-list '("✿")))
 #+end_src
 
 A good way to find more characters is to use =M-x insert-char=
