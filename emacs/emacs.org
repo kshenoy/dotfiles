@@ -843,6 +843,7 @@ References:
 
 #+begin_src emacs-lisp
   (use-package company
+    :disabled
     :custom
     (company-idle-delay 0.1)
     (company-minimum-prefix-length 2)
@@ -987,7 +988,7 @@ evil can be toggled using =C-z=
 
 Mode specific states
 #+begin_src emacs-lisp
-  (dolist (mode '(git-rebase-mode org-toc-mode))
+  (dolist (mode '(git-rebase-mode dired-mode org-toc-mode))
     (evil-set-initial-state mode 'emacs))
   (evil-set-initial-state 'term-mode 'insert)
 #+end_src
@@ -1477,7 +1478,6 @@ Also, strip leading and trailing empty lines if any.
 #+begin_src emacs-lisp
   (setq org-src-fontify-natively                       t
         org-src-window-setup                           'current-window
-        org-src-strip-leading-and-trailing-blank-lines t
         org-src-tab-acts-natively                      t)
 #+end_src
 
@@ -1934,15 +1934,6 @@ This can then be used to create a capture frame
   emacsclient --alternate-editor="" --create-frame --no-wait --socket-name=capture --frame-parameters='(quote (name . "capture"))' --eval "(my-make-capture-frame)"
 #+END_EXAMPLE
 
-***** TODO Get this running in Windows
-:PROPERTIES:
-:ID:       15dc9482-dc6b-4e44-b3a6-d28f7f12283e
-:CREATED:  [2019-01-30 Wed 09:53]
-:END:
-:LOGBOOK:
-- State "TODO"       from              [2019-01-30 Wed 09:53]
-:END:
-
 *** Keybindings
 :PROPERTIES:
 :ID:       ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7
@@ -1986,15 +1977,11 @@ https://fuco1.github.io/2017-04-20-Archive-subtrees-under-the-same-hierarchy-as-
     :init
 #+end_src
 
-**** TODO Don't add some files to the agenda
+Filter out any unwanted files from the notes that I don't want to add to the agenda
 #+begin_src emacs-lisp
-  (setq org-agenda-files
-        (seq-filter (lambda (x)
-                      (and 'file-exists-p
-                           (not (string= "Spanish.org" x))
-                           (not (string-match-p "Orgzly" x))))
-                    (mapcar (lambda (x) (expand-file-name x org-directory))
-                            '("Inbox.org" "Software/" "Personal/"))))
+  (setq org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
+                                                 (not (string-match-p "Spanish.org" x))))
+                                     (directory-files-recursively org-directory "\\.org$")))
 #+end_src
 
 **** :config
@@ -2002,34 +1989,28 @@ https://fuco1.github.io/2017-04-20-Archive-subtrees-under-the-same-hierarchy-as-
   :config
 #+end_src
 
+Force agenda to start on a Monday. By default, the agenda only shows the next 7 days. I want to see the previous week as well just in case I missed something. Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
+#+begin_src emacs-lisp
+  (setq org-agenda-start-day "-6d"
+        org-agenda-start-on-weekday 1
+        org-agenda-span 'month)
+#+end_src
+
+I don't want to see completed or already scheduled items
+#+begin_src emacs-lisp
+  (setq org-agenda-skip-deadline-if-done t
+        org-agenda-skip-scheduled-if-done t
+        org-agenda-skip-scheduled-if-deadline-is-shown t
+        org-agenda-skip-timestamp-if-done t
+        org-agenda-skip-timestamp-if-deadline-is-shown t
+        org-agenda-skip-additional-timestamps-same-entry t)
+#+end_src
+
 This sets up how I want my org-agenda to be displayed - I want it to be the only thing visible.
 I'm using eyebrowse to switch window layouts. One of the layouts is just org-agenda so I don't care about restoring the windows after quitting.
 #+begin_src emacs-lisp
   (setq org-agenda-window-setup 'only-window
-        ;; org-agenda-restore-windows-after-quit t
-        org-agenda-compact-blocks t)
-#+end_src
-
-Force agenda to start on a Monday as a week starts on a Monday. Sat and Sun are called week-ends for a reason :)
-Also, by default, the agenda only shows the next 7 days. I want to see the previous 7 days as well just in case I missed something.
-Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
-#+name: org-agenda-cfg-span
-#+begin_src emacs-lisp
-  (setq org-agenda-start-day "-7d"
-        org-agenda-start-on-weekday 1
-        org-agenda-span 14
         org-agenda-show-all-dates nil)
-#+end_src
-
-I don't want to see completed tasks
-#+begin_src emacs-lisp
-  (setq org-agenda-skip-scheduled-if-done t  ; Why isn't this default?
-        org-agenda-skip-deadline-if-done t)
-#+end_src
-
-Right-align the tags along column 150 in the agenda
-#+begin_src emacs-lisp
-  (setq org-agenda-tags-column -150)
 #+end_src
 
 **** org-agenda custom commands
@@ -2056,23 +2037,24 @@ These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/
 
 #+begin_src emacs-lisp
   (setq org-agenda-custom-commands
-        '(("d" "Daily agenda and all TODOs"
-           (
+        '(("d"                       ; key
+           "Daily agenda and TODOs"  ; desc
+           (                         ; cmds
 #+end_src
 
-All the high priority tasks that are still pending
+All the high-priority tasks that are still pending
 #+begin_src emacs-lisp
   (tags "PRIORITY=\"A\""
         ((org-agenda-overriding-header "High-priority unfinished tasks:")
          (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
 #+end_src
 
-An agenda showing the previous as well as the current week which I've [[org-agenda-cfg-span][configured]] above.
+An agenda showing the previous week and the next couple of weeks
 #+begin_src emacs-lisp
   (agenda "")
 #+end_src
 
-All the remaining todos (minus the high priority ones because why repeat it)
+All the remaining todos minus the high-priority ones
 #+begin_src emacs-lisp
   (alltodo ""
            ((org-agenda-overriding-header "ALL normal priority tasks:")
@@ -2081,11 +2063,16 @@ All the remaining todos (minus the high priority ones because why repeat it)
                                            (org-agenda-skip-if nil '(scheduled deadline))))))
 #+end_src
 
-Maybe I'll split this into two sections - normal and low priority but this is good for now
+#+begin_src emacs-lisp
+  )  ; END of cmds
+  (  ; settings
+#+end_src
 
-TODO: Restrict agenda to non-work files
-#+begin_src emacs-lisp :tangle no
-  ((org-agenda-files (mapcar (lambda (x) (expand-file-name x org-directory)) '("Inbox.org" "Software/" "Personal/"))))
+Restrict agenda to non-work files and filter out any other unwanted files
+#+begin_src emacs-lisp
+  (org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
+                                            (not (string-match-p "Work/" x))))
+                                org-agenda-files))
 #+end_src
 
 #+begin_src emacs-lisp

@@ -678,6 +678,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 
 ;; [[file:emacs.org::*company][company:1]]
 (use-package company
+  :disabled
   :custom
   (company-idle-delay 0.1)
   (company-minimum-prefix-length 2)
@@ -785,7 +786,7 @@ With prefix P, don't widen, just narrow even if buffer is already narrowed."
 ;; Mode specific states
 
 ;; [[file:emacs.org::*:config][:config:2]]
-(dolist (mode '(git-rebase-mode org-toc-mode))
+(dolist (mode '(git-rebase-mode dired-mode org-toc-mode))
   (evil-set-initial-state mode 'emacs))
 (evil-set-initial-state 'term-mode 'insert)
 ;; :config:2 ends here
@@ -1213,19 +1214,13 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 (setq org-directory "~/Documents/Notes/")
 (setq org-default-notes-file (expand-file-name "Inbox.org" org-directory))
 
-(setq org-M-RET-may-split-line '((item) (default . t)))
-;; (setq org-special-ctrl-a/e t)
-;; (setq org-return-follows-link nil)
 (setq org-use-speed-commands nil)
-;; (setq org-speed-commands-user nil)
-(setq org-startup-align-all-tables nil)
-(setq org-use-property-inheritance t)
-(setq org-tags-column -100)
+(setq org-startup-align-all-tables t)
+(setq org-tags-column 'auto)
 (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
-(setq org-blank-before-new-entry '((heading . t) (plain-list-item . t)))
 (setq org-link-search-must-match-exact-headline nil)
 (setq org-startup-with-inline-images t)
-(setq org-imenu-depth 10)
+(setq org-imenu-depth 8)
 ;; :init:1 ends here
 
 ;; org-babel source blocks
@@ -1236,8 +1231,6 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 ;; [[file:emacs.org::*org-babel source blocks][org-babel source blocks:1]]
 (setq org-src-fontify-natively                       t
       org-src-window-setup                           'current-window
-      org-src-strip-leading-and-trailing-blank-lines t
-      ;; org-src-preserve-indentation                t
       org-src-tab-acts-natively                      t)
 ;; org-babel source blocks:1 ends here
 
@@ -1644,17 +1637,15 @@ INITIAL-INPUT can be given as the initial minibuffer input."
   :init
 ;; org-agenda:1 ends here
 
-;; TODO Don't add some files to the agenda
 
-;; [[file:emacs.org::*Don't add some files to the agenda][Don't add some files to the agenda:1]]
-(setq org-agenda-files
-      (seq-filter (lambda (x)
-                    (and 'file-exists-p
-                         (not (string= "Spanish.org" x))
-                         (not (string-match-p "Orgzly" x))))
-                  (mapcar (lambda (x) (expand-file-name x org-directory))
-                          '("Inbox.org" "Software/" "Personal/"))))
-;; Don't add some files to the agenda:1 ends here
+
+;; Filter out any unwanted files from the notes that I don't want to add to the agenda
+
+;; [[file:emacs.org::*org-agenda][org-agenda:2]]
+(setq org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
+                                               (not (string-match-p "Spanish.org" x))))
+                                   (directory-files-recursively org-directory "\\.org$")))
+;; org-agenda:2 ends here
 
 ;; :config
 
@@ -1664,45 +1655,36 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 
 
 
-;; This sets up how I want my org-agenda to be displayed - I want it to be the only thing visible.
-;; I'm using eyebrowse to switch window layouts. One of the layouts is just org-agenda so I don't care about restoring the windows after quitting.
+;; Force agenda to start on a Monday. By default, the agenda only shows the next 7 days. I want to see the previous week as well just in case I missed something. Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
 
 ;; [[file:emacs.org::*:config][:config:2]]
-(setq org-agenda-window-setup 'only-window
-      ;; org-agenda-restore-windows-after-quit t
-      org-agenda-compact-blocks t)
+(setq org-agenda-start-day "-6d"
+      org-agenda-start-on-weekday 1
+      org-agenda-span 'month)
 ;; :config:2 ends here
 
 
 
-;; Force agenda to start on a Monday as a week starts on a Monday. Sat and Sun are called week-ends for a reason :)
-;; Also, by default, the agenda only shows the next 7 days. I want to see the previous 7 days as well just in case I missed something.
-;; Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
-;; #+name: org-agenda-cfg-span
+;; I don't want to see completed or already scheduled items
 
-;; [[file:emacs.org::org-agenda-cfg-span][org-agenda-cfg-span]]
-(setq org-agenda-start-day "-7d"
-      org-agenda-start-on-weekday 1
-      org-agenda-span 14
-      org-agenda-show-all-dates nil)
-;; org-agenda-cfg-span ends here
-
+;; [[file:emacs.org::*:config][:config:3]]
+(setq org-agenda-skip-deadline-if-done t
+      org-agenda-skip-scheduled-if-done t
+      org-agenda-skip-scheduled-if-deadline-is-shown t
+      org-agenda-skip-timestamp-if-done t
+      org-agenda-skip-timestamp-if-deadline-is-shown t
+      org-agenda-skip-additional-timestamps-same-entry t)
+;; :config:3 ends here
 
 
-;; I don't want to see completed tasks
+
+;; This sets up how I want my org-agenda to be displayed - I want it to be the only thing visible.
+;; I'm using eyebrowse to switch window layouts. One of the layouts is just org-agenda so I don't care about restoring the windows after quitting.
 
 ;; [[file:emacs.org::*:config][:config:4]]
-(setq org-agenda-skip-scheduled-if-done t  ; Why isn't this default?
-      org-agenda-skip-deadline-if-done t)
+(setq org-agenda-window-setup 'only-window
+      org-agenda-show-all-dates nil)
 ;; :config:4 ends here
-
-
-
-;; Right-align the tags along column 150 in the agenda
-
-;; [[file:emacs.org::*:config][:config:5]]
-(setq org-agenda-tags-column -150)
-;; :config:5 ends here
 
 ;; org-agenda custom commands
 ;; These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html][Aaron Bieber: An agenda for life with org-mode]]
@@ -1729,13 +1711,14 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
 
 ;; [[file:emacs.org::*org-agenda custom commands][org-agenda custom commands:2]]
 (setq org-agenda-custom-commands
-      '(("d" "Daily agenda and all TODOs"
-         (
+      '(("d"                       ; key
+         "Daily agenda and TODOs"  ; desc
+         (                         ; cmds
 ;; org-agenda custom commands:2 ends here
 
 
 
-;; All the high priority tasks that are still pending
+;; All the high-priority tasks that are still pending
 
 ;; [[file:emacs.org::*org-agenda custom commands][org-agenda custom commands:3]]
 (tags "PRIORITY=\"A\""
@@ -1745,7 +1728,7 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
 
 
 
-;; An agenda showing the previous as well as the current week which I've [[org-agenda-cfg-span][configured]] above.
+;; An agenda showing the previous week and the next couple of weeks
 
 ;; [[file:emacs.org::*org-agenda custom commands][org-agenda custom commands:4]]
 (agenda "")
@@ -1753,7 +1736,7 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
 
 
 
-;; All the remaining todos (minus the high priority ones because why repeat it)
+;; All the remaining todos minus the high-priority ones
 
 ;; [[file:emacs.org::*org-agenda custom commands][org-agenda custom commands:5]]
 (alltodo ""
@@ -1763,9 +1746,24 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
                                          (org-agenda-skip-if nil '(scheduled deadline))))))
 ;; org-agenda custom commands:5 ends here
 
+;; [[file:emacs.org::*org-agenda custom commands][org-agenda custom commands:6]]
+)  ; END of cmds
+(  ; settings
+;; org-agenda custom commands:6 ends here
+
+
+
+;; Restrict agenda to non-work files and filter out any other unwanted files
+
 ;; [[file:emacs.org::*org-agenda custom commands][org-agenda custom commands:7]]
-))))
+(org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
+                                          (not (string-match-p "Work/" x))))
+                              org-agenda-files))
 ;; org-agenda custom commands:7 ends here
+
+;; [[file:emacs.org::*org-agenda custom commands][org-agenda custom commands:8]]
+))))
+;; org-agenda custom commands:8 ends here
 
 ;; Keybindings
 ;; [[id:ebbf9970-d072-4b59-bcaa-5f4b3d71a7d7][General org keybindings]]
@@ -1786,7 +1784,7 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
 (use-package org-bullets
   :after org
   :hook (org-mode . (lambda() (org-bullets-mode 1)))
-  :custom (org-bullets-bullet-list '("✜")))
+  :custom (org-bullets-bullet-list '("✿")))
 ;; org-bullets:1 ends here
 
 ;; org-expiry
