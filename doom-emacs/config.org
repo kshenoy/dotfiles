@@ -1,6 +1,5 @@
 Doom emacs private configuration
 
-* Configuring Doom
 Running =doom sync= is not required after modifying this file!
 
 Some additional functions/macros to help configure Doom:
@@ -22,15 +21,15 @@ Some functionality uses this to identify you, e.g. GPG configuration, email clie
 
 ** Better defaults
 #+begin_src emacs-lisp
-    (setq-default confirm-kill-emacs 'y-or-n-p  ; Confirm before quitting
-  )
+(setq-default confirm-kill-emacs 'y-or-n-p  ; Confirm before quitting
+              )
 #+end_src
 
 This determines the style of line numbers in effect. If set to
 - `nil': line numbers are disabled.
 - `'relative - relative line numbers
 #+begin_src emacs-lisp
-  (setq display-line-numbers-type 'relative)
+(setq display-line-numbers-type 'relative)
 #+end_src
 
 ** Fonts
@@ -43,32 +42,51 @@ are the three important ones:
 
 They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 font string. You generally only need these two:
-#+begin_src emacs-lisp :tangle no
-  (setq doom-font (font-spec :family "monospace" :size 12 :weight 'semi-light)
-        doom-variable-pitch-font (font-spec :family "sans" :size 13))
+#+begin_src emacs-lisp
+  (setq doom-font "Iosevka-10"
+        doom-variable-pitch-font "Iosevka-10")
 #+end_src
 
 ** Themes
 There are two ways to load a theme. Both assume the theme is installed and available.
-You can either set `doom-theme' or manually load a theme with the `load-theme' function. This is the default:
+I can either set `doom-theme' or manually load a theme with the `load-theme' function. This is the default:
 #+begin_src emacs-lisp
-  (setq doom-theme 'doom-one)
+  (setq doom-theme 'doom-one-light)
 #+end_src
+
 ** Keybindings
-TODO
+
+Use =org-goto= instead of =semantic-or-imenu= when in org files
+#+begin_src emacs-lisp
+(defun my-org-goto-or-semantic-or-imenu ()
+  "Use mode-specific commands if available else fallback to counsel-semantic-or-imenu"
+  (interactive)
+  (if (string= major-mode "org-mode")
+      (counsel-org-goto)
+    (counsel-semantic-or-imenu)))
+
+(map! :after counsel
+      :map doom-leader-search-map
+      :desc "org-goto-or-semantic-or-imenu" "i" #'my-org-goto-or-semantic-or-imenu)
+#+end_src
 
 * Org
+
+#+begin_src emacs-lisp
+(after! org
+#+end_src
 
 Startup options
 #+begin_src emacs-lisp
 (setq org-startup-align-all-tables t
       org-startup-folded t
-      org-startup-with-inline-images t)
+      org-startup-with-inline-images t
+      org-agenda-inhibit-startup nil)
 #+end_src
 
 Prettify
 #+begin_src emacs-lisp
-  (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
+(setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
 #+end_src
 
 #+begin_src emacs-lisp
@@ -76,10 +94,24 @@ Prettify
       org-default-notes-file (expand-file-name "Inbox.org" org-directory))
 #+end_src
 
+** Source blocks
+#+begin_src emacs-lisp
+(setq org-src-window-setup 'current-window)
+#+end_src
+
+Easy templates for org-version >= 9.2. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
+#+begin_src emacs-lisp
+(add-to-list 'org-structure-template-alist '("sc" . "src c++"))
+(add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
+(add-to-list 'org-structure-template-alist '("sp" . "src python"))
+(add-to-list 'org-structure-template-alist '("ss" . "src bash"))
+#+end_src
+
 ** ToDo related
-FIXME: Custom keywords
-#+begin_src emacs-lisp :tangle no
-(setq org-todo-keywords '((sequence "TODO(t!)" "WAITING(w@/!)" "|" "DONE(d@/!)" "DEFER(f@/!)" "CANCEL(c@)")))
+Custom keywords
+#+begin_src emacs-lisp
+(setq org-todo-keywords '((sequence "TODO(t!)" "WAIT(w@/!)" "|" "DONE(d@/!)" "DEFER(f@/!)" "CANCEL(c@)")
+                          (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")))
 #+end_src
 
 =@=   - Log timestamp and note
@@ -88,42 +120,159 @@ FIXME: Custom keywords
       =y= takes affect when exiting if the state being entered doesn't have any logging
 Refer [[http://orgmode.org/manual/Tracking-TODO-state-changes.html][Tracking-TODO-state-changes]] for details
 
-Add logging when task state changes
-#+begin_src emacs-lisp
-  (setq org-log-redeadline 'note
-        org-log-into-drawer t  ; Save state changes into LOGBOOK drawer instead of in the body
-        org-treat-insert-todo-heading-as-state-change t
-        org-enforce-todo-dependencies t)  ; Prevent parent task from being marked complete till all child TODOS are marked as complete
-#+end_src
-
 Change from any todo state to any other state using =C-c C-t KEY=, provided selection keys have been defined
 #+begin_src emacs-lisp
-  (setq org-use-fast-todo-selection 'auto)
+(setq org-use-fast-todo-selection 'auto)
 #+end_src
 
-This frees up S-left and S-right which I can then use to cycles through the todo states but skip setting timestamps and entering notes which is very convenient when all I want to do is change the status of an entry without changing its timestamps
+Add logging when task state changes
 #+begin_src emacs-lisp
-  (setq org-treat-S-cursor-todo-selection-as-state-change nil)
+(setq org-log-into-drawer t  ; Save state changes into LOGBOOK drawer instead of in the body
+      org-log-redeadline 'note
+      org-treat-insert-todo-heading-as-state-change t
+      org-enforce-todo-dependencies t)  ; Prevent parent task from being marked complete till all child TODOS are marked as complete
 #+end_src
 
-FIXME: Need to figure out what's the difference between this and the hl-todo package
+Setting this to nil allows a convenient way to select a TODO state and bypass any logging associated with that.
+#+begin_src emacs-lisp
+(setq org-treat-S-cursor-todo-selection-as-state-change nil)
+#+end_src
+
 #+begin_src emacs-lisp :tangle no
-(setq org-todo-key  word-faces
+(setq org-todo-keyword-faces
       (quote (("TODO" :foreground "red" :weight bold)
               ("WAIT" :foreground "orange" :weight bold)
               ("DONE" :foreground "forest green" bold)
               ("CANCEL" :foreground "forest green" bold))))
 #+end_src
-** Source blocks
+
+** Agenda
 #+begin_src emacs-lisp
-(setq org-src-window-setup 'current-window)
+(setq org-agenda-files (mapcar (lambda (x) (expand-file-name x org-directory))
+                               '("Inbox.org" "Personal/" "Software/")))
 #+end_src
 
-Easy templates for org-version >= 9.2. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
+Prevent same entry from showing up multiple times
 #+begin_src emacs-lisp
-(after! org
-  (add-to-list 'org-structure-template-alist '("sc" . "src c++"))
-  (add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
-  (add-to-list 'org-structure-template-alist '("sp" . "src python"))
-  (add-to-list 'org-structure-template-alist '("ss" . "src bash")))
+(setq org-agenda-skip-deadline-if-done t
+      org-agenda-skip-scheduled-if-done t
+      org-agenda-skip-scheduled-if-deadline-is-shown t
+      org-agenda-skip-timestamp-if-done t
+      org-agenda-skip-timestamp-if-deadline-is-shown t
+      org-agenda-skip-additional-timestamps-same-entry t)
+#+end_src
+
+Open org-agenda in the only window and remove the fluff
+#+begin_src emacs-lisp
+(setq org-agenda-window-setup 'current-window)
+#+end_src
+
+Make agenda start on a Monday. Also, by default, the agenda only shows the next 7 days. I want to see the previous 7 days as well just in case I missed something.
+Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
+#+begin_src emacs-lisp
+(setq org-agenda-start-day "-7d"
+      org-agenda-start-on-weekday 1
+      org-agenda-span 14
+      org-agenda-show-all-dates nil)
+#+end_src
+
+*** Agenda custom commands
+These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html][Aaron Bieber: An agenda for life with org-mode]]
+#+begin_src emacs-lisp
+(defun my-org-skip-subtree-if-habit ()
+  "Skip an agenda entry if it has a STYLE property equal to \"habit\"."
+  (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+    (if (string= (org-entry-get nil "STYLE") "habit")
+        subtree-end
+      nil)))
+
+(defun my-org-skip-subtree-if-priority (priority)
+  "Skip an agenda subtree if it has a priority of PRIORITY.
+
+  PRIORITY may be one of the characters ?A, ?B, or ?C."
+  (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+        (pri-value (* 1000 (- org-lowest-priority priority)))
+        (pri-current (org-get-priority (thing-at-point 'line t))))
+    (if (= pri-value pri-current)
+        subtree-end
+      nil)))
+#+end_src
+
+#+begin_src emacs-lisp
+(setq org-agenda-custom-commands
+      '(("d" "Daily agenda and all TODOs"
+         (
+#+end_src
+
+High-priority tasks
+#+begin_src emacs-lisp
+(tags "PRIORITY=\"A\""
+      ((org-agenda-overriding-header "High-priority unfinished tasks:")
+       (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
+#+end_src
+
+An agenda showing the previous as well as the current week which I've [[org-agenda-cfg-span][configured]] above.
+#+begin_src emacs-lisp
+(agenda "")
+#+end_src
+
+The normal-priority todos
+#+begin_src emacs-lisp
+(alltodo ""
+         ((org-agenda-overriding-header "Normal-priority tasks:")
+          (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
+                                         (my-org-skip-subtree-if-priority ?A)
+                                         (my-org-skip-subtree-if-priority ?C)
+                                         (org-agenda-skip-if nil '(scheduled deadline))))))
+#+end_src
+
+The low-priority todos
+#+begin_src emacs-lisp
+(alltodo ""
+         ((org-agenda-overriding-header "Low-priority tasks:")
+          (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
+                                         (my-org-skip-subtree-if-priority ?A)
+                                         (my-org-skip-subtree-if-priority ?B)
+                                         (org-agenda-skip-if nil '(scheduled deadline))))))
+#+end_src
+
+#+begin_src emacs-lisp
+))))
+#+end_src
+
+** Capture
+#+begin_src emacs-lisp
+(setq org-capture-templates
+      '(("t" "TODO" entry
+         (file org-default-notes-file)
+         "* TODO %?\n:LOGBOOK:\n- State \"TODO\"       from              %U\n:END:"
+         :jump-to-captured t :empty-lines 1)
+
+        ("r" "Recommendation" item (file "Personal/Recommendations.org") "" :jump-to-captured t)
+
+        ("x" "Misc etc." entry
+         (file org-default-notes-file)
+         "* %?"
+         :jump-to-captured t :empty-lines 1)
+
+        ("s" "Snippets")
+
+        ("se" "Emacs snippets" entry
+         (file "Software/emacs.org")
+         "* %?"
+         :jump-to-captured t :empty-lines 1)
+
+        ("ss" "Shell snippets" entry
+         (file "Software/shell.org")
+         "* %?"
+         :jump-to-captured t :empty-lines 1)
+
+        ("sv" "Vim snippets" entry
+         (file "Software/vim.org")
+         "* %?"
+         :jump-to-captured t :empty-lines 1)))
+#+end_src
+
+#+begin_src emacs-lisp
+)
 #+end_src
