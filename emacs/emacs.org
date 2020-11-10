@@ -13,10 +13,6 @@ This allows me to run =org-babel-tangle= in the org file to generate the el file
 This adds all the non-code related text as comments in the tangled file. It also adds comments wrappers with links back to the heading in the original Org mode file.
 
 ** Resources
-:PROPERTIES:
-:ID:       b2032342-6c4c-48be-b370-6ae538a48e2c
-:CREATED:  [2019-01-15 Tue 05:25]
-:END:
 - [[https://www.youtube.com/watch?v=49kBWM3RQQ8&list=PL9KxKa8NpFxIcNQa9js7dQQIHc81b0-Xg][YouTube: Mike Zamansky - Using Emacs]]
 - [[https://www.youtube.com/watch?v=d6iY_1aMzeg&list=PLX2044Ew-UVVv31a0-Qn3dA6Sd_-NyA1n][YouTube: Uncle Dave - Emacs Tutorial]]
 - [[https://www.youtube.com/playlist?list=PLrFss89N5XNw8rTgI2fVhSj9Y62TpphFI][YouTube: Yisrael Dov - Emacs is Great]]
@@ -28,10 +24,6 @@ This adds all the non-code related text as comments in the tangled file. It also
 - https://brainlessdeveloper.com/2017/12/27/making-emacs-work-like-my-vim-setup/
 
 ** Debugging
-:PROPERTIES:
-:ID:       4e219760-3d5e-4a51-9837-8f24298b44d9
-:CREATED:  [2019-01-15 Tue 05:25]
-:END:
 
 Use =C-u C-M-x= with the point over the function to debug. This puts us into debugging minor mode in which the following bindings are useful
 
@@ -57,10 +49,6 @@ Setting this gives a backtrace
 #+end_src
 
 ** Using noweb references
-:PROPERTIES:
-:ID:       b19befdb-eada-4d1b-b48c-be04122e4ddf
-:CREATED:  [2019-02-01 Fri 08:45]
-:END:
 [[https://necromuralist.github.io/posts/org-babel-noweb-ref/][Inserting text from different blocks]], [[https://org-babel.readthedocs.io/en/latest/header-args/#noweb][noweb header-args]]
 Occasionally I use noweb references to insert text from one source block in another. I do this when I think it's useful to explain a particular section in more detail but at the same time I don't want to clutter the place where it's used at.
 
@@ -91,10 +79,6 @@ There are two ways I go about it:
    #+end_example
 
 * Setup the package manager
-:PROPERTIES:
-:ID:       7096b5ff-ae33-4474-b732-e17ef0696b58
-:CREATED:  [2019-01-17 Thu 19:47]
-:END:
 I'm using [[https://github.com/jwiegley/use-package][use-package]] ([[info:use-package#Top][info:use-package]]) to configure my packages. It is a macro that provides convenient syntactic sugar for many common tasks related to installing and configuring Emacs packages.
 
 | <<:ensure>> | Install packages automatically if set to /nil/ or /t/. Passing anything else allows me to use a different package than the one named in use-package [[org-config][eg.]] |
@@ -552,9 +536,6 @@ Prettier checkboxes in org-mode (From [[https://old.reddit.com/r/emacs/comments/
 #+end_src
 
 ** Tabs, Indentation and Spacing
-:PROPERTIES:
-:ID:       8d72d9c2-5b52-454f-892a-107b009563fa
-:END:
 Use only spaces and no tabs
 #+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil
@@ -619,9 +600,6 @@ Misc info:
 =list-colors-display= - List all colors with their names
 
 *** TODO Unload all loaded themes before loading new theme
-:PROPERTIES:
-:CREATED:  [2019-01-24 Thu 22:22]
-:END:
 :LOGBOOK:
 - State "TODO"       from              [2019-01-24 Thu 22:22]
 :END:
@@ -672,10 +650,6 @@ Emacs doesn't have a native hook that is called after a theme has loaded. So we'
 #+end_src
 
 *** COMMENT doom themes
-:PROPERTIES:
-:ID:       8bca6e20-a905-41b0-aecf-fb4aa6d64be5
-:CREATED:  [2019-07-25 Thu 11:10]
-:END:
 #+begin_src emacs-lisp
   (use-package doom-themes
     :config (load-theme 'doom-tomorrow-night t))
@@ -695,10 +669,6 @@ Set frame size programatically
 #+end_src
 
 ** IRC using [[https://www.gnu.org/software/emacs/manual/html_mono/rcirc.html][rcirc]]
-:PROPERTIES:
-:ID:       81b84d7b-1c28-4f0a-9039-e80af8063881
-:CREATED:  [2019-01-30 Wed 20:12]
-:END:
 I'm using to rcirc access #emacs and #vim IRC channels on freenode
 #+begin_src emacs-lisp
   (use-package rcirc
@@ -729,10 +699,6 @@ I should probably make this a part of the theme but I'm going to keep it here fo
 #+end_src
 
 *** Open rcirc in a new window-layout using eyebrowse
-:PROPERTIES:
-:ID:       b9c529de-8be7-4c3f-96bb-e4143b5d1d2c
-:CREATED:  [2019-02-02 Sat 23:08]
-:END:
 #+begin_src emacs-lisp
   :config
   (defun irc ()
@@ -745,10 +711,6 @@ I should probably make this a part of the theme but I'm going to keep it here fo
 #+end_src
 
 *** [[https://www.emacswiki.org/emacs/rcircNoNamesOnJoin][Don't display names when joining a channel]]
-:PROPERTIES:
-:ID:       ce06325b-1e07-476a-8659-6b5dd6d1b4ee
-:CREATED:  [2019-01-31 Thu 08:02]
-:END:
 #+begin_src emacs-lisp
   (defvar rcirc-hide-names-on-join t
     "Non-nil if nick names list should be hidden when joining a channel.")
@@ -791,10 +753,6 @@ Other examples:
 #+end_src
 
 ** all-the-icons
-:PROPERTIES:
-:ID:       c753c712-6fcc-4acf-a5c8-f867e2407e76
-:CREATED:  [2019-02-12 Tue 22:07]
-:END:
 #+begin_src emacs-lisp
   (use-package all-the-icons
     :straight
@@ -923,10 +881,6 @@ Keeping this at the end to be run after we've added all backends
 #+end_src
 
 *** FIXME COMMENT [[https://github.com/sebastiencs/company-box][company-box]]
-:PROPERTIES:
-:ID:       bc8afa5b-79fc-431f-9a61-300363b87160
-:CREATED:  [2019-01-22 Tue 21:29]
-:END:
 :LOGBOOK:
 - State "FIXME"      from "TODO"       [2019-01-22 Tue 21:54]
 - State "TODO"       from              [2019-01-22 Tue 21:54]
@@ -939,9 +893,6 @@ Disabled for now because it uses images which are huge compared to the font maki
 #+end_src
 
 *** FIXME COMMENT company-irony
-:PROPERTIES:
-:CREATED:  [2019-01-22 Tue 23:14]
-:END:
 :LOGBOOK:
 - State "FIXME"      from "TODO"       [2019-01-22 Tue 23:14]
 - State "TODO"       from              [2019-01-22 Tue 23:14]
@@ -955,10 +906,6 @@ Disabled for now because it uses images which are huge compared to the font maki
 
 *** FIXME COMMENT company-posframe
 Frame theme is messed up
-:PROPERTIES:
-:ID:       ba04ec48-20ab-40a6-b5af-032f96c440ed
-:CREATED:  [2019-07-23 Tue 09:39]
-:END:
 :LOGBOOK:
 - State "FIXME"      from "TODO"       [2019-07-23 Tue 10:47]
 - State "TODO"       from              [2019-07-23 Tue 10:47]
@@ -1153,20 +1100,12 @@ Provides =g~= operator to cycle between snake_case → SCREAMING_SNAKE_CASE → 
 #+end_src
 
 *** TODO evil TextObjects
-:PROPERTIES:
-:ID:       ec55d8a3-997b-4c81-aeb3-ba7fc1214c43
-:CREATED:  [2019-01-25 Fri 17:44]
-:END:
 :LOGBOOK:
 - State "TODO"       from              [2019-01-25 Fri 17:44]
 :END:
 http://seanbowman.me/blog/emacs-evil-function-objects/
 
 ** [[https://github.com/wasamasa/eyebrowse][eyebrowse]]
-:PROPERTIES:
-:ID:       49bd1e79-38fe-4046-86b2-5372e76496a1
-:CREATED:  [2019-01-30 Wed 20:25]
-:END:
 Makes it easy to save and restore windows layout (kinda like tabs). eg. I have one window for rcirc, another for org-agenda and another for regular buffers etc.
 I thought about using =gt= and =gT= but there are some buffers which are better used in emacs-state and, these won't work there so I'm going to stick with =C-c w= for the moment.
 #+begin_src emacs-lisp
@@ -1374,9 +1313,6 @@ NOTE: I'm deferring loading by using the =commands= keyword for =counsel-org-tag
 #+end_src
 
 *** COMMENT [[https://github.com/Yevgnen/ivy-rich][ivy-rich]]
-:PROPERTIES:
-:CREATED:  [2018-07-09 Mon 16:46]
-:END:
 #+begin_src emacs-lisp
   (use-package ivy-rich
     :after ivy
@@ -1424,10 +1360,6 @@ NOTE: I'm deferring loading by using the =commands= keyword for =counsel-org-tag
 #+end_src
 
 **** TODO Get this to run with all-the-icons
-:PROPERTIES:
-:ID:       ce9a01a4-d7aa-4d74-907d-9ce1e7f759c4
-:CREATED:  [2019-02-23 Sat 10:08]
-:END:
 :LOGBOOK:
 - State "TODO"       from              [2019-02-23 Sat 10:08]
 :END:
@@ -1439,9 +1371,6 @@ NOTE: I'm deferring loading by using the =commands= keyword for =counsel-org-tag
 #+end_src
 
 ** org
-:PROPERTIES:
-:ID:       dc10f8d2-0831-4bb6-8775-0f5da3dd8243
-:END:
 I specifically grab [[https://orgmode.org/worg/org-contrib/index.html][org-plus-contrib]] from the org repository instead of the bundled version to be able to
 - get the latest version of org
 - use contributed packages such as [[https://code.orgmode.org/bzg/org-mode/raw/master/contrib/lisp/org-expiry.el][org-expiry]], [[https://orgmode.org/worg/org-contrib/org-drill.html][org-drill]] and org-id
@@ -1578,10 +1507,6 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 #+end_src
 
 **** [[info:org#Structure%20Templates][Easy Templates]]
-:PROPERTIES:
-:ID:       851ad87b-250e-4c1e-83b1-6b4e1fa6b20d
-:CREATED:  [2019-01-11 Fri 13:03]
-:END:
 These should get added only if org-version < 9.2
 =?= in each string controls where the point will be placed after expansion
 #+begin_src emacs-lisp :tangle (if (org-string>= org-version "9.2") "no" "init.el")
@@ -1601,10 +1526,6 @@ For org-version >= 9.2, we have to use this. =C-c C-,= was also added in 9.2 and
 #+end_src
 
 **** Combine setting and aligning of tags
-:PROPERTIES:
-:ID:       dec6b49c-e37f-40df-9870-769ed0e68d3b
-:CREATED:  [2019-01-29 Tue 22:56]
-:END:
 #+begin_src emacs-lisp
   (defun my-org-modify-tags (p)
     "Set tags by calling counsel-org-tags and align tags as well.
@@ -1615,10 +1536,6 @@ For org-version >= 9.2, we have to use this. =C-c C-,= was also added in 9.2 and
 #+end_src
 
 ***** TODO Use Hydra to select between adding, removing and aligning tags
-:PROPERTIES:
-:ID:       0c1ada5e-77fc-47ba-a177-d7d8c538e933
-:CREATED:  [2019-05-21 Tue 10:41]
-:END:
 :LOGBOOK:
 - State "TODO"       from              [2019-05-21 Tue 10:41]
 :END:
@@ -1630,7 +1547,6 @@ Maybe use something like this
 **** Use ! to toggle timestamp type
 :PROPERTIES:
 :ID:       d4634d95-be37-4bdf-987e-22da5778e958
-:CREATED:  [2019-02-08 Fri 11:00]
 :END:
 [[https://orgmode.org/manual/Creating-timestamps.html][By default]], org-mode uses =C-c .= and =C-c != to create active and inactive timestamps respectively.
 However, I also have flycheck installed which conflicts with the =C-c != binding.
@@ -1703,10 +1619,6 @@ From [[http://emacs.stackexchange.com/questions/38062/configure-key-to-toggle-be
 #+end_src
 
 **** Custom priorities
-:PROPERTIES:
-:ID:       30e03c98-7190-48ad-99fb-49e28afa50e9
-:CREATED:  [2020-04-20 Mon 22:12]
-:END:
 
 Increase the no. of priority levels from 3 to 5 and change default priority to 'C'
 #+begin_src emacs-lisp
@@ -1828,10 +1740,6 @@ From https://emacs.stackexchange.com/a/9813/9690
 #+end_src
 
 ***** Jump to head/tail of any block, not just src blocks
-:PROPERTIES:
-:ID:       964101eb-3077-411d-b9e5-9011c055c4ff
-:CREATED:  [2019-01-14 Mon 21:36]
-:END:
 =org-babel-goto-src-block-head= jumps to the beginning of a source block. This is super useful! Why restrict it only to source blocks?
 #+begin_src emacs-lisp
   (defun my-org-babel-goto-block-corner (p)
@@ -1862,9 +1770,6 @@ From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 -
 [[id:f9b19f45-ee3a-4f40-b8af-0e5966e4df35][Add CREATED property to captured items]]
 
 ***** Capture templates
-:PROPERTIES:
-:CREATED:  [2018-12-28 Fri 23:04]
-:END:
 #+begin_src emacs-lisp
   (setq org-capture-templates
         '(("t" "TODO" entry
@@ -2117,7 +2022,6 @@ This allows me to add a =CREATED= property everytime I create a new org-heading.
 
 Add CREATED property to captured items
 :PROPERTIES:
-:CREATED:  [2018-12-28 Fri 23:04]
 :ID:       f9b19f45-ee3a-4f40-b8af-0e5966e4df35
 :END:
 From https://stackoverflow.com/a/16247032/734153
