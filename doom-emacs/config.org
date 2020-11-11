@@ -1,6 +1,5 @@
+#+TITLE: Doom emacs private configuration
 #+PROPERTY: header-args :results output silent :noweb tangle :comments both :mkdirp yes
-
-Doom emacs private configuration
 
 Running =doom sync= is not required after modifying this file!
 
@@ -153,7 +152,9 @@ Setting this to nil allows a convenient way to select a TODO state and bypass an
 Filter out any unwanted files from the notes that I don't want to add to the agenda
 #+begin_src emacs-lisp
 (setq org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
-                                                    (not (string-match-p "Spanish.org" x))))
+                                                    (not (or (string-match-p ".bak" x)
+                                                             (string-match-p "Spanish.org" x)
+                                                             (string-match-p "Work/" x)))))
                                    (directory-files-recursively org-directory "\\.org$")))
 #+end_src
 
@@ -246,7 +247,7 @@ Restrict agenda to non-work files and filter out any other unwanted files
   ))))
 #+end_src
 
-** Capture
+** org-capture
 #+begin_src emacs-lisp
 (setq org-capture-templates
       '(("t" "TODO" entry
@@ -281,4 +282,32 @@ Restrict agenda to non-work files and filter out any other unwanted files
 
 #+begin_src emacs-lisp
 )
+#+end_src
+
+** org-refile
+Resources:
+- [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Aaron Bieber - Organizing Notes with Refile]]
+
+By [[https://www.reddit.com/r/emacs/comments/4366f9/how_do_orgrefiletargets_work/czg008y/][/u/awalker4 on reddit]].
+Show upto 9 levels of headings from the current file and 5 levels of headings from all agenda files
+#+begin_src emacs-lisp
+  (setq org-refile-targets
+        '((nil . (:maxlevel . 9))
+          (org-agenda-files . (:maxlevel . 5))))
+#+end_src
+Each element of the list generates a set of possible targets.
+/nil/ indicates that all the headings in the current buffer will be considered.
+
+Following are from Aaron Bieber's post [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Organizing Notes with Refile]]
+
+Creating new parents - To create new heading, add =/HeadingName= to the end when using refile (=C-c C-w=)
+#+begin_src emacs-lisp
+  (setq org-refile-allow-creating-parent-nodes 'confirm)
+  (setq org-refile-use-outline-path 'file)
+  (setq org-outline-path-complete-in-steps nil)
+#+end_src
+
+Store the timestamp when an entry is refiled
+#+begin_src emacs-lisp
+  (setq org-log-refile 'time)
 #+end_src
