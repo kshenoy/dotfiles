@@ -6,6 +6,7 @@
 bash/history
 compiz/
 doom-emacs/config.el
+emacs/init.el
 vim/autoload/plug*
 vim/bundles
 vim/pack/rc_local
