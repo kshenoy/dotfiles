@@ -76,8 +76,6 @@ fzf-cmd-opts() {                                                                
 #=======================================================================================================================
 fzf-tmux-select-session() {                                                                                        #{{{1
 # Create new tmux session, or switch to existing one. Works from within tmux too
-# - Bypass fuzzy finder if there's only one match (--select-1)
-# - Exit if there's no match (--exit-0)
   if [[ -n "$TMUX" ]]; then
     local cmd="switch-client"
   else
@@ -86,7 +84,7 @@ fzf-tmux-select-session() {                                                     
 
   local session=$(tmux list-sessions 2>/dev/null |
                   sed -e 's/ (created[^)]*)//' -e 's/:/ :/' | column -t -o ' ' |
-                  fzf --select-1 --exit-0 --nth=1 |
+                  fzf --nth=1 |
                   awk '{print $1}')
   if [[ -n "$session" ]]; then
     tmux $cmd -t "$session"
