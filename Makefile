@@ -14,25 +14,27 @@ all: bash emacs git tmux links
 
 
 clean:
-	rm bash/dircolors ripgreprc emacs/init.el git/config tmux/tmux.conf
+	rm bash/dircolors ripgreprc emacs/vanilla/config.el git/config tmux/tmux.conf
 
 
 bash: bash/bashrc bash/dircolors ripgreprc bash_links
 bash/bashrc bash/dircolors ripgreprc: bash/bashrc.org
 	$(TANGLE) $<
 bash_links: force
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/bash/bashrc           ~/.bashrc
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/bash/bashrc  ~/.bashrc
 
 
-emacs: emacs/init.el emacs_links
-emacs/init.el: emacs/emacs.org
+emacs: emacs/vanilla/config.el emacs_links
+emacs/vanilla/config.el: emacs/vanilla/config.org
 	$(TANGLE) $<
 emacs_links: force
-	mkdir -p ~/.emacs.d
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/emacs/custom.el       ~/.emacs.d/custom.el
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/emacs/init.el         ~/.emacs.d/init.el
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/emacs/snippets        ~/.emacs.d/snippets
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles-priv/emacs/work.el    ~/.emacs.d/work.el
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/emacs/emacs-profiles.el  ~/.emacs-profiles.el
+	mkdir -p ~/.emacs-vanilla.d
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/emacs/vanilla/custom.el  ~/.emacs-vanilla.d/custom.el
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/emacs/vanilla/config.el  ~/.emacs-vanilla.d/init.el
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/emacs/bookmarks          ~/.emacs-vanilla.d/bookmarks
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/emacs/snippets           ~/.emacs-vanilla.d/snippets
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles-priv/emacs/work.el       ~/.emacs-vanilla.d/work.el
 
 
 git: git/config git_links
@@ -40,8 +42,8 @@ git/config: git/git.org
 	$(TANGLE) $<
 git_links: force
 	mkdir -p $(XDG_CONFIG_HOME)/git
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/git/config            $(XDG_CONFIG_HOME)/git/config
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/git/ignore            $(XDG_CONFIG_HOME)/git/ignore
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/git/config  $(XDG_CONFIG_HOME)/git/config
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/git/ignore  $(XDG_CONFIG_HOME)/git/ignore
 
 
 tmux: tmux/tmux.conf tmux_links
@@ -49,21 +51,21 @@ tmux/tmux.conf: tmux/tmux.org
 	$(TANGLE) $<
 tmux_links: force
 	mkdir -p $(XDG_CONFIG_HOME)/tmux
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/tmux/tmux.conf $(XDG_CONFIG_HOME)/tmux/.tmux.conf
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/tmux/tmux.conf  $(XDG_CONFIG_HOME)/tmux/.tmux.conf
 
 links: force
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles-priv/ssh/config       ~/.ssh/config
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/Xresources            ~/.Xresources
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/ctags                 ~/.ctags
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/fzf/fzf.bash          ~/.fzf.bash
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/scripts/emacs_daemon  ~/bin/emacs_daemon
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/scripts/rgf           ~/bin/rgf
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/scripts/vile          ~/bin/vile
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/scripts/vim_merge     ~/bin/vim_merge
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/unison/dotfiles.prf   ~/.unison/dotfiles.prf
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/vim                   ~/.config/nvim
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/vim                   ~/.vim
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/xinitrc               ~/.xinitrc
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles-priv/ssh/config       ~/.ssh/config
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/Xresources            ~/.Xresources
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/ctags                 ~/.ctags
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/fzf/fzf.bash          ~/.fzf.bash
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/scripts/emacs_daemon  ~/bin/emacs_daemon
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/scripts/rgf           ~/bin/rgf
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/scripts/vile          ~/bin/vile
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/scripts/vim_merge     ~/bin/vim_merge
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/unison/dotfiles.prf   ~/.unison/dotfiles.prf
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/vim                   ~/.config/nvim
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/vim                   ~/.vim
+	@$(MKLINK)  $(XDG_CONFIG_HOME)/dotfiles/xinitrc               ~/.xinitrc
 
 
 test:

@@ -5,8 +5,8 @@
 *sync.ffs_db
 bash/history
 compiz/
-doom-emacs/config.el
-emacs/init.el
+emacs/doom/config.el
+emacs/vanilla/config.el
 vim/autoload/plug*
 vim/bundles
 vim/pack/rc_local
