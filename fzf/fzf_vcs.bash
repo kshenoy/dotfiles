@@ -36,7 +36,7 @@ fzf-git-branches() {                                                            
   git branch -a --color=always | grep -v '/HEAD\s' | sort |
   __fzf-down --ansi --multi --tac --preview-window right:70% \
     --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1) | head -'$LINES |
-  sed 's/^..//' | cut -d' ' -f1 | sed 's#^remotes/##')
+  sed -e 's/^..//' -e 's#^remotes/##' | cut -d' ' -f1 | paste -s -d ' ')
 
   READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$_selected${READLINE_LINE:$READLINE_POINT}"
   READLINE_POINT=$(( READLINE_POINT + ${#_selected} ))
