@@ -48,8 +48,8 @@ tmux: tmux/tmux.conf tmux_links
 tmux/tmux.conf: tmux/tmux.org
 	$(TANGLE) $<
 tmux_links: force
-	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/tmux/tmux.conf ~/.tmux.conf
-
+	mkdir -p $(XDG_CONFIG_HOME)/tmux
+	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles/tmux/tmux.conf $(XDG_CONFIG_HOME)/tmux/.tmux.conf
 
 links: force
 	@$(MKLINK) $(XDG_CONFIG_HOME)/dotfiles-priv/ssh/config       ~/.ssh/config

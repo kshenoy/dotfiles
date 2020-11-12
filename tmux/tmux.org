@@ -187,9 +187,9 @@ Mostly, there's a method to the keybinding madness
 Reload tmux.conf
 #+begin_src conf
   unbind r
-  bind r   source-file ~/.tmux.conf \; refresh-client -S\; display-message " Config reloaded".
+  bind r   source-file ~/.config/tmux/tmux.conf \; refresh-client -S\; display-message " Config reloaded".
   unbind C-r
-  bind C-r source-file ~/.tmux.conf \; refresh-client -S\; display-message " Config reloaded".
+  bind C-r source-file ~/.config/tmux/tmux.conf \; refresh-client -S\; display-message " Config reloaded".
 #+end_src
 
 Remove suspend-client binding
@@ -332,6 +332,17 @@ Kill window without confirmation, kill other windows
 
 #+begin_src conf :tangle no
   bind C-j command-prompt -p "Join pane to:"  "join-pane -t ':%%'"
+#+end_src
+
+** Tmux Plugin Manager
+#+begin_src conf
+  # List of plugins
+  set -g @plugin 'tmux-plugins/tpm'
+  set -g @plugin 'tmux-plugins/tmux-resurrect'
+  set -g @plugin 'tmux-plugins/tmux-continuum'
+
+  # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
+  run '~/.config/tmux/plugins/tpm/tpm'
 #+end_src
 
 * Local variables                                                                         :noexport:
