@@ -328,10 +328,10 @@ _get_compact_pwd_() {                                                           
     _proj_regex='(AS|AH|BR|DG|EL|NV)'
     _proj_lcase_regex=$(tr [A-Z] [a-z] <<< "$_proj_regex")
 
-    if [[ "$_pwd" =~ ^"/proj/ch_func_gen_scratch" ]]; then
-      _pwd="$(sed -re "s:^/proj/ch_func_gen_scratch([0-9])/(${_proj_regex})/:~\2\1_Scratch/:" <<< "$_pwd")"
-    elif [[ "$_pwd" =~ ^/proj/ch_func_dev ]]; then
-      _pwd="$(sed -re "s:^/proj/ch_func_dev([0-9])/(${_proj_regex})/:~\2\1/:" <<< "$_pwd")"
+    if [[ "$_pwd" =~ ^/proj/ch_(legacy_)?func_gen_scratch ]]; then
+      _pwd="$(sed -re "s:^/proj/ch_(legacy_)?func_gen_scratch([0-9])/(${_proj_regex})/:~\3\2_Scratch/:" <<< "$_pwd")"
+    elif [[ "$_pwd" =~ ^/proj/ch_(legacy_)?func_dev ]]; then
+      _pwd="$(sed -re "s:^/proj/ch_(legacy_)?func_dev([0-9])/(${_proj_regex})/:~\3\2/:" <<< "$_pwd")"
       _pwd="$(sed -re "s:^(~${_proj_regex}[0-9])/\w+/${_proj_lcase_regex}[0-9]:\1:" <<< "$_pwd")"
     fi
   fi
