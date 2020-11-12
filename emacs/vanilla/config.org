@@ -1652,8 +1652,11 @@ A way to do it is by writing a function that sets /org-refile-targets/ in a let 
     If NOMOD is non-nil then just return org-refile-targets"
     (if nomod
         org-refile-targets
-      `((nil . (:maxlevel . 1))
-        (,(directory-files-recursively (file-name-directory (buffer-file-name)) "\\.org$") . (:maxlevel . 1)))))
+      `((nil . (:maxlevel . 9))
+        (,(seq-intersection
+           org-agenda-files
+           (directory-files-recursively (file-name-directory (buffer-file-name)) "\\.org$"))
+         . (:maxlevel . 5)))))
 
   (defun my-org-refile (&optional p)
     "Refile the current heading to another location using a custom
@@ -1894,6 +1897,8 @@ https://fuco1.github.io/2017-04-20-Archive-subtrees-under-the-same-hierarchy-as-
 Filter out any unwanted files from the notes that I don't want to add to the agenda
 #+begin_src emacs-lisp
   (setq org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
+                                                 (not (string-match-p ".bak" x))
+                                                 (not (string-match-p "Work/" x))
                                                  (not (string-match-p "Spanish.org" x))))
                                      (directory-files-recursively org-directory "\\.org$")))
 #+end_src
