@@ -147,13 +147,18 @@ Setting this to nil allows a convenient way to select a TODO state and bypass an
               ("CANCEL" :foreground "forest green" bold))))
 #+end_src
 
-** Agenda
+** org-agenda
+#+begin_src emacs-lisp
+(after! org-agenda
+#+end_src
 
 Filter out any unwanted files from the notes that I don't want to add to the agenda
 #+begin_src emacs-lisp
-(setq org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
-                                                    (not (string-match-p "Spanish.org" x))))
-                                   (directory-files-recursively org-directory "\\.org$")))
+  (setq org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
+                                                 (not (string-match-p ".bak" x))
+                                                 (not (string-match-p "Work/" x))
+                                                 (not (string-match-p "Spanish.org" x))))
+                                     (directory-files-recursively org-directory "\\.org$")))
 #+end_src
 
 Make agenda start on a Monday. By default, the agenda only shows the next 7 days. I want to see the previous 7 days as well just in case I missed something. Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
@@ -242,10 +247,14 @@ Restrict agenda to non-work files and filter out any other unwanted files
 #+end_src
 
 #+begin_src emacs-lisp
-  ))))
+  ))))  ;; END of (setq org-agenda-custom-commands
 #+end_src
 
-** Capture
+#+begin_src emacs-lisp
+)  ;; END of (after! org-agenda
+#+end_src
+
+** org-capture
 #+begin_src emacs-lisp
 (setq org-capture-templates
       '(("t" "TODO" entry
@@ -280,4 +289,65 @@ Restrict agenda to non-work files and filter out any other unwanted files
 
 #+begin_src emacs-lisp
 )
+#+end_src
+
+** org-refile
+Resources:
+- [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Aaron Bieber - Organizing Notes with Refile]]
+
+By [[https://www.reddit.com/r/emacs/comments/4366f9/how_do_orgrefiletargets_work/czg008y/][/u/awalker4 on reddit]].
+Show upto 9 levels of headings from the current file and 5 levels of headings from all agenda files
+#+begin_src emacs-lisp
+  (setq org-refile-targets
+        '((nil . (:maxlevel . 9))
+          (org-agenda-files . (:maxlevel . 5))))
+#+end_src
+
+Additionally, I'm using a more selective org-refile-targets which is limited based on the current file.
+The intent is to set org-refile-targets to the org files at or below the hierarchy of the current file.
+A way to do it is by writing a function that sets /org-refile-targets/ in a let binding making it local.
+#+begin_src emacs-lisp
+  (defun my-org-refile-targets (&optional nomod)
+    "Refile the current heading to another location.
+    The other heading can be in the current file or in a file that resides
+    at or anywhere below the directory the current file resides in.
+    The intent is to move to a similar file. If I'm in work-related file,
+    I almost never have to refile something to a personal file.
+
+    If NOMOD is non-nil then just return org-refile-targets"
+    (if nomod
+        org-refile-targets
+      `((nil . (:maxlevel . 9))
+        (,(seq-intersection
+           org-agenda-files
+           (directory-files-recursively (file-name-directory (buffer-file-name)) "\\.org$"))
+         . (:maxlevel . 5)))))
+
+  (defun my-org-refile (&optional p)
+    "Refile the current heading to another location using a custom
+     value of org-refile-targets"
+    (interactive "P")
+    (let ((org-refile-targets (my-org-refile-targets p)))
+      (call-interactively 'org-refile)))
+
+  (defun my-org-refile-copy ()
+    "Refile the current heading to another location using a custom
+     value of org-refile-targets"
+    (interactive)
+    (let ((org-refile-targets (my-org-refile-targets)))
+      (call-interactively 'org-refile-copy)))
+#+end_src
+
+Following are from Aaron Bieber's post [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Organizing Notes with Refile]]
+
+Creating new parents - To create new heading, add =/HeadingName= to the end when using refile (=C-c C-w=)
+#+begin_src emacs-lisp
+  (setq org-refile-allow-creating-parent-nodes 'confirm)
+  (setq org-refile-use-outline-path 'file)
+  (setq org-outline-path-complete-in-steps nil)
+#+end_src
+
+Store the timestamp when an entry is refiled
+#+begin_src emacs-lisp
+  (setq org-log-refile 'time)
 #+end_src
