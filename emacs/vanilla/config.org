@@ -1,4 +1,4 @@
-#+TITLE: emacs configuration
+#+TITLE: Emacs Configuration
 #+PROPERTY: header-args :results output silent :noweb tangle :comments both :mkdirp yes :tangle yes
 #+TODO: TODO(!) FIXME(!) |
 

@@ -2,7 +2,7 @@
 [[ $- == *i* ]] || return
 
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# Kartik Shenoy (kartik.shenoy@amd.com)
+# Kartik Shenoy
 echo "$(tput setaf 2)Sourcing$(tput sgr0) ${BASH_SOURCE[0]} ..."
 
 umask 027

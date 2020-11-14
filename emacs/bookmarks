@@ -2,9 +2,15 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("Emacs Config"
- (filename . "~/.config/dotfiles/emacs/emacs.org")
- (front-context-string . "#+TITLE: emacs c")
- (rear-context-string)
- (position . 1))
+(("Inbox"
+  (filename . "~/Documents/Notes/Inbox.org")
+  (front-context-string)
+  (rear-context-string)
+  (position . 15))
+ ("Emacs Config"
+  (filename . "~/.config/dotfiles/emacs/vanilla/config.org")
+  (position . 1))
+ ("C++"
+  (filename . "~/Documents/Notes/Software/cpp.org")
+  (position . 1))
 )
