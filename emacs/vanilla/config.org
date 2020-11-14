@@ -1392,7 +1392,7 @@ Resources: [[http://doc.norang.ca/org-mode.html][Organize Your Life in Plain Tex
   (setq org-default-notes-file (expand-file-name "Inbox.org" org-directory))
 
   (setq org-use-speed-commands nil)
-  (setq org-startup-align-all-tables t)
+  ;; (setq org-startup-align-all-tables t)  ; Don't enable this as it slows down startup terribly!
   (setq org-tags-column 'auto)
   (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
   (setq org-link-search-must-match-exact-headline nil)
@@ -1631,15 +1631,50 @@ Increase the no. of priority levels from 3 to 5 and change default priority to '
 Resources:
 - [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Aaron Bieber - Organizing Notes with Refile]]
 
-By [[https://www.reddit.com/r/emacs/comments/4366f9/how_do_orgrefiletargets_work/czg008y/][/u/awalker4 on reddit]].
 Show upto 9 levels of headings from the current file and 5 levels of headings from all agenda files
 #+begin_src emacs-lisp
   (setq org-refile-targets
         '((nil . (:maxlevel . 9))
           (org-agenda-files . (:maxlevel . 5))))
 #+end_src
-Each element of the list generates a set of possible targets.
-/nil/ indicates that all the headings in the current buffer will be considered.
+
+Additionally, I'm using a more selective org-refile-targets which is limited based on the current file.
+The intent is to set org-refile-targets to the org files at or below the hierarchy of the current file.
+A way to do it is by writing a function that sets /org-refile-targets/ in a let binding making it local.
+#+begin_src emacs-lisp
+  (defun my-org-refile-targets (&optional nomod)
+    "Refile the current heading to another location.
+    The other heading can be in the current file or in a file that resides
+    at or anywhere below the directory the current file resides in.
+    The intent is to move to a similar file. If I'm in work-related file,
+    I almost never have to refile something to a personal file.
+
+    If NOMOD is non-nil then just return org-refile-targets"
+    (if nomod
+        org-refile-targets
+      `((nil . (:maxlevel . 9))
+        (,(seq-intersection
+           org-agenda-files
+           (directory-files-recursively (file-name-directory (buffer-file-name)) "\\.org$"))
+         . (:maxlevel . 5)))))
+
+  (defun my-org-refile (&optional p)
+    "Refile the current heading to another location using a custom
+     value of org-refile-targets"
+    (interactive "P")
+    (let ((org-refile-targets (my-org-refile-targets p)))
+      (call-interactively 'org-refile)))
+
+  (defun my-org-refile-copy ()
+    "Refile the current heading to another location using a custom
+     value of org-refile-targets"
+    (interactive)
+    (let ((org-refile-targets (my-org-refile-targets)))
+      (call-interactively 'org-refile-copy)))
+
+  (bind-key "C-c C-w" 'my-org-refile      org-mode-map)
+  (bind-key "C-c M-w" 'my-org-refile-copy org-mode-map)
+#+end_src
 
 Following are from Aaron Bieber's post [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Organizing Notes with Refile]]
 
@@ -1653,29 +1688,6 @@ Creating new parents - To create new heading, add =/HeadingName= to the end when
 Store the timestamp when an entry is refiled
 #+begin_src emacs-lisp
   (setq org-log-refile 'time)
-#+end_src
-
-***** TODO Set org-refile targets based on current file
-Why would I want to refile something work-related under Softwares etc.
-A way to do it is by writing a function that sets /org-refile-targets/ in a let binding making it local.
-eg. implementation by abo-abo: [[https://github.com/abo-abo/worf/blob/master/worf.el][worf-refile-other]]
-
-#+begin_src emacs-lisp :tangle no
-  (load-library "find-lisp")
-
-  (defun my-org-refile-targets ()
-    "Refile the current heading to another heading.
-  The other heading can be in the current file or in a file that resides
-  anywhere below the directory the current file resides in.
-
-  The intent is to move to a similar file. If I'm in work-related file,
-  I almost never have to refile something to a personal file."
-    (interactive "p")
-    (let* ((org-refile-targets '((nil . (:maxlevel . 9)))))
-      (org-refile)))
-
-  (bind-key* "C-c C-w" 'my-org-refile)
-  (bind-key "C-c C-w" 'my-org-refile org-mode-map)
 #+end_src
 
 ***** TODO Rice org-refile
@@ -1885,6 +1897,8 @@ https://fuco1.github.io/2017-04-20-Archive-subtrees-under-the-same-hierarchy-as-
 Filter out any unwanted files from the notes that I don't want to add to the agenda
 #+begin_src emacs-lisp
   (setq org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
+                                                 (not (string-match-p ".bak" x))
+                                                 (not (string-match-p "Work/" x))
                                                  (not (string-match-p "Spanish.org" x))))
                                      (directory-files-recursively org-directory "\\.org$")))
 #+end_src
