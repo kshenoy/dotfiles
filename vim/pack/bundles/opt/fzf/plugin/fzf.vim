@@ -23,11 +23,14 @@ let $FZF_DEFAULT_OPTS=substitute($FZF_DEFAULT_OPTS, '--reverse', '--no-reverse',
 " nnoremap <silent> <Plug>my(Finder)o :FzfFunky<CR>
 nnoremap <silent> <Plug>my(Finder)m :FzfMarks<CR>
 nnoremap <silent> <Plug>my(Finder)t :FzfTags<CR>
-nnoremap <silent> <Plug>my(Finder)y :FzfSnippet<CR>
 
 imap <C-X><C-L> <plug>(fzf-complete-line)
 inoremap <expr> <plug>(fzf-complete-file-fd) fzf#vim#complete#path('fd --color=never --follow --hidden --exclude .git --type f')
 " imap <C-X><C-F> <plug>(fzf-complete-file-fd)
+
+"" FZF + UltiSnips
+nnoremap <silent> <Plug>my(Finder)y :FzfSnippet<CR>
+inoremap <C-X><C-G><C-Y> <C-O>:FzfSnippet<CR>
 
 Plug $FZF_PATH
 Plug 'junegunn/fzf.vim'

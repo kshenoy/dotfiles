@@ -15,7 +15,11 @@ execute 'let g:UltiSnipsSnippetDirectories=["' . g:dotvim . '/pack/bundles/opt/U
 let g:UltiSnipsEnableSnipMate=0
 " <C-X> is insert-mode completion so using <C-X><C-Y> feels natural for snippets
 let g:UltiSnipsExpandTrigger='<C-X><C-Y>'
-let g:UltiSnipsListSnippets='<C-X><C-G><C-Y>'
+
+"" I'm using FZF for listing snippets
+" let g:UltiSnipsListSnippets='<C-X><C-G><C-Y>'
+let g:UltiSnipsListSnippets=''
+
 let g:UltiSnipsJumpForwardTrigger='<Tab>'
 let g:UltiSnipsJumpBackwardTrigger='<S-Tab>'
 
