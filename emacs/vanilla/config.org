@@ -340,7 +340,8 @@ We can also put something like this into =~/.Xresources= to enable/disable certa
                 right-margin-width 1
                 uniquify-buffer-name-style 'forward ; Better unique buffer names
                 window-combination-resize t         ; Resize windows proportionally
-                x-stretch-cursor t)                 ; Stretch cursor to the glyph width
+                x-stretch-cursor t                  ; Stretch cursor to the glyph width
+                vc-follow-symlinks t)
 
   (column-number-mode t)               ; Show column no. in mode-line
   (global-visual-line-mode t)          ; Enable editing by visual lines

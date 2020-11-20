@@ -23,14 +23,14 @@ Some functionality uses this to identify you, e.g. GPG configuration, email clie
 ** Better defaults
 #+begin_src emacs-lisp
 (setq-default confirm-kill-emacs 'y-or-n-p  ; Confirm before quitting
-              )
+              vc-follow-symlinks t)
 #+end_src
 
 This determines the style of line numbers in effect. If set to
 - `nil': line numbers are disabled.
 - `'relative - relative line numbers
 #+begin_src emacs-lisp
-(setq display-line-numbers-type 'relative)
+  (setq display-line-numbers-type 'relative)
 #+end_src
 
 ** Fonts
@@ -52,7 +52,7 @@ font string. You generally only need these two:
 There are two ways to load a theme. Both assume the theme is installed and available.
 I can either set `doom-theme' or manually load a theme with the `load-theme' function. This is the default:
 #+begin_src emacs-lisp
-  (setq doom-theme 'doom-one-light)
+  (setq doom-theme 'doom-one)
 #+end_src
 
 ** Keybindings
@@ -79,7 +79,7 @@ Use =org-goto= instead of =semantic-or-imenu= when in org files
 
 Startup options
 #+begin_src emacs-lisp
-(setq org-startup-align-all-tables t
+(setq org-startup-align-all-tables nil  ; This slows down startup of large org files considerably!
       org-startup-folded t
       org-startup-with-inline-images t
       org-agenda-inhibit-startup nil)
@@ -145,6 +145,10 @@ Setting this to nil allows a convenient way to select a TODO state and bypass an
               ("WAIT" :foreground "orange" :weight bold)
               ("DONE" :foreground "forest green" bold)
               ("CANCEL" :foreground "forest green" bold))))
+#+end_src
+
+#+begin_src emacs-lisp
+)  ; END of (after! org)
 #+end_src
 
 ** org-agenda
@@ -235,8 +239,8 @@ All the remaining todos minus the high-priority ones
 #+end_src
 
 #+begin_src emacs-lisp
-  )  ;; END of cmds
-  (  ;; settings
+  )  ; END of cmds
+  (  ; Settings
 #+end_src
 
 Restrict agenda to non-work files and filter out any other unwanted files
@@ -247,16 +251,13 @@ Restrict agenda to non-work files and filter out any other unwanted files
 #+end_src
 
 #+begin_src emacs-lisp
-  ))))  ;; END of (setq org-agenda-custom-commands
-#+end_src
-
-#+begin_src emacs-lisp
-)  ;; END of (after! org-agenda
+  )))))  ; END of (after! org-agenda
 #+end_src
 
 ** org-capture
 #+begin_src emacs-lisp
-(setq org-capture-templates
+(after! org-capture
+  (setq org-capture-templates
       '(("t" "TODO" entry
          (file org-default-notes-file)
          "* TODO %?\n:LOGBOOK:\n- State \"TODO\"       from              %U\n:END:"
@@ -284,70 +285,82 @@ Restrict agenda to non-work files and filter out any other unwanted files
         ("sv" "Vim snippets" entry
          (file "Software/vim.org")
          "* %?"
-         :jump-to-captured t :empty-lines 1)))
-#+end_src
-
-#+begin_src emacs-lisp
-)
+         :jump-to-captured t :empty-lines 1))))
 #+end_src
 
 ** org-refile
+#+begin_src emacs-lisp
+(after! org-refile
+#+end_src
+
 Resources:
 - [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Aaron Bieber - Organizing Notes with Refile]]
 
 By [[https://www.reddit.com/r/emacs/comments/4366f9/how_do_orgrefiletargets_work/czg008y/][/u/awalker4 on reddit]].
 Show upto 9 levels of headings from the current file and 5 levels of headings from all agenda files
 #+begin_src emacs-lisp
-  (setq org-refile-targets
-        '((nil . (:maxlevel . 9))
-          (org-agenda-files . (:maxlevel . 5))))
+(setq org-refile-targets
+      '((nil . (:maxlevel . 9))
+        (org-agenda-files . (:maxlevel . 5))))
 #+end_src
 
 Additionally, I'm using a more selective org-refile-targets which is limited based on the current file.
 The intent is to set org-refile-targets to the org files at or below the hierarchy of the current file.
 A way to do it is by writing a function that sets /org-refile-targets/ in a let binding making it local.
 #+begin_src emacs-lisp
-  (defun my-org-refile-targets (&optional nomod)
-    "Refile the current heading to another location.
+(defun my-org-refile-targets (&optional nomod)
+  "Refile the current heading to another location.
     The other heading can be in the current file or in a file that resides
     at or anywhere below the directory the current file resides in.
     The intent is to move to a similar file. If I'm in work-related file,
     I almost never have to refile something to a personal file.
 
     If NOMOD is non-nil then just return org-refile-targets"
-    (if nomod
-        org-refile-targets
-      `((nil . (:maxlevel . 9))
-        (,(seq-intersection
-           org-agenda-files
-           (directory-files-recursively (file-name-directory (buffer-file-name)) "\\.org$"))
-         . (:maxlevel . 5)))))
+  (if nomod
+      org-refile-targets
+    `((nil . (:maxlevel . 9))
+      (,(seq-intersection
+         org-agenda-files
+         (directory-files-recursively (file-name-directory (buffer-file-name)) "\\.org$"))
+       . (:maxlevel . 5)))))
 
-  (defun my-org-refile (&optional p)
-    "Refile the current heading to another location using a custom
+(defun my-org-refile (&optional p)
+  "Refile the current heading to another location using a custom
      value of org-refile-targets"
-    (interactive "P")
-    (let ((org-refile-targets (my-org-refile-targets p)))
-      (call-interactively 'org-refile)))
+  (interactive "P")
+  (let ((org-refile-targets (my-org-refile-targets p)))
+    (call-interactively 'org-refile)))
 
-  (defun my-org-refile-copy ()
-    "Refile the current heading to another location using a custom
+(defun my-org-refile-copy ()
+  "Refile the current heading to another location using a custom
      value of org-refile-targets"
-    (interactive)
-    (let ((org-refile-targets (my-org-refile-targets)))
-      (call-interactively 'org-refile-copy)))
+  (interactive)
+  (let ((org-refile-targets (my-org-refile-targets)))
+    (call-interactively 'org-refile-copy)))
+#+end_src
+
+#+begin_src emacs-lisp
+(map! :map org-mode-map
+      :localleader
+      :prefix ("r" . "refile")
+      :desc "org-refile" "r" #'my-org-refile
+      :desc "org-refile-copy" "y" #'my-org-refile-copy)
 #+end_src
 
 Following are from Aaron Bieber's post [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Organizing Notes with Refile]]
 
 Creating new parents - To create new heading, add =/HeadingName= to the end when using refile (=C-c C-w=)
 #+begin_src emacs-lisp
-  (setq org-refile-allow-creating-parent-nodes 'confirm)
-  (setq org-refile-use-outline-path 'file)
-  (setq org-outline-path-complete-in-steps nil)
+(setq org-refile-allow-creating-parent-nodes 'confirm)
+(setq org-refile-use-outline-path 'file)
+(setq org-outline-path-complete-in-steps nil)
 #+end_src
 
 Store the timestamp when an entry is refiled
 #+begin_src emacs-lisp
-  (setq org-log-refile 'time)
+(setq org-log-refile 'time)
+#+end_src
+
+#+begin_src emacs-lisp
+)  ; END of (after! org-refile
 #+end_src
