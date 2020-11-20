@@ -1,6 +1,6 @@
 #!/bin/bash -f
 #=======================================================================================================================
-# Helper                                                                                                            {{{1
+# Helper
 #=======================================================================================================================
 # Foreground/Background Color Codes
   # 30/40 : black
@@ -34,108 +34,11 @@
 echo "$(tput setaf 2)Sourcing$(tput sgr0) ${BASH_SOURCE[0]} ..."
 
 # This should always point to whatever prompt is desired.
-PROMPT_COMMAND=_setprompt_sjlmod_
+PROMPT_COMMAND=setprompt
 
 
 #=======================================================================================================================
-# Mod of Phil's ZSH Prompt                                                                                          {{{1
-#=======================================================================================================================
-_setprompt_philmod_() {
-  ###
-  # Need this so the prompt will work.
-  #setopt PROMPT_SUBST
-
-
-  ###
-  # See if we can use colors.
-  autoload colors zsh/terminfo
-  if [[ "$terminfo[colors]" -ge 8 ]]; then
-      colors
-  fi
-  blink=$'\e[5m'
-  blink_off=$'\e[25m'
-    normal="%{$terminfo[sgr0]%}"
-
-
-    ###
-    # See if we can use extended characters to look nicer.
-    typeset -A altchar
-    set -A altchar ${(s..)terminfo[acsc]}
-    PR_SET_CHARSET="%{$terminfo[enacs]%}"
-    PR_SHIFT_IN="%{$terminfo[smacs]%}"      # Enter extended character input mode
-    PR_SHIFT_OUT="%{$terminfo[rmacs]%}"     # Exit extended character input mode
-    PR_HBAR=${altchar[q]:--}
-    PR_ULCORNER=${altchar[l]:--}
-    PR_LLCORNER=${altchar[m]:--}
-    PR_LRCORNER=${altchar[j]:--}
-    PR_URCORNER=${altchar[k]:--}
-
-
-    ###
-    # Decide if we need to set titlebar text.
-    case $TERM in
-    xterm*)
-      PR_TITLEBAR=$'%{\e]0;%n@%m: %~\a%}'
-      ;;
-    *)
-      PR_TITLEBAR=''
-      ;;
-    esac
-
-
-    ###
-    # Finally, the prompt.
-    PROMPT='$PR_SET_CHARSET${(e)PR_TITLEBAR}\
-%{$fg_no_bold[white]%}$PR_SHIFT_IN$PR_ULCORNER$PR_SHIFT_OUT\
-%{$fg_bold[black]%}(%{$fg_no_bold[green]%}%h%{$fg_bold[black]%})\
-%{$fg_no_bold[white]%}$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
-%{$fg_bold[black]%}(%{%(?.$fg_bold[green].$fg_bold[red])%}%$PR_PWDLEN<...<${modPWD}%<<%{$fg_bold[black]%})\
-%{$fg_no_bold[white]%}$PR_SHIFT_IN${(e)PR_FILLBAR}$PR_URCORNER$PR_SHIFT_OUT\
-
-$PR_SHIFT_IN$PR_LLCORNER$PR_HBAR$PR_SHIFT_OUT\
-%(?.%{$fg_bold[green]%}(^_^%).%{$fg_bold[red]%}(>_<%)) \
-%{%(!.$fg_bold[red].$fg_bold[white])%}%#$normal '
-
-    RPROMPT=' %{$fg_bold[black]%}(%{$fg_no_bold[yellow]%}%D{%H:%M %b %d, %a}%{$fg_bold[black]%})\
-%{$fg_no_bold[white]%}$PR_SHIFT_IN$PR_LRCORNER$PR_SHIFT_OUT$normal'
-
-    PS2='%{$fg_no_bold[white]%}%_ >$normal '
-}
-
-
-
-#=======================================================================================================================
-# Misc Prompts                                                                                                      {{{1
-#=======================================================================================================================
-_setprompt_misc_() {
-  setopt PROMPT_SUBST
-  autoload colors zsh/terminfo
-  if [[ "$terminfo[colors]" -ge 8 ]]; then
-    colors
-  fi
-
-  blink=$'\e[5m'
-  blink_off=$'\e[25m'
-  normal="%{$terminfo[sgr0]%}"
-
-  # PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-  #PS1="\`if [ \$? = 0 ]; then echo \[\e[32m\]^_^\[\e[0m\]; else echo \[\e[31m\]@_@\[\e[0m\]; fi\`[!\!] \W/$ "
-  #PS1="[\!] \W/$ "
-  #PS1="\[\e[0;33m\][!\!]\`if [[ \$? = "0" ]]; then echo "\\[\\e[32m\\]"; else echo "\\[\\e[31m\\]"; fi\` \`if [[ `pwd|wc -c` -gt 18 ]]; then echo "\\W"; else echo "\\w"; fi\`/\$\[\e[0m\] "
-  #PS1="\[\e[0;33m\][!\!]\[\e[0m\] \`if [ \$? = 0 ]; then echo '\[\e[1;32m\]\w \n^_^\[\e[0m\]'; else echo '\[\e[1;31m\]\w\n@_@\[\e[0m\]'; fi\` $ "
-  #PS1="\[\e[1;30m\](\[\e[0;33m\]!\!\[\e[1;30m\])-(\`if [ \$? = 0 ]; then echo '\[\e[1;32m\]\w\[\e[1;30m\])\n\[\e[1;32m\]^_^'; else echo '\[\e[1;31m\]\w\[\e[1;30m\])\n\[\e[1;31m\]@_@'; fi\` \[\e[1;30m\]$ \[\e[0m\]"
-  # PS1="\n\[\e[0;37m\](\[\e[0;33m\]!\!\[\e[0;37m\])-(\`if [ \$? = 0 ]; then echo '\[\e[1;32m\]\w\[\e[0;37m\])\n(\[\e[1;32m\]^_^\[\e[0;37m\])'; else echo '\[\e[1;31m\]\w\[\e[0;37m\])\n(\[\e[1;31m\]@_@\[\e[0;37m\])'; fi\` \[\e[0;37m\]$ \[\e[0m\]"
-  #PS1="${bg_red_fg_white_blink}%(t.DING!.)%(30t.DONG!.)${att_normal}${fg_dgray}[${fg_brown}%h${fg_dgray}]-(%(?.${fg_lgreen}.${fg_lred})%~${fg_dgray})${fg_lgray}%# ${att_normal}"
-  #PS1="[%(t.${blink}%{${bg[red]}${fg_no_bold[white]}%}DING!${normal}.%(30t.${blink}%{${bg[red]}${fg_no_bold[white]}%}DONG!${normal}.%{$fg_bold[yellow]%}%D{%H:%M}))${normal}] "
-  #PS1='[%h]-($modPWD)$ '
-  # RPS1=" [%h]"
-}
-
-
-#=======================================================================================================================
-# Mod of SJL's prompt                                                                                               {{{1
-#=======================================================================================================================
-#
+# Mod of SJL's prompt
 #  SJL's Prompt
 #  Credit for ideas/info: Phil!'s ZSH Prompt, Bashish, TERMWIDE prompt
 #                         Bash Prompt Howto
@@ -152,7 +55,7 @@ shopt -s checkwinsize
 
 ## This function is run at every prompt update, keeping our variables updated.
 ## Bash's PROMPT_COMMAND option handles this (see end of this function).
-_setprompt_sjlmod_() {
+setprompt() {
 
   # This has to be placed first
   local _exit_status="$?"
@@ -313,10 +216,10 @@ _setprompt_sjlmod_() {
 
 
 #=======================================================================================================================
-# Helper functions                                                                                                  {{{1
+# Helper functions
 #=======================================================================================================================
 unset -f _get_compact_pwd_
-_get_compact_pwd_() {                                                                                             # {{{2
+_get_compact_pwd_() {                                                                                             #
   # Contract the following:
   #   /proj/ch_func_dev{1:0}/ASPEN_HIGHLANDS -> ~AH{1:0}
   # Contract more if it's my directory
@@ -324,15 +227,14 @@ _get_compact_pwd_() {                                                           
   if [[ -n "$HOME" ]] && [[ "$_pwd" =~ ^"$HOME" ]]; then
     _pwd=${_pwd/#$HOME/\~};
   else
-    _pwd="$(sed -re 's/ASPEN_HIGHLANDS/AH/i' -e 's/ASPEN/AS/i' -e 's/BRECKENRIDGE/BR/i' -e 's/NV_EL3/NV/i' <<< "$_pwd")"
+    _pwd="$(sed -re 's/ASPEN_HIGHLANDS/AH/i' -e 's/ASPEN/AS/i' -e 's/BRECKENRIDGE/BR/i' <<< "$_pwd")"
     _proj_regex='(AS|AH|BR|DG|EL|NV)'
     _proj_lcase_regex=$(tr [A-Z] [a-z] <<< "$_proj_regex")
 
     if [[ "$_pwd" =~ ^/proj/ch_(legacy_)?func_gen_scratch ]]; then
       _pwd="$(sed -re "s:^/proj/ch_(legacy_)?func_gen_scratch([0-9])/(${_proj_regex})/:~\3\2_Scratch/:" <<< "$_pwd")"
     elif [[ "$_pwd" =~ ^/proj/ch_(legacy_)?func_dev ]]; then
-      _pwd="$(sed -re "s:^/proj/ch_(legacy_)?func_dev([0-9])/(${_proj_regex})/:~\3\2/:" <<< "$_pwd")"
-      _pwd="$(sed -re "s:^(~${_proj_regex}[0-9])/\w+/${_proj_lcase_regex}[0-9]:\1:" <<< "$_pwd")"
+      _pwd="$(sed -re "s/.*$(whoami)\//~/" <<< "$_pwd")"
     fi
   fi
   echo $_pwd
