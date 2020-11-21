@@ -264,6 +264,12 @@ export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
 
 export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgreprc
 
+export ENHANCD_COMMAND="enhancd"
+export ENHANCD_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/enhancd"
+export ENHANCD_DOT_ARG="..."
+export ENHANCD_FILTER="fzf"
+export ENHANCD_HYPHEN_ARG="="
+
 for i in \
   ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/bashrc-func          \
   ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/bashrc-prompt        \

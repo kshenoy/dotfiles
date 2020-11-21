@@ -1,24 +1,4 @@
 #=======================================================================================================================
-fzf-recent-dirs() {                                                                                                #{{{1
-  local out=($(command dirs -p | fzf --expect=alt-c "$@"))
-
-  case $(head -n1 <<< "$out") in
-    "alt-c")
-      # echo "cd ${out[1]}"
-      echo "cd $(sed 's:~:/home/kshenoy:' <<< ${out[1]})"
-      eval "cd $(sed 's:~:/home/kshenoy:' <<< ${out[1]})"
-      ;;
-    *)
-      local dir="${out[0]}"
-      READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}${dir}${READLINE_LINE:$READLINE_POINT}"
-      READLINE_POINT=$(( READLINE_POINT + ${#dir} ))
-      ;;
-  esac
-  # echo "Key=${key}, Dir=${dir}"
-}
-
-
-#=======================================================================================================================
 fzf-lsf-bjobs() {                                                                                                  #{{{1
   local selected=$(lsf_bjobs -w |
     FZF_DEFAULT_OPTS="--header-lines=1 $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
@@ -156,8 +136,6 @@ if [[ -o emacs ]]; then                                                         
   # cd into the selected directory
   # Unbind the default one first and then create new bindings
   bind '"\ec": nop'
-  bind '"\C-f\C-d": " \C-e\C-u`__fzf_cd__`\e\C-e\er\C-m"'
-  bind -x '"\C-f\C-g": "fzf-recent-dirs"'
 
   bind -x '"\C-f\C-l": "fzf-lsf-bjobs"'
 

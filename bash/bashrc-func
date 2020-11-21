@@ -11,6 +11,36 @@ _src_dir=$(dirname ${BASH_SOURCE[0]})
 # Misc utils                                                                                                        {{{1
 for i in $_src_dir/utils/*; do . "$i"; done
 
+
+# enhancd                                                                                                           {{{1
+unalias cd
+unset -f cd
+cd() {
+  if ! hash __enhancd::cd 2> /dev/null; then
+    command cd "$@"
+    return
+  fi
+
+  local _args=("$@")
+  if (( $# == 1 )); then
+    if [[ "$1" == "." ]]; then
+      # To prevent passing an empty string to enhancd when Ctrl+c is pressed
+      local _dir="$(__fzf_cd__)"
+      [[ -z "$_dir" ]] && return;
+      _args=("$_dir")
+    elif [[ "$1" == "!" ]]; then
+      if git rev-parse --is-inside-work-tree > /dev/null; then
+        _args=("$(git rev-parse --show-toplevel)")
+      elif [[ -n "$REPO_PATH" ]]; then
+        _args=("$REPO_PATH")
+      fi
+    fi
+  fi
+
+  enhancd "${_args[@]}"
+}
+
+
 # TMUX                                                                                                              {{{1
 [[ -f $_src_dir/../tmux/tmux_scripts ]] && . $_src_dir/../tmux/tmux_scripts
 
@@ -45,13 +75,6 @@ duh() { du -h "$@" | sort -rh; }
 # Silent push and popd. Use dirs -v for vertical dirstack                                                           {{{1
 pushd() { command pushd "$@" > /dev/null ; }
 popd()  { command popd  "$@" > /dev/null ; }
-
-# Intelligent ..                                                                                                    {{{1
-..() {
-  local _levels=${1:-1};
-  cd ..${_levels}
-}
-
 
 # Function to create new dir(s) and enter it (last directory if multiple arguments are given)                       {{{1
 unset -f mcd
