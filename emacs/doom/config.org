@@ -7,7 +7,7 @@ Some additional functions/macros to help configure Doom:
 - =load!= for loading external *.el files relative to this one
 - =use-package!= for configuring packages
 - =after!= for running code after a package has loaded
-- =add-load-path!= for adding directories to the `load-path', relative to this file. Emacs searches the `load-path' when you load packages with `require' or `use-package'.
+- =add-load-path!= for adding directories to the =load-path=, relative to this file. Emacs searches the =load-path= when you load packages with =require= or =use-package=.
 - =map!= for binding new keys
 
 To get information about any of these functions/macros, move the cursor over the highlighted symbol at press =K= (non-evil users must press =C-c c k=). This will open documentation for it, including demos of how they are used.
@@ -27,30 +27,31 @@ Some functionality uses this to identify you, e.g. GPG configuration, email clie
 #+end_src
 
 This determines the style of line numbers in effect. If set to
-- `nil': line numbers are disabled.
-- `'relative - relative line numbers
+- =nil=: line numbers are disabled.
+- ='relative= - relative line numbers
 #+begin_src emacs-lisp
   (setq display-line-numbers-type 'relative)
 #+end_src
 
-** Fonts
-Doom exposes five (optional) variables for controlling fonts in Doom. Here
-are the three important ones:
-
-- `doom-font'
-- `doom-variable-pitch-font'
-- `doom-big-font' -- used for `doom-big-font-mode'; use this for presentations or streaming.
-
-They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
-font string. You generally only need these two:
 #+begin_src emacs-lisp
-  (setq doom-font "Iosevka-10"
-        doom-variable-pitch-font "Iosevka-10")
+(setq bookmark-default-file (concat doom-private-dir "bookmarks"))
+#+end_src
+
+** Fonts
+Doom exposes five (optional) variables for controlling fonts in Doom. The three important ones are
+- =doom-font=
+- =doom-variable-pitch-font=
+- =doom-big-font= -- used for =doom-big-font-mode=; use this for presentations or streaming.
+
+They all accept either a font-spec, font string ("Input Mono-12"), or xlfd font string. Generally only two are needed
+#+begin_src emacs-lisp
+(setq doom-font "Iosevka-11"
+      doom-variable-pitch-font "Iosevka-11")
 #+end_src
 
 ** Themes
 There are two ways to load a theme. Both assume the theme is installed and available.
-I can either set `doom-theme' or manually load a theme with the `load-theme' function. This is the default:
+I can either set =doom-theme= or manually load a theme with the =load-theme= function. This is the default:
 #+begin_src emacs-lisp
   (setq doom-theme 'doom-one)
 #+end_src
@@ -59,16 +60,40 @@ I can either set `doom-theme' or manually load a theme with the `load-theme' fun
 
 Use =org-goto= instead of =semantic-or-imenu= when in org files
 #+begin_src emacs-lisp
-(defun my-org-goto-or-semantic-or-imenu ()
-  "Use mode-specific commands if available else fallback to counsel-semantic-or-imenu"
-  (interactive)
-  (if (string= major-mode "org-mode")
-      (counsel-org-goto)
-    (counsel-semantic-or-imenu)))
+(after! (counsel org)
+  (defun my-org-goto-or-semantic-or-imenu ()
+    "Use mode-specific commands if available else fallback to counsel-semantic-or-imenu"
+    (interactive)
+    (if (string= major-mode "org-mode")
+        (counsel-org-goto)
+      (counsel-semantic-or-imenu))))
 
-(map! :after counsel
+(map! :after (counsel org)
       :map doom-leader-search-map
       :desc "org-goto-or-semantic-or-imenu" "i" #'my-org-goto-or-semantic-or-imenu)
+#+end_src
+
+#+begin_src emacs-lisp
+(map! :after evil
+      :map evil-normal-state-map
+      :desc "evil-redo" "U" #'evil-redo)
+#+end_src
+
+* evil
+Move by visual lines
+#+begin_src emacs-lisp
+(map! :after evil
+      :map evil-motion-state-map
+      :desc "evil-next-visual-line"     "j"   #'evil-next-visual-line
+      :desc "evil-next-line"            "g j" #'evil-next-line
+      :desc "evil-previous-visual-line" "k"   #'evil-previous-visual-line
+      :desc "evil-previous-line"        "g k" #'evil-previous-line
+      :desc "evil-end-of-visual-line"   "$"   #'evil-end-of-visual-line
+      :desc "evil-end-of-line"          "g $" #'evil-end-of-line
+      :desc "evil-beginning-of-line"    "g 0" #'evil-beginning-of-line)
+
+(after! evil-maps
+  (evil-redirect-digit-argument evil-motion-state-map "0" 'evil-beginning-of-visual-line))
 #+end_src
 
 * Org
@@ -90,9 +115,11 @@ Prettify
 (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
 #+end_src
 
+Specify locations of files
 #+begin_src emacs-lisp
 (setq org-directory "~/Documents/Notes"
-      org-default-notes-file (expand-file-name "Inbox.org" org-directory))
+      org-default-notes-file (expand-file-name "Inbox.org" org-directory)
+      org-id-locations-file (expand-file-name ".org-id-locations" doom-private-dir))
 #+end_src
 
 ** Source blocks
@@ -363,4 +390,13 @@ Store the timestamp when an entry is refiled
 
 #+begin_src emacs-lisp
 )  ; END of (after! org-refile
+#+end_src
+
+** org-id
+
+Create an ID when storing the link. Curiously this also causes =org-store-link= to store IDs by default
+Also note that setting this to true will create an ID for every entry which could become expensive when =org-id-track-globally= is enabled
+
+#+begin_src emacs-lisp
+(setq org-id-link-to-org-use-id 'create-if-interactive)
 #+end_src
