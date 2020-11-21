@@ -2,19 +2,19 @@
 
 # Collection of utilities to deal with all VCS related stuff
 
-vcs__is_in_git_repo() {                                                                                            #{{{1
+vcs::is_in_git_repo() {
   git rev-parse HEAD &> /dev/null
 }
 
-vcs__is_in_mercurial_repo() {                                                                                      #{{{1
-  hg status &> /dev/null
-}
-
-vcs__is_in_perforce_repo() {                                                                                       #{{{1
+vcs::is_in_perforce_repo() {
   p4 info &> /dev/null
 }
 
-vcs__get_type() {                                                                                                  #{{{1
+vcs::is_in_repo() {
+  vcs::is_in_git_repo || vcs::is_in_perforce_repo
+}
+
+vcs::get_type() {
   # Description: Check if specified directory is under a Version-controlled system
   # Arguments: 1 - Variable to return VCS type
   #            2 - Directory to check. If skipped, defaults to PWD
@@ -24,11 +24,9 @@ vcs__get_type() {                                                               
     command cd $1
   fi
 
-  if vcs__is_in_git_repo; then
+  if vcs::is_in_git_repo; then
     echo "git"
-  elif vcs__is_in_mercurial_repo; then
-    echo "hg"
-  elif vcs__is_in_perforce_repo; then
+  elif vcs::is_in_perforce_repo; then
     echo "p4"
   else
     # No VCS. Return empty string
@@ -40,13 +38,13 @@ vcs__get_type() {                                                               
   fi
 }
 
-vcs__get_branch() {                                                                                                #{{{1
+vcs::get_branch() {
   # Description: If PWD is under a VCS, return the branch. If not, return an empty string
   # Arguments:
   # - $1 (optional): Use that as the VCS type instead of calculating it
 
-  local _vcs_type=${1-$(vcs__get_type)}
-  #echo "DEBUG: VCS Type=$_vcs_type (vcs__get_branch)"
+  local _vcs_type=${1-$(vcs::get_type)}
+  #echo "DEBUG: VCS Type=$_vcs_type (vcs::get_branch)"
 
   if [[ $_vcs_type == "git" ]]; then
     git symbolic-ref --short HEAD 2> /dev/null
@@ -59,14 +57,14 @@ vcs__get_branch() {                                                             
   fi
 }
 
-vcs__get_status() {                                                                                                #{{{1
+vcs::get_status() {
   # Description: Get the status of the VCS - works only for git at the moment
   # Arguments:
   # - $1 (optional): Use as the VCS type instead of calculating it
   # - $2 (optional): Use as the VCS branch instead of calculating it
 
-  local _vcs_type=${1-$(vcs__get_type)}
-  local _vcs_branch=${2-$(vcs__get_branch $_vcs_type)}
+  local _vcs_type=${1-$(vcs::get_type)}
+  local _vcs_branch=${2-$(vcs::get_branch $_vcs_type)}
 
   if [[ "$_vcs_type" == "git" ]]; then
     if $(echo "$(git log origin/$_vcs_branch..HEAD 2> /dev/null)" | grep '^commit' &> /dev/null); then
@@ -76,5 +74,15 @@ vcs__get_status() {                                                             
     else
       echo "committed"
     fi
+  fi
+}
+
+vcs::get_root() {
+  if vcs::is_in_git_repo; then
+    echo "$(git rev-parse --show-toplevel)"
+  elif vcs::is_in_perforce_repo; then
+    echo "$REPO_PATH"
+  else
+    echo ""
   fi
 }

@@ -56,7 +56,6 @@ else
 fi
 command rm -i ~/.bash_history 2> /dev/null
 
-# enhancd ()
 # Create a pipe. Woo!
 if [[ ! -p ~/pipe ]]; then
   mkfifo ~/pipe

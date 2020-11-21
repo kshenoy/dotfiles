@@ -108,8 +108,8 @@ __setprompt() {
   local _host="$(hostname) "
 
   # VCS specific
-  local _vcs_type=$(vcs__get_type)
-  local _vcs_branch=$(vcs__get_branch ${_vcs_type})
+  local _vcs_type=$(vcs::get_type)
+  local _vcs_branch=$(vcs::get_branch ${_vcs_type})
   local _vcs_sep=" on "
 
   if [[ $_vcs_type == "git" ]]; then
@@ -166,7 +166,7 @@ __setprompt() {
 
   # Colorize vcs:
   if [[ $_vcs_type == "git" ]]; then
-    local _vcs_status=$(vcs__get_status ${_vcs_type} ${_vcs_branch})
+    local _vcs_status=$(vcs::get_status ${_vcs_type} ${_vcs_branch})
     if [[ "${_vcs_status}" == "staged" ]]; then
       _vcs_branch="${_fg_yellow}${_vcs_branch}${_reset}"
     elif [[ "${_vcs_status}" == "modified" ]]; then

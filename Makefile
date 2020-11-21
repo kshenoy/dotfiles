@@ -10,7 +10,7 @@ MKLINK := ln -svTf
 # I have two things per target that I want to do
 # - the tangling which I can do as a pattern and,
 # - other recipes that are specific to the target
-all: bash emacs enhancd git tmux links
+all: bash emacs git tmux links
 
 
 clean:

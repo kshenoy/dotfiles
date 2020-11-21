@@ -1,6 +1,6 @@
-# bashrc file for home
+## bashrc file for home
 
-# Aliases
+## Aliases
 alias gp=globalprotect
 amd_vpn() {
   # if command grep Connected <<< $(globalprotect show --status); then
@@ -14,7 +14,7 @@ amd_vpn() {
 
 alias fd=fdfind
 
-# fzf: https://github.com/junegunn/fzf
+## fzf: https://github.com/junegunn/fzf
 [[ -d /opt/fzf ]] && export FZF_PATH=/opt/fzf
 
 ## Specific to root
@@ -28,7 +28,7 @@ __histfile_perm_update__() {
 }
 trap __histfile_perm_update__ EXIT
 
-# When leaving the console, clear the screen to increase privacy
+## When leaving the console, clear the screen to increase privacy
 if [[ "$SHLVL" = 1 ]]; then
   [[ -x /usr/bin/clear_console ]] && /usr/bin/clear_console -q
 fi

@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+#
+# This is a wrapper around enhancd (https://github/b4b4r07/enhancd) and adds the following
+# cd . [ARG]  Lists the subfolders recursively. If ARG is provided, shows only directories with ARG in the name
+# cd !        Jumps to the Git root > Perforce root > HOME
+
+## Provide some default aliases
+alias cd=pushd
+alias ..='cd ..'
+
+if [[ ! -d $HOME/.local/install/enhancd ]]; then
+  return
+fi
+
+export ENHANCD_COMMAND="enhancd"
+export ENHANCD_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/enhancd"
+export ENHANCD_DOT_ARG="..."
+export ENHANCD_FILTER="fzf"
+export ENHANCD_HYPHEN_ARG="="
+. $HOME/.local/install/enhancd/init.sh
+
+if ! hash __enhancd::cd; then
+  return
+fi
+
+unalias cd
+unset -f cd
+cd() {
+  if [[ "$1" == '.' ]]; then
+    $(FZF_ALT_C_OPTS="${FZF_ALT_C_OPTS}${2:+ --exact --query=$2}" __fzf_cd__)
+
+  elif [[ "$1" == '!' ]]; then
+    if vcs::is_in_git_repo > /dev/null; then
+      enhancd "$(vcs::get_root)"
+    else
+      enhancd "$HOME"
+    fi
+  else
+    enhancd "$@"
+  fi
+}

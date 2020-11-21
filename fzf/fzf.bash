@@ -31,4 +31,6 @@ if hash fd 2> /dev/null || hash fdfind 2> /dev/null; then
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 fi
 export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --ansi --select-1 --exit-0 --inline-info --reverse --bind=ctrl-n:down,ctrl-p:up"
+export FZF_ALT_C_OPTS="$FZF_ALT_C_OPTS --tiebreak=length,end"
 # export FZF_CTRL_T_OPTS='--expect=alt-v,alt-e,alt-c'
+export FZF_CTRL_T_OPTS="$FZF_CTRL_T_OPTS --tiebreak=length,end"
