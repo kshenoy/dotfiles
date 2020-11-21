@@ -71,7 +71,11 @@ alias df='df -h'
 alias pppath='tr ":" "\n" <<< $PATH'
 alias clnpath='export PATH=$(tr ":" "\n" <<< $PATH | perl -ne "print unless \$seen{\$_}++" | paste -s -d":")'
 
-alias C=cat
+if hash bat 2> /dev/null; then
+  alias C='bat --paging=never --style=numbers,grid'
+else
+  alias C=cat
+fi
 alias P=$PAGER
 alias H=head
 alias T='tail -n 50'
@@ -86,7 +90,7 @@ alias k9='kill -9'
 # Search related
 if ! hash fd 2> /dev/null; then
   alias fn='find . -name'
-  alias fdd='find . -type d -name'
+  alias fnd='find . -type d -name'
 fi
 
 psgrep() {

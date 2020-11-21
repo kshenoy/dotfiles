@@ -1394,7 +1394,7 @@ Resources: [[http://doc.norang.ca/org-mode.html][Organize Your Life in Plain Tex
 
   (setq org-use-speed-commands nil)
   ;; (setq org-startup-align-all-tables t)  ; Don't enable this as it slows down startup terribly!
-  (setq org-tags-column 'auto)
+  (setq org-tags-column -100)
   (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
   (setq org-link-search-must-match-exact-headline nil)
   (setq org-startup-with-inline-images t)
@@ -1533,7 +1533,7 @@ For org-version >= 9.2, we have to use this. =C-c C-,= was also added in 9.2 and
     If called with a prefix, only align tags"
     (interactive "P")
     (unless p (org-set-tags-command))
-    (org-align-all-tags))
+    (org-align-tags))
 #+end_src
 
 ***** TODO Use Hydra to select between adding, removing and aligning tags

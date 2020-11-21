@@ -34,7 +34,7 @@
 echo "$(tput setaf 2)Sourcing$(tput sgr0) ${BASH_SOURCE[0]} ..."
 
 # This should always point to whatever prompt is desired.
-PROMPT_COMMAND=setprompt
+PROMPT_COMMAND=__setprompt
 
 
 #=======================================================================================================================
@@ -55,7 +55,7 @@ shopt -s checkwinsize
 
 ## This function is run at every prompt update, keeping our variables updated.
 ## Bash's PROMPT_COMMAND option handles this (see end of this function).
-setprompt() {
+__setprompt() {
 
   # This has to be placed first
   local _exit_status="$?"
@@ -90,7 +90,7 @@ setprompt() {
   fi
 
   # The info variables
-  local _pwd=$(_get_compact_pwd_)
+  local _pwd=$(__get_compact_pwd)
 
   #for k in "${!dir_alias[@]}"; do
     #echo "$k => ${dir_alias[$k]}"
@@ -218,24 +218,11 @@ setprompt() {
 #=======================================================================================================================
 # Helper functions
 #=======================================================================================================================
-unset -f _get_compact_pwd_
-_get_compact_pwd_() {                                                                                             #
-  # Contract the following:
-  #   /proj/ch_func_dev{1:0}/ASPEN_HIGHLANDS -> ~AH{1:0}
-  # Contract more if it's my directory
+unset -f __get_compact_pwd
+__get_compact_pwd() {
   local _pwd=${PWD}
   if [[ -n "$HOME" ]] && [[ "$_pwd" =~ ^"$HOME" ]]; then
     _pwd=${_pwd/#$HOME/\~};
-  else
-    _pwd="$(sed -re 's/ASPEN_HIGHLANDS/AH/i' -e 's/ASPEN/AS/i' -e 's/BRECKENRIDGE/BR/i' <<< "$_pwd")"
-    _proj_regex='(AS|AH|BR|DG|EL|NV)'
-    _proj_lcase_regex=$(tr [A-Z] [a-z] <<< "$_proj_regex")
-
-    if [[ "$_pwd" =~ ^/proj/ch_(legacy_)?func_gen_scratch ]]; then
-      _pwd="$(sed -re "s:^/proj/ch_(legacy_)?func_gen_scratch([0-9])/(${_proj_regex})/:~\3\2_Scratch/:" <<< "$_pwd")"
-    elif [[ "$_pwd" =~ ^/proj/ch_(legacy_)?func_dev ]]; then
-      _pwd="$(sed -re "s/.*$(whoami)\//~/" <<< "$_pwd")"
-    fi
   fi
   echo $_pwd
 }
