@@ -257,12 +257,6 @@ export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
 eval "$($BASE16_SHELL/profile_helper.sh)"
 base16_solarized-light
 
-if hash fd 2> /dev/null; then
-  export FD_CMD=fd
-elif hash fdfind 2> /dev/null; then
-  export FD_CMD=fdfind
-fi
-
 export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgreprc
 
 for i in \
