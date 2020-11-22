@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # bashrc file for home-wsl
 
 # Start by grabbing all the regular settings that I use at home
