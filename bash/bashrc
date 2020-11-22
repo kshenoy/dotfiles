@@ -261,6 +261,11 @@ base16_solarized-light
 # Thus, I "set" it first before sourcing fzf.bash which appends to it
 export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
 [[ -n "$BASE16_THEME" ]] && source "${BASE16_FZF}/bash/base16-${BASE16_THEME}.config"
+if hash fd 2> /dev/null; then
+  export FD_CMD=fd
+elif hash fdfind 2> /dev/null; then
+  export FD_CMD=fdfind
+fi
 
 export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgreprc
 

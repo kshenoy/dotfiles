@@ -88,7 +88,9 @@ alias k9='kill -9'
 
 #=================
 # Search related
-if ! hash fd 2> /dev/null; then
+if [[ -n "$FD_CMD" ]]; then
+  alias fd=$FD_CMD
+else
   alias fn='find . -name'
   alias fnd='find . -type d -name'
 fi
