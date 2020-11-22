@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 #
 # This is a wrapper around enhancd (https://github/b4b4r07/enhancd) and adds the following
-# cd . [ARG]  Lists the subfolders recursively. If ARG is provided, shows only directories with ARG in the name
-# cd !        Jumps to the Git root > Perforce root > HOME
+# cd **some**path**to**search  -  Search dirs that match the glob '*some*path*to*search'
+# cd . [ARG]                   -  Lists subfolders recursively.
+#                                 If ARG is provided, shows only directories with ARG in the name
+# cd !                         -  Jumps to the Git root > Perforce root > HOME
 
 ## Provide some default aliases
 alias cd=pushd
@@ -26,16 +28,38 @@ fi
 unalias cd
 unset -f cd
 cd() {
-  if [[ "$1" == '.' ]]; then
-    $(FZF_ALT_C_OPTS="${FZF_ALT_C_OPTS}${2:+ --exact --query=$2}" __fzf_cd__)
+  case "$1" in
+    *\*\**)
+      # Split $1 about the first ** into 'src' and 'match'.
+      # Find under 'src' for all dirs that match the glob expr 'match'
+      local _path=${1%%\*\**}; _path=${_path:-.}
+      local _pattern="*$(tr -s '*' <<< ${1#*\*\*})*"
 
-  elif [[ "$1" == '!' ]]; then
-    if vcs::is_in_git_repo > /dev/null; then
-      enhancd "$(vcs::get_root)"
-    else
-      enhancd "$HOME"
-    fi
-  else
-    enhancd "$@"
-  fi
+      if [[ -n "$FD_CMD" ]]; then
+        $(FZF_ALT_C_COMMAND="fd --follow --type=d --full-path --glob '${_pattern}' ${_path}" __fzf_cd__)
+      else
+        $(FZF_ALT_C_COMMAND="find ${_path} -type d -path '${_pattern}'" __fzf_cd__)
+      fi
+      ;;
+
+
+    '.')
+      $(FZF_ALT_C_OPTS="${FZF_ALT_C_OPTS}${2+ --exact --query=$2}" __fzf_cd__)
+      ;;
+
+
+    '!')
+      if vcs::is_in_git_repo > /dev/null; then
+        enhancd "$(vcs::get_root)"
+      else
+        enhancd "$HOME"
+      fi
+      ;;
+
+
+    *)
+      enhancd "$@"
+      ;;
+
+  esac
 }
