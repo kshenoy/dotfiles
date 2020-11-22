@@ -1705,12 +1705,17 @@ Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
         ((executable-find "g++") (setq org-babel-C++-compiler "g++")))
 
   (setq org-babel-default-header-args:C++
-        '((:flags . "-std=c++14 -Wall -Wextra -Werror ${BOOST_HOME:+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -L${HOME}/.local/lib -I${HOME}/.local/include -Wl,${BOOST_HOME:+-rpath ${BOOST_HOME}/lib}")))
+        '((:flags . "-std=c++14 -Wall -Wextra -Werror ${BOOST_HOME+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -L${HOME}/.local/lib -I${HOME}/.local/include -Wl,${BOOST_HOME+-rpath ${BOOST_HOME}/lib}")))
 
   (setq org-babel-default-header-args:perl
         '((:results . "output")))
 
   (setq org-babel-python-command "python3")
+#+end_src
+
+Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
+#+begin_src emacs-lisp
+  (define-key key-translation-map (kbd "C-c C-v C-k") (kbd "C-c C-v k"))
 #+end_src
 
 ***** TODO Display errors and warnings in an org-babel code block
@@ -1754,6 +1759,7 @@ From https://emacs.stackexchange.com/a/9813/9690
 
 ***** Jump to head/tail of any block, not just src blocks
 =org-babel-goto-src-block-head= jumps to the beginning of a source block. This is super useful! Why restrict it only to source blocks?
+Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is left untouched to only jump to top of src blocks
 #+begin_src emacs-lisp
   (defun my-org-babel-goto-block-corner (p)
     "Go to the beginning of the current block.
@@ -1772,6 +1778,10 @@ From https://emacs.stackexchange.com/a/9813/9690
             (when p
               (skip-chars-backward " \r\t\n")
               (beginning-of-line)))))))
+#+end_src
+
+#+begin_src emacs-lisp
+  (bind-key "u" 'my-org-babel-goto-block-corner org-babel-map))
 #+end_src
 
 **** org-capture
@@ -1870,16 +1880,6 @@ Custom keymap for org-mode bindings.
 
 #+begin_src emacs-lisp
   (bind-key "C-c C-q" 'my-org-modify-tags org-mode-map)
-#+end_src
-
-Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
-#+begin_src emacs-lisp
-  (define-key key-translation-map (kbd "C-c C-v C-k") (kbd "C-c C-v k"))
-#+end_src
-
-Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is left untouched to only jump to top of src blocks
-#+begin_src emacs-lisp
-  (bind-key "u" 'my-org-babel-goto-block-corner org-babel-map))
 #+end_src
 
 *** TODO Archive subtrees hierarchically
