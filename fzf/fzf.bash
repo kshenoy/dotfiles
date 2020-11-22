@@ -30,7 +30,14 @@ if [[ -n "$FD_CMD" ]]; then
   export FZF_ALT_C_COMMAND="$FD_CMD --color=never --follow --hidden --exclude .git --type d"
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 fi
-export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --ansi --select-1 --exit-0 --inline-info --reverse --bind=ctrl-n:down,ctrl-p:up"
-export FZF_ALT_C_OPTS="$FZF_ALT_C_OPTS --tiebreak=length,end"
+
+# Clear out old env vars
+export FZF_DEFAULT_OPTS="--ansi --select-1 --exit-0 --inline-info --reverse --tiebreak=length,end --bind=ctrl-n:down,ctrl-p:up"
+export FZF_ALT_C_OPTS=
+export FZF_CTRL_T_OPTS=
 # export FZF_CTRL_T_OPTS='--expect=alt-v,alt-e,alt-c'
-export FZF_CTRL_T_OPTS="$FZF_CTRL_T_OPTS --tiebreak=length,end"
+
+# base16 fzf colorscheme is applied by appending to the FZF_DEFAULT_OPTS env var
+# Thus, I "set" it first before sourcing the base16 file which appends to it
+export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
+[[ -n "$BASE16_THEME" ]] && source "${BASE16_FZF}/bash/base16-${BASE16_THEME}.config"
