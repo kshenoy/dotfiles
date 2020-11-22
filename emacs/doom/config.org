@@ -45,8 +45,8 @@ Doom exposes five (optional) variables for controlling fonts in Doom. The three 
 
 They all accept either a font-spec, font string ("Input Mono-12"), or xlfd font string. Generally only two are needed
 #+begin_src emacs-lisp
-(setq doom-font "Iosevka-11"
-      doom-variable-pitch-font "Iosevka-11")
+(setq doom-font "Iosevka-10"
+      doom-variable-pitch-font "Iosevka-10")
 #+end_src
 
 ** Themes
@@ -280,6 +280,53 @@ Restrict agenda to non-work files and filter out any other unwanted files
 #+begin_src emacs-lisp
   )))))  ; END of (after! org-agenda
 #+end_src
+** org-babel
+Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
+
+#+begin_src emacs-lisp
+(after! org
+  (setq org-babel-C++-compiler
+        (cond ((executable-find "clang++") "clang++")
+              ((executable-find "g++") "g++")))
+
+  (setq org-babel-default-header-args
+        '((:results . "verbatim replace")))
+
+  (setq org-babel-default-header-args:C++
+        '((:flags . "-std=c++14 -Wall -Wextra -Werror ${BOOST_HOME+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -L${HOME}/.local/lib -I${HOME}/.local/include -Wl,${BOOST_HOME+-rpath ${BOOST_HOME}/lib}")))
+
+  (setq org-babel-python-command "python3")
+#+end_src
+
+Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
+#+begin_src emacs-lisp
+  (define-key key-translation-map (kbd "C-c C-v C-k") (kbd "C-c C-v k"))
+#+end_src
+
+*** Jump to head/tail of any block, not just src blocks
+=org-babel-goto-src-block-head= jumps to the beginning of a source block. This is super useful! Why restrict it only to source blocks?
+Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is left untouched to only jump to top of src blocks
+#+begin_src emacs-lisp
+(defun my-org-babel-goto-block-corner (p)
+  "Go to the beginning of the current block.
+    If called with a prefix, go to the end of the block"
+  (interactive "P")
+  (let* ((element (org-element-at-point)))
+    (when (or (eq (org-element-type element) 'example-block)
+              (eq (org-element-type element) 'src-block) )
+      (let ((begin (org-element-property :begin element))
+            (end (org-element-property :end element)))
+        ;; Ensure point is not on a blank line after the block.
+        (beginning-of-line)
+        (skip-chars-forward " \r\t\n" end)
+        (when (< (point) end)
+          (goto-char (if p end begin))
+          (when p
+            (skip-chars-backward " \r\t\n")
+            (beginning-of-line)))))))
+
+(bind-key "u" 'my-org-babel-goto-block-corner org-babel-map))
+#+end_src
 
 ** org-capture
 #+begin_src emacs-lisp
@@ -315,6 +362,14 @@ Restrict agenda to non-work files and filter out any other unwanted files
          :jump-to-captured t :empty-lines 1))))
 #+end_src
 
+** org-id
+
+Create an ID when storing the link. Curiously this also causes =org-store-link= to store IDs by default
+Also note that setting this to true will create an ID for every entry which could become expensive when =org-id-track-globally= is enabled
+
+#+begin_src emacs-lisp
+(setq org-id-link-to-org-use-id 'create-if-interactive)
+#+end_src
 ** org-refile
 #+begin_src emacs-lisp
 (after! org-refile
@@ -390,13 +445,4 @@ Store the timestamp when an entry is refiled
 
 #+begin_src emacs-lisp
 )  ; END of (after! org-refile
-#+end_src
-
-** org-id
-
-Create an ID when storing the link. Curiously this also causes =org-store-link= to store IDs by default
-Also note that setting this to true will create an ID for every entry which could become expensive when =org-id-track-globally= is enabled
-
-#+begin_src emacs-lisp
-(setq org-id-link-to-org-use-id 'create-if-interactive)
 #+end_src
