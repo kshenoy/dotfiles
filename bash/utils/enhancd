@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# NOTE: Source this file, don't execute it
 #
 # This is a wrapper around enhancd (https://github/b4b4r07/enhancd) and extends it by adding the following:
 #   cd **some**path**to**search  -  Search dirs that match the glob '*some*path*to*search' (requires fzf)
@@ -41,15 +41,17 @@ cd() {
         local _pattern="*$(tr -s '*' <<< ${1#*\*\*})*"
 
         if hash fd 2> /dev/null; then
-          $(FZF_ALT_C_COMMAND="fd --follow --type=d --full-path --glob '${_pattern}' ${_path}" __fzf_cd__)
+          $(FZF_ALT_C_COMMAND="fd --type=d --full-path --glob '${_pattern}' ${_path}" __fzf_cd__)
         else
           $(FZF_ALT_C_COMMAND="find ${_path} -type d -path '${_pattern}'" __fzf_cd__)
         fi
+        return
         ;;
 
 
       '.')
         $(FZF_ALT_C_OPTS="${FZF_ALT_C_OPTS}${2+ --exact --query=$2}" __fzf_cd__)
+        return
         ;;
     esac
   fi
