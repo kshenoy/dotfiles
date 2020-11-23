@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Provides a --files-from option: rgf --files-from=[-|FILELIST]
+# Provides a --files-from option: rgw --files-from=[-|FILELIST]
 # The list of files to be searched is specified in FILELIST and must be separated by newlines.
 # If FILELIST is "-", the list is loaded from standard input.
 # This option may be specified multiple times.
@@ -8,21 +8,21 @@
 # Note that this affects how the -t option is applied. When --files-from is specified,
 # -t is used to filter the list of files and then ripgrep searches for PATTERN on the list of filtered files
 #
-# * rgf --files-from=FILELIST PATTERN
+# * rgw --files-from=FILELIST PATTERN
 #   - Search for PATTERN in all files specified in FILELIST
 #
-# * cat FILELIST | rgf --files-from=- PATTERN
-#   rgf --files-from=- PATTERN < FILELIST
+# * cat FILELIST | rgw --files-from=- PATTERN
+#   rgw --files-from=- PATTERN < FILELIST
 #   - Search for PATTERN in all files specified in FILELIST
 #
-# * rgf --files-from=- -tFILETYPE PATTERN < FILELIST
+# * rgw --files-from=- -tFILETYPE PATTERN < FILELIST
 #   - Filter FILELIST for all files of type FILETYPE and then search for PATTERN on the filtered output
 
 re=\(-h\|--help\)\\b
 if [[ "$*" =~ $re ]]; then
   command rg "$@"
   echo "
-OPTIONS (added by rgf):
+OPTIONS (added by rgw):
         --files-from=FILE
             The list of files to be searched is specified in FILE (similar to ack)
             The list of files must be separated by newlines.

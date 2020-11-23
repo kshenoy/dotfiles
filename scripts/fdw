@@ -23,7 +23,7 @@ while (( $# > 0 )); do
   if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
     command fd "$@"
     echo "
-OPTIONS (added by fd++):
+OPTIONS (added by fdw):
         --ext-group <EXT_GROUP>
           Only find files matching type EXT_GROUP. Can be specified multiple times
           The supported types are obtained from ripgrep and can be seen using \`ripgrep --type-list\`"
