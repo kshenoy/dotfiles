@@ -278,14 +278,10 @@ done
 # PATH                                                                                                              {{{1
 #=======================================================================================================================
 if ((which ruby &> /dev/null) && (which gem &> /dev/null)); then
-  rubyGemPath="$(ruby -rubygems -e 'puts Gem.user_dir')/bin"
+  export PATH="$(ruby -rubygems -e 'puts Gem.user_dir')/bin:$PATH"
 fi
-for path in "$rubyGemPath" "${HOME}/.local/bin" "${HOME}/bin"; do
-  if [[ -d "$path" ]] && [[ ! "$PATH" == *$path* ]]; then
-    export PATH=$path:$PATH
-  fi
-done
-unset rubyGemPath
+export PATH="${HOME}/bin:${HOME}/.local/bin:$PATH"
+clnpath
 
 for path in /usr/man /usr/share/man ${HOME}/.local/share/man; do
   if [[ -d "$path" ]] && [[ ! "$MANPATH" == *$path* ]]; then
