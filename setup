@@ -45,7 +45,7 @@ if [[ ! -d ${_xdg_config_home}/base16-fzf ]]; then
   if (( $UID == 0 )); then
     ln -s ~kshenoy/.config/base16-fzf ${_xdg_config_home}/base16-fzf
   else
-    git clone https://github.com/nicodebo/base16-fzf ${_xdg_config_home}/base16-fzf
+    git clone https://github.com/fnune/base16-fzf ${_xdg_config_home}/base16-fzf
   fi
 fi
 
