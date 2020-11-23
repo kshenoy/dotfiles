@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+
+#=======================================================================================================================
+__help() {
+  echo "\
+Filters files from STDIN using ripgrep's type* options and outputs the results to STDOUT
+
+USAGE:
+    rgf --type-list
+    command | rgf [OPTIONS] [PATTERN]
+
+ARGS:
+    PATTERN   A regular expression used for filtering
+
+OPTIONS:
+    -t, --type <TYPE>...                    Only search files matching TYPE.
+        --type-add <TYPE_SPEC>...           Add a new glob for a file type.
+        --type-clear <TYPE>...              Clear globs for a file type.
+        --type-list                         Show all supported file types.
+    -T, --type-not <TYPE>...                Do not search files matching TYPE.\
+"
+}
+
+#=======================================================================================================================
+_name=$(basename $0)
+_red=$(tput setaf 1)
+_reset=$(tput sgr0)
+
+yell() { echo "$_name: $*" >&2; }
+die() {
+  yell "${_red}ERROR${_reset}: $*";
+  exit 1;
+}
+try() { "$@" || die "Cannot $*"; }
+
+#=======================================================================================================================
+# Sanity check to ensure that ripgrep exists
+if ! hash rg 2> /dev/null; then
+  die "ripgrep executable not found"
+fi
+
+_inc_type_grps=()
+_exc_type_grps=()
+_opts=()
+while (( $# > 0 )); do
+  case "$1" in
+    -h|--help)
+      __help
+      exit 0
+      ;;
+
+    --type-list)
+      command rg --type-list
+      exit 0
+      ;;
+
+    -t|--type)
+      _inc_type_grps+=("$2")
+      shift
+      ;;
+
+    -T|--type-not)
+      _exc_type_grps+=("$2")
+      shift
+      ;;
+
+    -T*|--type-not=*)
+      _exc_type_grps+=("$(command sed 's/-T\|--type-not=//' <<< "$1")")
+      ;;
+
+    -t*|--type=*)
+      _inc_type_grps+=("$(command sed 's/-t\|--type=//' <<< "$1")")
+      ;;
+
+    *)
+      _opts+=("$1")
+      ;;
+  esac
+  shift
+done
+# echo "DEBUG: inc_type_grps=${_inc_type_grps[@]}" >> /tmp/debug
+# echo "DEBUG: exc_type_grps=${_exc_type_grps[@]}" >> /tmp/debug
+# echo "DEBUG: opts=${_opts[@]}"                   >> /tmp/debug
+
+_inc_file_pat=""
+for _type_grp in "${_inc_type_grps[@]}"; do
+  _inc_file_pat="${_inc_file_pat:+$_inc_file_pat|}\
+$(command rg --type-list | command grep -E "^${_type_grp}:" | command cut -d: -f2 | command sed -e 's/[* ]//g' -e 's:\.:\\.:g' -e 's/,/|/g')"
+done
+_inc_file_pat="${_inc_file_pat:+(${_inc_file_pat})$}"
+# echo "DEBUG: inc_type_pat='${_inc_file_pat}'" >> /tmp/debug
+
+_exc_file_pat=""
+for _type_grp in "${_exc_type_grps[@]}"; do
+  _exc_file_pat="${_exc_file_pat:+$_exc_file_pat|}\
+$(command rg --type-list | command grep -E "^${_type_grp}:" | command cut -d: -f2 | command sed -e 's/[* ]//g' -e 's:\.:\\.:g' -e 's/,/|/g')"
+done
+_exc_file_pat="${_exc_file_pat:+(${_exc_file_pat})$}"
+# echo "DEBUG: exc_type_pat='${_exc_file_pat}'" >> /tmp/debug
+
+_cmd="cat"
+if [[ -n "$_inc_file_pat" ]]; then
+  _cmd+=" | command grep -E \"${_inc_file_pat}\""
+elif [[ -n "$_exc_file_pat" ]]; then
+  _cmd+=" | command grep -v -E \"${_exc_file_pat}\""
+fi
+if (( ${#_opts[@]} > 0 )); then
+  _cmd+=" | command rg "${_opts[@]}" --no-line-number --no-heading --color=never"
+fi
+
+# echo "DEBUG: Cmd='$_cmd'" >> /tmp/debug
+eval "$_cmd"
