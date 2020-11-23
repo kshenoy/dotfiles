@@ -35,16 +35,12 @@ cd() {
   if hash fzf 2> /dev/null; then
     case "$1" in
       *\*\**)
-        # Split $1 about the first ** into 'src' and 'match'.
-        # Find under 'src' for all dirs that match the glob expr 'match'
+        # Split $1 about the first ** into '_path' and '_pattern'.
         local _path=${1%%\*\**}; _path=${_path:-.}
         local _pattern="*$(tr -s '*' <<< ${1#*\*\*})*"
 
-        if hash fd 2> /dev/null; then
-          $(FZF_ALT_C_COMMAND="fd --type=d --full-path --glob '${_pattern}' ${_path}" __fzf_cd__)
-        else
-          $(FZF_ALT_C_COMMAND="find ${_path} -type d -path '${_pattern}'" __fzf_cd__)
-        fi
+        # Find '_path' for all dirs that match the glob expr '_pattern' and select with FZF from the results
+        $(FZF_ALT_C_COMMAND="find ${_path} -type d -path '${_pattern}'" __fzf_cd__)
         return
         ;;
 
@@ -59,7 +55,7 @@ cd() {
 
   case "$1" in
     '!')
-      if vcs::is_in_git_repo > /dev/null; then
+      if vcs::is_in_repo > /dev/null; then
         enhancd "$(vcs::get_root)"
       else
         enhancd "$HOME"
