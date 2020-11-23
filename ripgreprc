@@ -1,15 +1,18 @@
 # [[file:~/.config/dotfiles/bash/bashrc.org::*%5B%5Bhttps://github.com/BurntSushi/ripgrep%5D%5Bripgrep%5D%5D][[[https://github.com/BurntSushi/ripgrep][ripgrep]]:3]]
-# Add to the cpp type.
+# Redefine the cpp extension to make it easier to parse and use it with fd. Start by first clearing it
+--type-clear
+cpp
+# Next, instead of simply flattening it out, let's be a little smarter about it
+# First define separate types for header and source files
 --type-add
-cpp:*.ipp,*.tpp
-
+chdr: *.h, *.H, *.h.in, *.H.in, *.hpp, *.hpp.in, *.hxx, *.hxx.in, *.hh, *.hh.in
 --type-add
-chdr:include:h
+csrc: *.C, *.C.in, *.cpp, *.cpp.in, *.cxx, *.cxx.in, *.cc, *.cc.in, *.inl, *.ipp, *.tpp
+# Now, define cpp to be a union of the two
 --type-add
-chdr:*.{H,hh,hxx}
-
+cpp:include:chdr
 --type-add
-csrc:*.{C,cc,cpp,cxx,inl,ipp,tpp}
+cpp:include:csrc
 
 --type-add
 rdl:*.rdl

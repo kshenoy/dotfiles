@@ -1,0 +1,52 @@
+#! /usr/bin/env bash
+#
+# This is a wrapper around fd (https://github.com/sharkdp/fd) and extends it by adding the following:
+#   fd --extension_group=EXT_GROUP        EXT_GROUP must be a type of extension recognized by ripgrep eg. cpp, ruby etc.
+#
+# * fd --ext-group=cpp [OPTIONS]
+#     Search for all files which match all extensions that comprise the type-group "cpp"
+#     Note that this is different from `fd -e cpp' as that only searches for files with extension .cpp
+#     while `fd --ext-group=cpp' will also find files with extensions .h, .hpp, .cc etc. in addition to .cpp
+#
+# * fd --ext-group=chdr [OPTIONS]
+#     Search for all files which match all extensions that comprise the type-group "chdr", provided that is defined
+
+# Sanity check to ensure that fd exists
+if ! hash fd 2> /dev/null; then
+  exit 1
+fi
+
+_opts=()
+while (( $# > 0 )); do
+  _ext_grp=""
+
+  if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
+    command fd "$@"
+    echo "
+OPTIONS (added by fd++):
+        --ext-group <EXT_GROUP>
+          Only find files matching type EXT_GROUP. Can be specified multiple times
+          The supported types are obtained from ripgrep and can be seen using \`ripgrep --type-list\`"
+    exit 0
+
+  elif [[ "$1" =~ --ext-group= ]]; then
+    _ext_grp=$(sed 's/--ext-group=//' <<< "$1")
+
+  elif [[ "$1" =~ --ext-group ]]; then
+    shift
+    _ext_grp="$1"
+
+  else
+    _opts+=("$1")
+  fi
+
+  shift
+
+  if [[ -n $_ext_grp ]]; then
+    # echo "DEBUG: Found ExtGrp: $_ext_grp"
+    _opts+=("$(command rg --type-list | command rg "^$_ext_grp\b" | command cut -d':' -f2 | command tr -d ',' | sed 's/\*\./-e /g')")
+  fi
+done
+# echo "DEBUG: Opts: ${_opts[@]}"
+
+eval command fd "${_opts[@]}"
