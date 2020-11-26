@@ -40,12 +40,12 @@ OPTIONS (added by fdw):
     _opts+=("$1")
   fi
 
-  shift
-
   if [[ -n $_ext_grp ]]; then
     # echo "DEBUG: Found ExtGrp: $_ext_grp"
     _opts+=("$(command rg --type-list | command rg "^$_ext_grp\b" | command cut -d':' -f2 | command tr -d ',' | sed 's/\*\./-e /g')")
   fi
+
+  shift
 done
 # echo "DEBUG: Opts: ${_opts[@]}"
 

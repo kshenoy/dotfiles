@@ -4,11 +4,11 @@
 
 ##======================================================================================================================
 _name=$(basename $0)
+_red=$(tput setaf 1)
+_reset=$(tput sgr0)
 
 yell() { echo "$_name: $*" >&2; }
 die() {
-  local _red=$(tput setaf 1)
-  local _reset=$(tput sgr0)
   yell "${_red}ERROR${_reset}: $*";
   exit 111;
 }
