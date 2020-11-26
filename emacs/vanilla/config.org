@@ -1,5 +1,5 @@
 #+TITLE: Emacs Configuration
-#+PROPERTY: header-args :results output silent :noweb tangle :comments both :mkdirp yes :tangle yes
+#+PROPERTY: header-args :results output silent :noweb tangle :comments both :mkdirp yes :tangle init.el
 #+TODO: TODO(!) FIXME(!) |
 
 /This file is best viewed in org-mode in emacs as github doesn't do a good job of parsing links which use the ID Property/
@@ -1510,7 +1510,7 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 **** [[info:org#Structure%20Templates][Easy Templates]]
 These should get added only if org-version < 9.2
 =?= in each string controls where the point will be placed after expansion
-#+begin_src emacs-lisp :tangle (if (org-string>= org-version "9.2") "no" "config.el")
+#+begin_src emacs-lisp :tangle (if (org-string>= org-version "9.2") "no" "init.el")
   (add-to-list 'org-structure-template-alist '("sc" "#+begin_src C++\n?\n#+end_src"))
   (add-to-list 'org-structure-template-alist '("sl" "#+begin_src emacs-lisp\n?\n#+end_src\n"))
   (add-to-list 'org-structure-template-alist '("sp" "#+begin_src python\n?\n#+end_src\n"))
@@ -1519,7 +1519,7 @@ These should get added only if org-version < 9.2
 #+end_src
 
 For org-version >= 9.2, we have to use this. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
-#+begin_src emacs-lisp :tangle (if (org-string>= org-version "9.2") "config.el" "no")
+#+begin_src emacs-lisp :tangle (if (org-string>= org-version "9.2") "init.el" "no")
   (add-to-list 'org-structure-template-alist '("sc" . "src c++"))
   (add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist '("sp" . "src python"))
