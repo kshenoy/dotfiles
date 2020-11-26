@@ -53,7 +53,12 @@ They all accept either a font-spec, font string ("Input Mono-12"), or xlfd font 
 There are two ways to load a theme. Both assume the theme is installed and available.
 I can either set =doom-theme= or manually load a theme with the =load-theme= function. This is the default:
 #+begin_src emacs-lisp
-  (setq doom-theme 'doom-one)
+  (setq doom-theme 'doom-zenburn)
+#+end_src
+
+ToDo: Set theme based on time of day
+#+begin_src bash :tangle no
+
 #+end_src
 
 ** Keybindings
@@ -79,8 +84,15 @@ Use =org-goto= instead of =semantic-or-imenu= when in org files
       :desc "evil-redo" "U" #'evil-redo)
 #+end_src
 
+=SPC SPC= is too valuable to use to find files in project. Rebind to =switch-to-buffer= instead
+#+begin_src emacs-lisp
+(map! :after ivy
+      :map doom-leader-map
+      :desc "Switch buffer" "SPC" #'ivy-switch-buffer)
+#+end_src
+
 * evil
-Move by visual lines
+FIXME: Move by visual lines
 #+begin_src emacs-lisp
 (map! :after evil
       :map evil-motion-state-map
@@ -96,7 +108,9 @@ Move by visual lines
   (evil-redirect-digit-argument evil-motion-state-map "0" 'evil-beginning-of-visual-line))
 #+end_src
 
-* Org
+FIXME: Change evil-exchange binding from =g x= to =c x=
+
+* org
 
 #+begin_src emacs-lisp
 (after! org
@@ -127,7 +141,7 @@ Specify locations of files
 (setq org-src-window-setup 'current-window)
 #+end_src
 
-Easy templates for org-version >= 9.2. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
+Easy templates for org-version ≥ 9.2. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
 #+begin_src emacs-lisp
 (add-to-list 'org-structure-template-alist '("sc" . "src c++"))
 (add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
@@ -170,7 +184,7 @@ Setting this to nil allows a convenient way to select a TODO state and bypass an
 (setq org-todo-keyword-faces
       (quote (("TODO" :foreground "red" :weight bold)
               ("WAIT" :foreground "orange" :weight bold)
-              ("DONE" :foreground "forest green" bold)
+              ("DONE" :foreground "forest green" :weight bold)
               ("CANCEL" :foreground "forest green" bold))))
 #+end_src
 
@@ -445,4 +459,9 @@ Store the timestamp when an entry is refiled
 
 #+begin_src emacs-lisp
 )  ; END of (after! org-refile
+#+end_src
+
+* rcirc
+#+begin_src emacs-lisp
+(setq rcirc-kill-channel-buffers t)
 #+end_src
