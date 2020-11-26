@@ -17,6 +17,7 @@ fi
 export ENHANCD_COMMAND="enhancd"
 export ENHANCD_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/enhancd"
 export ENHANCD_DOT_ARG="..."
+export ENHANCD_HOME_ARG="@"
 export ENHANCD_HYPHEN_ARG="="
 
 if hash fzf 2> /dev/null; then
@@ -32,6 +33,15 @@ fi
 unalias cd
 unset -f cd
 cd() {
+  if (( "$#" == 0 )); then
+    if vcs::is_in_repo > /dev/null; then
+      enhancd "$(vcs::get_root)"
+    else
+      enhancd "$HOME"
+    fi
+    return
+  fi
+
   if hash fzf 2> /dev/null; then
     case "$1" in
       *\*\**)
@@ -45,26 +55,12 @@ cd() {
         ;;
 
 
-      '.')
+      ',')
         $(FZF_ALT_C_OPTS="${FZF_ALT_C_OPTS}${2+ --exact --query=$2}" __fzf_cd__)
         return
         ;;
     esac
   fi
 
-
-  case "$1" in
-    '!')
-      if vcs::is_in_repo > /dev/null; then
-        enhancd "$(vcs::get_root)"
-      else
-        enhancd "$HOME"
-      fi
-      ;;
-
-
-    *)
-      enhancd "$@"
-      ;;
-  esac
+  enhancd "$@"
 }
