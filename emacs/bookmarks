@@ -1,16 +1,27 @@
-;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8-emacs -*-
+;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8-emacs -*- 
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("Emacs Config"
+(("Inbox"
+ (filename . "~/Documents/Notes/Inbox.org")
+ (position . 1))
+ ("Emacs Config"
   (filename . "~/.config/dotfiles/emacs/vanilla/config.org")
   (position . 1))
- ("Inbox"
-  (filename . "~/Documents/Notes/Inbox.org")
-  (front-context-string)
-  (rear-context-string)
-  (position . 15))
- ("C++"
-  (filename . "~/Documents/Notes/Software/cpp.org")
+ ("Personal"
+  (filename . "~/Documents/Notes/Personal/")
+  (position . 1))
+ ("Software"
+  (filename . "~/Documents/Notes/Software/")
+  (position . 1))
+ ("Work @work"
+  (filename . "/ssh:work:/home/kshenoy/Documents/Notes/Work/")
+  (position . 1))
+ ("~kshenoy @work"
+  (filename . "/ssh:work:/home/kshenoy/")
+  (rear-context-string . "0K Nov 13 09:21 ")
+  (position . 1))
+ ("~/proj @work"
+  (filename . "/ssh:work:/home/kshenoy/proj/")
   (position . 1))
 )

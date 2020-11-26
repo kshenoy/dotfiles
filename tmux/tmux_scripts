@@ -116,6 +116,10 @@ __tmux_pp_select_layout_work() {                                                
 tmux_pp() {
   # We can't make the helper functions private because doing so will run tmux_pp in a subshell
   # However, since we can't export variables from a subshell to its parent shell, tmux_update_env won't work
+  if (( $# == 0 )); then
+    command tmux
+    return
+  fi
 
   local cmd=$1; shift;
 
