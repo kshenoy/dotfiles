@@ -13,7 +13,7 @@ all: dotfiles-priv base16-fzf base16-shell bash emacs git tmux misc
 #== dotfiles-priv ======================================================================================================
 dotfiles-priv: ${XDG_CONFIG_HOME}/dotfiles-priv
 ${XDG_CONFIG_HOME}/dotfiles-priv:
-	git clone git@github.com:kshenoy/dotfiles-priv ${XDG_CONFIG_HOME}/dotfiles-priv
+	git clone git@github.com:kshenoy/dotfiles-priv $@
 
 
 #== bash ===============================================================================================================
@@ -33,13 +33,13 @@ ${XDG_DATA_HOME}/bash_history:
 #== base16-fzf =========================================================================================================
 base16-fzf: ${XDG_CONFIG_HOME}/base16-fzf
 ${XDG_CONFIG_HOME}/base16-fzf:
-	git clone https://github.com/fnune/base16-fzf ${XDG_CONFIG_HOME}/base16-fzf
+	git clone https://github.com/fnune/base16-fzf $@
 
 
 #== base16-shell =======================================================================================================
 base16-shell: ${XDG_CONFIG_HOME}/base16-shell
 ${XDG_CONFIG_HOME}/base16-shell:
-	git clone https://github.com/chriskempson/base16-shell.git ${XDG_CONFIG_HOME}/base16-shell
+	git clone https://github.com/chriskempson/base16-shell.git $@
 
 
 #== emacs ==============================================================================================================
@@ -61,7 +61,7 @@ emacs/vanilla/snippets:
 
 emacs-doom: ${XDG_CONFIG_HOME}/doom-emacs ${XDG_CONFIG_HOME}/doom emacs/doom/config.el emacs/doom/bookmarks
 ${XDG_CONFIG_HOME}/doom-emacs ${XDG_CONFIG_HOME}/doom-emacs/bin/doom:
-	git clone https://github.com/hlissner/doom-emacs $(dir $@)
+	git clone https://github.com/hlissner/doom-emacs $@
 ${XDG_CONFIG_HOME}/doom:
 	@${MKLINK} ${PWD}/emacs/doom $@
 emacs/doom/config.el: emacs/doom/config.org
@@ -131,12 +131,14 @@ ${HOME}/pipe:
 	mkfifo $@
 
 
-#== xmonad =============================================================================================================
-xmonad: ${XDG_CONFIG_HOME}/.xmonad/xmonad.hs ${HOME}/xmobar/xmobarrc
-${XDG_CONFIG_HOME}/.xmonad/xmonad.hs:
-	@${MKLINK} ${PWD}/xmonad/xmonad.hs $@
-${XDG_CONFIG_HOME}/xmobar/xmobarrc:
-	@${MKLINK} ${PWD}/xmobarrc $@
+#== xmonad et al. ======================================================================================================
+xmonad: ${XDG_CONFIG_HOME}/xmonad xmobar
+${XDG_CONFIG_HOME}/xmonad:
+	@${MKLINK} ${PWD}/xmonad $@
+
+xmobar: ${XDG_CONFIG_HOME}/xmobar
+${XDG_CONFIG_HOME}/xmobar:
+	@${MKLINK} ${PWD}/xmobar $@
 
 
 #=======================================================================================================================
