@@ -292,18 +292,28 @@ call plug#('tpope/vim-vinegar')
 
 
 " wordmotion ------------------------------------------------------------------------------------------------------ {{{1
-if hostname() !~ "windows"
+if has('gui_running')
   let g:wordmotion_mappings = {
-  \ 'w':          '<A-w>',
-  \ 'b':          '<A-b>',
-  \ 'e':          '<A-e>',
-  \ 'ge':         'g<A-e>',
-  \ 'aw':         'a<A-w>',
-  \ 'iw':         'i<A-w>',
-  \ '<C-R><C-W>': '<C-R><A-w>'
+  \ 'w':          '<M-w>',
+  \ 'b':          '<M-b>',
+  \ 'e':          '<M-e>',
+  \ 'ge':         'g<M-e>',
+  \ 'aw':         'a<M-w>',
+  \ 'iw':         'i<M-w>',
+  \ '<C-R><C-W>': '<C-R><M-w>'
   \ }
-  call plug#('chaoren/vim-wordmotion')
+else
+  let g:wordmotion_mappings = {
+  \ 'w':          'w',
+  \ 'b':          'b',
+  \ 'e':          'e',
+  \ 'ge':         'ge',
+  \ 'aw':         'aw',
+  \ 'iw':         'iw',
+  \ '<C-R><C-W>': '<C-R>w'
+  \ }
 endif
+call plug#('chaoren/vim-wordmotion')
 " }}}1
 
 call plug#end()
