@@ -7,6 +7,7 @@ MKLINK := ln -svTf
 
 
 all: dotfiles-priv base16-fzf base16-shell bash emacs git tmux misc
+# Rules not included in all: xmonad
 
 
 #== dotfiles-priv ======================================================================================================
@@ -128,6 +129,14 @@ ${HOME}/.xinitrc:
 	@${MKLINK} ${PWD}/xinitrc $@
 ${HOME}/pipe:
 	mkfifo $@
+
+
+#== xmonad =============================================================================================================
+xmonad: ${XDG_CONFIG_HOME}/.xmonad/xmonad.hs ${HOME}/xmobar/xmobarrc
+${XDG_CONFIG_HOME}/.xmonad/xmonad.hs:
+	@${MKLINK} ${PWD}/xmonad/xmonad.hs $@
+${XDG_CONFIG_HOME}/xmobar/xmobarrc:
+	@${MKLINK} ${PWD}/xmobarrc $@
 
 
 #=======================================================================================================================
