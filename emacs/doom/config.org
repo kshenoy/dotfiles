@@ -1,5 +1,6 @@
 #+TITLE: Doom emacs private configuration
 #+PROPERTY: header-args :results output silent :noweb tangle :comments both :mkdirp yes
+#+FILETAG:
 
 Running =doom sync= is not required after modifying this file!
 
@@ -53,18 +54,49 @@ They all accept either a font-spec, font string ("Input Mono-12"), or xlfd font 
 There are two ways to load a theme. Both assume the theme is installed and available.
 I can either set =doom-theme= or manually load a theme with the =load-theme= function. This is the default:
 #+begin_src emacs-lisp :tangle no
-(setq doom-theme 'doom-zenburn)
+(setq doom-theme 'doom-one)
 #+end_src
 
 Set theme based on time of day
 #+begin_src emacs-lisp
-(after! theme-changer
+(use-package! theme-changer
+  :init
   (setq calendar-location-name "Fort Collins, CO")
   (setq calendar-latitude 32.85)
   (setq calendar-longitude -96.85)
+  :config
   (change-theme 'doom-solarized-light 'doom-zenburn))
 #+end_src
 
+*** load-theme hook
+Emacs doesn't have a native hook that is called after a theme has loaded. So we've to create one. (from [[https://www.reddit.com/r/emacs/comments/4v7tcj/does_emacs_have_a_hook_for_when_the_theme_changes/d5wyu1r/][reddit]])
+#+begin_src emacs-lisp
+(defvar after-load-theme-hook nil
+  "Hook run after a color theme is loaded using `load-theme'.")
+
+(defadvice load-theme (after run-after-load-theme-hook activate)
+  "Run `after-load-theme-hook'."
+  (run-hooks 'after-load-theme-hook))
+#+end_src
+
+Usage examples
+#+begin_src emacs-lisp :tangle no
+(add-hook 'after-load-theme-hook (lambda() (message "Theme loaded")))
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+(add-hook 'after-load-theme-hook
+          (lambda()
+            (set-face-attribute 'fringe nil :background (face-attribute 'highlight :background))))
+#+end_src
+
+*** doom-solarized-light
+#+begin_src emacs-lisp
+(add-hook 'after-load-theme-hook
+          (lambda()
+            (when (eq doom-theme 'doom-solarized-light)
+              (set-face-attribute 'shadow nil :foreground "#93a1a1"))))
+#+end_src
 
 ** Keybindings
 
@@ -117,21 +149,12 @@ FIXME: Change evil-exchange binding from =g x= to =c x=
 
 * org
 
-#+begin_src emacs-lisp
-(after! org
-#+end_src
-
 Startup options
 #+begin_src emacs-lisp
 (setq org-startup-align-all-tables nil  ; This slows down startup of large org files considerably!
       org-startup-folded t
       org-startup-with-inline-images t
       org-agenda-inhibit-startup nil)
-#+end_src
-
-Prettify
-#+begin_src emacs-lisp
-(setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
 #+end_src
 
 Specify locations of files
@@ -141,6 +164,36 @@ Specify locations of files
       org-id-locations-file (expand-file-name ".org-id-locations" doom-private-dir))
 #+end_src
 
+** Prettify
+- org-superstart default: "◉ ○ ✸ ✿"
+- Large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
+- Small: ► • ★ ▸
+
+#+begin_src emacs-lisp
+(setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
+(setq org-ellipsis " ▼ ")
+(setq org-superstar-headline-bullets-list '(10040))
+#+end_src
+
+Prevent DONE org-headlines from being highlighted a different color
+#+begin_src emacs-lisp
+(setq org-fontify-done-headline nil)
+#+end_src
+
+Scale Title and headlines
+#+begin_src emacs-lisp
+(after! org
+  (set-face-attribute 'org-document-info-keyword nil :inherit 'org-meta-line)
+  (set-face-attribute 'org-document-title nil :height 1.5)
+  (set-face-attribute 'org-level-1 nil :height 1.3)
+  (set-face-attribute 'org-level-2 nil :height 1.2)
+  (set-face-attribute 'org-level-3 nil :height 1.15)
+  (set-face-attribute 'org-level-4 nil :height 1.1)
+
+  (when (eq doom-theme 'doom-solarized-light)
+    (set-face-attribute 'org-document-title nil :foreground "#586e75")))
+#+end_src
+
 ** Source blocks
 #+begin_src emacs-lisp
 (setq org-src-window-setup 'current-window)
@@ -148,10 +201,11 @@ Specify locations of files
 
 Easy templates for org-version ≥ 9.2. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
 #+begin_src emacs-lisp
-(add-to-list 'org-structure-template-alist '("sc" . "src c++"))
-(add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
-(add-to-list 'org-structure-template-alist '("sp" . "src python"))
-(add-to-list 'org-structure-template-alist '("ss" . "src bash"))
+(after! org
+  (add-to-list 'org-structure-template-alist '("sc" . "src c++"))
+  (add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("sp" . "src python"))
+  (add-to-list 'org-structure-template-alist '("ss" . "src bash")))
 #+end_src
 
 ** ToDo related
@@ -191,10 +245,6 @@ Setting this to nil allows a convenient way to select a TODO state and bypass an
               ("WAIT" :foreground "orange" :weight bold)
               ("DONE" :foreground "forest green" :weight bold)
               ("CANCEL" :foreground "forest green" bold))))
-#+end_src
-
-#+begin_src emacs-lisp
-)  ; END of (after! org)
 #+end_src
 
 ** org-agenda
@@ -387,9 +437,12 @@ Create an ID when storing the link. Curiously this also causes =org-store-link= 
 Also note that setting this to true will create an ID for every entry which could become expensive when =org-id-track-globally= is enabled
 
 #+begin_src emacs-lisp
+(add-to-list 'org-modules 'org-id)
 (setq org-id-link-to-org-use-id 'create-if-interactive)
 #+end_src
+
 ** org-refile
+
 #+begin_src emacs-lisp
 (after! org-refile
 #+end_src
