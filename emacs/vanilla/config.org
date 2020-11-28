@@ -1508,22 +1508,24 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 #+end_src
 
 **** [[info:org#Structure%20Templates][Easy Templates]]
+
 These should get added only if org-version < 9.2
 =?= in each string controls where the point will be placed after expansion
-#+begin_src emacs-lisp :tangle (if (org-string>= org-version "9.2") "no" "init.el")
-  (add-to-list 'org-structure-template-alist '("sc" "#+begin_src C++\n?\n#+end_src"))
-  (add-to-list 'org-structure-template-alist '("sl" "#+begin_src emacs-lisp\n?\n#+end_src\n"))
-  (add-to-list 'org-structure-template-alist '("sp" "#+begin_src python\n?\n#+end_src\n"))
-  ;; (add-to-list 'org-structure-template-alist '("sd" "#+begin_src dot :file /tmp/out.png\n?\n#+end_src\n"))
-  (add-to-list 'org-structure-template-alist '("ss" "#+begin_src bash\n?\n#+end_src\n"))
+#+begin_src emacs-lisp :tangle (when (not (version< org-version "9.2")) "no")
+(add-to-list 'org-structure-template-alist '("sc" "#+begin_src C++\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("sl" "#+begin_src emacs-lisp\n?\n#+end_src\n"))
+(add-to-list 'org-structure-template-alist '("sp" "#+begin_src python\n?\n#+end_src\n"))
+;; (add-to-list 'org-structure-template-alist '("sd" "#+begin_src dot :file /tmp/out.png\n?\n#+end_src\n"))
+(add-to-list 'org-structure-template-alist '("ss" "#+begin_src bash\n?\n#+end_src\n"))
 #+end_src
 
-For org-version >= 9.2, we have to use this. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
-#+begin_src emacs-lisp :tangle (if (org-string>= org-version "9.2") "init.el" "no")
-  (add-to-list 'org-structure-template-alist '("sc" . "src c++"))
-  (add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
-  (add-to-list 'org-structure-template-alist '("sp" . "src python"))
-  (add-to-list 'org-structure-template-alist '("ss" . "src bash"))
+For org-version >= 9.2, we have to use this format.
+=C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
+#+begin_src emacs-lisp :tangle (when (version< org-version "9.2") "no")
+(add-to-list 'org-structure-template-alist '("sc" . "src c++"))
+(add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
+(add-to-list 'org-structure-template-alist '("sp" . "src python"))
+(add-to-list 'org-structure-template-alist '("ss" . "src bash"))
 #+end_src
 
 **** Combine setting and aligning of tags
@@ -1790,7 +1792,7 @@ Show all the hierarchical headlines instead of having to step down them
 
 From [[http://cestlaz.github.io/posts/using-emacs-23-capture-1][Using Emacs 23 - Capture 1]] and [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][Using Emacs 24 - Capture 2]]
 
-[[id:f9b19f45-ee3a-4f40-b8af-0e5966e4df35][Add CREATED property to captured items]]
+[[Add CREATED property to captured items]]
 
 ***** Capture templates
 #+begin_src emacs-lisp
@@ -2021,7 +2023,7 @@ Small: ► • ★ ▸
 
 A good way to find more characters is to use =M-x insert-char=
 
-*** org-expiry
+*** COMMENT org-expiry
 [[https://code.orgmode.org/bzg/org-mode/raw/master/contrib/lisp/org-expiry.el][org-expiry]] is provided by the [[https://orgmode.org/worg/org-contrib/index.html][org-plus-contrib]] from the org repo. Hence I use [[:ensure]] and [[:pin]] to grab it from there.
 This allows me to add a =CREATED= property everytime I create a new org-heading. From [[https://stackoverflow.com/a/13285957/734153][here]].
 #+begin_src emacs-lisp
@@ -2035,12 +2037,9 @@ This allows me to add a =CREATED= property everytime I create a new org-heading.
     (org-expiry-insinuate)
 #+end_src
 
-Add CREATED property to captured items
-:PROPERTIES:
-:ID:       f9b19f45-ee3a-4f40-b8af-0e5966e4df35
-:END:
+<<Add CREATED property to captured items>>
 From https://stackoverflow.com/a/16247032/734153
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (add-hook 'org-capture-prepare-finalize-hook 'org-expiry-insert-created))
 #+end_src
 

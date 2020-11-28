@@ -5,23 +5,26 @@
 (("Inbox"
  (filename . "~/Documents/Notes/Inbox.org")
  (position . 1))
- ("Emacs Config"
-  (filename . "~/.config/dotfiles/emacs/vanilla/config.org")
-  (position . 1))
- ("Personal"
-  (filename . "~/Documents/Notes/Personal/")
-  (position . 1))
- ("Software"
-  (filename . "~/Documents/Notes/Software/")
-  (position . 1))
- ("Work @work"
-  (filename . "/ssh:work:/home/kshenoy/Documents/Notes/Work/")
-  (position . 1))
- ("~kshenoy @work"
-  (filename . "/ssh:work:/home/kshenoy/")
-  (rear-context-string . "0K Nov 13 09:21 ")
-  (position . 1))
- ("~/proj @work"
-  (filename . "/ssh:work:/home/kshenoy/proj/")
-  (position . 1))
+("Cfg: dotfiles"
+ (filename . "~/.config/dotfiles/")
+ (position . 1))
+("Cfg: Vanilla Emacs"
+ (filename . "~/.config/dotfiles/emacs/vanilla/config.org")
+ (position . 1))
+("Notes: Personal"
+ (filename . "~/Documents/Notes/Personal/")
+ (position . 1))
+("Notes: Software"
+ (filename . "~/Documents/Notes/Software/")
+ (position . 1))
+("Notes: Work @work"
+ (filename . "/ssh:work:/home/kshenoy/Documents/Notes/Work/")
+ (position . 1))
+("~kshenoy @work"
+ (filename . "/ssh:work:/home/kshenoy/")
+ (rear-context-string . "0K Nov 13 09:21 ")
+ (position . 1))
+("~/proj @work"
+ (filename . "/ssh:work:/home/kshenoy/proj/")
+ (position . 1))
 )

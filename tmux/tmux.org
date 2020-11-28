@@ -219,9 +219,6 @@ Use fzf to select and switch sessions. =prefix+s= is tmux's way of doing it (usi
 #+end_src
 
 *** FIXME COMMENT Mouse bindings
-:PROPERTIES:
-:CREATED:  [2019-08-19 Mon 18:51]
-:END:
 Make mouse more useful (from [[https://old.reddit.com/r/tmux/comments/cpvd02/can_i_pass_only_mousescroll_to_shell/ewtd5a3/][reddit]]). There's also [[https://github.com/NHDaly/tmux-better-mouse-mode][tmux-better-mouse-mode]] which I'm yet to try
 On a wheelup event:
 - if mouse is enabled, send the mouse event,

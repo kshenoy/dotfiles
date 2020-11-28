@@ -60,8 +60,6 @@ alias td='tkdiff'
 
 #alias echo '\echo -e'
 #alias lock='/usr/local/bin/xlock'
-alias be='bindkey -me'
-alias bv='bindkey -v'
 alias mv='mv -vi'
 alias cp='cp -vi'
 alias rm='rm -vi'
@@ -102,9 +100,6 @@ psgrep() {
   ps wwup $(command pgrep -f "$@") 2> /dev/null
 }
 
-# Explicitly declaring this as a function as without it RHEL7 gets confused and errors out
-function grep() { command grep -sP --color=always "$@"; }
-
 # If rg/ag exists, use it!!
 if hash rg 2> /dev/null; then
   # Custom types and settings are defined in RIPGREP_CONFIG_PATH=~/.ripgreprc
@@ -118,7 +113,7 @@ elif hash ag 2> /dev/null; then
   gtsv()  { command ag -G "\.(sv|svh)$" "$@"; }
   gtv()   { command ag -G "\.(v|x)$" "$@"; }
 else
-  alias g=grep
+  alias g='grep -sP --color=always'
 fi
 gi() { g -i "$@"; }
 gv() { g -v "$@"; }
@@ -128,7 +123,7 @@ gv() { g -v "$@"; }
 # Editor aliases
 #
 alias v=vim
-vq() { vim -q <(eval "$(fc -nl -1) $@"); }
+vq() { v -q <(eval "$(fc -nl -1) $@"); }
 
 # Using -f keeps the window in the foreground and prevents a whole bunch of diffs opening at the same time
 gvim_diff() {

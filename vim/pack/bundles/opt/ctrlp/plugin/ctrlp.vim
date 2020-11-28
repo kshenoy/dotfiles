@@ -74,7 +74,7 @@ let g:ctrlp_funky_after_jump = {
 let g:ctrlp_funky_nolim = 1
 
 call plug#('ctrlpvim/ctrlp.vim')
-call plug#('kshenoy/ctrlp-funky')
+call plug#('tacahiroy/ctrlp-funky')
 if has('python3')
   call plug#('FelikZ/ctrlp-py-matcher')
 endif

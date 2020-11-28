@@ -17,7 +17,7 @@ ${XDG_CONFIG_HOME}/dotfiles-priv:
 
 
 #== bash ===============================================================================================================
-bash: bash/bashrc bash/dircolors ripgreprc ${HOME}/.bashrc ${XDG_DATA_HOME}/bash_history
+bash: bash/bashrc bash/dircolors ripgreprc ${HOME}/.bashrc
 # Using grouped targets here to run tangle bash/bashrc.org only once. Supported only for make versions >= 4.3
 bash/bashrc bash/dircolors ripgreprc &: bash/bashrc.org
 	${TANGLE} $<
@@ -25,8 +25,7 @@ bash/bashrc bash/dircolors ripgreprc &: bash/bashrc.org
 	@touch $@
 ${HOME}/.bashrc:
 	@${MKLINK} ${PWD}/bash/bashrc $@
-${XDG_DATA_HOME}/bash_history:
-	mkdir -p ${XDG_DATA_HOME}/bash_history
+	@mkdir -p ${XDG_DATA_HOME}/bash_history
 	@command rm -i ${HOME}/.bash_history 2> /dev/null
 
 
@@ -59,12 +58,14 @@ emacs/vanilla/bookmarks:
 emacs/vanilla/snippets:
 	@${MKLINK} ${PWD}/emacs/snippets $@
 
-emacs-doom: ${XDG_CONFIG_HOME}/doom-emacs ${XDG_CONFIG_HOME}/doom emacs/doom/config.el emacs/doom/bookmarks
+emacs-doom: ${XDG_CONFIG_HOME}/doom-emacs ${XDG_CONFIG_HOME}/doom emacs/doom/config.el  emacs/doom/init.el emacs/doom/packages.el emacs/doom/bookmarks
 ${XDG_CONFIG_HOME}/doom-emacs ${XDG_CONFIG_HOME}/doom-emacs/bin/doom:
 	git clone https://github.com/hlissner/doom-emacs $@
 ${XDG_CONFIG_HOME}/doom:
 	@${MKLINK} ${PWD}/emacs/doom $@
 emacs/doom/config.el: emacs/doom/config.org
+	${XDG_CONFIG_HOME}/doom-emacs/bin/doom sync
+emacs/doom/init.el emacs/doom/packages.el:
 	${XDG_CONFIG_HOME}/doom-emacs/bin/doom sync
 emacs/doom/bookmarks:
 	@${MKLINK} ${PWD}/emacs/bookmarks $@
@@ -74,24 +75,22 @@ ${HOME}/bin/emacs_daemon:
 
 
 #== git ================================================================================================================
-git: git/config ${XDG_CONFIG_HOME}/git ${XDG_CONFIG_HOME}/git/config ${XDG_CONFIG_HOME}/git/ignore
+git: git/config ${XDG_CONFIG_HOME}/git/config ${XDG_CONFIG_HOME}/git/ignore
 git/config: git/git.org
-	${TANGLE} $@
-${XDG_CONFIG_HOME}/git:
-	mkdir -p $@
+	${TANGLE} $<
 ${XDG_CONFIG_HOME}/git/config:
+	@mkdir -p $(dir $@)
 	@${MKLINK} ${PWD}/git/config $@
 ${XDG_CONFIG_HOME}/git/ignore:
 	@${MKLINK} ${PWD}/git/ignore $@
 
 
 #== tmux ===============================================================================================================
-tmux: tmux/tmux.conf ${XDG_CONFIG_HOME}/tmux ${XDG_CONFIG_HOME}/tmux/.tmux.conf
+tmux: tmux/tmux.conf ${XDG_CONFIG_HOME}/tmux/.tmux.conf
 tmux/tmux.conf: tmux/tmux.org
-	${TANGLE} $@
-${XDG_CONFIG_HOME}/tmux:
-	mkdir -p $@
+	${TANGLE} $<
 ${XDG_CONFIG_HOME}/tmux/.tmux.conf:
+	@mkdir -p $(dir $@)
 	@${MKLINK} ${PWD}/tmux/tmux.conf $@
 
 
@@ -112,7 +111,7 @@ vim/pack/rc_local:
 #== misc ===============================================================================================================
 misc: ${HOME}/.ssh/config ${HOME}/.Xresources ${HOME}/.ctags ${HOME}/.fzf.bash ${HOME}/bin/rgf ${HOME}/.unison/dotfiles.prf ${HOME}/.xinitrc ${HOME}/pipe 
 ${HOME}/.ssh/config:
-	mkdir -p $(dir $@)
+	@mkdir -p $(dir $@)
 	@${MKLINK} ${XDG_CONFIG_HOME}/dotfiles-priv/ssh/config $@
 ${HOME}/.Xresources:
 	@${MKLINK} ${PWD}/Xresources $@
@@ -123,7 +122,7 @@ ${HOME}/.fzf.bash:
 ${HOME}/bin/rgf:
 	@${MKLINK} ${PWD}/scripts/rgf $@
 ${HOME}/.unison/dotfiles.prf:
-	mkdir -p $(dir $@)
+	@mkdir -p $(dir $@)
 	@${MKLINK} ${PWD}/unison/dotfiles.prf $@
 ${HOME}/.xinitrc:
 	@${MKLINK} ${PWD}/xinitrc $@

@@ -61,7 +61,7 @@ __setprompt() {
   local _exit_status="$?"
 
   # We use this instead of $COLUMNS as when a shell is starting, the $COLUMNS variable is not set
-  local columns=$(tput cols)
+  local _columns=$(tput cols)
 
   # Colors
   # NOTE: Non-printable sequences should be enclosed in \[ and \] else it'll cause long commands to not wrap correctly
@@ -129,14 +129,14 @@ __setprompt() {
   _info="${_ulcorner} ${_user}${_user_host_sep}${_host}${_pwd_sep}${_pwd}${_vcs_sep}${_vcs_branch} ${_time}"
 
   # If info is wider than the screen, drop the time
-  if (( $columns < ${#_info} )); then
+  if (( $_columns < ${#_info} )); then
     _time=""
     _info="${_ulcorner} ${_user}${_user_host_sep}${_host}${_pwd_sep}${_pwd}${_vcs_sep}${_vcs_branch} "
   fi
   _pwd_sep="${_fg_light_black}${_pwd_sep}${_reset}"
 
   # If the info still can't fit, drop user and domain info
-  if (( $columns < ${#_info} )); then
+  if (( $_columns < ${#_info} )); then
     _user=""
     _user_host_sep=""
     _host=""
@@ -145,23 +145,23 @@ __setprompt() {
   fi
 
   # If the info still can't fit, drop vcs branch
-  if (( $columns < ${#_info} )); then
+  if (( $_columns < ${#_info} )); then
     _vcs_sep=""
     _vcs_branch=""
     _info="${_ulcorner} ${_pwd} "
   fi
 
   # If the info still can't fit, truncate PWD
-  if (( $columns < ${#_info} )); then
+  if (( $_columns < ${#_info} )); then
     _pwd_sep="..."
-    while (( $columns < ${#_info} )); do
+    while (( $_columns < ${#_info} )); do
       _pwd=`echo $_pwd | sed 's|^/\?[^/]*/||'`
       _info="${_ulcorner} ${_pwd_sep}${_pwd} "
     done
     _pwd_sep="${_bold}${_fg_green}${_pwd_sep}${_reset}"
   fi
 
-  local _fillsize=$(( $columns - ${#_info} - 1 ))
+  local _fillsize=$(( $_columns - ${#_info} - 1 ))
   local _fill=$(printf "${_dash}%.0s" $(seq 1 $_fillsize))" "
 
   # Colorize vcs:

@@ -52,14 +52,19 @@ They all accept either a font-spec, font string ("Input Mono-12"), or xlfd font 
 ** Themes
 There are two ways to load a theme. Both assume the theme is installed and available.
 I can either set =doom-theme= or manually load a theme with the =load-theme= function. This is the default:
+#+begin_src emacs-lisp :tangle no
+(setq doom-theme 'doom-zenburn)
+#+end_src
+
+Set theme based on time of day
 #+begin_src emacs-lisp
-  (setq doom-theme 'doom-zenburn)
+(after! theme-changer
+  (setq calendar-location-name "Fort Collins, CO")
+  (setq calendar-latitude 32.85)
+  (setq calendar-longitude -96.85)
+  (change-theme 'doom-solarized-light 'doom-zenburn))
 #+end_src
 
-ToDo: Set theme based on time of day
-#+begin_src bash :tangle no
-
-#+end_src
 
 ** Keybindings
 

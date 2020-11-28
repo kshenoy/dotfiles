@@ -83,89 +83,9 @@ unset -f =base
   echo $_result
 )
 
-unset -f =bin
-=bin() (                                                                                                          # {{{1
-  _help () { # {{{
-    echo 'SYNTAX:'
-    echo '  =bin NUM [FROM=10]'
-    echo '  echo NUM | =bin [FROM=10]'
-    echo '  =bin [FROM=10] <<< "NUM"'
-  } # }}}
-
-  if (( $# >= 2 )); then
-    local _num=$1
-    shift
-  elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
-    # From pipe or from redirection respectively
-    local _num=$(</dev/stdin)
-  elif (( $# == 0 )); then
-    echo -e "ERROR: Insufficient arguments. At least one required\n"; _help
-    return 1
-  else
-    local _num=$1
-    shift
-  fi
-
-  local _ibase=${1:-10}
-  local _obase=2
-  =base $_num $_obase $_ibase
-)
-
-unset -f =dec
-=dec() (                                                                                                          # {{{1
-  _help () { # {{{
-    echo 'SYNTAX:'
-    echo '  =dec NUM [FROM=16]'
-    echo '  echo NUM | =dec [FROM=16]'
-    echo '  =dec [FROM=16] <<< "NUM"'
-  } # }}}
-
-  if (( $# >= 2 )); then
-    local _num=$1
-    shift
-  elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
-    # From pipe or from redirection respectively
-    local _num=$(</dev/stdin)
-  elif (( $# == 0 )); then
-    echo -e "ERROR: Insufficient arguments. At least one required\n"; _help
-    return 1
-  else
-    local _num=$1
-    shift
-  fi
-
-  local _ibase=${1:-16}
-  local _obase=10
-  =base $_num $_obase $_ibase
-)
-
-unset -f =hex
-=hex() (                                                                                                          # {{{1
-  _help () { # {{{
-    echo 'SYNTAX:'
-    echo '  =hex NUM [FROM=10]'
-    echo '  echo NUM | =hex [FROM=10]'
-    echo '  =hex [FROM=10] <<< "NUM"'
-  } # }}}
-
-  if (( $# >= 2 )); then
-    local _num=$1
-    shift
-  elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
-    # From pipe or from redirection respectively
-    local _num=$(</dev/stdin)
-  elif (( $# == 0 )); then
-    echo -e "ERROR: Insufficient arguments. At least one required\n"; _help
-    return 1
-  else
-    local _num=$1
-    shift
-  fi
-
-  local _ibase=${1:-10}
-  local _obase=16
-  =base $_num $_obase $_ibase
-)
+=bin() { =base $1  2 ${2:-10}; }  # Convert to binary, by default from decimal
+=dec() { =base $1 10 ${2:-16}; }  # Convert to decimal, by default from hexadecimal
+=hex() { =base $1 16 ${2:-10}; }  # Convert to hexadecimal, by default from decimal
 
 # BitSlice
 unset -f =slice
