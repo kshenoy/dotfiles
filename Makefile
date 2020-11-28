@@ -13,7 +13,7 @@ all: dotfiles-priv base16-fzf base16-shell bash emacs git tmux misc
 #== dotfiles-priv ======================================================================================================
 dotfiles-priv: ${XDG_CONFIG_HOME}/dotfiles-priv
 ${XDG_CONFIG_HOME}/dotfiles-priv:
-	git clone git@github.com:kshenoy/dotfiles-priv $@
+	if [ ! -d $@ ]; then git clone git@github.com:kshenoy/dotfiles-priv $@; fi
 
 
 #== bash ===============================================================================================================
@@ -32,13 +32,13 @@ ${HOME}/.bashrc:
 #== base16-fzf =========================================================================================================
 base16-fzf: ${XDG_CONFIG_HOME}/base16-fzf
 ${XDG_CONFIG_HOME}/base16-fzf:
-	git clone https://github.com/fnune/base16-fzf $@
+	if [ ! -d $@ ]; then git clone https://github.com/fnune/base16-fzf $@; fi
 
 
 #== base16-shell =======================================================================================================
 base16-shell: ${XDG_CONFIG_HOME}/base16-shell
 ${XDG_CONFIG_HOME}/base16-shell:
-	git clone https://github.com/chriskempson/base16-shell.git $@
+	if [ ! -d $@ ]; then git clone https://github.com/chriskempson/base16-shell.git $@; fi
 
 
 #== emacs ==============================================================================================================
@@ -60,7 +60,7 @@ emacs/vanilla/snippets:
 
 emacs-doom: ${XDG_CONFIG_HOME}/doom-emacs ${XDG_CONFIG_HOME}/doom emacs/doom/config.el  emacs/doom/init.el emacs/doom/packages.el emacs/doom/bookmarks
 ${XDG_CONFIG_HOME}/doom-emacs ${XDG_CONFIG_HOME}/doom-emacs/bin/doom:
-	git clone https://github.com/hlissner/doom-emacs $@
+	if [ ! -d $@ ]; then git clone https://github.com/hlissner/doom-emacs; fi
 ${XDG_CONFIG_HOME}/doom:
 	@${MKLINK} ${PWD}/emacs/doom $@
 emacs/doom/config.el: emacs/doom/config.org
@@ -109,7 +109,7 @@ vim/pack/rc_local:
 
 
 #== misc ===============================================================================================================
-misc: ${HOME}/.ssh/config ${HOME}/.Xresources ${HOME}/.ctags ${HOME}/.fzf.bash ${HOME}/bin/rgf ${HOME}/.unison/dotfiles.prf ${HOME}/.xinitrc ${HOME}/pipe 
+misc: ${HOME}/.ssh/config ${HOME}/.Xresources ${HOME}/.ctags ${HOME}/.fzf.bash ${HOME}/bin/rgf ${HOME}/.unison/dotfiles.prf ${HOME}/.xinitrc ${HOME}/pipe
 ${HOME}/.ssh/config:
 	@mkdir -p $(dir $@)
 	@${MKLINK} ${XDG_CONFIG_HOME}/dotfiles-priv/ssh/config $@
