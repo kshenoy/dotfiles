@@ -139,10 +139,6 @@ ${XDG_CONFIG_HOME}/xmobar:
 
 
 #=======================================================================================================================
-clean:
-	rm bash/dircolors ripgreprc emacs/vanilla/config.el git/config tmux/tmux.conf
-
-
 info:
 	$(info EUID=${EUID})
 	$(info XDG_CONFIG_HOME=${XDG_CONFIG_HOME})

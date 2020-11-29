@@ -245,8 +245,8 @@ export HISTCONTROL=ignoreboth
 
 Keeps history forever. Requires ~PROMPT_COMMAND='history -a; history -r'~
 #+begin_src bash :tangle no
-HISTFILE="$HOME/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
-mkdir -p $(dirname $HISTFILE)
+HISTFILE="${XDG_DATA_HOME:-$HOME/.local/share}/bash_history/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
+[[ -d $(dirname ${HISTFILE}) ]] || mkdir -p $(dirname ${HISTFILE})
 #+end_src
 However, a downside of this is that when sessions span multiple days, commands end up getting logged in the wrong files
 Thus, I've moved this to =PROMPT_COMMAND= instead to keep the HISTFILE current.
@@ -1523,16 +1523,20 @@ PS1+="${_fg_user_symbol}${_user_symbol}${_reset} "
 PS2="      ${_fg_user_symbol}...${_reset}   "
 #+end_src
 
-Miscellaneous stuff that I want to evaluate dynamically so I've put it here. I really should find a better place for them.
+Evaluate dynamic variables only if dyn_vars is defined (Not required for prompt)
 #+begin_src bash
-# Evaluate dynamic variables only if dyn_vars is defined (Not required for prompt)
 declare -F dyn_vars &> /dev/null && dyn_vars
+#+end_src
 
-# Putting this here to keep the HISTFILE current when sessions span multiple days
-# FIXME: Find a better way to do this i.e. do it once a day instead of everytime the prompt is refreshed
-HISTFILE="$HOME/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
-[[ -d $(dirname $HISTFILE) ]] || mkdir -p $(dirname $HISTFILE)
-# Write to the history file immediately instead of waiting till the end of the session
+Set HISTFILE here to keep it current when sessions span multiple days
+FIXME: Find a better way to do this i.e. do it once a day instead of everytime the prompt is refreshed
+#+begin_src bash
+HISTFILE="${XDG_DATA_HOME:-$HOME/.local/share}/bash_history/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
+[[ -d $(dirname ${HISTFILE}) ]] || mkdir -p $(dirname ${HISTFILE})
+#+end_src
+
+Write to the history file immediately instead of waiting till the end of the session
+#+begin_src bash
 history -a
 }
 #+end_src

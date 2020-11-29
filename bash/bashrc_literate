@@ -1470,20 +1470,30 @@ PS2="      ${_fg_user_symbol}...${_reset}   "
 
 
 
-# Miscellaneous stuff that I want to evaluate dynamically so I've put it here. I really should find a better place for them.
+# Evaluate dynamic variables only if dyn_vars is defined (Not required for prompt)
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:13]]
-# Evaluate dynamic variables only if dyn_vars is defined (Not required for prompt)
 declare -F dyn_vars &> /dev/null && dyn_vars
+# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:13 ends here
 
-# Putting this here to keep the HISTFILE current when sessions span multiple days
+
+
+# Set HISTFILE here to keep it current when sessions span multiple days
 # FIXME: Find a better way to do this i.e. do it once a day instead of everytime the prompt is refreshed
-HISTFILE="$HOME/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
-[[ -d $(dirname $HISTFILE) ]] || mkdir -p $(dirname $HISTFILE)
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:14]]
+HISTFILE="${XDG_DATA_HOME:-$HOME/.local/share}/bash_history/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
+[[ -d $(dirname ${HISTFILE}) ]] || mkdir -p $(dirname ${HISTFILE})
+# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:14 ends here
+
+
+
 # Write to the history file immediately instead of waiting till the end of the session
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:15]]
 history -a
 }
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:13 ends here
+# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:15 ends here
 
 # PATH
 
