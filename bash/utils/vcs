@@ -3,15 +3,39 @@
 # Collection of utilities to deal with all VCS related stuff
 
 vcs::is_in_git_repo() {
+  local _cwd=$PWD
+  if (( $# > 0 )); then
+    command cd $1
+  fi
+
   git rev-parse HEAD &> /dev/null
+  local _ret=$?
+
+  if (( $# > 0 )); then
+    command cd $_cwd
+  fi
+
+  return $_ret
 }
 
 vcs::is_in_perforce_repo() {
+  local _cwd=$PWD
+  if (( $# > 0 )); then
+    command cd $1
+  fi
+
   p4 info &> /dev/null
+  local _ret=$?
+
+  if (( $# > 0 )); then
+    command cd $_cwd
+  fi
+
+  return $_ret
 }
 
 vcs::is_in_repo() {
-  vcs::is_in_git_repo || vcs::is_in_perforce_repo
+  vcs::is_in_git_repo "$@" || vcs::is_in_perforce_repo "$@"
 }
 
 vcs::get_type() {
@@ -19,22 +43,13 @@ vcs::get_type() {
   # Arguments: 1 - Variable to return VCS type
   #            2 - Directory to check. If skipped, defaults to PWD
 
-  local _cwd=$PWD
-  if (( $# > 0 )); then
-    command cd $1
-  fi
-
-  if vcs::is_in_git_repo; then
+  if vcs::is_in_git_repo "$@"; then
     echo "git"
-  elif vcs::is_in_perforce_repo; then
+  elif vcs::is_in_perforce_repo "$@"; then
     echo "p4"
   else
     # No VCS. Return empty string
     echo ""
-  fi
-
-  if (( $# > 0 )); then
-    command cd $_cwd
   fi
 }
 
@@ -48,8 +63,6 @@ vcs::get_branch() {
 
   if [[ $_vcs_type == "git" ]]; then
     git symbolic-ref --short HEAD 2> /dev/null
-  elif [[ $_vcs_type == "hg" ]]; then
-    echo "$(hg branch 2> /dev/null)"
   elif [[ $_vcs_type == "p4" ]] && [[ -n "$REPO_PATH" ]] && [[ -f "$REPO_PATH/configuration_id" ]]; then
     echo "$(sed 's/@.*//' "$REPO_PATH/configuration_id" 2> /dev/null)"
   else
@@ -78,9 +91,9 @@ vcs::get_status() {
 }
 
 vcs::get_root() {
-  if vcs::is_in_git_repo; then
+  if vcs::is_in_git_repo "$@"; then
     echo "$(git rev-parse --show-toplevel)"
-  elif vcs::is_in_perforce_repo; then
+  elif vcs::is_in_perforce_repo "$@"; then
     echo "$REPO_PATH"
   else
     echo ""

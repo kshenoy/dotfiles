@@ -123,42 +123,6 @@ rm_rf_silent() {
 }
 alias rdj='rm_rf_silent'
 
-# Delete all but...                                                                                                 {{{1
-unset -f rm_but
-rm_but() {
-  # Delete all files except the specified ones.
-  # All arguments are considered relative to the PWD even if any argument has an absolute path
-  # This is because, for this function to work, two pieces of information are needed -
-  #   1. a base workarea from which
-  #   2. a list of files or folders will not be deleted
-  # The arguments provide us with 2. However, this still leaves the issue of specifying the base workarea.
-  #
-  # Also, currently, only files and folders located in the PWD can be specified.
-  # Those located in subfolders are not supported
-
-  local _names=""
-  for i in "$@"; do
-    _names="$_names -name "'"'"$i"'" -o'
-  done
-  _names=${_names%" -o"}
-  #echo $_names
-
-  echo "find . -mindepth 1 -maxdepth 1 $_names -prune -o -print"
-  find . -mindepth 1 -maxdepth 1 $_names -prune -o -print
-}
-alias rmb='rm_but'
-
-# dos2unix/unix2dos                                                                                                 {{{1
-unset -f dos2unix
-dos2unix() {
-  command sed -i -e 's/\r*$//' "$@"
-}
-unset -f unix2dos
-unix2dos() {
-  command sed -i -e 's/\r*$/\r/' "$@"
-}
-
-
 # base16 wrapper to set theme for shell+fzf etc. in one go
 unset -f base16
 base16() {
