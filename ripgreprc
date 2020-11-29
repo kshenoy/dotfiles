@@ -1,6 +1,6 @@
 # ripgrep config file
 # :PROPERTIES:
-# :header-args+: :tangle (when (executable-find "rg") "../ripgreprc")
+# :header-args+: :tangle (if (executable-find "rg") "../ripgreprc" "no")
 # :END:
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*ripgrep%20config%20file][ripgrep config file:1]]

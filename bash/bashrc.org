@@ -11,6 +11,13 @@
   # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
 #+end_src
 
+** local init
+Any local settings that need to be set initially go here
+
+#+begin_src bash :tangle (if (string-match "buntu" (system-name)) "bashrc_literate" "no")
+[[ -d /opt/fzf ]] && export FZF_PATH=/opt/fzf
+#+end_src
+
 ** interactive, login shell settings
 How to check for login v/s interactive shell
 #+begin_src bash :tangle no
@@ -28,13 +35,6 @@ if [[ $- == *i* ]]; then
     stty ixoff # enable sending (to app) of start/stop characters
     stty ixany # let any character restart output, not only start character
 fi
-#+end_src
-
-** local init
-Any local settings that need to be set initially go here
-
-#+begin_src bash :tangle (when (string-match "buntu" (system-name)) "bashrc_literate")
-[[ -d /opt/fzf ]] && export FZF_PATH=/opt/fzf
 #+end_src
 
 ** configuration
@@ -282,13 +282,9 @@ fi
 
 *** base16 themes
 #+begin_src bash
-if [[ -d "${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell" ]]; then
-    export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
-    [[ -n "$PS1" ]] && \
-        [[ -s $BASE16_SHELL/profile_helper.sh ]] && \
-        eval "$($BASE16_SHELL/profile_helper.sh)"
-    base16_solarized-light
-fi
+export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
+[[ -n "$PS1" ]] && [[ -s $BASE16_SHELL/profile_helper.sh ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
+base16_solarized-light
 #+end_src
 
 *** colored man pages with less
@@ -1219,7 +1215,7 @@ _query_pp_() {                                                                  
 
 *** [[https://github.com/BurntSushi/ripgrep][ripgrep]]
 :PROPERTIES:
-:header-args+: :tangle (when (executable-find "rg") "bashrc_literate")
+:header-args+: :tangle (if (executable-find "rg") "bashrc_literate" "no")
 :END:
 This will be tangled only if =rg= exists
 #+begin_src bash
@@ -1229,7 +1225,7 @@ alias g=rg
 
 **** ripgrep config file
 :PROPERTIES:
-:header-args+: :tangle (when (executable-find "rg") "../ripgreprc")
+:header-args+: :tangle (if (executable-find "rg") "../ripgreprc" "no")
 :END:
 #+begin_src conf
 # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
@@ -1553,7 +1549,7 @@ clnpath
 ** local override
 *** home (*buntu)
 :PROPERTIES:
-:header-args: :tangle (when (string-match "buntu" (system-name)) "bashrc_literate")
+:header-args: :tangle (if (string-match "buntu" (system-name)) "bashrc_literate" "no")
 :END:
 
 To connect to work-vpn
@@ -1593,6 +1589,9 @@ alias boot2win='sudo grub-reboot Windows && shutdown -r 0'
 #+end_src
 
 *** wsl
+:PROPERTIES:
+:header-args: :tangle (if (string-match "wsl" (system-name)) "bashrc_literate" "no")
+:END:
 #+begin_src bash
 export LIBGL_ALWAYS_INDIRECT=1
 # Need to specify the IP of the host

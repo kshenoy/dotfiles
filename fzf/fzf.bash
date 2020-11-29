@@ -33,8 +33,8 @@ fi
 
 # Clear out old env vars
 export FZF_DEFAULT_OPTS="--ansi --select-1 --exit-0 --inline-info --reverse --tiebreak=length,end --bind=ctrl-n:down,ctrl-p:up"
-export FZF_ALT_C_OPTS=
-export FZF_CTRL_T_OPTS=
+unset FZF_ALT_C_OPTS
+unset FZF_CTRL_T_OPTS
 # export FZF_CTRL_T_OPTS='--expect=alt-v,alt-e,alt-c'
 
 # base16 fzf colorscheme is applied by appending to the FZF_DEFAULT_OPTS env var

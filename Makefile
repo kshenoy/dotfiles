@@ -17,14 +17,12 @@ ${XDG_CONFIG_HOME}/dotfiles-priv:
 
 
 #== bash ===============================================================================================================
-bash: bash/bashrc bash/dircolors ripgreprc ${HOME}/.bashrc
+bash: bash/bashrc_literate bash/dircolors ripgreprc ${HOME}/.bashrc
 # Using grouped targets here to run tangle bash/bashrc.org only once. Supported only for make versions >= 4.3
-bash/bashrc bash/dircolors ripgreprc &: bash/bashrc.org
+bash/bashrc_literate bash/dircolors ripgreprc &: bash/bashrc.org
 	${TANGLE} $<
-# FIXME: Temporary workaround as bashrc is tangled to /tmp at the moment
-	@touch $@
 ${HOME}/.bashrc:
-	@${MKLINK} ${PWD}/bash/bashrc $@
+	@${MKLINK} ${PWD}/bash/bashrc_literate $@
 	@mkdir -p ${XDG_DATA_HOME}/bash_history
 	@command rm -i ${HOME}/.bash_history 2> /dev/null
 

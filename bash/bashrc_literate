@@ -9,6 +9,14 @@
 # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
 # bashrc:1 ends here
 
+# local init
+# Any local settings that need to be set initially go here
+
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*local%20init][local init:1]]
+[[ -d /opt/fzf ]] && export FZF_PATH=/opt/fzf
+# local init:1 ends here
+
 
 
 # If shell is interactive turn off TTY "start" and "stop" commands in all interactive shells.
@@ -23,14 +31,6 @@ if [[ $- == *i* ]]; then
     stty ixany # let any character restart output, not only start character
 fi
 # interactive, login shell settings:2 ends here
-
-# local init
-# Any local settings that need to be set initially go here
-
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*local%20init][local init:1]]
-[[ -d /opt/fzf ]] && export FZF_PATH=/opt/fzf
-# local init:1 ends here
 
 # configuration
 # default permissions
@@ -368,13 +368,9 @@ fi
 # base16 themes
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*base16%20themes][base16 themes:1]]
-if [[ -d "${XDG_CONFIG_HOME:-HOME/.config}/base16-shell" ]]; then
-    export BASE16_SHELL=${XDG_CONFIG_HOME:-HOME/.config}/base16-shell
-    [[ -n "$PS1" ]] && \
-        [[ -s $BASE16_SHELL/profile_helper.sh ]] && \
-        eval "$($BASE16_SHELL/profile_helper.sh)"
-    base16_solarized-light
-fi
+export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
+[[ -n "$PS1" ]] && [[ -s $BASE16_SHELL/profile_helper.sh ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
+base16_solarized-light
 # base16 themes:1 ends here
 
 # colored man pages with less
@@ -621,11 +617,11 @@ rm_rf_silent() {
         # Remove trailing slash and move to hidden
         ni=${i/%\//}
         bi=$(basename $ni)
-        ni=${ni/%${bi}/.${bi}}
+        ni=${ni/%$bi/.$bi}
 
-        #echo ${ni}.$$
-        command mv $i ${ni}.$$
-        command rm -rf ${ni}.$$ &
+        #echo $ni.$$
+        command mv $i $ni.$$
+        command rm -rf $ni.$$ &
     done
 }
 alias rdj='rm_rf_silent'
@@ -671,15 +667,15 @@ alert() {
 
     # Add TMUX information if available
     if [[ -n $TMUX ]]; then
-        _msg="$(tmux display-message -p "[#S:#I.#P]") ${_msg}"
+        _msg="$(tmux display-message -p "[#S:#I.#P]") $_msg"
     else
-        _msg="[$$] ${_msg}"
+        _msg="[$$] $_msg"
     fi
 
     # Indicate normal completion or error
     local _icon=$( (($? == 0)) && echo terminal || echo error)
 
-    notify-send --urgency=low -i ${_icon} "${_msg}"
+    notify-send --urgency=low -i $_icon "$_msg"
 }
 # alert:1 ends here
 
@@ -706,7 +702,7 @@ unset -f =
         elif [[ $_input =~ 0b ]]; then
             local _base=2
         fi
-        _input="(${_input}).to_s(${_base})"
+        _input="($_input).to_s($_base)"
     fi
 
     local _result=$(echo "$_input" | irb -m --noverbose | command sed 's/"//g')
@@ -757,7 +753,7 @@ unset -f =base
         16) _num=$(tr '[a-f]' '[A-F]' <<< "${_num#0[xX]}") ;;
     esac
 
-    local _result=$(echo "obase=${_obase}; ibase=${_ibase}; $_num" | bc)
+    local _result=$(echo "obase=$_obase; ibase=$_ibase; $_num" | bc)
     case $_obase in
         2)  _result="0b${_result}" ;;
         16) _result="0x${_result}" ;;
@@ -892,7 +888,7 @@ else
     # base16 fzf colorscheme is applied by appending to the FZF_DEFAULT_OPTS env var
     # Thus, I "set" it first before sourcing the base16 file which appends to it
     export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
-    [[ -n "$BASE16_THEME" ]] && source "${BASE16_FZF}/bash/base16-${BASE16_THEME}.config"
+    [[ -n "$BASE16_THEME" ]] && source "$BASE16_FZF/bash/base16-${BASE16_THEME}.config"
 fi
 # fzf:1 ends here
 
@@ -1048,8 +1044,8 @@ _query_alias_() {                                                               
       fi
     done
     for _i in ${_query_next[@]}; do
-      _query_tree[${_level_next}]=$(( ${_query_tree[$_level_next]} - 1 ))
-      query "${_cmd_recurse[@]}" --level ${_level_next} $_i
+      _query_tree[$_level_next]=$(( ${_query_tree[$_level_next]} - 1 ))
+      query "${_cmd_recurse[@]}" --level $_level_next $_i
     done
   fi
 }
@@ -1120,7 +1116,7 @@ _query_pp_() {                                                                  
       fi
     done
     if (( ${_query_tree[${_query_opts[level]}]} == 0 )); then
-      _x_bar=${_xl_bar}
+      _x_bar=$_xl_bar
     fi
     _query_pp[sep]="${_query_pp[spc]%????}${_x_bar}${_h_bar}${_h_bar} "
     echo "${_query_pp[spc]%????}${_v_bar}"
@@ -1142,7 +1138,7 @@ _query_pp_() {                                                                  
   fi
 
   local _type=$(command type -t -- "${_query_opts[input]}")
-  #echo "DEBUG: Input='${_query_opts[input]}', Type='${_type}'"
+  #echo "DEBUG: Input='${_query_opts[input]}', Type='$_type'"
 
   # Pretty-print the tree structure for recursive lookups
   local -A _query_pp=()
@@ -1175,7 +1171,7 @@ alias que=query
 
 # [[https://github.com/BurntSushi/ripgrep][ripgrep]]
 # :PROPERTIES:
-# :header-args+: :tangle (when (executable-find "rg") "bashrc_literate")
+# :header-args+: :tangle (if (executable-find "rg") "bashrc_literate" "no")
 # :END:
 # This will be tangled only if =rg= exists
 
@@ -1257,7 +1253,7 @@ shopt -s checkwinsize
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*Colors%20and%20helper%20functions][Colors and helper functions:2]]
 __get_compact_pwd() {
-    local _pwd=${PWD}
+    local _pwd=$PWD
     if [[ -n "$HOME" ]] && [[ "$_pwd" =~ ^"$HOME" ]]; then
         _pwd=${_pwd/#$HOME/\~};
     fi
@@ -1322,8 +1318,8 @@ local _host="$(hostname) "
 # If root user then colour the arrow red.
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:3]]
-if (( "${UID}" == 0 )); then
-    local _fg_user_symbol=${_fg_red}
+if (( "$UID" == 0 )); then
+    local _fg_user_symbol=$_fg_red
 else
     local _fg_user_symbol=${_bold}${_fg_light_black}
 fi
@@ -1335,7 +1331,7 @@ fi
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:4]]
 local _vcs_type=$(vcs::get_type)
-local _vcs_branch=$(vcs::get_branch ${_vcs_type})
+local _vcs_branch=$(vcs::get_branch $_vcs_type)
 local _vcs_sep=" on "
 
 if [[ $_vcs_type == "git" ]]; then
@@ -1482,8 +1478,8 @@ declare -F dyn_vars &> /dev/null && dyn_vars
 
 # Putting this here to keep the HISTFILE current when sessions span multiple days
 # FIXME: Find a better way to do this i.e. do it once a day instead of everytime the prompt is refreshed
-HISTFILE="${HOME}/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
-[[ -d $(dirname ${HISTFILE}) ]] || mkdir -p $(dirname ${HISTFILE})
+HISTFILE="$HOME/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
+[[ -d $(dirname $HISTFILE) ]] || mkdir -p $(dirname $HISTFILE)
 # Write to the history file immediately instead of waiting till the end of the session
 history -a
 }
@@ -1495,7 +1491,7 @@ history -a
 if ((which ruby &> /dev/null) && (which gem &> /dev/null)); then
   export PATH="$(ruby -rubygems -e 'puts Gem.user_dir')/bin:$PATH"
 fi
-export PATH="${HOME}/bin:${HOME}/.local/bin:$PATH"
+export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 clnpath
 # PATH:1 ends here
 
@@ -1526,14 +1522,6 @@ if [[ "$SHLVL" = 1 ]]; then
 fi
 
 alias boot2win='sudo grub-reboot Windows && shutdown -r 0'
-
-# wsl
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*wsl][wsl:1]]
-export LIBGL_ALWAYS_INDIRECT=1
-# Need to specify the IP of the host
-export DISPLAY=192.168.1.122:0
-# wsl:1 ends here
 
 # command completion
 
@@ -1612,7 +1600,7 @@ _compl_alias() {
     fi
     [[ -z "$_cmd" ]] && return
 
-    eval "$(complete -p $_cmd | sed "s/${_cmd}$/${_alias}/")"
+    eval "$(complete -p $_cmd | sed "s/$_cmd$/$_alias/")"
 }
 # alias completion:1 ends here
 
