@@ -1,12 +1,11 @@
-#!/usr/bin/env bash -f
-# Function to simplify using tmux
+#!/usr/bin/env bash
+# Function to simplify using tmux. This file must be sourced
 
 __tmux_exe() {
-    # echo command tmux "$TMUX_DEFAULT_OPTS ${TMUX_DEFAULT_SOCKET:+-L $TMUX_DEFAULT_SOCKET} $@"
-    LANG=en_US.UTF-8 command tmux "$TMUX_DEFAULT_OPTS ${TMUX_DEFAULT_SOCKET:+-L $TMUX_DEFAULT_SOCKET} $@"
+    LANG=en_US.UTF-8 TMUX_DEFAULT_OPTS="$TMUX_DEFAULT_OPTS ${TMUX_DEFAULT_SOCKET:+-L $TMUX_DEFAULT_SOCKET}" command tmux "$@"
 }
 
-__tmux_pp_attach_or_new() {
+__tmuxw_attach_or_new() {
     # Attach to existing session or else create a new one
     if [[ ! -z "$TMUX" ]]; then return; fi
 
@@ -28,7 +27,7 @@ __tmux_pp_attach_or_new() {
 }
 
 
-__tmux_pp_update_env() {
+__tmuxw_update_env() {
     # Update environment variables in TMUX
     # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
     echo "Updating to latest tmux environment...";
@@ -48,7 +47,7 @@ __tmux_pp_update_env() {
 }
 
 
-__tmux_pp_send_keys_other_panes() {
+__tmuxw_send_keys_other_panes() {
     local _pane_current=$(tmux display-message -p '#P')
     for _pane in $(tmux list-panes -F '#P'); do
         if (( "$_pane" != "$_pane_current" )); then
@@ -58,14 +57,14 @@ __tmux_pp_send_keys_other_panes() {
 }
 
 
-__tmux_pp_send_keys_all_panes() {
+__tmuxw_send_keys_all_panes() {
     for _pane in $(tmux list-panes -F '#P'); do
         __tmux_exe send-keys -t ${_pane} "$@"
     done
 }
 
 
-__tmux_pp_send_keys_all() {
+__tmuxw_send_keys_all() {
     for _window in $(tmux list-windows -F '#I'); do
         for _pane in $(tmux list-panes -t ${_window} -F '#P'); do
             __tmux_exe send-keys -t ${_window}.${_pane} "$@"
@@ -74,7 +73,7 @@ __tmux_pp_send_keys_all() {
 }
 
 
-__tmux_pp_select_layout_work() {
+__tmuxw_select_layout_work() {
     local num_panes=$(__tmux_exe display-message -p "#{window_panes}")
     local win_width=$(__tmux_exe display-message -p "#{window_width}")
     local win_width_by2=$(( $win_width / 2 ))
@@ -90,28 +89,28 @@ __tmux_pp_select_layout_work() {
 
     if [[ "$1" == "work-max" ]]; then
         __tmux_exe select-layout "1be5,639x73,0,0{319x73,0,0,0,159x73,320,0,1,159x73,480,0,58}"
-        tmux_pp resize-pane -t 2 -x 100% > /dev/null
-        tmux_pp resize-pane -t 1 -x 50% > /dev/null
+        tmuxw resize-pane -t 2 -x 100% > /dev/null
+        tmuxw resize-pane -t 1 -x 50% > /dev/null
     elif [[ "$1" == "work-home" ]]; then
         __tmux_exe select-layout "1be5,639x73,0,0{319x73,0,0,0,159x73,320,0,1,159x73,480,0,58}"
-        tmux_pp resize-pane -t 1 -x 25% > /dev/null
-        tmux_pp resize-pane -t 2 -x 50% > /dev/null
+        tmuxw resize-pane -t 1 -x 25% > /dev/null
+        tmuxw resize-pane -t 2 -x 50% > /dev/null
     elif [[ "$1" == "work-pc" ]]; then
         __tmux_exe select-layout "1be5,639x73,0,0{319x73,0,0,0,159x73,320,0,1,159x73,480,0,58}"
-        tmux_pp resize-pane -t 1 -x 50% > /dev/null
-        tmux_pp resize-pane -t 2 -x 25% > /dev/null
+        tmuxw resize-pane -t 1 -x 50% > /dev/null
+        tmuxw resize-pane -t 2 -x 25% > /dev/null
     elif [[ "$1" == "work-lp" ]]; then
         __tmux_exe select-layout "96ed,319x66,0,0{159x66,0,0,0,159x66,160,0[159x32,160,0,1,159x33,160,33,90]}"
-        tmux_pp resize-pane -t 1 -x 50% > /dev/null
-        tmux_pp resize-pane -t 2 -y 50% > /dev/null
+        tmuxw resize-pane -t 1 -x 50% > /dev/null
+        tmuxw resize-pane -t 2 -y 50% > /dev/null
     fi
 
     __tmux_exe select-pane -t $curr_pane
 }
 
 
-tmux_pp() {
-    # We can't make the helper functions private because doing so will run tmux_pp in a subshell
+tmuxw() {
+    # We can't make the helper functions private because doing so will run tmuxw in a subshell
     # However, since we can't export variables from a subshell to its parent shell, tmux_update_env won't work
     if (( $# == 0 )); then
         __tmux_exe
@@ -123,7 +122,7 @@ tmux_pp() {
     case $cmd in
         attach-new|an)
             # if (( $(__tmux_exe -V) < 2.3 )); then
-            __tmux_pp_attach_or_new "$@"
+            __tmuxw_attach_or_new "$@"
             # else
             # __tmux_exe new-session -A -s "$@"
             # fi
@@ -135,15 +134,15 @@ tmux_pp() {
 
         update-env|ue)
             if (( $# > 0 )); then echo "Ignoring extra arguments: '$@'"; fi
-            __tmux_pp_update_env
+            __tmuxw_update_env
             ;;
 
         update-env-all-panes|ueap)
-            tmux_pp send-keys-all-panes "tmux_pp ue" C-m
+            tmuxw send-keys-all-panes "tmuxw ue" C-m
             ;;
 
         update-env-all|uea)
-            tmux_pp send-keys-all "tmux_pp ue" C-m
+            tmuxw send-keys-all "tmuxw ue" C-m
             ;;
 
         resize-p*|resizep)
@@ -174,7 +173,7 @@ tmux_pp() {
 
         select-layout|sl)
             if [[ "$1" =~ "work" ]]; then
-                __tmux_pp_select_layout_work "$1"
+                __tmuxw_select_layout_work "$1"
             else
                 __tmux_exe ${cmd} "$@"
             fi
@@ -185,15 +184,15 @@ tmux_pp() {
             ;;
 
         send-keys-other-panes|skop)
-            __tmux_pp_send_keys_other_panes "$@"
+            __tmuxw_send_keys_other_panes "$@"
             ;;
 
         send-keys-all-panes|skap)
-            __tmux_pp_send_keys_all_panes "$@"
+            __tmuxw_send_keys_all_panes "$@"
             ;;
 
         send-keys-all|ska)
-            __tmux_pp_send_keys_all "$@"
+            __tmuxw_send_keys_all "$@"
             ;;
 
         *)

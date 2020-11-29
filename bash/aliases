@@ -195,6 +195,6 @@ alias gs='git status'
 
 #=============
 # Misc Tools
-alias tmux='tmux_pp'
+alias tmux='tmuxw'
 alias tm='tmux'
 # alias tmi=tmuxinator

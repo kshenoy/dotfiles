@@ -311,9 +311,9 @@ Swap panes. These are the default bindings
 #+end_src
 
 #+begin_src conf
-  bind M-7 run-shell 'bash -ci "tmux_pp select-layout work-lp"  > /dev/null'
-  bind M-8 run-shell 'bash -ci "tmux_pp select-layout work-pc"  > /dev/null'
-  bind M-9 run-shell 'bash -ci "tmux_pp select-layout work-max" > /dev/null'
+  bind M-7 run-shell 'bash -ci "tmuxw select-layout work-lp"  > /dev/null'
+  bind M-8 run-shell 'bash -ci "tmuxw select-layout work-pc"  > /dev/null'
+  bind M-9 run-shell 'bash -ci "tmuxw select-layout work-max" > /dev/null'
 #+end_src
 
 #+begin_src conf

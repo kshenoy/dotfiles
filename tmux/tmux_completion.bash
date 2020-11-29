@@ -187,4 +187,4 @@ _tmux_complete_() (
   return 0
 )
 complete -F _tmux_complete_ tmux
-complete -F _tmux_complete_ tmux_pp
+complete -F _tmux_complete_ tmuxw
