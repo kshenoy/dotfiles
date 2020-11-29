@@ -245,8 +245,8 @@ export HISTCONTROL=ignoreboth
 
 Keeps history forever. Requires ~PROMPT_COMMAND='history -a; history -r'~
 #+begin_src bash :tangle no
-HISTFILE="${HOME}/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
-mkdir -p $(dirname ${HISTFILE})
+HISTFILE="$HOME/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
+mkdir -p $(dirname $HISTFILE)
 #+end_src
 However, a downside of this is that when sessions span multiple days, commands end up getting logged in the wrong files
 Thus, I've moved this to =PROMPT_COMMAND= instead to keep the HISTFILE current.
@@ -282,8 +282,8 @@ fi
 
 *** base16 themes
 #+begin_src bash
-if [[ -d "${XDG_CONFIG_HOME:-HOME/.config}/base16-shell" ]]; then
-    export BASE16_SHELL=${XDG_CONFIG_HOME:-HOME/.config}/base16-shell
+if [[ -d "${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell" ]]; then
+    export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
     [[ -n "$PS1" ]] && \
         [[ -s $BASE16_SHELL/profile_helper.sh ]] && \
         eval "$($BASE16_SHELL/profile_helper.sh)"
@@ -530,11 +530,11 @@ rm_rf_silent() {
         # Remove trailing slash and move to hidden
         ni=${i/%\//}
         bi=$(basename $ni)
-        ni=${ni/%${bi}/.${bi}}
+        ni=${ni/%$bi/.$bi}
 
-        #echo ${ni}.$$
-        command mv $i ${ni}.$$
-        command rm -rf ${ni}.$$ &
+        #echo $ni.$$
+        command mv $i $ni.$$
+        command rm -rf $ni.$$ &
     done
 }
 alias rdj='rm_rf_silent'
@@ -578,15 +578,15 @@ alert() {
 
     # Add TMUX information if available
     if [[ -n $TMUX ]]; then
-        _msg="$(tmux display-message -p "[#S:#I.#P]") ${_msg}"
+        _msg="$(tmux display-message -p "[#S:#I.#P]") $_msg"
     else
-        _msg="[$$] ${_msg}"
+        _msg="[$$] $_msg"
     fi
 
     # Indicate normal completion or error
     local _icon=$( (($? == 0)) && echo terminal || echo error)
 
-    notify-send --urgency=low -i ${_icon} "${_msg}"
+    notify-send --urgency=low -i $_icon "$_msg"
 }
 #+end_src
 
@@ -612,7 +612,7 @@ unset -f =
         elif [[ $_input =~ 0b ]]; then
             local _base=2
         fi
-        _input="(${_input}).to_s(${_base})"
+        _input="($_input).to_s($_base)"
     fi
 
     local _result=$(echo "$_input" | irb -m --noverbose | command sed 's/"//g')
@@ -660,7 +660,7 @@ unset -f =base
         16) _num=$(tr '[a-f]' '[A-F]' <<< "${_num#0[xX]}") ;;
     esac
 
-    local _result=$(echo "obase=${_obase}; ibase=${_ibase}; $_num" | bc)
+    local _result=$(echo "obase=$_obase; ibase=$_ibase; $_num" | bc)
     case $_obase in
         2)  _result="0b${_result}" ;;
         16) _result="0x${_result}" ;;
@@ -772,11 +772,11 @@ DirStack - Emulate Zsh's behavior of pushd lifting the directory to tos instead 
     fi
 
     local _dirstack=($(command dirs))
-    case ${_dir} in
+    case "$_dir" in
       +[0-9]*)
         #echo "Jumping to a dir on the stack"
         # $[#_dirstack[@]] gives the number of elements in _dirstack
-        #if ((${_dir}<$[#_dirstack[@]])); then
+        #if (( $_dir < ${#_dirstack[@]})); then
         command popd $1 > /dev/null
         command pushd ${_dirstack[$1]/#~/$HOME} > /dev/null
         ;;
@@ -799,11 +799,11 @@ DirStack - Emulate Zsh's behavior of pushd lifting the directory to tos instead 
       ,*\*\**)
         local _src=${1%%\*\**}; _src=${_src:-.}
         local _dst=${1##*\*\*}
-        # echo find ${_src} -type d -path "*${_dst}" -print -quit
-        _dir=$(find ${_src} -type d -path "*${_dst}" -print -quit)
-        if [[ -z ${_dir} ]]; then
+        # echo find $_src -type d -path "*${_dst}" -print -quit
+        _dir=$(find $_src -type d -path "*${_dst}" -print -quit)
+        if [[ -z "$_dir" ]]; then
           # find was unable to find a matching directory
-          echo "ERROR: Unable to find ${_dst#/} under ${_src}"
+          echo "ERROR: Unable to find ${_dst#/} under $_src"
           return 1
         fi
         ;;&  # This will cause it to get evaluated against *) as well
@@ -815,7 +815,7 @@ DirStack - Emulate Zsh's behavior of pushd lifting the directory to tos instead 
 
       ,*)
         #echo "Pushing $_dir onto the stack"
-        command pushd ${_dir} > /dev/null
+        command pushd $_dir > /dev/null
         if [[ $? != 0 ]]; then return; fi
 
         # Remove any duplicate entries
@@ -844,7 +844,7 @@ Smarter =..= eg. =.. 3= will jump up 3 levels. Also take a look at [[id:19b2ef22
       _levels=1;
     fi;
 
-    cd $(printf '../%.0s' $(seq 1 ${_levels}))
+    cd $(printf '../%.0s' $(seq 1 $_levels))
   }
 #+end_src
 
@@ -905,7 +905,7 @@ else
     # base16 fzf colorscheme is applied by appending to the FZF_DEFAULT_OPTS env var
     # Thus, I "set" it first before sourcing the base16 file which appends to it
     export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
-    [[ -n "$BASE16_THEME" ]] && source "${BASE16_FZF}/bash/base16-${BASE16_THEME}.config"
+    [[ -n "$BASE16_THEME" ]] && source "$BASE16_FZF/bash/base16-${BASE16_THEME}.config"
 fi
 #+end_src
 
@@ -925,17 +925,17 @@ Based on [[http://brettterpstra.com/2014/05/14/up-fuzzy-navigation-up-a-director
 
     # Jumping to a subdirectory of the parent dir in the path
     local _targ=${1%%/*}
-    local _subdir="${1/${_targ}/}"
+    local _subdir="${1/$_targ/}"
     # echo "Targ:$_targ, SubDir:$_subdir" >> log
 
     # Plain-old jumping, no fuzziness
     # local _dir=$(echo $PWD | sed "s,\(^.*${_targ}[^/]*\)/.*$,\1,")
 
     # Remove spaces, escape any bare dots and add fuzzy magic
-    local _rx=$(ruby -e "print '${_targ}'.gsub(/\s+/,'').split('').join('.*?').gsub(/\.(?!\*\?)/,'\.')")
+    local _rx=$(ruby -e "print '$_targ'.gsub(/\s+/,'').split('').join('.*?').gsub(/\.(?!\*\?)/,'\.')")
     local _dir=$(echo $PWD | ruby -e "print STDIN.read.sub(/(.*?\/${_rx}[^\/]*).*/,'\1')")
 
-    echo ${_dir}/${_subdir}
+    echo $_dir/$_subdir
   }
 
   alias ,=jumper
@@ -1092,8 +1092,8 @@ _query_alias_() {                                                               
       fi
     done
     for _i in ${_query_next[@]}; do
-      _query_tree[${_level_next}]=$(( ${_query_tree[$_level_next]} - 1 ))
-      query "${_cmd_recurse[@]}" --level ${_level_next} $_i
+      _query_tree[$_level_next]=$(( ${_query_tree[$_level_next]} - 1 ))
+      query "${_cmd_recurse[@]}" --level $_level_next $_i
     done
   fi
 }
@@ -1164,7 +1164,7 @@ _query_pp_() {                                                                  
       fi
     done
     if (( ${_query_tree[${_query_opts[level]}]} == 0 )); then
-      _x_bar=${_xl_bar}
+      _x_bar=$_xl_bar
     fi
     _query_pp[sep]="${_query_pp[spc]%????}${_x_bar}${_h_bar}${_h_bar} "
     echo "${_query_pp[spc]%????}${_v_bar}"
@@ -1186,7 +1186,7 @@ _query_pp_() {                                                                  
   fi
 
   local _type=$(command type -t -- "${_query_opts[input]}")
-  #echo "DEBUG: Input='${_query_opts[input]}', Type='${_type}'"
+  #echo "DEBUG: Input='${_query_opts[input]}', Type='$_type'"
 
   # Pretty-print the tree structure for recursive lookups
   local -A _query_pp=()
@@ -1361,7 +1361,7 @@ Contract the following: /proj/ch_func_dev{1:0}/ASPEN_HIGHLANDS -> ~AH{1:0}
 Contract more if it's my directory
 #+begin_src bash
 __get_compact_pwd() {
-    local _pwd=${PWD}
+    local _pwd=$PWD
     if [[ -n "$HOME" ]] && [[ "$_pwd" =~ ^"$HOME" ]]; then
         _pwd=${_pwd/#$HOME/\~};
     fi
@@ -1404,8 +1404,8 @@ local _host="$(hostname) "
 
 If root user then colour the arrow red.
 #+begin_src bash
-if (( "${UID}" == 0 )); then
-    local _fg_user_symbol=${_fg_red}
+if (( "$UID" == 0 )); then
+    local _fg_user_symbol=$_fg_red
 else
     local _fg_user_symbol=${_bold}${_fg_light_black}
 fi
@@ -1414,7 +1414,7 @@ fi
 VCS specific
 #+begin_src bash
 local _vcs_type=$(vcs::get_type)
-local _vcs_branch=$(vcs::get_branch ${_vcs_type})
+local _vcs_branch=$(vcs::get_branch $_vcs_type)
 local _vcs_sep=" on "
 
 if [[ $_vcs_type == "git" ]]; then
@@ -1534,8 +1534,8 @@ declare -F dyn_vars &> /dev/null && dyn_vars
 
 # Putting this here to keep the HISTFILE current when sessions span multiple days
 # FIXME: Find a better way to do this i.e. do it once a day instead of everytime the prompt is refreshed
-HISTFILE="${HOME}/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
-[[ -d $(dirname ${HISTFILE}) ]] || mkdir -p $(dirname ${HISTFILE})
+HISTFILE="$HOME/.history_bash/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
+[[ -d $(dirname $HISTFILE) ]] || mkdir -p $(dirname $HISTFILE)
 # Write to the history file immediately instead of waiting till the end of the session
 history -a
 }
@@ -1546,7 +1546,7 @@ history -a
 if ((which ruby &> /dev/null) && (which gem &> /dev/null)); then
   export PATH="$(ruby -rubygems -e 'puts Gem.user_dir')/bin:$PATH"
 fi
-export PATH="${HOME}/bin:${HOME}/.local/bin:$PATH"
+export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 clnpath
 #+end_src
 
@@ -1676,7 +1676,7 @@ _compl_alias() {
     fi
     [[ -z "$_cmd" ]] && return
 
-    eval "$(complete -p $_cmd | sed "s/${_cmd}$/${_alias}/")"
+    eval "$(complete -p $_cmd | sed "s/$_cmd$/$_alias/")"
 }
 #+end_src
 
