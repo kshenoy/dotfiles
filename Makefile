@@ -46,7 +46,7 @@ emacs: chemacs emacs-vanilla emacs-doom ${HOME}/bin/emacs_daemon
 
 chemacs: ${HOME}/.emacs ${HOME}/.emacs-profiles.el
 ${HOME}/.emacs:
-	wget -O ${HOME}/.emacs https://raw.githubusercontent.com/plexus/chemacs/master/.emacs
+	wget -O $@ https://raw.githubusercontent.com/plexus/chemacs/master/.emacs
 ${HOME}/.emacs-profiles.el:
 	@${MKLINK} ${PWD}/emacs/emacs-profiles.el $@
 
@@ -58,9 +58,9 @@ emacs/vanilla/bookmarks:
 emacs/vanilla/snippets:
 	@${MKLINK} ${PWD}/emacs/snippets $@
 
-emacs-doom: ${XDG_CONFIG_HOME}/doom-emacs ${XDG_CONFIG_HOME}/doom emacs/doom/config.el  emacs/doom/init.el emacs/doom/packages.el emacs/doom/bookmarks
-${XDG_CONFIG_HOME}/doom-emacs ${XDG_CONFIG_HOME}/doom-emacs/bin/doom:
-	if [ ! -d $@ ]; then git clone https://github.com/hlissner/doom-emacs; fi
+emacs-doom: ${XDG_CONFIG_HOME}/doom-emacs ${XDG_CONFIG_HOME}/doom emacs/doom/config.el emacs/doom/init.el emacs/doom/packages.el emacs/doom/bookmarks
+${XDG_CONFIG_HOME}/doom-emacs:
+	if [ ! -d $@ ]; then git clone https://github.com/hlissner/doom-emacs $@; fi
 ${XDG_CONFIG_HOME}/doom:
 	@${MKLINK} ${PWD}/emacs/doom $@
 emacs/doom/config.el: emacs/doom/config.org
