@@ -1,6 +1,7 @@
 #+TITLE: Doom emacs private configuration
 #+PROPERTY: header-args :results output silent :noweb tangle :comments both :mkdirp yes
-#+FILETAG:
+#+TODO: FIXME | DONE
+
 
 Running =doom sync= is not required after modifying this file!
 
@@ -16,6 +17,9 @@ To get information about any of these functions/macros, move the cursor over the
 Also, =gd= (or =C-c c d=) will jump to their definition and see how they are implemented.
 
 * General
+:PROPERTIES:
+:END:
+
 Some functionality uses this to identify you, e.g. GPG configuration, email clients, file templates and snippets.
 #+begin_src emacs-lisp
   (setq user-full-name "Kartik Shenoy")
@@ -129,7 +133,8 @@ Use =org-goto= instead of =semantic-or-imenu= when in org files
 #+end_src
 
 * evil
-FIXME: Move by visual lines
+** Keybindings
+Move by visual lines
 #+begin_src emacs-lisp
 (map! :after evil
       :map evil-motion-state-map
@@ -145,7 +150,7 @@ FIXME: Move by visual lines
   (evil-redirect-digit-argument evil-motion-state-map "0" 'evil-beginning-of-visual-line))
 #+end_src
 
-FIXME: Change evil-exchange binding from =g x= to =c x=
+*** Change evil-exchange binding from =g x= to =c x=
 
 * org
 
@@ -165,6 +170,9 @@ Specify locations of files
 #+end_src
 
 ** Prettify
+:PROPERTIES:
+:END:
+
 - org-superstart default: "◉ ○ ✸ ✿"
 - Large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
 - Small: ► • ★ ▸
@@ -177,21 +185,45 @@ Specify locations of files
 
 Prevent DONE org-headlines from being highlighted a different color
 #+begin_src emacs-lisp
-(setq org-fontify-done-headline nil)
+(after! org
+  (setq org-fontify-done-headline nil))
 #+end_src
 
-Scale Title and headlines
+Change faces
 #+begin_src emacs-lisp
 (after! org
-  (set-face-attribute 'org-document-info-keyword nil :inherit 'org-meta-line)
-  (set-face-attribute 'org-document-title nil :height 1.5)
-  (set-face-attribute 'org-level-1 nil :height 1.3)
-  (set-face-attribute 'org-level-2 nil :height 1.2)
-  (set-face-attribute 'org-level-3 nil :height 1.15)
-  (set-face-attribute 'org-level-4 nil :height 1.1)
 
-  (when (eq doom-theme 'doom-solarized-light)
-    (set-face-attribute 'org-document-title nil :foreground "#586e75")))
+  (defun my-update-org-faces-after-load-theme ()
+    "Update some org-mode faces for all themes"
+    (set-face-attribute 'org-document-info-keyword nil :inherit 'org-meta-line :foreground nil)
+    (set-face-attribute 'org-drawer                nil :inherit 'org-meta-line :foreground nil)
+    (set-face-attribute 'org-document-title        nil :height 1.5)
+    (set-face-attribute 'org-level-1               nil :height 1.3)
+    (set-face-attribute 'org-level-2               nil :height 1.2)
+    (set-face-attribute 'org-level-3               nil :height 1.15)
+    (set-face-attribute 'org-level-4               nil :height 1.1))
+
+  (defun my-update-org-faces-for-doom-solarized-light ()
+    "Update some org-mode faces for doom-solarized-light theme"
+    (my-update-org-faces-after-load-theme)
+    (set-face-attribute 'org-document-title nil :foreground "#586e75")
+    (set-face-attribute 'org-level-1        nil :foreground "#cb4b16")
+    (set-face-attribute 'org-level-2        nil :foreground "#859900")
+    (set-face-attribute 'org-level-3        nil :foreground "#268bd2")
+    (set-face-attribute 'org-level-4        nil :foreground "#b58900")
+    (set-face-attribute 'org-level-5        nil :foreground "#2aa198")
+    (set-face-attribute 'org-level-6        nil :foreground "#859900")
+    (set-face-attribute 'org-level-7        nil :foreground "#dc322f")
+    (set-face-attribute 'org-level-8        nil :foreground "#268bd2")
+    (set-face-attribute 'org-todo           nil :foreground "#2aa198")
+    (set-face-attribute 'org-done           nil :foreground "#859900")
+    (set-face-attribute 'org-meta-line      nil :foreground "#93a1a1")
+    (set-face-attribute 'org-drawer         nil :foreground "#2aa198"))
+
+  (add-hook 'after-load-theme-hook
+            (lambda()
+              (cond ((eq doom-theme 'doom-solarized-light) (my-update-org-faces-for-doom-solarized-light))
+                    (t (my-update-org-faces-after-load-theme))))))
 #+end_src
 
 ** Source blocks
