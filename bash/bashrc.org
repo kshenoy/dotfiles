@@ -6,9 +6,9 @@
 :header-args+: :tangle bashrc_literate
 :END:
 #+begin_src bash :export none
-  # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
-  # Use =org-babel-tangle-jump-to-org= to jump back to it from any code block.
-  # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
+# This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
+# Use =org-babel-tangle-jump-to-org= to jump back to it from any code block.
+# If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
 #+end_src
 
 ** local init
@@ -284,7 +284,7 @@ fi
 #+begin_src bash
 export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
 [[ -n "$PS1" ]] && [[ -s $BASE16_SHELL/profile_helper.sh ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
-base16_solarized-light
+base16_solarized-light &> /dev/null
 #+end_src
 
 *** colored man pages with less
@@ -298,7 +298,7 @@ man() {
         LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
         LESS_TERMCAP_ue=$(printf "\e[0m") \
         LESS_TERMCAP_us=$(printf "\e[1;32m") \
-        command man "$@"
+        man "$@"
 }
 #+end_src
 
@@ -722,146 +722,85 @@ mcd() {
 }
 #+end_src
 
-Silent push and popd. Use ~dirs -v~ for vertical dirstack
+Silent pushd and uniquifies while pushing
 #+begin_src bash
-pushd() { command pushd "$@" > /dev/null ; }
-popd()  { command popd  "$@" > /dev/null ; }
+pushd() {
+    builtin pushd "$@" > /dev/null;
+
+    # Remove any duplicate entries. The 1st entry will be the PWD so skip it
+    dir_pos=($(dirs -l -v | tail -n+2 | grep "$PWD$" | sed 's/^\s*//' | cut -d ' ' -f1 | paste -s))
+    for pos in ${dir_pos[@]}; do
+        command popd -n +$pos 2> /dev/null
+    done
+}
 #+end_src
 
 NOTE: The use of $* is deliberate here as it produces all the scripts arguments separated by the first character of $IFS which, by default, is a space. This allows me to match all arguments against a regex in one go instead of looping over them
-
 #+begin_src bash
 dirs() {
-    if [[ "$*" =~ [-+][0-9]+ ]]; then
+    if (( $# == 0 )); then
+        builtin dirs -v
+    elif [[ "$*" =~ [-+][0-9]+ ]]; then
         # Use long-listing format. Without this, the home directory is display as '~' preventing me from doing something
         # like `cp $(dirs +1)` as it results in an error: pushd: ~/.vim: No such file or directory
         builtin dirs "$@" -l
-    elif (( $# == 0 )); then
-        # Display index along with the path. This allows me to use pushd and popd more easily
-        builtin dirs -v
     else
         builtin dirs "$@"
     fi
 }
 #+end_src
 
-**** COMMENT deprecated
-
-DirStack - Emulate Zsh's behavior of pushd lifting the directory to tos instead of cycling the stack
-- cd =      Lists the contents of the stack.
-- =cd +N=     Exchanges the current directory with the directory stored in 'N'. 'cd +0' is a NOP.
-- =cd -=      Is the same as 'cd +1'
-- =cd +=      Pops the current directory off the stack and cd's to the next directory on the stack (equivalent to popd).
-- =cd=        Goes to $REPO_PATH if it's set else goes to $HOME
-- =cd ,TARG=  Jump to a directory in the path that starts with TARG using [[id:19b2ef22-73ae-40ca-a043-6c507d865658][jumper]]
 #+begin_src bash
-  unset -f cdpp
-  cdpp() {
-    local _dir
-    if (( $#==0 )); then
-      _dir=${REPO_PATH-${HOME/%\//}}
-    else
-      until [[ $1 != "--" ]]; do
-        shift;
-      done
-      _dir=${1/%\//}
-    fi
-
-    local _dirstack=($(command dirs))
-    case "$_dir" in
-      +[0-9]*)
-        #echo "Jumping to a dir on the stack"
-        # $[#_dirstack[@]] gives the number of elements in _dirstack
-        #if (( $_dir < ${#_dirstack[@]})); then
-        command popd $1 > /dev/null
-        command pushd ${_dirstack[$1]/#~/$HOME} > /dev/null
-        ;;
-
-      -)
-        #echo "Jumping to the prev dir"
-        command popd +1 > /dev/null
-        command pushd ${_dirstack[1]/#~/$HOME} > /dev/null
-        ;;
-
-      +)
-        #echo "Popping current dir from the stack"
-        command popd > /dev/null
-        ;;
-
-      =)
-        command dirs -v
-        ;;
-
-      ,*\*\**)
-        local _src=${1%%\*\**}; _src=${_src:-.}
-        local _dst=${1##*\*\*}
-        # echo find $_src -type d -path "*${_dst}" -print -quit
-        _dir=$(find $_src -type d -path "*${_dst}" -print -quit)
-        if [[ -z "$_dir" ]]; then
-          # find was unable to find a matching directory
-          echo "ERROR: Unable to find ${_dst#/} under $_src"
-          return 1
+cd() {
+    if (( "$#" == 0 )); then
+        if vcs::is_in_repo > /dev/null; then
+            cd "$(vcs::get_root)"
+        else
+            cd "$HOME"
         fi
-        ;;&  # This will cause it to get evaluated against *) as well
-
-      ,,*)
-        # echo "Jumping to a parent dir in the path ($_dir)"
-        _dir=$(jumper ${_dir:1})
-        ;;&  # This will cause it to get evaluated against *) as well
-
-      ,*)
-        #echo "Pushing $_dir onto the stack"
-        command pushd $_dir > /dev/null
-        if [[ $? != 0 ]]; then return; fi
-
-        # Remove any duplicate entries
-        # $[#_dirstack[@]] gives the number of elements in _dirstack
-        local _i=0
-        while (( $_i < ${#_dirstack[@]} )); do
-          #echo $_i / ${#_dirstack[@]} : ${_dir/#~/$HOME} ${_dirstack[$_i]/#~/$HOME}
-          if [ "$PWD" == "${_dirstack[$_i]/#~/$HOME}" ]; then
-            command popd +$((($_i+1))) > /dev/null
-            break
-          fi
-          let _i=$_i+1
-        done
-        ;;
-    esac
-  }
-
-  alias cd=cdpp
-#+end_src
-
-Smarter =..= eg. =.. 3= will jump up 3 levels. Also take a look at [[id:19b2ef22-73ae-40ca-a043-6c507d865658][jumper]]
-#+begin_src bash
-  ..() {
-    local _levels=${1:-1};
-    if (( $_levels <= 0 )); then
-      _levels=1;
-    fi;
-
-    cd $(printf '../%.0s' $(seq 1 $_levels))
-  }
-#+end_src
-
-[[https://www.reddit.com/r/commandline/comments/4v1y05/favorite_alias_commands/d5v2i5c/][rationalize_dots]] - This is an interesting idea but I'm a little wary of binding something to ~.~
-#+begin_src bash
-  unset -f rationalize_dots
-  rationalize_dots() {
-    local -n  n  r=READLINE_LINE  i=READLINE_POINT
-
-    (( n = i > 3 ? i - 3 : 0 ))
-
-    if [[ ${r:n:3} == ?([$' \t\n"\'/']).. ]]; then
-      r=${r:0:i}/..${r:i}
-      (( i += 3 ))
-    else
-      r=${r:0:i}.${r:i}
-      (( i++ ))
+        return
     fi
-  }
 
-  bind -x '".":"rationalize_dots"'
+    case "$1" in
+        -)
+            pushd
+            return
+            ;;
+
+        =)
+            dirs
+            return
+            ;;
+
+        ...)
+            local _dir=$PWD;
+            $(FZF_ALT_C_COMMAND='_dir=$PWD; while [[ -n "$_dir" ]]; do _dir="${_dir%/[^/]*}"; echo ${_dir:-/}; done' __fzf_cd__)
+            return
+            ;;
+
+        ,*\*\**)
+            # Split $1 about the first ** into '_path' and '_pattern'.
+            local _path=${1%%\*\**}; _path=${_path:-.}
+            local _pattern="*$(tr -s '*' <<< ${1#*\*\*})*"
+
+            if hash fzf 2> /dev/null; then
+                # Find '_path' for all dirs that match the glob expr '_pattern' and select with FZF from the results
+                $(FZF_ALT_C_COMMAND="find ${_path} -type d -path '*${_pattern}*'" __fzf_cd__)
+                return
+            else
+                _dir=$(find $_path -type d -path "*${_pattern}*" -print -quit)
+                if [[ -n $_dir ]]; then
+                    pushd "$_dir"
+                fi
+            fi
+            ;;
+    esac
+
+    pushd "$@"
+}
+
+# Not adding to dirstack to avoid cluttering it
+alias ..='command cd ..'
 #+end_src
 
 *** emacs

@@ -370,7 +370,7 @@ fi
 # [[file:~/.config/dotfiles/bash/bashrc.org::*base16%20themes][base16 themes:1]]
 export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
 [[ -n "$PS1" ]] && [[ -s $BASE16_SHELL/profile_helper.sh ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
-base16_solarized-light
+base16_solarized-light &> /dev/null
 # base16 themes:1 ends here
 
 # colored man pages with less
@@ -385,7 +385,7 @@ man() {
         LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
         LESS_TERMCAP_ue=$(printf "\e[0m") \
         LESS_TERMCAP_us=$(printf "\e[1;32m") \
-        command man "$@"
+        man "$@"
 }
 # colored man pages with less:1 ends here
 
@@ -822,32 +822,90 @@ mcd() {
 
 
 
-# Silent push and popd. Use ~dirs -v~ for vertical dirstack
+# Silent pushd and uniquifies while pushing
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir related:2]]
-pushd() { command pushd "$@" > /dev/null ; }
-popd()  { command popd  "$@" > /dev/null ; }
+pushd() {
+    builtin pushd "$@" > /dev/null;
+
+    # Remove any duplicate entries. The 1st entry will be the PWD so skip it
+    dir_pos=($(dirs -l -v | tail -n+2 | grep "$PWD$" | sed 's/^\s*//' | cut -d ' ' -f1 | paste -s))
+    for pos in ${dir_pos[@]}; do
+        command popd -n +$pos 2> /dev/null
+    done
+}
 # dir related:2 ends here
 
 
 
 # NOTE: The use of $* is deliberate here as it produces all the scripts arguments separated by the first character of $IFS which, by default, is a space. This allows me to match all arguments against a regex in one go instead of looping over them
 
-
 # [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir related:3]]
 dirs() {
-    if [[ "$*" =~ [-+][0-9]+ ]]; then
+    if (( $# == 0 )); then
+        builtin dirs -v
+    elif [[ "$*" =~ [-+][0-9]+ ]]; then
         # Use long-listing format. Without this, the home directory is display as '~' preventing me from doing something
         # like `cp $(dirs +1)` as it results in an error: pushd: ~/.vim: No such file or directory
         builtin dirs "$@" -l
-    elif (( $# == 0 )); then
-        # Display index along with the path. This allows me to use pushd and popd more easily
-        builtin dirs -v
     else
         builtin dirs "$@"
     fi
 }
 # dir related:3 ends here
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir related:4]]
+cd() {
+    if (( "$#" == 0 )); then
+        if vcs::is_in_repo > /dev/null; then
+            cd "$(vcs::get_root)"
+        else
+            cd "$HOME"
+        fi
+        return
+    fi
+
+    case "$1" in
+        -)
+            pushd
+            return
+            ;;
+
+        =)
+            dirs
+            return
+            ;;
+
+        ...)
+            local _dir=$PWD;
+            $(FZF_ALT_C_COMMAND='_dir=$PWD; while [[ -n "$_dir" ]]; do _dir="${_dir%/[^/]*}"; echo ${_dir:-/}; done' __fzf_cd__)
+            return
+            ;;
+
+        *\*\**)
+            # Split $1 about the first ** into '_path' and '_pattern'.
+            local _path=${1%%\*\**}; _path=${_path:-.}
+            local _pattern="*$(tr -s '*' <<< ${1#*\*\*})*"
+
+            if hash fzf 2> /dev/null; then
+                # Find '_path' for all dirs that match the glob expr '_pattern' and select with FZF from the results
+                $(FZF_ALT_C_COMMAND="find ${_path} -type d -path '*${_pattern}*'" __fzf_cd__)
+                return
+            else
+                _dir=$(find $_path -type d -path "*${_pattern}*" -print -quit)
+                if [[ -n $_dir ]]; then
+                    pushd "$_dir"
+                fi
+            fi
+            ;;
+    esac
+
+    pushd "$@"
+}
+
+# Not adding to dirstack to avoid cluttering it
+alias ..='command cd ..'
+# dir related:4 ends here
 
 # emacs
 
