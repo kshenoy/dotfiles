@@ -14,7 +14,7 @@
 ** local init
 Any local settings that need to be set initially go here
 
-#+begin_src bash :tangle (if (string-match "buntu" (system-name)) "bashrc_literate" "no")
+#+begin_src bash
 [[ -d /opt/fzf ]] && export FZF_PATH=/opt/fzf
 #+end_src
 
@@ -1490,24 +1490,8 @@ clnpath
 #+end_src
 
 ** local override
-*** home (*buntu)
-:PROPERTIES:
-:header-args: :tangle (if (string-match "buntu" (system-name)) "bashrc_literate" "no")
-:END:
+*** home
 
-To connect to work-vpn
-#+begin_src bash
-alias gp=globalprotect
-
-amd_vpn() {
-    # if command grep Connected <<< $(globalprotect show --status); then
-    if command grep gpd0 <<< $(ifconfig -s) >& /dev/null; then
-        echo "VPN is already connected"
-    else
-        globalprotect connect --portal vpn.amd.com --username kshenoy
-    fi
-}
-#+end_src
 
 Update permissions of the history when exiting as root
 #+begin_src bash
@@ -1527,15 +1511,26 @@ if [[ "$SHLVL" = 1 ]]; then
 fi
 #+end_src
 
-#+begin_src bash
+To connect to work-vpn
+#+begin_src bash :tangle (if (string-match "buntu" (system-name)) "bashrc_literate" "no")
+alias gp=globalprotect
+
+work_vpn() {
+    # if command grep Connected <<< $(globalprotect show --status); then
+    if command grep gpd0 <<< $(ifconfig -s) >& /dev/null; then
+        echo "VPN is already connected"
+    else
+        globalprotect connect --portal vpn.amd.com --username kshenoy
+    fi
+}
+#+end_src
+
+#+begin_src bash :tangle (if (string-match "buntu" (system-name)) "bashrc_literate" "no")
 alias boot2win='sudo grub-reboot Windows && shutdown -r 0'
 #+end_src
 
-*** wsl
-:PROPERTIES:
-:header-args: :tangle (if (string-match "wsl" (system-name)) "bashrc_literate" "no")
-:END:
-#+begin_src bash
+Only for home WSL
+#+begin_src bash :tangle (if (string-match "windows" (system-name)) "bashrc_literate" "no")
 export LIBGL_ALWAYS_INDIRECT=1
 # Need to specify the IP of the host
 export DISPLAY=192.168.1.122:0

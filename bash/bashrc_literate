@@ -1563,17 +1563,12 @@ export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 clnpath
 # PATH:1 ends here
 
-alias gp=globalprotect
+# home
 
-amd_vpn() {
-    # if command grep Connected <<< $(globalprotect show --status); then
-    if command grep gpd0 <<< $(ifconfig -s) >& /dev/null; then
-        echo "VPN is already connected"
-    else
-        globalprotect connect --portal vpn.amd.com --username kshenoy
-    fi
-}
 
+# Update permissions of the history when exiting as root
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:1]]
 __histfile_perm_update__() {
     if [[ -f $HISTFILE ]]; then
         echo "Changing permissions of HISTFILE..."
@@ -1588,8 +1583,17 @@ trap __histfile_perm_update__ EXIT
 if [[ "$SHLVL" = 1 ]]; then
     [[ -x /usr/bin/clear_console ]] && /usr/bin/clear_console -q
 fi
+# home:1 ends here
 
-alias boot2win='sudo grub-reboot Windows && shutdown -r 0'
+
+
+# Only for home WSL
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:4]]
+export LIBGL_ALWAYS_INDIRECT=1
+# Need to specify the IP of the host
+export DISPLAY=192.168.1.122:0
+# home:4 ends here
 
 # command completion
 
