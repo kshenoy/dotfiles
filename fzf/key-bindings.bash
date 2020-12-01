@@ -159,7 +159,6 @@ if [[ -o emacs ]]; then                                                         
   bind -x '"\C-f\C-v\C-r": "fzf-git-remotes"'
   bind -x '"\C-f\C-v\C-s": "fzf-vcs-status"'
   bind -x '"\C-f\C-v\C-t": "fzf-git-tags"'
-  bind    '"\C-f\C-v\C-w": " \C-e\C-u`__fzf_p4_walist__`\e\C-e\er\C-m"'
 
   bind '"\er": redraw-current-line'
 

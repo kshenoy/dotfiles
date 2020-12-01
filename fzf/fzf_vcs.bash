@@ -60,11 +60,6 @@ fzf-git-remotes() {                                                             
 }
 
 
-__fzf_p4_walist__() {                                                                                              #{{{1
-  FZF_ALT_C_COMMAND='wals' __fzf_cd__
-}
-
-
 __fzf-p4-cd() {                                                                                                    #{{{1
   local cmd='command find $STEM -mindepth 1 \
     -type d \( -path $STEM/_env -o -path $STEM/emu -o -path $STEM/env_squash -o -path $STEM/import -o \
