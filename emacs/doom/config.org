@@ -16,10 +16,84 @@ To get information about any of these functions/macros, move the cursor over the
 
 Also, =gd= (or =C-c c d=) will jump to their definition and see how they are implemented.
 
-* General
-:PROPERTIES:
-:END:
+* Literate config
+[[https://org-babel.readthedocs.io/en/latest/header-args/][header-args]]:
+- =:tangle yes=
+This allows me to run =org-babel-tangle= in the org file to generate the el file without having to restart emacs and rely on =org-babel-load-file=
 
+- =:comments both=
+This adds all the non-code related text as comments in the tangled file. It also adds comments wrappers with links back to the heading in the original Org mode file.
+
+Resources:
+- [[https://www.youtube.com/watch?v=49kBWM3RQQ8&list=PL9KxKa8NpFxIcNQa9js7dQQIHc81b0-Xg][YouTube: Mike Zamansky - Using Emacs]]
+- [[https://www.youtube.com/watch?v=d6iY_1aMzeg&list=PLX2044Ew-UVVv31a0-Qn3dA6Sd_-NyA1n][YouTube: Uncle Dave - Emacs Tutorial]]
+- [[https://www.youtube.com/playlist?list=PLrFss89N5XNw8rTgI2fVhSj9Y62TpphFI][YouTube: Yisrael Dov - Emacs is Great]]
+- [[https://github.com/caisah/emacs.dz][Curated list of "nice" config files]]
+- [[http://wolfecub.github.io/dotfiles/][Wolfe's Literate Emacs Config]]
+- [[https://huytd.github.io/emacs-from-scratch.html][Emacs from scratch]]
+- [[https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org][AngryBacon]]
+- [[https://to1ne.gitlab.io/literate-dotfiles/][Toon's Literate Dotfiles]]
+- https://brainlessdeveloper.com/2017/12/27/making-emacs-work-like-my-vim-setup/
+
+** Debugging
+
+Use =C-u C-M-x= with the point over the function to debug. This puts us into debugging minor mode in which the following bindings are useful
+
+| SPC | Step next      |
+| b   | Set breakpoint |
+| g   | Go (run)       |
+| h   | Goto here      |
+| i   | Step into      |
+| q   | Quit           |
+
+Setting this gives a backtrace
+#+begin_src emacs-lisp :tangle no
+  (setq debug-on-error t)
+#+end_src
+
+** Detangling
+[[https://www.youtube.com/watch?v=BLomb52wjvE][Yisrael Dov - Emacs is Great ep. 11]]
+
+#+begin_src emacs-lisp :export none
+  ;; This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
+  ;; - Use `org-babel-tangle-jump-back-to-org' to jump back to it from any code block.
+  ;; - Use `org-babel-detangle' to propagate any changes made here back to the original Org mode file.
+#+end_src
+
+** Using noweb references
+[[https://necromuralist.github.io/posts/org-babel-noweb-ref/][Inserting text from different blocks]], [[https://org-babel.readthedocs.io/en/latest/header-args/#noweb][noweb header-args]]
+Occasionally I use noweb references to insert text from one source block in another. I do this when I think it's useful to explain a particular section in more detail but at the same time I don't want to clutter the place where it's used at.
+
+There are two ways I go about it:
+1. The first way is to specify =:noweb-ref NAME= in the source block's header-args eg.
+   #+begin_example
+     #+begin_src emacs-lisp :noweb-ref MY_BLK_NAME
+     #+end_src
+   #+end_example
+
+2. The other way is by specifying an explicit name for the source block
+   #+begin_example
+     #+name: MY_BLK_NAME
+     #+begin_src emacs-lisp
+     #+end_src
+   #+end_example
+
+   and it can be used in the same way. However, this has the added advantage of allowing me to create links to it:
+   #+begin_example
+     [[MY_BLK_NAME][Link to block called MY_BLK_NAME]]
+   #+end_example
+
+In both cases, I can then use this in another block like this.
+The only thing is that care must be taken to ensure that the noweb reference is on its own line
+#+begin_example
+  #+begin_src emacs-lisp
+    <<MY_BLK_NAME>>
+  #+end_src
+#+end_example
+
+Also note that using the same name with multiple blocks concatenates them
+
+* General
 Some functionality uses this to identify you, e.g. GPG configuration, email clients, file templates and snippets.
 #+begin_src emacs-lisp
   (setq user-full-name "Kartik Shenoy")
@@ -294,6 +368,7 @@ Filter out any unwanted files from the notes that I don't want to add to the age
 #+end_src
 
 Make agenda start on a Monday. By default, the agenda only shows the next 7 days. I want to see the previous 7 days as well just in case I missed something. Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
+#+name: org-agenda-span
 #+begin_src emacs-lisp
 (setq org-agenda-start-day "-6d"
       org-agenda-start-on-weekday 1
@@ -316,7 +391,15 @@ Open org-agenda in the only window and remove the fluff
       org-agenda-show-all-dates nil)
 #+end_src
 
+#+begin_src emacs-lisp
+)  ; END of (after! org-agenda
+#+end_src
+
 *** Agenda custom commands
+#+begin_src emacs-lisp
+(after! org-agenda
+#+end_src
+
 These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html][Aaron Bieber: An agenda for life with org-mode]]
 #+begin_src emacs-lisp
 (defun my-org-skip-subtree-if-habit ()
@@ -340,47 +423,47 @@ These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/
 
 #+begin_src emacs-lisp
 (setq org-agenda-custom-commands
-      '(("d"                       ; key
-         "Daily agenda and TODOs"  ; desc
-         (                         ; cmds
+      '(("d" "Daily agenda and TODOs"
+         (
+          <<daily-agenda-cmds>>
+          )
+         (
+          <<daily-agenda-settings>>
+          ))))
 #+end_src
 
 All the high-priority tasks that are still pending
-#+begin_src emacs-lisp
-  (tags "PRIORITY=\"A\""
-        ((org-agenda-overriding-header "High-priority unfinished tasks:")
-         (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
+#+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
+(tags "PRIORITY=\"A\""
+      ((org-agenda-overriding-header "High-priority unfinished tasks:")
+       (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
 #+end_src
 
-An agenda showing the previous week and the next couple of weeks
-#+begin_src emacs-lisp
-  (agenda "")
+An agenda showing the previous week and the next couple of weeks [[org-agenda-span][configured above]]
+#+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
+(agenda "")
 #+end_src
 
 All the remaining todos minus the high-priority ones
-#+begin_src emacs-lisp
-  (alltodo ""
-           ((org-agenda-overriding-header "ALL normal priority tasks:")
-            (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
-                                           (my-org-skip-subtree-if-priority ?A)
-                                           (org-agenda-skip-if nil '(scheduled deadline))))))
-#+end_src
-
-#+begin_src emacs-lisp
-  )  ; END of cmds
-  (  ; Settings
+#+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
+(alltodo ""
+         ((org-agenda-overriding-header "ALL normal priority tasks:")
+          (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
+                                         (my-org-skip-subtree-if-priority ?A)
+                                         (org-agenda-skip-if nil '(scheduled deadline))))))
 #+end_src
 
 Restrict agenda to non-work files and filter out any other unwanted files
-#+begin_src emacs-lisp
-  (org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
-                                            (not (string-match-p "Work/" x))))
-                                org-agenda-files))
+#+begin_src emacs-lisp :noweb-ref daily-agenda-settings :tangle no
+(org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
+                                               (not (string-match-p "Work/" x))))
+                              org-agenda-files))
 #+end_src
 
 #+begin_src emacs-lisp
-  )))))  ; END of (after! org-agenda
+)  ; END of (after! org-agenda
 #+end_src
+
 ** org-babel
 Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
 

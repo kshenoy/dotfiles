@@ -12,7 +12,7 @@ This allows me to run =org-babel-tangle= in the org file to generate the el file
 - =:comments both=
 This adds all the non-code related text as comments in the tangled file. It also adds comments wrappers with links back to the heading in the original Org mode file.
 
-** Resources
+Resources:
 - [[https://www.youtube.com/watch?v=49kBWM3RQQ8&list=PL9KxKa8NpFxIcNQa9js7dQQIHc81b0-Xg][YouTube: Mike Zamansky - Using Emacs]]
 - [[https://www.youtube.com/watch?v=d6iY_1aMzeg&list=PLX2044Ew-UVVv31a0-Qn3dA6Sd_-NyA1n][YouTube: Uncle Dave - Emacs Tutorial]]
 - [[https://www.youtube.com/playlist?list=PLrFss89N5XNw8rTgI2fVhSj9Y62TpphFI][YouTube: Yisrael Dov - Emacs is Great]]
@@ -44,8 +44,8 @@ Setting this gives a backtrace
 
 #+begin_src emacs-lisp :export none
   ;; This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
-  ;; Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
-  ;; If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
+  ;; - Use `org-babel-tangle-jump-back-to-org' to jump back to it from any code block.
+  ;; - Use `org-babel-detangle' to propagate any changes made here back to the original Org mode file.
 #+end_src
 
 ** Using noweb references
@@ -56,13 +56,6 @@ There are two ways I go about it:
 1. The first way is to specify =:noweb-ref NAME= in the source block's header-args eg.
    #+begin_example
      #+begin_src emacs-lisp :noweb-ref MY_BLK_NAME
-     #+end_src
-   #+end_example
-
-   I can then use this in another block like this
-   #+begin_example
-     #+begin_src emacs-lisp
-       <<MY_BLK_NAME>>
      #+end_src
    #+end_example
 
@@ -77,6 +70,16 @@ There are two ways I go about it:
    #+begin_example
      [[MY_BLK_NAME][Link to block called MY_BLK_NAME]]
    #+end_example
+
+In both cases, I can then use this in another block like this.
+The only thing is that care must be taken to ensure that the noweb reference is on its own line
+#+begin_example
+  #+begin_src emacs-lisp
+    <<MY_BLK_NAME>>
+  #+end_src
+#+end_example
+
+Also note that using the same name with multiple blocks concatenates them
 
 * Setup the package manager
 I'm using [[https://github.com/jwiegley/use-package][use-package]] ([[info:use-package#Top][info:use-package]]) to configure my packages. It is a macro that provides convenient syntactic sugar for many common tasks related to installing and configuring Emacs packages.
@@ -1511,7 +1514,7 @@ This frees up S-left and S-right which I can then use to cycles through the todo
 
 These should get added only if org-version < 9.2
 =?= in each string controls where the point will be placed after expansion
-#+begin_src emacs-lisp :tangle (when (not (version< org-version "9.2")) "no")
+#+begin_src emacs-lisp :tangle (if (version< org-version "9.2") "init.el" "no")
 (add-to-list 'org-structure-template-alist '("sc" "#+begin_src C++\n?\n#+end_src"))
 (add-to-list 'org-structure-template-alist '("sl" "#+begin_src emacs-lisp\n?\n#+end_src\n"))
 (add-to-list 'org-structure-template-alist '("sp" "#+begin_src python\n?\n#+end_src\n"))
@@ -1521,7 +1524,7 @@ These should get added only if org-version < 9.2
 
 For org-version >= 9.2, we have to use this format.
 =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
-#+begin_src emacs-lisp :tangle (when (version< org-version "9.2") "no")
+#+begin_src emacs-lisp :tangle (if (not (version< org-version "9.2")) "init.el" "no")
 (add-to-list 'org-structure-template-alist '("sc" . "src c++"))
 (add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("sp" . "src python"))
@@ -1911,7 +1914,8 @@ Filter out any unwanted files from the notes that I don't want to add to the age
   :config
 #+end_src
 
-Force agenda to start on a Monday. By default, the agenda only shows the next 7 days. I want to see the previous week as well just in case I missed something. Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
+Make agenda start on a Monday. By default, the agenda only shows the next 7 days. I want to see the previous 7 days as well just in case I missed something. Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
+#+name: org-agenda-span
 #+begin_src emacs-lisp
   (setq org-agenda-start-day "-6d"
         org-agenda-start-on-weekday 1
@@ -1959,25 +1963,29 @@ These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/
 
 #+begin_src emacs-lisp
   (setq org-agenda-custom-commands
-        '(("d"                       ; key
-           "Daily agenda and TODOs"  ; desc
-           (                         ; cmds
+        '(("d" "Daily agenda and TODOs"
+           (
+            <<daily-agenda-cmds>>
+            )
+           (
+            <<daily-agenda-settings>>
+            ))))
 #+end_src
 
 All the high-priority tasks that are still pending
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
   (tags "PRIORITY=\"A\""
         ((org-agenda-overriding-header "High-priority unfinished tasks:")
          (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
 #+end_src
 
-An agenda showing the previous week and the next couple of weeks
-#+begin_src emacs-lisp
+An agenda showing the previous week and the next couple of weeks [[org-agenda-span][configured above]]
+#+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
   (agenda "")
 #+end_src
 
 All the remaining todos minus the high-priority ones
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
   (alltodo ""
            ((org-agenda-overriding-header "ALL normal priority tasks:")
             (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
@@ -1985,20 +1993,11 @@ All the remaining todos minus the high-priority ones
                                            (org-agenda-skip-if nil '(scheduled deadline))))))
 #+end_src
 
-#+begin_src emacs-lisp
-  )  ; END of cmds
-  (  ; settings
-#+end_src
-
 Restrict agenda to non-work files and filter out any other unwanted files
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb-ref daily-agenda-settings :tangle no
   (org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
                                             (not (string-match-p "Work/" x))))
                                 org-agenda-files))
-#+end_src
-
-#+begin_src emacs-lisp
-  ))))
 #+end_src
 
 **** Keybindings
