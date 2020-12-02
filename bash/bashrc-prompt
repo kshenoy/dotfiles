@@ -90,7 +90,7 @@ __setprompt() {
   fi
 
   # The info variables
-  local _pwd=$(__get_compact_pwd)
+  local _pwd=$(prompt::get_compact_pwd)
 
   #for k in "${!dir_alias[@]}"; do
     #echo "$k => ${dir_alias[$k]}"
@@ -218,10 +218,9 @@ __setprompt() {
 #=======================================================================================================================
 # Helper functions
 #=======================================================================================================================
-unset -f __get_compact_pwd
-__get_compact_pwd() {
+prompt::get_compact_pwd() {
   local _pwd=${PWD}
-  if [[ -n "$HOME" ]] && [[ "$_pwd" =~ ^"$HOME" ]]; then
+  if [[ "$_pwd" =~ ^"$HOME" ]]; then
     _pwd=${_pwd/#$HOME/\~};
   fi
   echo $_pwd

@@ -263,7 +263,7 @@ for i in \
   ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/aliases              \
   ~/.bashrc_local                                                      \
   ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf.bash              \
-  ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/tmux/tmux_completion_bash \
+  ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/tmux/tmux_completion.bash \
 ; do
   if [[ -f ${i} ]]; then
     source ${i}

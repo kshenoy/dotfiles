@@ -1,5 +1,5 @@
 #=======================================================================================================================
-fzf-lsf-bjobs() {                                                                                                  #{{{1
+fzf::lsf::bjobs() {                                                                                                #{{{1
   local selected=$(lsf_bjobs -w |
     FZF_DEFAULT_OPTS="--header-lines=1 $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
     cut -d' ' -f1 | while read -r item; do
@@ -13,7 +13,7 @@ fzf-lsf-bjobs() {                                                               
 
 
 #=======================================================================================================================
-fzf-cmd-opts() {                                                                                                   #{{{1
+fzf::cmd_opts() {                                                                                                  #{{{1
   # echo "DEBUG: '${READLINE_LINE}' Point=${READLINE_POINT}, Char='${READLINE_LINE:$READLINE_POINT:1}'"
   local pos=$READLINE_POINT
 
@@ -54,7 +54,7 @@ fzf-cmd-opts() {                                                                
 
 
 #=======================================================================================================================
-fzf-tmux-select-session() {                                                                                        #{{{1
+fzf::tmux::select_session() {                                                                                      #{{{1
 # Create new tmux session, or switch to existing one. Works from within tmux too
   if [[ -n "$TMUX" ]]; then
     local cmd="switch-client"
@@ -73,7 +73,7 @@ fzf-tmux-select-session() {                                                     
 
 
 #=======================================================================================================================
-# __fzf_bookmarks__() {                                                                                            #{{{1
+# fzf::bookmarks() {                                                                                               #{{{1
 #   local _cmd="cat <(command find -L ~/Notes -type f -name '*.org' 2> /dev/null) ~/bookmarks"
 
 #   local _out=($(eval "$_cmd | sed "s:${HOME}:~:g" | fzf -m --expect=alt-v,alt-e"))
@@ -137,28 +137,28 @@ if [[ -o emacs ]]; then                                                         
   # Unbind the default one first and then create new bindings
   bind '"\ec": nop'
 
-  bind -x '"\C-f\C-l": "fzf-lsf-bjobs"'
+  bind -x '"\C-f\C-l": "fzf::lsf::bjobs"'
 
   # CTRL-O: Show list of options of the command before the cursor using '<cmd> -h'
-  bind -x '"\C-f\C-o": "fzf-cmd-opts"'
+  bind -x '"\C-f\C-o": "fzf::cmd_opts"'
 
   # CTRL-X: Experimental
-  # bind -x '"\C-f\C-x": "__fzf_expt__"'
+  # bind -x '"\C-f\C-x": "fzf::_expt"'
 
   # Tmux related bindings: CTRL-F CTRL-T
-  bind -x '"\C-f\C-t\C-s": "fzf-tmux-select-session"'
+  bind -x '"\C-f\C-t\C-s": "fzf::tmux::select_session"'
 
   # Version-control related bindings: CTRL-F CTRL-V
-  bind -x '"\C-f\C-v\C-b": "fzf-git-branches"'
-  bind -x '"\C-f\C-v\C-d": "fzf-git-diffs"'
-  bind -x '"\C-f\C-v\C-e": "fzf-vcs-files"'
-  bind -x '"\C-f\C-v\C-f": "fzf-vcs-all-files"'
-  bind    '"\C-f\C-v\C-g": " \C-e\C-u`fzf-vcs-cd`\e\C-e\er\C-m"'
-  bind -x '"\C-f\C-v\C-k": "fzf-vcs-commits"'
-  bind -x '"\C-f\C-v\C-l": "fzf-vcs-filelog"'
-  bind -x '"\C-f\C-v\C-r": "fzf-git-remotes"'
-  bind -x '"\C-f\C-v\C-s": "fzf-vcs-status"'
-  bind -x '"\C-f\C-v\C-t": "fzf-git-tags"'
+  bind -x '"\C-f\C-v\C-b": "fzf::git::branches"'
+  bind -x '"\C-f\C-v\C-d": "fzf::git::diffs"'
+  bind -x '"\C-f\C-v\C-e": "fzf::vcs::files"'
+  bind -x '"\C-f\C-v\C-f": "fzf::vcs::all_files"'
+  bind    '"\C-f\C-v\C-g": " \C-e\C-u`fzf::vcs::cd`\e\C-e\er\C-m"'
+  bind -x '"\C-f\C-v\C-k": "fzf::vcs::commits"'
+  bind -x '"\C-f\C-v\C-l": "fzf::vcs::filelog"'
+  bind -x '"\C-f\C-v\C-r": "fzf::git::remotes"'
+  bind -x '"\C-f\C-v\C-s": "fzf::vcs::status"'
+  bind -x '"\C-f\C-v\C-t": "fzf::git::tags"'
 
   bind '"\er": redraw-current-line'
 

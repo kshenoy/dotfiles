@@ -1,5 +1,6 @@
 #+TITLE: bash configuration
 #+PROPERTY: header-args+ :results output silent :noweb tangle :comments both :mkdirp yes
+#+TODO: FIXME | DONE
 
 * bashrc
 :PROPERTIES:
@@ -13,10 +14,6 @@
 
 ** local init
 Any local settings that need to be set initially go here
-
-#+begin_src bash
-[[ -d /opt/fzf ]] && export FZF_PATH=/opt/fzf
-#+end_src
 
 ** interactive, login shell settings
 How to check for login v/s interactive shell
@@ -809,10 +806,15 @@ emacs_func() { emacsclient --alternate-editor="" --no-wait --create-frame --quie
 alias doomacs='emacs --with-profile doom'
 #+end_src
 
-*** fzf
-https://github.com/junegunn/fzf
+*** [[https://github.com/junegunn/fzf][fzf]]
 
 #+begin_src bash
+if [[ -d /opt/fzf ]]; then
+    export FZF_PATH=/opt/fzf
+elif [[ -d $HOME/.local/install/fzf ]]; then
+    export FZF_PATH="$HOME/.local/install/fzf"
+fi
+
 if [[ -z "$FZF_PATH" ]]; then
     echo "$(tput setaf 1)ERROR$(tput sgr0): FZF_PATH is not set"
 else
@@ -845,7 +847,6 @@ fi
 #+end_src
 
 Completion has to be specified at the end: [[*fzf][fzf]]
-
 
 *** COMMENT jumper
 Jump to any arbitrary folder in the current filepath. Case-insensitive and supports fuzzy matching
@@ -1295,9 +1296,9 @@ local _llcorner="└"
 Contract the following: /proj/ch_func_dev{1:0}/ASPEN_HIGHLANDS -> ~AH{1:0}
 Contract more if it's my directory
 #+begin_src bash
-__get_compact_pwd() {
+prompt::get_compact_pwd() {
     local _pwd=$PWD
-    if [[ -n "$HOME" ]] && [[ "$_pwd" =~ ^"$HOME" ]]; then
+    if [[ "$_pwd" =~ ^"$HOME" ]]; then
         _pwd=${_pwd/#$HOME/\~};
     fi
     echo $_pwd
@@ -1327,7 +1328,7 @@ local _exit_status="$?"
 local _columns=$(tput cols)
 
 # The info variables
-local _pwd=$(__get_compact_pwd)
+local _pwd=$(prompt::get_compact_pwd)
 
 # Force time to US Mountain Time. I don't want to export TZ as it messes up some other scripts
 local _time="$(TZ=US/Mountain date +%I:%M%P) "
@@ -1492,7 +1493,6 @@ clnpath
 ** local override
 *** home
 
-
 Update permissions of the history when exiting as root
 #+begin_src bash
 __histfile_perm_update__() {
@@ -1534,6 +1534,11 @@ Only for home WSL
 export LIBGL_ALWAYS_INDIRECT=1
 # Need to specify the IP of the host
 export DISPLAY=192.168.1.122:0
+#+end_src
+
+And finally, check for a .bashrc_local and load it
+#+begin_src bash
+[[ -f ~/.bashrc_local ]] && . ~/.bashrc_local
 #+end_src
 
 ** completion
@@ -1596,6 +1601,9 @@ Rest of fzf configuration defined above: [[*\[\[https://github.com/junegunn/fzf\
 #+begin_src bash
 [[ $- == *i* ]] && source "$FZF_PATH/shell/completion.bash" 2> /dev/null
 #+end_src
+
+*** FIXME COMMENT tmux completion
+Use tmux/tmux_completion.bash
 
 *** alias completion
 Automatically add completion for all aliases to commands having completion functions

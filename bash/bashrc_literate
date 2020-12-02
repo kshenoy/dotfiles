@@ -1,28 +1,31 @@
+
 # bashrc
 # :PROPERTIES:
 # :header-args+: :tangle bashrc_literate
 # :END:
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*bashrc][bashrc:1]]
+
 # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
 # Use =org-babel-tangle-jump-to-org= to jump back to it from any code block.
 # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
+
 # bashrc:1 ends here
 
 # local init
 # Any local settings that need to be set initially go here
 
+# [[file:~/.config/dotfiles/bash/bashrc.org::*local%20init][local\ init:1]]
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*local%20init][local init:1]]
 [[ -d /opt/fzf ]] && export FZF_PATH=/opt/fzf
-# local init:1 ends here
 
-
+# local\ init:1 ends here
 
 # If shell is interactive turn off TTY "start" and "stop" commands in all interactive shells.
 # They default to ~C-q~ and ~C-s~. I want to use ~C-s~ to do forward history search.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*interactive,%20login%20shell%20settings][interactive, login shell settings:2]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*interactive,%20login%20shell%20settings][interactive\,\ login\ shell\ settings:1]]
+
 if [[ $- == *i* ]]; then
     stty start ''
     stty stop  ''
@@ -30,16 +33,17 @@ if [[ $- == *i* ]]; then
     stty ixoff # enable sending (to app) of start/stop characters
     stty ixany # let any character restart output, not only start character
 fi
-# interactive, login shell settings:2 ends here
+
+# interactive\,\ login\ shell\ settings:1 ends here
 
 # configuration
 # default permissions
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 umask 007
+
 # configuration:1 ends here
-
-
 
 # [[https://unix.stackexchange.com/questions/32409/set-and-shopt-why-two][shopt v/s set]]
 
@@ -52,248 +56,253 @@ umask 007
 
 # If set, a command name that is the name of a directory is executed as if it were the argument to the cd command.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:2]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -u autocd
-# configuration:2 ends here
 
-
+# configuration:1 ends here
 
 # If this is set, an argument to the cd builtin command that is not a directory is assumed to be the name of a variable whose value is the directory to change to.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:3]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s cdable_vars
-# configuration:3 ends here
 
-
+# configuration:1 ends here
 
 # If set, minor errors in the spelling of a directory component in a cd command will be corrected.
 # The errors checked for are transposed characters, a missing character, and a character too many.
 # If a correction is found, the corrected path is printed, and the command proceeds.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:4]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s cdspell
-# configuration:4 ends here
 
-
+# configuration:1 ends here
 
 # If this is set, Bash checks that a command found in the hash table exists before trying to execute it.
 # If a hashed command no longer exists, a normal path search is performed.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:5]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s checkhash
-# configuration:5 ends here
 
-
+# configuration:1 ends here
 
 # If set, Bash lists the status of any stopped and running jobs before exiting an interactive shell.
 # If any jobs are running, this causes the exit to be deferred until a second exit is attempted without an intervening command (see Job Control).
 # The shell always postpones exiting if any jobs are stopped.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:6]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s checkjobs
-# configuration:6 ends here
 
-
+# configuration:1 ends here
 
 # If set, Bash checks the window size after each command and, if necessary, updates the values of LINES and COLUMNS.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:7]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s checkwinsize
-# configuration:7 ends here
 
-
+# configuration:1 ends here
 
 # If set, Bash attempts to save all lines of a multiple-line command in the same history entry.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:8]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s cmdhist
-# configuration:8 ends here
 
-
+# configuration:1 ends here
 
 # If set, Bash quotes all shell metacharacters in filenames and directory names when performing completion.
 # If not set, Bash removes metacharacters such as the dollar sign from the set of characters that will be quoted in completed filenames when these metacharacters appear in shell variable references in words to be completed.
 # This means that dollar signs in variable names that expand to directories will not be quoted; however, any dollar signs appearing in filenames will not be quoted, either.
 # This is active only when bash is using backslashes to quote completed filenames.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:9]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s complete_fullquote
-# configuration:9 ends here
 
-
+# configuration:1 ends here
 
 # If set, Bash replaces directory names with the results of word expansion when performing filename completion.
 # This changes the contents of the readline editing buffer. If not set, Bash attempts to preserve what the user typed.
 # I use it mainly to prevent bash from escaping $ in $dir_variable
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:10]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s direxpand
-# configuration:10 ends here
 
-
+# configuration:1 ends here
 
 # If set, Bash attempts spelling correction on directory names during word completion if the directory name initially supplied does not exist.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:11]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s dirspell
-# configuration:11 ends here
 
-
+# configuration:1 ends here
 
 # If set, Bash includes filenames beginning with a ‘.’ in the results of filename expansion.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:12]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s dotglob
-# configuration:12 ends here
 
-
+# configuration:1 ends here
 
 # If set, aliases are expanded as described below under Aliases, Aliases.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:13]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 # shopt -s expand_aliases
-# configuration:13 ends here
 
-
+# configuration:1 ends here
 
 # If set, the extended pattern matching features described above (see Pattern Matching) are enabled.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:14]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 # shopt -s extglob
-# configuration:14 ends here
 
-
+# configuration:1 ends here
 
 # If set, patterns which fail to match filenames during filename expansion result in an expansion error.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:15]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 # shopt -s failglob
-# configuration:15 ends here
 
-
+# configuration:1 ends here
 
 # If set, the pattern ‘**’ used in a filename expansion context will match all files and zero or more directories and subdirectories.
 # If the pattern is followed by a ‘/’, only directories and subdirectories match.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:16]]
-# shopt -s globstar
-# configuration:16 ends here
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
 
+# shopt -s globstar
+
+# configuration:1 ends here
 
 # Not using this as it's too slow! - Use [[id:2870e3ab-aa92-4006-9899-372135ae00c4][home-brewed @]] instead
 
 # If set, shell error messages are written in the standard GNU error message format.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:17]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 # shopt -s gnu_errfmt
-# configuration:17 ends here
 
-
+# configuration:1 ends here
 
 # If set, the history list is appended to the file named by the value of the HISTFILE variable when the shell exits, rather than overwriting the file.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:18]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s histappend
-# configuration:18 ends here
 
-
+# configuration:1 ends here
 
 # If set, and Readline is being used, a user is given the opportunity to re-edit a failed history substitution.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:19]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s histreedit
-# configuration:19 ends here
 
-
+# configuration:1 ends here
 
 # If set, and Readline is being used, the results of history substitution are not immediately passed to the shell parser.
 # Instead, the resulting line is loaded into the Readline editing buffer, allowing further modification.
 # eg. commands using (!, !!, etc.) will print to shell first for confirmation and not auto-execute
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:20]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s histverify
-# configuration:20 ends here
 
-
+# configuration:1 ends here
 
 # If set, Bash will send SIGHUP to all jobs when an interactive login shell exits (see [[https://www.gnu.org/software/bash/manual/html_node/Signals.html][Signals]]).
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:21]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s huponexit
-# configuration:21 ends here
 
-
+# configuration:1 ends here
 
 # If set, and job control is not active, the shell runs the last command of a pipeline not executed in the background
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:22]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s lastpipe
-# configuration:22 ends here
 
-
+# configuration:1 ends here
 
 # If enabled, and the cmdhist option is enabled, multi-line commands are saved to the history with embedded newlines rather than using semicolon separators where possible.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:23]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s lithist
-# configuration:23 ends here
 
-
+# configuration:1 ends here
 
 # If set, and a file that Bash is checking for mail has been accessed since the last time it was checked, the message "The mail in mailfile has been read" is displayed.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:24]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 shopt -s mailwarn
-# configuration:24 ends here
 
-
+# configuration:1 ends here
 
 # If set, and Readline is being used, Bash will not attempt to search the PATH for possible completions when completion is attempted on an empty line.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:25]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 # shopt -s no_empty_cmd_completion
-# configuration:25 ends here
 
-
+# configuration:1 ends here
 
 # If set, Bash matches filenames in a case-insensitive fashion when performing filename expansion.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:26]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 # shopt -s nocaseglob
-# configuration:26 ends here
 
-
+# configuration:1 ends here
 
 # If set, Bash matches patterns in a case-insensitive fashion when performing matching while executing case or =[[= conditional commands,
 # when performing pattern substitution word expansions, or when filtering possible completions as part of programmable completion.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:27]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 # shopt -s nocasematch
-# configuration:27 ends here
 
-
+# configuration:1 ends here
 
 # If set, Bash allows filename patterns which match no files to expand to a null string, rather than themselves.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:28]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 # shopt -s nullglob
-# configuration:28 ends here
 
-
+# configuration:1 ends here
 
 # If this is set, the shift builtin prints an error message when the shift count exceeds the number of parameters.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:29]]
-shopt -s shift_verbose
-# configuration:29 ends here
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:30]]
+shopt -s shift_verbose
+
+# configuration:1 ends here
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
+
 set -o noclobber
 #set -o vi
 set bell-style none
 # Otherwise some completions will fail
 set +o nounset
-# configuration:30 ends here
+
+# configuration:1 ends here
 
 # history
 # NOTE: exporting a variable makes it available for child processes via the environment
@@ -301,81 +310,91 @@ set +o nounset
 # Increase size of history in the terminal. Default is a measly 512 lines
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*history][history:1]]
+
 export HISTSIZE=65535
 export HISTFILESIZE=65535
+
 # history:1 ends here
-
-
 
 # Add timestamps to history
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*history][history:2]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*history][history:1]]
+
 export HISTTIMEFORMAT="%F %T  "
-# history:2 ends here
 
-
+# history:1 ends here
 
 # Ignore duplicates and trivial one/two char commands as I've a bad habit of doing =cl= all the time.
 # Furthermore, I can add all the commands I want to ignore to it as well.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*history][history:3]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*history][history:1]]
+
 export HISTIGNORE='?:??:history*:sosa:sosc:sosf:sosp:cd:que*:lla*'
-# history:3 ends here
 
-
+# history:1 ends here
 
 # =ignoredups= allows me to ignore the same command type multiple times consecutively
 # =ignorespace= does not add commands that start with a space to the history just in case I don't want to log something
 # =ignoreboth= does both
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*history][history:4]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*history][history:1]]
+
 export HISTCONTROL=ignoreboth
-# history:4 ends here
+
+# history:1 ends here
 
 # misc
 
-
 # [[file:~/.config/dotfiles/bash/bashrc.org::*misc][misc:1]]
+
 export EDITOR=vim
 export VISUAL=gvim
+
 # misc:1 ends here
-
-
 
 # Make less more friendly for non-text input files, see lesspipe(1)
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*misc][misc:2]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*misc][misc:1]]
+
 export MANPAGER=less
 export PAGER=less
 [[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
-# misc:2 ends here
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*misc][misc:3]]
+# misc:1 ends here
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*misc][misc:1]]
+
 export HOSTNAME="$(hostname)"
 export LANG=en_US.UTF-8
-# misc:3 ends here
+
+# misc:1 ends here
 
 # ls colors
 # See [[id:2823d31a-572c-44ec-80e1-84acbbb6412e][dircolors]]
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*ls%20colors][ls colors:1]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*ls%20colors][ls\ colors:1]]
+
 if [[ -x /usr/bin/dircolors ]]; then
     _dircolors=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/dircolors
     [[ -r $_dircolors ]] && eval "$(/usr/bin/dircolors -b $_dircolors)" || eval "$(/usr/bin/dircolors -b)"
 fi
-# ls colors:1 ends here
+
+# ls\ colors:1 ends here
 
 # base16 themes
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*base16%20themes][base16 themes:1]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*base16%20themes][base16\ themes:1]]
+
 export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
 [[ -n "$PS1" ]] && [[ -s $BASE16_SHELL/profile_helper.sh ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
 base16_solarized-light &> /dev/null
-# base16 themes:1 ends here
+
+# base16\ themes:1 ends here
 
 # colored man pages with less
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*colored%20man%20pages%20with%20less][colored man pages with less:1]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*colored%20man%20pages%20with%20less][colored\ man\ pages\ with\ less:1]]
+
 man() {
     env \
         LESS_TERMCAP_mb=$(printf "\e[1;31m") \
@@ -387,13 +406,14 @@ man() {
         LESS_TERMCAP_us=$(printf "\e[1;32m") \
         man "$@"
 }
-# colored man pages with less:1 ends here
+
+# colored\ man\ pages\ with\ less:1 ends here
 
 # helper functions
 # Collection of utilities to deal with all VCS related stuff
 
+# [[file:~/.config/dotfiles/bash/bashrc.org::*helper%20functions][helper\ functions:1]]
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*helper%20functions][helper functions:1]]
 vcs::is_in_git_repo() {
     local _cwd=$PWD
     if (( $# > 0 )); then
@@ -491,24 +511,26 @@ vcs::get_root() {
         echo ""
     fi
 }
-# helper functions:1 ends here
 
+# helper\ functions:1 ends here
 
 # Now, if I run =g SOMETHING= followed by =vq= then =vq= doesn't run as expected because ~!!~ expands to 'g SOMETHING'.
 # However, in the expanded form, 'g' doesn't get replaced with grep because of the afore-mentioned limitation.
 
 # To avoid this, I use functions for my most commonly used aliases so that they work everywhere and, aliases only if I'm sure that they won't be used in the middle of a command.
 
+# [[file:~/.config/dotfiles/bash/bashrc.org::*aliases/utilities][aliases/utilities:1]]
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*aliases/utilities][aliases/utilities:2]]
 alias ls='ls -FLH --color=always'
 alias l=ls
 alias la='ls -A'
 alias ll='ls -lh'
 alias lla='ll -A'
-# aliases/utilities:2 ends here
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*aliases/utilities][aliases/utilities:3]]
+# aliases/utilities:1 ends here
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*aliases/utilities][aliases/utilities:1]]
+
 alias c=clear
 alias cl="c;l"
 
@@ -535,22 +557,22 @@ alias k9='kill -9'
 alias j='jobs -l'
 alias pls='sudo $(history -p !!)'
 duh() { du -h "$@" | sort -rh; }
-# aliases/utilities:3 ends here
 
-
+# aliases/utilities:1 ends here
 
 # From https://askubuntu.com/a/185746/38952
 # Using ww twice ensures that the output is not truncated to the width of the terminal
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*aliases/utilities][aliases/utilities:4]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*aliases/utilities][aliases/utilities:1]]
+
 psgrep() { ps wwup $(command pgrep -f "$@"); }
-# aliases/utilities:4 ends here
 
-
+# aliases/utilities:1 ends here
 
 # bookmarks for commonly used configs
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*aliases/utilities][aliases/utilities:5]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*aliases/utilities][aliases/utilities:1]]
+
 alias gosc='$VISUAL ~/.bashrc'
 alias gosa='$VISUAL ~/.dotfiles/bash/aliases'
 alias gosf='$VISUAL ~/.dotfiles/bash/bashrc-func'
@@ -558,30 +580,36 @@ alias gost='$VISUAL ~/.dotfiles/tmux/tmux.conf'
 alias gosx='$VISUAL ~/.Xresources'
 alias sosc='. ~/.bashrc && clnpath && echo Sourced bashrc'
 alias sosa='. ~/.dotfiles/bash/aliases && . ~/.dotfiles/bash/bashrc-func && echo Sourced aliases and functions'
-# aliases/utilities:5 ends here
+
+# aliases/utilities:1 ends here
 
 # grep
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*grep][grep:1]]
+
 export GREP_COLORS='1;32'
 
 alias grep='grep -sP --color=always'
 alias gi='grep -i'
 alias gv='grep -v'
+
 # grep:1 ends here
 
 # git
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*git][git:1]]
+
 alias ga='git add'
 alias gA='git add -A .'
 alias gh='git help'
 alias gs='git status'
+
 # git:1 ends here
 
 # perforce
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*perforce][perforce:1]]
+
 alias pf='p4'
 alias pfd='p4 diff'
 alias pfd2='p4diff2'
@@ -589,13 +617,13 @@ alias pfdg='P4DIFF= p4 diff -du | grepdiff --output-matching=hunk'
 alias pfe='p4 edit'
 alias pfo='p4 opened'
 alias pflog='p4 filelog -stl -m 5'
+
 # perforce:1 ends here
-
-
 
 # Show top N (default=10) changes
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*perforce][perforce:2]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*perforce][perforce:1]]
+
 pftop() {
     local num=10
     if (( $# > 0 )) && [[ "$1" =~ ^[0-9]+$ ]]; then
@@ -604,12 +632,14 @@ pftop() {
     fi
     p4 changes -m $num "$@" $STEM/...
 }
-# perforce:2 ends here
+
+# perforce:1 ends here
 
 # rm
 # Delete in background
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*rm][rm:1]]
+
 unset -f rm_rf
 rm_rf_silent() {
     # FIXME: Doesn't work if there are spaces in the filename
@@ -625,13 +655,14 @@ rm_rf_silent() {
     done
 }
 alias rdj='rm_rf_silent'
+
 # rm:1 ends here
 
 # @: a simpler and faster alternative to globstar
 # =@ ls /some/long/path/**/that/I/dont/want/to/type= is converted to =ls $(find /some/long/path/ -path '*/that/I/dont/want/to/type')=
 
+# [[file:~/.config/dotfiles/bash/bashrc.org::*@:%20a%20simpler%20and%20faster%20alternative%20to%20globstar][@:\ a\ simpler\ and\ faster\ alternative\ to\ globstar:1]]
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*@:%20a%20simpler%20and%20faster%20alternative%20to%20globstar][@: a simpler and faster alternative to globstar:1]]
 unset -f @
 function @ {
     # Description:
@@ -651,7 +682,8 @@ function @ {
     # echo
     eval "${_cmd[@]}"
 }
-# @: a simpler and faster alternative to globstar:1 ends here
+
+# @:\ a\ simpler\ and\ faster\ alternative\ to\ globstar:1 ends here
 
 # alert
 # Simply function to "alert" when a command completes.
@@ -660,6 +692,7 @@ function @ {
 # Use like this: =sleep 10 && alert=
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*alert][alert:1]]
+
 unset -f alert
 alert() {
     # Pick up display message if provided as argument. If not show the last command that was run
@@ -677,12 +710,14 @@ alert() {
 
     notify-send --urgency=low -i $_icon "$_msg"
 }
+
 # alert:1 ends here
 
 # calc
 # Simple wrapper around =irb= to make it more natural to use. eg. ~= 4 + 5~
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*calc][calc:1]]
+
 unset -f =
 =() {                                                                                                             # {{{1
     local _input="${@:-$(</dev/stdin)}"
@@ -716,13 +751,13 @@ unset -f =
 
     echo $_result
 }
+
 # calc:1 ends here
-
-
 
 # Simple base-converter
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*calc][calc:2]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*calc][calc:1]]
+
 unset -f =base
 =base() (                                                                                                         # {{{1
     _help () { #{{{
@@ -765,9 +800,11 @@ unset -f =base
 =bin() { =base $1  2 ${2:-10}; }  # Convert to binary, by default from decimal
 =dec() { =base $1 10 ${2:-16}; }  # Convert to decimal, by default from hexadecimal
 =hex() { =base $1 16 ${2:-10}; }  # Convert to hexadecimal, by default from decimal
-# calc:2 ends here
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*calc][calc:3]]
+# calc:1 ends here
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*calc][calc:1]]
+
 unset -f =slice
 =slice() (
     _help() {
@@ -805,11 +842,13 @@ unset -f =slice
     # echo "in=$_num, msb=$_msb, lsb=$_lsb"
     = "($_num >> $_lsb) & ((1 << ($_msb - $_lsb + 1)) - 1)"
 )
-# calc:3 ends here
+
+# calc:1 ends here
 
 # dir related
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir related:1]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir\ related:1]]
+
 alias md='mkdir -p'
 
 # Create new dir(s) and enter it (last directory if multiple arguments are given)
@@ -818,13 +857,13 @@ mcd() {
     command mkdir -p "$@" || return
     cd -- "${@: -1}"
 }
-# dir related:1 ends here
 
-
+# dir\ related:1 ends here
 
 # Silent pushd and uniquifies while pushing
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir related:2]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir\ related:1]]
+
 pushd() {
     builtin pushd "$@" > /dev/null;
 
@@ -834,13 +873,13 @@ pushd() {
         command popd -n +$pos 2> /dev/null
     done
 }
-# dir related:2 ends here
 
-
+# dir\ related:1 ends here
 
 # NOTE: The use of $* is deliberate here as it produces all the scripts arguments separated by the first character of $IFS which, by default, is a space. This allows me to match all arguments against a regex in one go instead of looping over them
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir related:3]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir\ related:1]]
+
 dirs() {
     if (( $# == 0 )); then
         builtin dirs -v
@@ -852,9 +891,11 @@ dirs() {
         builtin dirs "$@"
     fi
 }
-# dir related:3 ends here
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir related:4]]
+# dir\ related:1 ends here
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir\ related:1]]
+
 cd() {
     if (( "$#" == 0 )); then
         if vcs::is_in_repo > /dev/null; then
@@ -905,20 +946,22 @@ cd() {
 
 # Not adding to dirstack to avoid cluttering it
 alias ..='command cd ..'
-# dir related:4 ends here
+
+# dir\ related:1 ends here
 
 # emacs
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*emacs][emacs:1]]
+
 emacs_func() { emacsclient --alternate-editor="" --no-wait --create-frame --quiet "$@" & }
 alias doomacs='emacs --with-profile doom'
+
 # emacs:1 ends here
 
-# fzf
-# https://github.com/junegunn/fzf
+# [[https://github.com/junegunn/fzf][fzf]]
 
+# [[file:~/.config/dotfiles/bash/bashrc.org::*%5B%5Bhttps://github.com/junegunn/fzf%5D%5Bfzf%5D%5D][\[\[https://github\.com/junegunn/fzf\]\[fzf\]\]:1]]
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*fzf][fzf:1]]
 if [[ -z "$FZF_PATH" ]]; then
     echo "$(tput setaf 1)ERROR$(tput sgr0): FZF_PATH is not set"
 else
@@ -948,13 +991,47 @@ else
     export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
     [[ -n "$BASE16_THEME" ]] && source "$BASE16_FZF/bash/base16-${BASE16_THEME}.config"
 fi
-# fzf:1 ends here
+
+# \[\[https://github\.com/junegunn/fzf\]\[fzf\]\]:1 ends here
+
+# COMMENT jumper
+# Jump to any arbitrary folder in the current filepath. Case-insensitive and supports fuzzy matching
+# Based on [[http://brettterpstra.com/2014/05/14/up-fuzzy-navigation-up-a-directory-tree/][up]]. Also take a look at [[https://github.com/vigneshwaranr/bd][bd]].
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*jumper][COMMENT\ jumper:1]]
+
+unset -f jumper
+jumper() {
+  if (($# == 0)); then
+    echo "ERROR: Insufficient number of arguments"
+    echo "SYNTAX: path_jump <dir>[/subdir]"
+  fi
+
+  # Jumping to a subdirectory of the parent dir in the path
+  local _targ=${1%%/*}
+  local _subdir="${1/$_targ/}"
+  # echo "Targ:$_targ, SubDir:$_subdir" >> log
+
+  # Plain-old jumping, no fuzziness
+  # local _dir=$(echo $PWD | sed "s,\(^.*${_targ}[^/]*\)/.*$,\1,")
+
+  # Remove spaces, escape any bare dots and add fuzzy magic
+  local _rx=$(ruby -e "print '$_targ'.gsub(/\s+/,'').split('').join('.*?').gsub(/\.(?!\*\?)/,'\.')")
+  local _dir=$(echo $PWD | ruby -e "print STDIN.read.sub(/(.*?\/${_rx}[^\/]*).*/,'\1')")
+
+  echo $_dir/$_subdir
+}
+
+alias ,=jumper
+
+# COMMENT\ jumper:1 ends here
 
 # query
 # =which= on steroids. Shows aliases and function definitions recursively.
 # Since this function deals with aliases, it cannot be made into a stand-alone script since aliases are not accessible inside subshells.
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*query][query:1]]
+
 query() (
 # Yep, parentheses is correct. It makes this a subshell function allowing the definition to be inaccessible from outside
 # Thus, no more polluting of shell space with helper functions
@@ -1221,11 +1298,14 @@ _query_pp_() {                                                                  
       ;;
   esac
 )
+
 # query:1 ends here
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*query][query:2]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*query][query:1]]
+
 alias que=query
-# query:2 ends here
+
+# query:1 ends here
 
 # [[https://github.com/BurntSushi/ripgrep][ripgrep]]
 # :PROPERTIES:
@@ -1233,34 +1313,37 @@ alias que=query
 # :END:
 # This will be tangled only if =rg= exists
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*%5B%5Bhttps://github.com/BurntSushi/ripgrep%5D%5Bripgrep%5D%5D][[[https://github.com/BurntSushi/ripgrep][ripgrep]]:1]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*%5B%5Bhttps://github.com/BurntSushi/ripgrep%5D%5Bripgrep%5D%5D][\[\[https://github\.com/BurntSushi/ripgrep\]\[ripgrep\]\]:1]]
+
 export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgreprc
 alias g=rg
-# [[https://github.com/BurntSushi/ripgrep][ripgrep]]:1 ends here
+
+# \[\[https://github\.com/BurntSushi/ripgrep\]\[ripgrep\]\]:1 ends here
 
 # vim
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*vim][vim:1]]
+
 alias v=vim
 alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
 # alias vi='vim --config NONE'
+
 # vim:1 ends here
-
-
 
 # Open results of the last shell command in vim quickfix.
 # Very useful for searching something using =rg= etc. and iterating through the results in vim
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*vim][vim:2]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*vim][vim:1]]
+
 vq() { v -q <(eval "$(fc -nl -1) $@"); }
-# vim:2 ends here
 
-
+# vim:1 ends here
 
 # Opening up vimdiff takes some observable amount of time. This will run it only if required.
 # Using -f keeps the window in the foreground and prevents a whole bunch of diffs opening at the same time
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*vim][vim:3]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*vim][vim:1]]
+
 gvim_diff() {
     # Check to see if all files are present. If not, return.
     for i in "$@"; do
@@ -1274,14 +1357,17 @@ gvim_diff() {
     gvim -df -c 'set nobackup' "$@"
 }
 alias vd=gvim_diff
-# vim:3 ends here
+
+# vim:1 ends here
 
 # tmux
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*tmux][tmux:1]]
+
 source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/tmux/tmuxw.bash
 alias tmux='tmuxw'
 alias tm='tmux'
+
 # tmux:1 ends here
 
 # prompt
@@ -1293,23 +1379,24 @@ alias tm='tmux'
 # I use this by assigning it to a function which updates PS1 and PS2 allowing me to have a dynamic prompt
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*prompt][prompt:1]]
+
 PROMPT_COMMAND=__setprompt
+
 # prompt:1 ends here
-
-
 
 # Use bash builtin =checkwinsize= option for terminals which fail to properly set the $COLUMNS variable. (bug workaround)
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*prompt][prompt:2]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*prompt][prompt:1]]
+
 shopt -s checkwinsize
-# prompt:2 ends here
 
-
+# prompt:1 ends here
 
 # Contract the following: /proj/ch_func_dev{1:0}/ASPEN_HIGHLANDS -> ~AH{1:0}
 # Contract more if it's my directory
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*Colors%20and%20helper%20functions][Colors and helper functions:2]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*Colors%20and%20helper%20functions][Colors\ and\ helper\ functions:1]]
+
 __get_compact_pwd() {
     local _pwd=$PWD
     if [[ -n "$HOME" ]] && [[ "$_pwd" =~ ^"$HOME" ]]; then
@@ -1317,7 +1404,8 @@ __get_compact_pwd() {
     fi
     echo $_pwd
 }
-# Colors and helper functions:2 ends here
+
+# Colors\ and\ helper\ functions:1 ends here
 
 # mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]
 # Also based on [[http://aperiodic.net/phil/prompt/][Phil's Zsh prmpt]]. This is what it looks like:
@@ -1328,7 +1416,8 @@ __get_compact_pwd() {
 
 # The function has to be called '__setprompt' as that's what =PROMPT_COMMAND= is set to
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:1]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1]]
+
 __setprompt() {
     # Colors and line-graphics that I use commonly
     local _reset="\[$(tput sgr0)\]"
@@ -1347,13 +1436,13 @@ __setprompt() {
     # local _ulcorner="╭"
     local _llcorner="└"
     # local _llcorner="╰"
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:1 ends here
 
-
+# mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1 ends here
 
 # This is all the information I need to set my prompt!
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:2]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1]]
+
 # This has to be placed first
 local _exit_status="$?"
 
@@ -1369,25 +1458,25 @@ local _user="$(whoami) "
 local _user_host_sep="@ "
 local _pwd_sep="in "
 local _host="$(hostname) "
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:2 ends here
 
-
+# mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1 ends here
 
 # If root user then colour the arrow red.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:3]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1]]
+
 if (( "$UID" == 0 )); then
     local _fg_user_symbol=$_fg_red
 else
     local _fg_user_symbol=${_bold}${_fg_light_black}
 fi
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:3 ends here
 
-
+# mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1 ends here
 
 # VCS specific
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:4]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1]]
+
 local _vcs_type=$(vcs::get_type)
 local _vcs_branch=$(vcs::get_branch $_vcs_type)
 local _vcs_sep=" on "
@@ -1404,36 +1493,36 @@ else
     local _user_symbol=" $"
     local _vcs_sep=""
 fi
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:4 ends here
 
-
+# mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1 ends here
 
 # Here, I try to decide what all to put on the prompt depending on the width of the screen.
 # I work backwards by constructing the full prompt and remove stuff if it's longer than the screen width as most of the it won't be.
 
 # Start with everything of interest
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:5]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1]]
+
 _info="${_ulcorner} ${_user}${_user_host_sep}${_host}${_pwd_sep}${_pwd}${_vcs_sep}${_vcs_branch} ${_time}"
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:5 ends here
 
-
+# mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1 ends here
 
 # If info is wider than the screen, drop the time
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:6]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1]]
+
 if (( $_columns < ${#_info} )); then
     _time=""
     _info="${_ulcorner} ${_user}${_user_host_sep}${_host}${_pwd_sep}${_pwd}${_vcs_sep}${_vcs_branch} "
 fi
 _pwd_sep="${_fg_light_black}${_pwd_sep}${_reset}"
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:6 ends here
 
-
+# mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1 ends here
 
 # If the info still can't fit, drop user and domain info
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:7]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1]]
+
 if (( $_columns < ${#_info} )); then
     _user=""
     _user_host_sep=""
@@ -1441,25 +1530,25 @@ if (( $_columns < ${#_info} )); then
     _pwd_sep=""
     _info="${_ulcorner} ${_pwd}${_vcs_sep}${_vcs_branch} "
 fi
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:7 ends here
 
-
+# mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1 ends here
 
 # If the info still can't fit, drop vcs branch
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:8]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1]]
+
 if (( $_columns < ${#_info} )); then
     _vcs_sep=""
     _vcs_branch=""
     _info="${_ulcorner} ${_pwd} "
 fi
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:8 ends here
 
-
+# mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1 ends here
 
 # If the info still can't fit, truncate PWD
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:9]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1]]
+
 if (( $_columns < ${#_info} )); then
     _pwd_sep="..."
     while (( $_columns < ${#_info} )); do
@@ -1471,13 +1560,13 @@ fi
 
 local _fillsize=$(( $_columns - ${#_info} - 1 ))
 local _fill=$(printf "${_dash}%.0s" $(seq 1 $_fillsize))" "
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:9 ends here
 
-
+# mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1 ends here
 
 # Colorize vcs:
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:10]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1]]
+
 if [[ $_vcs_type == "git" ]]; then
     local _vcs_status=$(vcs::get_status ${_vcs_type} ${_vcs_branch})
     if [[ "${_vcs_status}" == "staged" ]]; then
@@ -1488,25 +1577,25 @@ if [[ $_vcs_type == "git" ]]; then
         _vcs_branch="${_bold}${_fg_green}${_vcs_branch}${_reset}"
     fi
 fi
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:10 ends here
 
-
+# mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1 ends here
 
 # Create exit status indicator based on exit status of last command
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:11]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1]]
+
 if (( "$_exit_status" == 0 )); then
     _exit_status="${_bold}${_fg_green} (^_^)"
 else
     _exit_status="${_fg_red} (@_@)"
 fi
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:11 ends here
 
-
+# mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1 ends here
 
 # Now that I've decided what all I want to put on the prompt and how, it's time to set the prompt variables
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:12]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1]]
+
 PS1="\n${_reset}"
 PS1+="${_fg_light_black}${_ulcorner}${_reset} "
 PS1+="${_fg_red}${_user}${_reset}"
@@ -1524,51 +1613,54 @@ PS1+="${_exit_status}${_reset}"
 PS1+="${_fg_user_symbol}${_user_symbol}${_reset} "
 
 PS2="      ${_fg_user_symbol}...${_reset}   "
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:12 ends here
 
-
+# mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1 ends here
 
 # Evaluate dynamic variables only if dyn_vars is defined (Not required for prompt)
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:13]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1]]
+
 declare -F dyn_vars &> /dev/null && dyn_vars
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:13 ends here
 
-
+# mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1 ends here
 
 # Set HISTFILE here to keep it current when sessions span multiple days
 # FIXME: Find a better way to do this i.e. do it once a day instead of everytime the prompt is refreshed
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:14]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1]]
+
 HISTFILE="${XDG_DATA_HOME:-$HOME/.local/share}/bash_history/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
 [[ -d $(dirname ${HISTFILE}) ]] || mkdir -p $(dirname ${HISTFILE})
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:14 ends here
 
-
+# mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1 ends here
 
 # Write to the history file immediately instead of waiting till the end of the session
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:15]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*mod%20of%20%5B%5Bhttp://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/%5D%5BSJL's%20prompt%5D%5D][mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1]]
+
 history -a
 }
-# mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]:15 ends here
+
+# mod\ of\ \[\[http://stevelosh\.com/blog/2010/02/my-extravagant-zsh-prompt/\]\[SJL\'s\ prompt\]\]:1 ends here
 
 # PATH
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*PATH][PATH:1]]
+
 if ((which ruby &> /dev/null) && (which gem &> /dev/null)); then
   export PATH="$(ruby -rubygems -e 'puts Gem.user_dir')/bin:$PATH"
 fi
 export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 clnpath
+
 # PATH:1 ends here
 
 # home
 
-
 # Update permissions of the history when exiting as root
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:1]]
+
 __histfile_perm_update__() {
     if [[ -f $HISTFILE ]]; then
         echo "Changing permissions of HISTFILE..."
@@ -1583,21 +1675,21 @@ trap __histfile_perm_update__ EXIT
 if [[ "$SHLVL" = 1 ]]; then
     [[ -x /usr/bin/clear_console ]] && /usr/bin/clear_console -q
 fi
+
 # home:1 ends here
 
+# And finally, check for a .bashrc_local and load it
 
+# [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:1]]
 
-# Only for home WSL
+[[ -f ~/.bashrc_local ]] && . ~/.bashrc_local
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:4]]
-export LIBGL_ALWAYS_INDIRECT=1
-# Need to specify the IP of the host
-export DISPLAY=192.168.1.122:0
-# home:4 ends here
+# home:1 ends here
 
 # command completion
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*command%20completion][command completion:1]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*command%20completion][command\ completion:1]]
+
 if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
@@ -1645,22 +1737,24 @@ complete -f -o default -X '!*.gif'  kview
 #complete -f -o default -X '!*.+(jp*g|gif|xpm|png|bmp)' xv gimp
 #complete -f -o default -X '!*.+(mp3|MP3)' mpg123 mpg321
 #complete -f -o default -X '!*.+(ogg|OGG)' ogg123
-# command completion:1 ends here
+
+# command\ completion:1 ends here
 
 # fzf completion
 # Rest of fzf configuration defined above: [[*\[\[https://github.com/junegunn/fzf\]\[fzf\]\]][fzf]]
 
+# [[file:~/.config/dotfiles/bash/bashrc.org::*fzf%20completion][fzf\ completion:1]]
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*fzf%20completion][fzf completion:1]]
 [[ $- == *i* ]] && source "$FZF_PATH/shell/completion.bash" 2> /dev/null
-# fzf completion:1 ends here
+
+# fzf\ completion:1 ends here
 
 # alias completion
 # Automatically add completion for all aliases to commands having completion functions
 # This must be called only at the very end
 
+# [[file:~/.config/dotfiles/bash/bashrc.org::*alias%20completion][alias\ completion:1]]
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*alias%20completion][alias completion:1]]
 _compl_alias() {
     [[ -z "$1" ]] && return
     local _alias="$1"
@@ -1674,13 +1768,13 @@ _compl_alias() {
 
     eval "$(complete -p $_cmd | sed "s/$_cmd$/$_alias/")"
 }
-# alias completion:1 ends here
 
-
+# alias\ completion:1 ends here
 
 # Note the order of application is important
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*alias%20completion][alias completion:2]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*alias%20completion][alias\ completion:1]]
+
 _compl_alias bat  cat
 _compl_alias e    emacs
 _compl_alias g    grep
@@ -1689,4 +1783,5 @@ _compl_alias vile less
 for _alias in C P gi gv l la ll lla v bat doomacs; do
     _compl_alias "$_alias"
 done
-# alias completion:2 ends here
+
+# alias\ completion:1 ends here
