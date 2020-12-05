@@ -1,6 +1,6 @@
 #+TITLE: bash configuration
 #+PROPERTY: header-args+ :results output silent :noweb tangle :comments both :mkdirp yes
-#+TODO: FIXME | DONE
+#+TODO: FIXME | FIXED
 
 * bashrc
 :PROPERTIES:
@@ -119,7 +119,7 @@ If set, aliases are expanded as described below under Aliases, Aliases.
 # shopt -s expand_aliases
 #+end_src
 
-If set, the extended pattern matching features described above (see Pattern Matching) are enabled.
+If set, the extended pattern matching features (see [[https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html#Pattern-Matching][Pattern Matching]]) are enabled.
 #+begin_src bash
 # shopt -s extglob
 #+end_src
@@ -230,7 +230,7 @@ export HISTTIMEFORMAT="%F %T  "
 Ignore duplicates and trivial one/two char commands as I've a bad habit of doing =cl= all the time.
 Furthermore, I can add all the commands I want to ignore to it as well.
 #+begin_src bash
-export HISTIGNORE='?:??:history*:sosa:sosc:sosf:sosp:cd:que*:lla*'
+export HISTIGNORE='?:??:history*:sosc:que*:ll*'
 #+end_src
 
 =ignoredups= allows me to ignore the same command type multiple times consecutively
@@ -292,7 +292,7 @@ man() {
         LESS_TERMCAP_md=$(printf "\e[1;31m") \
         LESS_TERMCAP_me=$(printf "\e[0m") \
         LESS_TERMCAP_se=$(printf "\e[0m") \
-        LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
+        LESS_TERMCAP_so=$(printf "\e[0;43;30m") \
         LESS_TERMCAP_ue=$(printf "\e[0m") \
         LESS_TERMCAP_us=$(printf "\e[1;32m") \
         man "$@"
@@ -442,11 +442,7 @@ alias df='df -h'
 alias pppath='tr ":" "\n" <<< $PATH'
 alias clnpath='export PATH=$(tr ":" "\n" <<< $PATH | perl -ne "print unless \$seen{\$_}++" | paste -s -d":")'
 
-if hash bat 2> /dev/null; then
-    alias C=bat
-else
-    alias C=cat
-fi
+alias C=cat
 alias P=$PAGER
 alias hh='history | tail'
 alias x=exit
@@ -462,15 +458,12 @@ Using ww twice ensures that the output is not truncated to the width of the term
 psgrep() { ps wwup $(command pgrep -f "$@"); }
 #+end_src
 
-bookmarks for commonly used configs
+bookmarks for commonly used config files
 #+begin_src bash
 alias gosc='$VISUAL ~/.bashrc'
-alias gosa='$VISUAL ~/.dotfiles/bash/aliases'
-alias gosf='$VISUAL ~/.dotfiles/bash/bashrc-func'
 alias gost='$VISUAL ~/.dotfiles/tmux/tmux.conf'
 alias gosx='$VISUAL ~/.Xresources'
-alias sosc='. ~/.bashrc && clnpath && echo Sourced bashrc'
-alias sosa='. ~/.dotfiles/bash/aliases && . ~/.dotfiles/bash/bashrc-func && echo Sourced aliases and functions'
+alias sosc='. ~/.bashrc && clnpath'
 #+end_src
 
 *** grep
@@ -493,12 +486,22 @@ alias gv='grep -v'
 *** perforce
 #+begin_src bash
 alias pf='p4'
-alias pfd='p4 diff'
-alias pfd2='p4diff2'
-alias pfdg='P4DIFF= p4 diff -du | grepdiff --output-matching=hunk'
-alias pfe='p4 edit'
-alias pfo='p4 opened'
-alias pflog='p4 filelog -stl -m 5'
+alias pfd='pf diff'
+alias pfdg='P4DIFF= pf diff -du | grepdiff --output-matching=hunk'
+alias pfe='pf edit'
+alias pflog='pf filelog -stl -m 5'
+#+end_src
+
+Make opened files prettier by aligning the columns
+#+begin_src bash
+pfo() {
+    pf opened "$@" | command column -s# -o ' #' -t | command column -o ' ' -t | command sed 's/#/   #/'
+}
+
+pfor() {
+    pf where $(pf opened "$@" | command sed -e 's/#.*//') |
+        awk "{ if (\$3 != \"$REPO_PATH/...\") { print \$3; } }" | sed -e "s:$REPO_PATH/::"
+}
 #+end_src
 
 Show top N (default=10) changes
@@ -509,7 +512,7 @@ pftop() {
         num=$1
         shift
     fi
-    p4 changes -m $num "$@" $STEM/...
+    pf changes -m $num "$@" $STEM/...
 }
 #+end_src
 
@@ -719,19 +722,6 @@ mcd() {
 }
 #+end_src
 
-Silent pushd and uniquifies while pushing
-#+begin_src bash
-pushd() {
-    builtin pushd "$@" > /dev/null;
-
-    # Remove any duplicate entries. The 1st entry will be the PWD so skip it
-    dir_pos=($(dirs -l -v | tail -n+2 | grep "$PWD$" | sed 's/^\s*//' | cut -d ' ' -f1 | paste -s))
-    for pos in ${dir_pos[@]}; do
-        command popd -n +$pos 2> /dev/null
-    done
-}
-#+end_src
-
 NOTE: The use of $* is deliberate here as it produces all the scripts arguments separated by the first character of $IFS which, by default, is a space. This allows me to match all arguments against a regex in one go instead of looping over them
 #+begin_src bash
 dirs() {
@@ -747,6 +737,24 @@ dirs() {
 }
 #+end_src
 
+Silent pushd and uniquifies while pushing
+#+begin_src bash
+pushd() {
+    builtin pushd "$@" > /dev/null;
+
+    # Remove any duplicate entries. The 1st entry will be the PWD so skip it
+    local _dir_pos=$(dirs -l -v | tail -n+2 | grep "$PWD$" | sed 's/^\s*//' | cut -d ' ' -f1 | paste -s)
+    command popd -n +$_dir_pos &> /dev/null
+}
+#+end_src
+
+Better dirstack. Adds the following to the usual =cd= behavior:
+- =cd ==           Lists the contents of the stack and use fzf to select from it
+- =cd=             (with no args) Goes to $REPO_PATH if it's set else goes to $HOME
+- =cd ... [TARG]=  Jump to a directory in the path that starts with TARG.
+                 If TARG is not given, show all directories in the filepath and use fzf to select
+
+Note that =pushd= calls =cd= under the hood. So =cdable_vars= and =cdspell= apply to =pushd= as well
 #+begin_src bash
 cd() {
     if (( "$#" == 0 )); then
@@ -765,13 +773,19 @@ cd() {
             ;;
 
         =)
+        if hash fzf 2> /dev/null; then
+            FZF_ALT_C_COMMAND='command dirs -lp' __fzf_cd__
+        else
             dirs
-            return
-            ;;
+        fi
+        ;;
 
         ...)
-            local _dir=$PWD;
-            $(FZF_ALT_C_COMMAND='_dir=$PWD; while [[ -n "$_dir" ]]; do _dir="${_dir%/[^/]*}"; echo ${_dir:-/}; done' __fzf_cd__)
+            if hash fzf 2> /dev/null; then
+                local _dir=$PWD;
+                FZF_ALT_C_COMMAND='_dir=$PWD; while [[ -n "$_dir" ]]; do _dir="${_dir%/[^/]*}"; echo ${_dir:-/}; done' \
+                FZF_ALT_C_OPTS="${FZF_ALT_C_OPTS} --select-1 ${2+ --query=$2}" __fzf_cd__
+            fi
             return
             ;;
 
@@ -782,7 +796,7 @@ cd() {
 
             if hash fzf 2> /dev/null; then
                 # Find '_path' for all dirs that match the glob expr '_pattern' and select with FZF from the results
-                $(FZF_ALT_C_COMMAND="find ${_path} -type d -path '*${_pattern}*'" __fzf_cd__)
+                FZF_ALT_C_COMMAND="find ${_path} -type d -path '*${_pattern}*'" __fzf_cd__
                 return
             else
                 _dir=$(find $_path -type d -path "*${_pattern}*" -print -quit)
@@ -796,8 +810,7 @@ cd() {
     pushd "$@"
 }
 
-# Not adding to dirstack to avoid cluttering it
-alias ..='command cd ..'
+alias ..='cd ..'
 #+end_src
 
 *** emacs
@@ -834,9 +847,9 @@ else
     fi
 
     # Clear out old env vars
-    export FZF_DEFAULT_OPTS="--ansi --select-1 --exit-0 --inline-info --reverse --tiebreak=length,end --bind=ctrl-n:down,ctrl-p:up"
-    export FZF_ALT_C_OPTS=
-    export FZF_CTRL_T_OPTS=
+    export FZF_DEFAULT_OPTS="--ansi --select-1 --exit-0 --inline-info --reverse --tiebreak=length,end --bind=shift-tab:toggle-all,ctrl-n:down,ctrl-p:up"
+    unset FZF_ALT_C_OPTS
+    unset FZF_CTRL_T_OPTS
     # export FZF_CTRL_T_OPTS='--expect=alt-v,alt-e,alt-c'
 
     # base16 fzf colorscheme is applied by appending to the FZF_DEFAULT_OPTS env var
@@ -1160,7 +1173,7 @@ _query_pp_() {                                                                  
 This will be tangled only if =rg= exists
 #+begin_src bash
 export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgreprc
-alias g=rg
+alias g='command rg'
 #+end_src
 
 **** ripgrep config file
@@ -1305,8 +1318,8 @@ prompt::get_compact_pwd() {
 }
 #+end_src
 
-*** mod of [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]]
-Also based on [[http://aperiodic.net/phil/prompt/][Phil's Zsh prmpt]]. This is what it looks like:
+*** prompt
+This is based on [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]] and [[http://aperiodic.net/phil/prompt/][Phil's Zsh prmpt]]. This is what it looks like:
 #+begin_example
   ┌ kshenoy @ svvgar-nx16 in ~/.vim ───────────────────── 03:57pm Aug 02, Fri
   └ (^_^) ➤
@@ -1428,7 +1441,13 @@ if [[ $_vcs_type == "git" ]]; then
     elif [[ "${_vcs_status}" == "modified" ]]; then
         _vcs_branch="${_fg_red}${_vcs_branch}${_reset}"
     elif [[ "${_vcs_status}" == "committed" ]]; then
-        _vcs_branch="${_bold}${_fg_green}${_vcs_branch}${_reset}"
+        _vcs_branch="${_fg_green}${_vcs_branch}${_reset}"
+    fi
+elif [[ $_vcs_type == "p4" ]]; then
+    if (( $(p4 opened 2> /dev/null | wc -l) > 0 )); then
+        _vcs_branch="${_fg_red}${_vcs_branch}${_reset}"
+    else
+        _vcs_branch="${_fg_green}${_vcs_branch}${_reset}"
     fi
 fi
 #+end_src
@@ -1450,7 +1469,7 @@ PS1+="${_fg_red}${_user}${_reset}"
 PS1+="${_fg_light_black}${_user_host_sep}${_reset}"
 PS1+="${_fg_yellow}${_host}${_reset}"
 PS1+="${_pwd_sep}"
-PS1+="${_bold}${_fg_green}${_pwd}${_reset}"
+PS1+="${_fg_blue}${_pwd}${_reset}"
 PS1+="${_fg_light_black}${_vcs_sep}${_reset}"
 PS1+="${_vcs_branch} "
 PS1+="${_fg_light_black}${_fill}${_reset}"
@@ -1627,12 +1646,12 @@ _compl_alias() {
 
 Note the order of application is important
 #+begin_src bash
-_compl_alias bat  cat
 _compl_alias e    emacs
 _compl_alias g    grep
+_compl_alias v    vim
 _compl_alias vd   diff
 _compl_alias vile less
-for _alias in C P gi gv l la ll lla v bat doomacs; do
+for _alias in C P gi gv l la ll lla doomacs; do
     _compl_alias "$_alias"
 done
 #+end_src
