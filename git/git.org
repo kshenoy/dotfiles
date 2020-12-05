@@ -1,6 +1,6 @@
 #+TITLE: git configuration
 #+PROPERTY: header-args+ :results output silent :noweb tangle :comments both :mkdirp yes
-#+TODO: TODO FIXME |
+#+TODO: FIXME | FIXED
 
 * config
 :PROPERTIES:

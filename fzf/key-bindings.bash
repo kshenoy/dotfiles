@@ -74,6 +74,11 @@ fzf::tmux::select_session() {                                                   
 
 #=======================================================================================================================
 # fzf::bookmarks() {                                                                                               #{{{1
+  
+#   local _cmd='grep filename ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/emacs/bookmarks | cut -d " " -f4 | tr -d \'")\' | sed -e "s,/ssh:\w\+:,," -e "s,~,\$HOME," | sort -u' | while
+# read -r item; do
+# [[ -d "$item" ]] && printf '%q\n' "$item"
+# done
 #   local _cmd="cat <(command find -L ~/Notes -type f -name '*.org' 2> /dev/null) ~/bookmarks"
 
 #   local _out=($(eval "$_cmd | sed "s:${HOME}:~:g" | fzf -m --expect=alt-v,alt-e"))

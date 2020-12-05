@@ -1,6 +1,6 @@
 #+TITLE: Doom emacs private configuration
 #+PROPERTY: header-args :results output silent :noweb tangle :comments both :mkdirp yes
-#+TODO: FIXME | DONE
+#+TODO: FIXME | FIXED
 
 
 Running =doom sync= is not required after modifying this file!
@@ -224,7 +224,11 @@ Move by visual lines
   (evil-redirect-digit-argument evil-motion-state-map "0" 'evil-beginning-of-visual-line))
 #+end_src
 
-*** Change evil-exchange binding from =g x= to =c x=
+This changes evil-exchange default binding from =g x= to =c x=
+#+begin_src emacs-lisp
+(after! evil-exchange
+  (evil-exchange-cx-install))
+#+end_src
 
 * org
 

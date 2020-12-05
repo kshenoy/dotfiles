@@ -1,6 +1,6 @@
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args :results output silent :noweb tangle :comments both :mkdirp yes :tangle init.el
-#+TODO: TODO(!) FIXME(!) |
+#+TODO: FIXME | FIXED
 
 /This file is best viewed in org-mode in emacs as github doesn't do a good job of parsing links which use the ID Property/
 
