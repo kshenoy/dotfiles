@@ -1,35 +1,57 @@
-#!/usr/bin/env bash
-# Function to simplify using tmux. This file must be sourced
+# tmux++
+# :PROPERTIES:
+# :header-args+: :tangle tmuxw.bash
+# :END:
 
-__tmux_exe() {
+# Wrapper around tmux to add more functionality. This file must be sourced
+
+# [[file:tmux.org::*tmux++][tmux++:1]]
+#!/usr/bin/env bash
+# tmux++:1 ends here
+
+
+
+# Wrapper around the tmux command
+
+# [[file:tmux.org::*tmux++][tmux++:2]]
+tmux::exe() {
     LANG=en_US.UTF-8 TMUX_DEFAULT_OPTS="$TMUX_DEFAULT_OPTS ${TMUX_DEFAULT_SOCKET:+-L $TMUX_DEFAULT_SOCKET}" command tmux "$@"
 }
+# tmux++:2 ends here
 
-__tmuxw_attach_or_new() {
-    # Attach to existing session or else create a new one
+
+
+# Attach to existing session or else create a new one
+
+# [[file:tmux.org::*tmux++][tmux++:3]]
+tmux::attach_or_new() {
     if [[ ! -z "$TMUX" ]]; then return; fi
 
     if [[ -z "$1" ]]; then
-        __tmux_exe -2 attach-session || __tmux_exe -2 new-session
+        tmux::exe -2 attach-session || tmux::exe -2 new-session
     else
-        # The commented one-liner doesn't work when the supplied argument is a subset of an already existing session name
+        # This doesn't work when the supplied argument is a subset of an already existing session name
         # For eg. if we have a session called DebugBus, and we check if the session "Debug" exists, tmux returns true
-        #tmux -2 attach-session -t "$@" || ( echo "Creating new session..." && tmux -2 new-session -s "$@" )
+        # tmux -2 attach-session -t "$@" || ( echo "Creating new session..." && tmux -2 new-session -s "$@" )
 
         if [[ $(tm ls | grep -P "^$1\b" 2> /dev/null) ]]; then
             #echo "Attaching to exising session..."
-            __tmux_exe -2 attach-session -t "$@"
+            tmux::exe -2 attach-session -t "$@"
         else
             echo "Creating new session $1 ..."
-            __tmux_exe -2 new-session -s "$1"
+            tmux::exe -2 new-session -s "$1"
         fi
     fi
 }
+# tmux++:3 ends here
 
 
-__tmuxw_update_env() {
-    # Update environment variables in TMUX
-    # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
+
+
+# Update environment variables in TMUX. From https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
+
+# [[file:tmux.org::*tmux++][tmux++:4]]
+tmux::update_env() {
     echo "Updating to latest tmux environment...";
 
     local _line;
@@ -45,75 +67,86 @@ __tmuxw_update_env() {
 
     echo "...done"
 }
+# tmux++:4 ends here
 
 
-__tmuxw_send_keys_other_panes() {
+
+# Helper functions to simplify sending keys
+
+# [[file:tmux.org::*tmux++][tmux++:5]]
+tmux::send_keys_other_panes() {
     local _pane_current=$(tmux display-message -p '#P')
     for _pane in $(tmux list-panes -F '#P'); do
         if (( "$_pane" != "$_pane_current" )); then
-            __tmux_exe send-keys -t ${_pane} "$@"
+            tmux::exe send-keys -t ${_pane} "$@"
         fi
     done
 }
 
-
-__tmuxw_send_keys_all_panes() {
+tmux::send_keys_all_panes() {
     for _pane in $(tmux list-panes -F '#P'); do
-        __tmux_exe send-keys -t ${_pane} "$@"
+        tmux::exe send-keys -t ${_pane} "$@"
     done
 }
 
-
-__tmuxw_send_keys_all() {
+tmux::send_keys_all() {
     for _window in $(tmux list-windows -F '#I'); do
         for _pane in $(tmux list-panes -t ${_window} -F '#P'); do
-            __tmux_exe send-keys -t ${_window}.${_pane} "$@"
+            tmux::exe send-keys -t ${_window}.${_pane} "$@"
         done
     done
 }
+# tmux++:5 ends here
 
 
-__tmuxw_select_layout_work() {
-    local num_panes=$(__tmux_exe display-message -p "#{window_panes}")
-    local win_width=$(__tmux_exe display-message -p "#{window_width}")
+
+# Custom layout for work
+
+# [[file:tmux.org::*tmux++][tmux++:6]]
+tmux::_select_layout_work() {
+    local num_panes=$(tmux::exe display-message -p "#{window_panes}")
+    local win_width=$(tmux::exe display-message -p "#{window_width}")
     local win_width_by2=$(( $win_width / 2 ))
     local win_width_by4=$(( $win_width / 4 ))
-    local win_height=$(__tmux_exe display-message -p "#{window_height}")
+    local win_height=$(tmux::exe display-message -p "#{window_height}")
     local win_height_by2=$(( $win_height / 2 ))
 
-    local curr_pane=$(__tmux_exe display-message -p "#{pane_index}")
-    local curr_path=$(__tmux_exe display-message -p "#{pane_current_path}")
+    local curr_pane=$(tmux::exe display-message -p "#{pane_index}")
+    local curr_path=$(tmux::exe display-message -p "#{pane_current_path}")
     for (( i = $num_panes; i < 3; i++ )); do
-        __tmux_exe split-window -h -c "$curr_path"
+        tmux::exe split-window -h -c "$curr_path"
     done
 
     if [[ "$1" == "work-max" ]]; then
-        __tmux_exe select-layout "1be5,639x73,0,0{319x73,0,0,0,159x73,320,0,1,159x73,480,0,58}"
+        tmux::exe select-layout "1be5,639x73,0,0{319x73,0,0,0,159x73,320,0,1,159x73,480,0,58}"
         tmuxw resize-pane -t 2 -x 100% > /dev/null
         tmuxw resize-pane -t 1 -x 50% > /dev/null
     elif [[ "$1" == "work-home" ]]; then
-        __tmux_exe select-layout "1be5,639x73,0,0{319x73,0,0,0,159x73,320,0,1,159x73,480,0,58}"
+        tmux::exe select-layout "1be5,639x73,0,0{319x73,0,0,0,159x73,320,0,1,159x73,480,0,58}"
         tmuxw resize-pane -t 1 -x 25% > /dev/null
         tmuxw resize-pane -t 2 -x 50% > /dev/null
     elif [[ "$1" == "work-pc" ]]; then
-        __tmux_exe select-layout "1be5,639x73,0,0{319x73,0,0,0,159x73,320,0,1,159x73,480,0,58}"
+        tmux::exe select-layout "1be5,639x73,0,0{319x73,0,0,0,159x73,320,0,1,159x73,480,0,58}"
         tmuxw resize-pane -t 1 -x 50% > /dev/null
         tmuxw resize-pane -t 2 -x 25% > /dev/null
     elif [[ "$1" == "work-lp" ]]; then
-        __tmux_exe select-layout "96ed,319x66,0,0{159x66,0,0,0,159x66,160,0[159x32,160,0,1,159x33,160,33,90]}"
+        tmux::exe select-layout "96ed,319x66,0,0{159x66,0,0,0,159x66,160,0[159x32,160,0,1,159x33,160,33,90]}"
         tmuxw resize-pane -t 1 -x 50% > /dev/null
         tmuxw resize-pane -t 2 -y 50% > /dev/null
     fi
 
-    __tmux_exe select-pane -t $curr_pane
+    tmux::exe select-pane -t $curr_pane
 }
+# tmux++:6 ends here
 
 
+
+# Top-level wrapper function
+
+# [[file:tmux.org::*tmux++][tmux++:7]]
 tmuxw() {
-    # We can't make the helper functions private because doing so will run tmuxw in a subshell
-    # However, since we can't export variables from a subshell to its parent shell, tmux_update_env won't work
     if (( $# == 0 )); then
-        __tmux_exe
+        tmux::exe
         return
     fi
 
@@ -121,20 +154,20 @@ tmuxw() {
 
     case $cmd in
         attach-new|an)
-            # if (( $(__tmux_exe -V) < 2.3 )); then
-            __tmuxw_attach_or_new "$@"
+            # if (( $(tmux::exe -V) < 2.3 )); then
+            tmux::attach_or_new "$@"
             # else
-            # __tmux_exe new-session -A -s "$@"
+            # tmux::exe new-session -A -s "$@"
             # fi
             ;;
 
         msg)
-            __tmux_exe display-message "$@"
+            tmux::exe display-message "$@"
             ;;
 
         update-env|ue)
             if (( $# > 0 )); then echo "Ignoring extra arguments: '$@'"; fi
-            __tmuxw_update_env
+            tmux::update_env
             ;;
 
         update-env-all-panes|ueap)
@@ -150,14 +183,14 @@ tmuxw() {
             if [[ "$*" =~ -[xy][[:space:]]+[[:digit:]]+% ]]; then
                 local perVal=$(sed -e 's/^.*-[xy]\s*//' -e 's/%.*//' <<< "$*")
                 if [[ "$*" =~ -x ]]; then
-                    local absVal=$(( $(__tmux_exe display-message -p "#{window_width}") * $perVal / 100 ))
+                    local absVal=$(( $(tmux::exe display-message -p "#{window_width}") * $perVal / 100 ))
                 elif [[ "$*" =~ -y ]]; then
-                    local absVal=$(( $(__tmux_exe display-message -p "#{window_height}") * $perVal / 100 ))
+                    local absVal=$(( $(tmux::exe display-message -p "#{window_height}") * $perVal / 100 ))
                 fi
                 echo "tmux resize-pane $(sed "s/${perVal}%/${absVal}/" <<< "$*")"
-                eval "__tmux_exe resize-pane $(sed "s/${perVal}%/${absVal}/" <<< "$*")"
+                eval "tmux::exe resize-pane $(sed "s/${perVal}%/${absVal}/" <<< "$*")"
             else
-                __tmux_exe ${cmd} "$@"
+                tmux::exe ${cmd} "$@"
             fi
             ;;
 
@@ -167,35 +200,44 @@ tmuxw() {
             ;;
 
         save-layout)
-            eval $1=$(__tmux_exe display-message -p "#{window_layout}")
+            eval $1=$(tmux::exe display-message -p "#{window_layout}")
             echo "Saved current layout to $1"
             ;;
 
         select-layout|sl)
             if [[ "$1" =~ "work" ]]; then
-                __tmuxw_select_layout_work "$1"
+                tmux::_select_layout_work "$1"
             else
-                __tmux_exe ${cmd} "$@"
+                tmux::exe "${cmd}" "$@"
             fi
             ;;
 
+        save-session)
+            ${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tmux-resurrect/scripts/save.sh
+            ;;
+
+        restore-session)
+            ${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tmux-resurrect/scripts/restore.sh
+            ;;
+
         sk)
-            __tmux_exe send-keys "$@"
+            tmux::exe send-keys "$@"
             ;;
 
         send-keys-other-panes|skop)
-            __tmuxw_send_keys_other_panes "$@"
+            tmux::send_keys_other_panes "$@"
             ;;
 
         send-keys-all-panes|skap)
-            __tmuxw_send_keys_all_panes "$@"
+            tmux::send_keys_all_panes "$@"
             ;;
 
         send-keys-all|ska)
-            __tmuxw_send_keys_all "$@"
+            tmux::send_keys_all "$@"
             ;;
 
         *)
-            __tmux_exe ${cmd} "$@"
+            tmux::exe ${cmd} "$@"
     esac
 }
+# tmux++:7 ends here
