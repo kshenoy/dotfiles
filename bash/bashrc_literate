@@ -11,18 +11,23 @@
 
 
 
-# If shell is interactive turn off TTY "start" and "stop" commands in all interactive shells.
+# Proceed only if its an interactive shell
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*bashrc][bashrc:3]]
+[[ $- == *i* ]] || return
+# bashrc:3 ends here
+
+# interactive, login shell settings
+# Turn off TTY "start" and "stop" commands in all interactive shells.
 # They default to ~C-q~ and ~C-s~. I want to use ~C-s~ to do forward history search.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*interactive,%20login%20shell%20settings][interactive, login shell settings:2]]
-if [[ $- == *i* ]]; then
-    stty start ''
-    stty stop  ''
-    stty -ixon # disable XON/XOFF flow control
-    stty ixoff # enable sending (to app) of start/stop characters
-    stty ixany # let any character restart output, not only start character
-fi
-# interactive, login shell settings:2 ends here
+# [[file:~/.config/dotfiles/bash/bashrc.org::*interactive,%20login%20shell%20settings][interactive, login shell settings:1]]
+stty start ''
+stty stop  ''
+stty -ixon # disable XON/XOFF flow control
+stty ixoff # enable sending (to app) of start/stop characters
+stty ixany # let any character restart output, not only start character
+# interactive, login shell settings:1 ends here
 
 # configuration
 # default permissions
@@ -933,11 +938,11 @@ if [[ -d /opt/fzf ]]; then
     export FZF_PATH=/opt/fzf
 elif [[ -d $HOME/.local/install/fzf ]]; then
     export FZF_PATH="$HOME/.local/install/fzf"
+else
+    echo "$(tput setaf 1)ERROR$(tput sgr0): FZF_PATH is not set"
 fi
 
-if [[ -z "$FZF_PATH" ]]; then
-    echo "$(tput setaf 1)ERROR$(tput sgr0): FZF_PATH is not set"
-else
+if [[ -n "$FZF_PATH" ]]; then
     [[ ! "$PATH" == *$FZF_PATH/bin* ]] && export PATH="$PATH:$FZF_PATH/bin"
 
     # Key bindings
@@ -1605,6 +1610,27 @@ if [[ "$SHLVL" = 1 ]]; then
     [[ -x /usr/bin/clear_console ]] && /usr/bin/clear_console -q
 fi
 # home:1 ends here
+
+
+
+# To connect to work-vpn
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:2]]
+alias gp=globalprotect
+
+work_vpn() {
+    # if command grep Connected <<< $(globalprotect show --status); then
+    if command grep gpd0 <<< $(ifconfig -s) >& /dev/null; then
+        echo "VPN is already connected"
+    else
+        globalprotect connect --portal vpn.amd.com --username kshenoy
+    fi
+}
+# home:2 ends here
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:3]]
+alias boot2win='sudo grub-reboot Windows && shutdown -r 0'
+# home:3 ends here
 
 
 

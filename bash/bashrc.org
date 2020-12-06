@@ -12,26 +12,29 @@
 # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
 #+end_src
 
-** local init
-Any local settings that need to be set initially go here
-
-** interactive, login shell settings
 How to check for login v/s interactive shell
 #+begin_src bash :tangle no
 shopt -q login_shell && echo "Login shell" || echo "Not a login shell"
 [[ $- == *i* ]] && echo "This is an interactive shell" || echo "This is a script"
 #+end_src
 
-If shell is interactive turn off TTY "start" and "stop" commands in all interactive shells.
+Proceed only if its an interactive shell
+#+begin_src bash
+[[ $- == *i* ]] || return
+#+end_src
+
+** local init
+Any local settings that need to be set initially go here
+
+** interactive, login shell settings
+Turn off TTY "start" and "stop" commands in all interactive shells.
 They default to ~C-q~ and ~C-s~. I want to use ~C-s~ to do forward history search.
 #+begin_src bash
-if [[ $- == *i* ]]; then
-    stty start ''
-    stty stop  ''
-    stty -ixon # disable XON/XOFF flow control
-    stty ixoff # enable sending (to app) of start/stop characters
-    stty ixany # let any character restart output, not only start character
-fi
+stty start ''
+stty stop  ''
+stty -ixon # disable XON/XOFF flow control
+stty ixoff # enable sending (to app) of start/stop characters
+stty ixany # let any character restart output, not only start character
 #+end_src
 
 ** configuration
@@ -826,11 +829,11 @@ if [[ -d /opt/fzf ]]; then
     export FZF_PATH=/opt/fzf
 elif [[ -d $HOME/.local/install/fzf ]]; then
     export FZF_PATH="$HOME/.local/install/fzf"
+else
+    echo "$(tput setaf 1)ERROR$(tput sgr0): FZF_PATH is not set"
 fi
 
-if [[ -z "$FZF_PATH" ]]; then
-    echo "$(tput setaf 1)ERROR$(tput sgr0): FZF_PATH is not set"
-else
+if [[ -n "$FZF_PATH" ]]; then
     [[ ! "$PATH" == *$FZF_PATH/bin* ]] && export PATH="$PATH:$FZF_PATH/bin"
 
     # Key bindings
