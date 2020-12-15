@@ -2,7 +2,6 @@
 #+PROPERTY: header-args :results output silent :noweb tangle :comments both :mkdirp yes
 #+TODO: FIXME | FIXED
 
-
 Running =doom sync= is not required after modifying this file!
 
 Some additional functions/macros to help configure Doom:
@@ -177,26 +176,10 @@ Usage examples
 #+end_src
 
 ** Keybindings
-
-Use =org-goto= instead of =semantic-or-imenu= when in org files
 #+begin_src emacs-lisp
-(after! (counsel org)
-  (defun my-org-goto-or-semantic-or-imenu ()
-    "Use mode-specific commands if available else fallback to counsel-semantic-or-imenu"
-    (interactive)
-    (if (string= major-mode "org-mode")
-        (counsel-org-goto)
-      (counsel-semantic-or-imenu))))
-
-(map! :after (counsel org)
-      :map doom-leader-search-map
-      :desc "org-goto-or-semantic-or-imenu" "i" #'my-org-goto-or-semantic-or-imenu)
-#+end_src
-
-#+begin_src emacs-lisp
-(map! :after evil
-      :map evil-normal-state-map
-      :desc "evil-redo" "U" #'evil-redo)
+(map! :after avy
+      :map goto-map
+      :desc "avy-goto-line" "M-g" #'avy-goto-line)
 #+end_src
 
 =SPC SPC= is too valuable to use to find files in project. Rebind to =switch-to-buffer= instead
@@ -224,142 +207,31 @@ Move by visual lines
   (evil-redirect-digit-argument evil-motion-state-map "0" 'evil-beginning-of-visual-line))
 #+end_src
 
+#+begin_src emacs-lisp
+(map! :after evil
+      :map evil-normal-state-map
+      :desc "evil-redo" "U" #'evil-redo)
+#+end_src
+
 This changes evil-exchange default binding from =g x= to =c x=
 #+begin_src emacs-lisp
 (after! evil-exchange
   (evil-exchange-cx-install))
 #+end_src
 
-* org
-
-Startup options
-#+begin_src emacs-lisp
-(setq org-startup-align-all-tables nil  ; This slows down startup of large org files considerably!
-      org-startup-folded t
-      org-startup-with-inline-images t
-      org-agenda-inhibit-startup nil)
-#+end_src
-
-Specify locations of files
+* Org
 #+begin_src emacs-lisp
 (setq org-directory "~/Documents/Notes"
-      org-default-notes-file (expand-file-name "Inbox.org" org-directory)
-      org-id-locations-file (expand-file-name ".org-id-locations" doom-private-dir))
+      org-default-notes-file (expand-file-name "Inbox.org" org-directory))
 #+end_src
 
-** Prettify
-:PROPERTIES:
-:END:
-
-- org-superstart default: "◉ ○ ✸ ✿"
-- Large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
-- Small: ► • ★ ▸
-
-#+begin_src emacs-lisp
-(setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
-(setq org-ellipsis " ▼ ")
-(setq org-superstar-headline-bullets-list '(10040))
-#+end_src
-
-Prevent DONE org-headlines from being highlighted a different color
-#+begin_src emacs-lisp
-(after! org
-  (setq org-fontify-done-headline nil))
-#+end_src
-
-Change faces
-#+begin_src emacs-lisp
-(after! org
-
-  (defun my-update-org-faces-after-load-theme ()
-    "Update some org-mode faces for all themes"
-    (set-face-attribute 'org-document-info-keyword nil :inherit 'org-meta-line :foreground nil)
-    (set-face-attribute 'org-drawer                nil :inherit 'org-meta-line :foreground nil)
-    (set-face-attribute 'org-document-title        nil :height 1.5)
-    (set-face-attribute 'org-level-1               nil :height 1.3)
-    (set-face-attribute 'org-level-2               nil :height 1.2)
-    (set-face-attribute 'org-level-3               nil :height 1.15)
-    (set-face-attribute 'org-level-4               nil :height 1.1))
-
-  (defun my-update-org-faces-for-doom-solarized-light ()
-    "Update some org-mode faces for doom-solarized-light theme"
-    (my-update-org-faces-after-load-theme)
-    (set-face-attribute 'org-document-title nil :foreground "#586e75")
-    (set-face-attribute 'org-level-1        nil :foreground "#cb4b16")
-    (set-face-attribute 'org-level-2        nil :foreground "#859900")
-    (set-face-attribute 'org-level-3        nil :foreground "#268bd2")
-    (set-face-attribute 'org-level-4        nil :foreground "#b58900")
-    (set-face-attribute 'org-level-5        nil :foreground "#2aa198")
-    (set-face-attribute 'org-level-6        nil :foreground "#859900")
-    (set-face-attribute 'org-level-7        nil :foreground "#dc322f")
-    (set-face-attribute 'org-level-8        nil :foreground "#268bd2")
-    (set-face-attribute 'org-todo           nil :foreground "#2aa198")
-    (set-face-attribute 'org-done           nil :foreground "#859900")
-    (set-face-attribute 'org-meta-line      nil :foreground "#93a1a1")
-    (set-face-attribute 'org-drawer         nil :foreground "#2aa198"))
-
-  (add-hook 'after-load-theme-hook
-            (lambda()
-              (cond ((eq doom-theme 'doom-solarized-light) (my-update-org-faces-for-doom-solarized-light))
-                    (t (my-update-org-faces-after-load-theme))))))
-#+end_src
-
-** Source blocks
-#+begin_src emacs-lisp
-(setq org-src-window-setup 'current-window)
-#+end_src
-
-Easy templates for org-version ≥ 9.2. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
-#+begin_src emacs-lisp
-(after! org
-  (add-to-list 'org-structure-template-alist '("sc" . "src c++"))
-  (add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
-  (add-to-list 'org-structure-template-alist '("sp" . "src python"))
-  (add-to-list 'org-structure-template-alist '("ss" . "src bash")))
-#+end_src
-
-** ToDo related
-Custom keywords
-#+begin_src emacs-lisp
-(setq org-todo-keywords '((sequence "TODO(t!)" "WAIT(w@/!)" "|" "DONE(d@/!)" "DEFER(f@/!)" "CANCEL(c@)")
-                          (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")))
-#+end_src
-
-=@=   - Log timestamp and note
-=!=   - Log timestamp only
-=x/y= - =x= takes affect when entering the state and
-      =y= takes affect when exiting if the state being entered doesn't have any logging
-Refer [[http://orgmode.org/manual/Tracking-TODO-state-changes.html][Tracking-TODO-state-changes]] for details
-
-Change from any todo state to any other state using =C-c C-t KEY=, provided selection keys have been defined
-#+begin_src emacs-lisp
-(setq org-use-fast-todo-selection 'auto)
-#+end_src
-
-Add logging when task state changes
-#+begin_src emacs-lisp
-(setq org-log-into-drawer t  ; Save state changes into LOGBOOK drawer instead of in the body
-      org-log-redeadline 'note
-      org-treat-insert-todo-heading-as-state-change t
-      org-enforce-todo-dependencies t)  ; Prevent parent task from being marked complete till all child TODOS are marked as complete
-#+end_src
-
-Setting this to nil allows a convenient way to select a TODO state and bypass any logging associated with that.
-#+begin_src emacs-lisp
-(setq org-treat-S-cursor-todo-selection-as-state-change nil)
-#+end_src
-
-#+begin_src emacs-lisp :tangle no
-(setq org-todo-keyword-faces
-      (quote (("TODO" :foreground "red" :weight bold)
-              ("WAIT" :foreground "orange" :weight bold)
-              ("DONE" :foreground "forest green" :weight bold)
-              ("CANCEL" :foreground "forest green" bold))))
-#+end_src
-
-** org-agenda
+** Org Agenda
 #+begin_src emacs-lisp
 (after! org-agenda
+#+end_src
+
+#+begin_src emacs-lisp
+(setq org-agenda-inhibit-startup nil)
 #+end_src
 
 Filter out any unwanted files from the notes that I don't want to add to the agenda
@@ -468,7 +340,74 @@ Restrict agenda to non-work files and filter out any other unwanted files
 )  ; END of (after! org-agenda
 #+end_src
 
-** org-babel
+** Org Appearance
+:PROPERTIES:
+:END:
+
+- org-superstart default: "◉ ○ ✸ ✿"
+- Large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
+- Small: ► • ★ ▸
+
+#+begin_src emacs-lisp
+(setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
+(setq org-superstar-headline-bullets-list '(10040))
+#+end_src
+
+Prevent DONE org-headlines from being highlighted a different color
+#+begin_src emacs-lisp
+(after! org
+  (setq org-fontify-done-headline nil))
+#+end_src
+
+Change faces
+#+begin_src emacs-lisp
+(after! org
+
+  (defun my-update-org-faces-after-load-all-themes ()
+    "Update some org-mode faces for all themes"
+    (set-face-attribute 'org-document-info-keyword nil :inherit 'org-meta-line :foreground nil)
+    (set-face-attribute 'org-drawer                nil :inherit 'org-meta-line :foreground nil)
+    (set-face-attribute 'org-document-title        nil :height 1.5)
+    (set-face-attribute 'org-level-1               nil :height 1.3)
+    (set-face-attribute 'org-level-2               nil :height 1.2)
+    (set-face-attribute 'org-level-3               nil :height 1.15)
+    (set-face-attribute 'org-level-4               nil :height 1.1))
+
+  (defun my-update-org-faces-after-load-doom-solarized-light ()
+    "Update some org-mode faces for doom-solarized-light theme"
+    (my-update-org-faces-after-load-all-themes)
+    ;; (set-face-attribute 'org-document-title nil :foreground "#586e75")
+    ;; (set-face-attribute 'org-level-1        nil :foreground "#cb4b16")
+    ;; (set-face-attribute 'org-level-2        nil :foreground "#859900")
+    ;; (set-face-attribute 'org-level-3        nil :foreground "#268bd2")
+    ;; (set-face-attribute 'org-level-4        nil :foreground "#b58900")
+    ;; (set-face-attribute 'org-level-5        nil :foreground "#2aa198")
+    ;; (set-face-attribute 'org-level-6        nil :foreground "#859900")
+    ;; (set-face-attribute 'org-level-7        nil :foreground "#dc322f")
+    ;; (set-face-attribute 'org-level-8        nil :foreground "#268bd2")
+    ;; (set-face-attribute 'org-todo           nil :foreground "#2aa198")
+    ;; (set-face-attribute 'org-done           nil :foreground "#859900")
+    ;; (set-face-attribute 'org-meta-line      nil :foreground "#93a1a1")
+    ;; (set-face-attribute 'org-drawer         nil :foreground "#2aa198")
+    )
+
+  (defun my-update-org-faces-after-load-theme ()
+    ""
+    (cond ((eq doom-theme 'doom-solarized-light) (my-update-org-faces-after-load-doom-solarized-light))
+          (t (my-update-org-faces-after-load-all-themes))))
+#+end_src
+
+Add a hook to update faces after a theme is loaded
+#+begin_src emacs-lisp
+  (add-hook 'after-load-theme-hook 'my-update-org-faces-after-load-theme)
+#+end_src
+
+Also call it immediately as theme is loaded before org mode
+#+begin_src emacs-lisp
+(my-update-org-faces-after-load-theme))
+#+end_src
+
+** Org Babel
 Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
 
 #+begin_src emacs-lisp
@@ -478,12 +417,13 @@ Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
               ((executable-find "g++") "g++")))
 
   (setq org-babel-default-header-args
-        '((:results . "verbatim replace")))
+        '((:session . "none") (:results . "verbatim replace") (:noweb . "strip-export")))
 
   (setq org-babel-default-header-args:C++
         '((:flags . "-std=c++14 -Wall -Wextra -Werror ${BOOST_HOME+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -L${HOME}/.local/lib -I${HOME}/.local/include -Wl,${BOOST_HOME+-rpath ${BOOST_HOME}/lib}")))
 
   (setq org-babel-python-command "python3")
+  (setq org-babel-default-header-args:python '((:results . "output")))
 #+end_src
 
 Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
@@ -516,7 +456,7 @@ Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is le
 (bind-key "u" 'my-org-babel-goto-block-corner org-babel-map))
 #+end_src
 
-** org-capture
+** Org Capture
 #+begin_src emacs-lisp
 (after! org-capture
   (setq org-capture-templates
@@ -550,7 +490,29 @@ Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is le
          :jump-to-captured t :empty-lines 1))))
 #+end_src
 
-** org-id
+** Org Edit Structure
+#+begin_src emacs-lisp
+(setq org-blank-before-new-entry '((heading . t) (plain-list-item . auto)))
+#+end_src
+
+#+begin_src emacs-lisp
+(after! org
+  (setq org-src-window-setup 'current-window))
+#+end_src
+
+Easy templates for org-version ≥ 9.2. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
+#+begin_src emacs-lisp
+(after! org
+  (add-to-list 'org-structure-template-alist '("sc" . "src c++"))
+  (add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("sp" . "src python"))
+  (add-to-list 'org-structure-template-alist '("ss" . "src bash")))
+#+end_src
+
+** Org ID
+#+begin_src emacs-lisp
+(setq org-id-locations-file (expand-file-name ".org-id-locations" doom-private-dir))
+#+end_src
 
 Create an ID when storing the link. Curiously this also causes =org-store-link= to store IDs by default
 Also note that setting this to true will create an ID for every entry which could become expensive when =org-id-track-globally= is enabled
@@ -560,7 +522,7 @@ Also note that setting this to true will create an ID for every entry which coul
 (setq org-id-link-to-org-use-id 'create-if-interactive)
 #+end_src
 
-** org-refile
+** Org Refile
 
 #+begin_src emacs-lisp
 (after! org-refile
@@ -638,7 +600,118 @@ Store the timestamp when an entry is refiled
 )  ; END of (after! org-refile
 #+end_src
 
+** Org Startup
+#+begin_src emacs-lisp
+(setq org-startup-align-all-tables nil  ; This slows down startup of large org files considerably!
+      org-startup-folded t
+      org-startup-with-inline-images t
+      org-ellipsis " ▼ ")
+#+end_src
+
+** Org TODO
+Custom keywords
+#+begin_src emacs-lisp
+(setq org-todo-keywords '((sequence "TODO(t!)" "WAIT(w@/!)" "|" "DONE(d@/!)" "DEFER(f@/!)" "CANCEL(c@)")
+                          (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")))
+#+end_src
+
+=@=   - Log timestamp and note
+=!=   - Log timestamp only
+=x/y= - =x= takes affect when entering the state and
+      =y= takes affect when exiting if the state being entered doesn't have any logging
+Refer [[http://orgmode.org/manual/Tracking-TODO-state-changes.html][Tracking-TODO-state-changes]] for details
+
+Change from any todo state to any other state using =C-c C-t KEY=, provided selection keys have been defined
+#+begin_src emacs-lisp
+(setq org-use-fast-todo-selection 'auto)
+#+end_src
+
+Add logging when task state changes
+#+begin_src emacs-lisp
+(setq org-log-into-drawer t  ; Save state changes into LOGBOOK drawer instead of in the body
+      org-log-redeadline 'note
+      org-treat-insert-todo-heading-as-state-change t
+      org-enforce-todo-dependencies t)  ; Prevent parent task from being marked complete till all child TODOS are marked as complete
+#+end_src
+
+Setting this to nil allows a convenient way to select a TODO state and bypass any logging associated with that.
+#+begin_src emacs-lisp
+(setq org-treat-S-cursor-todo-selection-as-state-change nil)
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+(setq org-todo-keyword-faces
+      (quote (("TODO" :foreground "red" :weight bold)
+              ("WAIT" :foreground "orange" :weight bold)
+              ("DONE" :foreground "forest green" :weight bold)
+              ("CANCEL" :foreground "forest green" bold))))
+#+end_src
+
+*** Inline Tasks
+#+begin_src emacs-lisp
+(add-to-list 'org-modules 'org-inlinetask)
+#+end_src
+
+*************** TODO Better fontify inline-tasks
+Also look into reducing the indent
+*************** END
+
+** Keybindings
+Use =org-goto= instead of =semantic-or-imenu= when in org files
+#+begin_src emacs-lisp
+(after! (counsel org)
+  (defun my-org-goto-or-semantic-or-imenu ()
+    "Use mode-specific commands if available else fallback to counsel-semantic-or-imenu"
+    (interactive)
+    (if (string= major-mode "org-mode")
+        (counsel-org-goto)
+      (counsel-semantic-or-imenu))))
+
+(map! :after (counsel org)
+      :map doom-leader-search-map
+      :desc "org-goto-or-semantic-or-imenu" "i" #'my-org-goto-or-semantic-or-imenu)
+#+end_src
+
 * rcirc
 #+begin_src emacs-lisp
-(setq rcirc-kill-channel-buffers t)
+(setq rcirc-kill-channel-buffers t
+      rcirc-fill-column 'window-text-width)
+#+end_src
+
+* workspaces
+Using persp-mode
+
+#+begin_src emacs-lisp
+(map! :after persp-mode
+      :map doom-leader-workspace-map
+      :desc "Swap Left"  "<" #'+workspace/swap-left
+      :desc "Swap Right" ">" #'+workspace/swap-right)
+#+end_src
+
+** FIXME COMMENT Automatically create new workspace when opening IRC buffers
+#+begin_src emacs-lisp
+(after! persp-mode
+        (persp-def-auto-persp "IRC"
+          :parameters '((dont-save-to-file . t))
+          :mode 'rcirc-mode
+          :dyn-env '(after-switch-to-buffer-functions ;; prevent recursion
+                     (persp-add-buffer-on-find-file nil)
+                     persp-add-buffer-on-after-change-major-mode)
+          :hooks '(after-switch-to-buffer-functions)
+          :switch 'window))
+#+end_src
+
+* local settings
+#+name:lcl_cfg_windows-lp
+#+begin_src emacs-lisp :tangle no
+(defun browse-url-xdg-open-wsl (url &optional ignored)
+  (interactive (browse-url-interactive-arg "URL: "))
+  (shell-command-to-string (concat "explorer.exe " url)))
+(advice-add #'browse-url-xdg-open :override #'browse-url-xdg-open-wsl)
+#+end_src
+
+#+begin_src emacs-lisp
+(when (and (eq system-type 'gnu/linux) (string-match-p "microsoft" (shell-command-to-string "uname -a")))
+<<lcl_cfg_windows-lp>>
+)
 #+end_src
