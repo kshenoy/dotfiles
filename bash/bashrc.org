@@ -4,7 +4,7 @@
 
 * bashrc
 :PROPERTIES:
-:header-args+: :tangle bashrc_literate
+:header-args+: :tangle (concat (getenv "HOME") "/.bashrc")
 :END:
 #+begin_src bash :export none
 # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.

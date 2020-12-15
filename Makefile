@@ -17,14 +17,19 @@ ${XDG_CONFIG_HOME}/dotfiles-priv:
 
 
 #== bash ===============================================================================================================
-bash: bash/bashrc_literate bash/dircolors ripgreprc ${HOME}/.bashrc
+# My usual approach is to save the tangled file in the repo and create links to it from elsewhere.
+# I prefer this to tangling directly and not linking, as in case I have to setup on a machine that doesn't have emacs,
+# I can use the tangled version of the file saved in the repo
+# However, this approach doesn't work on files which have machine-specific configuration as everytime I tangle it,
+# the saved version of the file gets updated, thereby affecting the link
+# Hence, a workaround at the moment is to tangle to the location and copy it over to the repo
+bash: ${HOME}/.bashrc bash/dircolors ripgreprc
 # Using grouped targets here to run tangle bash/bashrc.org only once. Supported only for make versions >= 4.3
-bash/bashrc_literate bash/dircolors ripgreprc &: bash/bashrc.org
+${HOME}/.bashrc bash/dircolors ripgreprc &: bash/bashrc.org
 	${TANGLE} $<
-${HOME}/.bashrc:
-	@${MKLINK} ${PWD}/bash/bashrc_literate $@
 	@mkdir -p ${XDG_DATA_HOME}/bash_history
-	@command rm -i ${HOME}/.bash_history 2> /dev/null
+	@if [ -f ${HOME}/.bash_history ]; then rm -i ${HOME}/.bash_history; fi
+	@cp ${HOME}/.bashrc bash/bashrc_literate
 
 
 #== base16-fzf =========================================================================================================
