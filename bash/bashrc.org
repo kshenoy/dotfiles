@@ -734,7 +734,9 @@ alias j='jobs -l'
 alias pls='sudo $(history -p !!)'
 duh() { du -h "$@" | sort -rh; }
 
-e() { emacsclient --alternate-editor="" --no-wait --create-frame --quiet "$@" & }
+ec() { emacsclient --alternate-editor="" --no-wait --create-frame --quiet "$@" & }
+alias e=ec
+alias evan='emacs --with-profile vanilla'
 #+end_src
 
 From https://askubuntu.com/a/185746/38952
@@ -1143,7 +1145,7 @@ Completion has to be specified at the end: [[*fzf][fzf]]
 
 *** [[https://github.com/BurntSushi/ripgrep][ripgrep]]
 :PROPERTIES:
-:header-args+: :tangle (if (executable-find "rg") "bashrc_literate" "no")
+:header-args+: :tangle (if (executable-find "rg") (concat (getenv "HOME") "/.bashrc") "no")
 :END:
 This will be tangled only if =rg= exists
 #+begin_src bash
@@ -1504,7 +1506,7 @@ fi
 #+end_src
 
 To connect to work-vpn
-#+begin_src bash :tangle (if (string-match "buntu" (system-name)) "bashrc_literate" "no")
+#+begin_src bash :tangle (if (string-match "buntu" (system-name)) (concat (getenv "HOME") "/.bashrc") "no")
 alias gp=globalprotect
 
 work_vpn() {
@@ -1517,12 +1519,12 @@ work_vpn() {
 }
 #+end_src
 
-#+begin_src bash :tangle (if (string-match "buntu" (system-name)) "bashrc_literate" "no")
+#+begin_src bash :tangle (if (string-match "buntu" (system-name)) (concat (getenv "HOME") "/.bashrc") "no")
 alias boot2win='sudo grub-reboot Windows && shutdown -r 0'
 #+end_src
 
 Only for home WSL
-#+begin_src bash :tangle (if (string-match "windows" (system-name)) "bashrc_literate" "no")
+#+begin_src bash :tangle (if (string-match "windows" (system-name)) (concat (getenv "HOME") "/.bashrc") "no")
 export LIBGL_ALWAYS_INDIRECT=1
 # Need to specify the IP of the host
 export DISPLAY=192.168.1.122:0
