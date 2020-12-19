@@ -805,7 +805,6 @@ References:
 
 #+begin_src emacs-lisp
   (use-package company
-    :disabled
     :custom
     (company-idle-delay 0.1)
     (company-minimum-prefix-length 2)
@@ -931,6 +930,14 @@ evil can be toggled using =C-z=
           evil-want-Y-yank-to-eol t)
 #+end_src
 
+The default behavior of evil is to create windows to the left and the top and go there.
+However, this makes it seem like it's creating a split but not jumping to it.
+The following makes it behave more like vim
+#+begin_src emacs-lisp
+(setq evil-vsplit-window-right t
+      evil-split-window-below t)
+#+end_src
+
 *** :config
 #+begin_src emacs-lisp
   :config
@@ -985,13 +992,6 @@ Mode specific states
 <<Make Escape quit everything>>
 #+begin_src emacs-lisp
   (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
-#+end_src
-
-***** Follow newly created splits
-#+begin_src emacs-lisp
-  (bind-keys :map evil-window-map
-             ("s" . (lambda() (interactive) (evil-window-split)(other-window 1)))
-             ("v" . (lambda() (interactive) (evil-window-vsplit)(other-window 1))))
 #+end_src
 
 ***** Move by visual lines

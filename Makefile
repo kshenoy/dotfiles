@@ -45,21 +45,13 @@ ${XDG_CONFIG_HOME}/base16-shell:
 
 
 #== emacs ==============================================================================================================
-emacs: chemacs emacs-vanilla emacs-doom ${HOME}/bin/emacs_daemon
+emacs: chemacs emacs-doom emacs-vanilla ${HOME}/bin/emacs_daemon
 
 chemacs: ${HOME}/.emacs ${HOME}/.emacs-profiles.el
 ${HOME}/.emacs:
 	wget -O $@ https://raw.githubusercontent.com/plexus/chemacs/master/.emacs
 ${HOME}/.emacs-profiles.el:
 	@${MKLINK} ${PWD}/emacs/emacs-profiles.el $@
-
-emacs-vanilla: emacs/vanilla/init.el emacs/vanilla/bookmarks emacs/vanilla/snippets
-emacs/vanilla/init.el: emacs/vanilla/config.org
-	emacs --batch --load emacs/tangle.el --funcall literate-dotfiles-tangle $<
-emacs/vanilla/bookmarks:
-	@${MKLINK} ${PWD}/emacs/bookmarks $@
-emacs/vanilla/snippets:
-	@${MKLINK} ${PWD}/emacs/snippets $@
 
 emacs-doom: ${XDG_CONFIG_HOME}/doom-emacs ${XDG_CONFIG_HOME}/doom emacs/doom/config.el emacs/doom/init.el emacs/doom/packages.el emacs/doom/bookmarks
 ${XDG_CONFIG_HOME}/doom-emacs:
@@ -72,6 +64,14 @@ emacs/doom/init.el emacs/doom/packages.el:
 	${XDG_CONFIG_HOME}/doom-emacs/bin/doom sync
 emacs/doom/bookmarks:
 	@${MKLINK} ${PWD}/emacs/bookmarks $@
+
+emacs-vanilla: emacs/vanilla/init.el emacs/vanilla/bookmarks emacs/vanilla/snippets
+emacs/vanilla/init.el: emacs/vanilla/config.org
+	emacs --batch --load emacs/tangle.el --funcall literate-dotfiles-tangle $<
+emacs/vanilla/bookmarks:
+	@${MKLINK} ${PWD}/emacs/bookmarks $@
+emacs/vanilla/snippets:
+	@${MKLINK} ${PWD}/emacs/snippets $@
 
 ${HOME}/bin/emacs_daemon:
 	@${MKLINK} ${PWD}/scripts/emacs_daemon $@

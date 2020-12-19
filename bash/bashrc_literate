@@ -809,7 +809,9 @@ alias j='jobs -l'
 alias pls='sudo $(history -p !!)'
 duh() { du -h "$@" | sort -rh; }
 
-e() { emacsclient --alternate-editor="" --no-wait --create-frame --quiet "$@" & }
+ec() { emacsclient --alternate-editor="" --no-wait --create-frame --quiet "$@" & }
+alias e=ec
+alias evan='emacs --with-profile vanilla'
 # aliases:3 ends here
 
 
@@ -1165,18 +1167,19 @@ cd() {
             ;;
 
         =)
-        if hash fzf 2> /dev/null; then
-            FZF_ALT_C_COMMAND='command dirs -lp' __fzf_cd__
-        else
-            dirs
-        fi
-        ;;
+            if hash fzf 2> /dev/null; then
+                $(FZF_ALT_C_COMMAND='command dirs -l -p' __fzf_cd__)
+            else
+                dirs
+            fi
+            return
+            ;;
 
         ...)
             if hash fzf 2> /dev/null; then
                 local _dir=$PWD;
                 FZF_ALT_C_COMMAND='_dir=$PWD; while [[ -n "$_dir" ]]; do _dir="${_dir%/[^/]*}"; echo ${_dir:-/}; done' \
-                FZF_ALT_C_OPTS="${FZF_ALT_C_OPTS} --select-1 ${2+ --query=$2}" __fzf_cd__
+                    FZF_ALT_C_OPTS="${FZF_ALT_C_OPTS} --select-1 ${2+ --query=$2}" __fzf_cd__
             fi
             return
             ;;
@@ -1245,6 +1248,17 @@ if [[ -n "$FZF_PATH" ]]; then
     [[ -n "$BASE16_THEME" ]] && source "$BASE16_FZF/bash/base16-${BASE16_THEME}.config"
 fi
 # [[https://github.com/junegunn/fzf][fzf]]:1 ends here
+
+# [[https://github.com/BurntSushi/ripgrep][ripgrep]]
+# :PROPERTIES:
+# :header-args+: :tangle (if (executable-find "rg") (concat (getenv "HOME") "/.bashrc") "no")
+# :END:
+# This will be tangled only if =rg= exists
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*%5B%5Bhttps://github.com/BurntSushi/ripgrep%5D%5Bripgrep%5D%5D][[[https://github.com/BurntSushi/ripgrep][ripgrep]]:1]]
+export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgreprc
+alias g='command rg'
+# [[https://github.com/BurntSushi/ripgrep][ripgrep]]:1 ends here
 
 # vim
 
@@ -1595,6 +1609,16 @@ if [[ "$SHLVL" = 1 ]]; then
     [[ -x /usr/bin/clear_console ]] && /usr/bin/clear_console -q
 fi
 # home:1 ends here
+
+
+
+# Only for home WSL
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:4]]
+export LIBGL_ALWAYS_INDIRECT=1
+# Need to specify the IP of the host
+export DISPLAY=192.168.1.122:0
+# home:4 ends here
 
 # bashrc_local
 # And finally, check for a .bashrc_local and load it
