@@ -101,7 +101,9 @@ Some functionality uses this to identify you, e.g. GPG configuration, email clie
 ** Better defaults
 #+begin_src emacs-lisp
 (setq-default confirm-kill-emacs 'y-or-n-p  ; Confirm before quitting
-              vc-follow-symlinks t)
+              vc-follow-symlinks t
+              help-window-select t
+              x-stretch-cursor   t)
 #+end_src
 
 This determines the style of line numbers in effect. If set to
@@ -190,6 +192,15 @@ Usage examples
 #+end_src
 
 * evil
+The default behavior of evil is to create windows to the left and the top and go there.
+However, this makes it seem like it's creating a split but not jumping to it.
+The following makes it behave more like vim
+#+begin_src emacs-lisp
+(after! evil
+(setq evil-vsplit-window-right t
+      evil-split-window-below t))
+#+end_src
+
 ** Keybindings
 Move by visual lines
 #+begin_src emacs-lisp
@@ -225,7 +236,7 @@ This changes evil-exchange default binding from =g x= to =c x=
       org-default-notes-file (expand-file-name "Inbox.org" org-directory))
 #+end_src
 
-** Org Agenda
+** Agenda
 #+begin_src emacs-lisp
 (after! org-agenda
 #+end_src
@@ -340,7 +351,7 @@ Restrict agenda to non-work files and filter out any other unwanted files
 )  ; END of (after! org-agenda
 #+end_src
 
-** Org Appearance
+** Appearance
 :PROPERTIES:
 :END:
 
@@ -407,7 +418,7 @@ Also call it immediately as theme is loaded before org mode
 (my-update-org-faces-after-load-theme))
 #+end_src
 
-** Org Babel
+** Babel
 Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
 
 #+begin_src emacs-lisp
@@ -428,35 +439,37 @@ Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
 
 Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
 #+begin_src emacs-lisp
-  (define-key key-translation-map (kbd "C-c C-v C-k") (kbd "C-c C-v k"))
+  (define-key key-translation-map (kbd "C-c C-v C-k") (kbd "C-c C-v k")))
 #+end_src
 
 *** Jump to head/tail of any block, not just src blocks
 =org-babel-goto-src-block-head= jumps to the beginning of a source block. This is super useful! Why restrict it only to source blocks?
 Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is left untouched to only jump to top of src blocks
 #+begin_src emacs-lisp
-(defun my-org-babel-goto-block-corner (p)
-  "Go to the beginning of the current block.
+(after! org
+  (defun my-org-babel-goto-block-corner (p)
+    "Go to the beginning of the current block.
     If called with a prefix, go to the end of the block"
-  (interactive "P")
-  (let* ((element (org-element-at-point)))
-    (when (or (eq (org-element-type element) 'example-block)
-              (eq (org-element-type element) 'src-block) )
-      (let ((begin (org-element-property :begin element))
-            (end (org-element-property :end element)))
-        ;; Ensure point is not on a blank line after the block.
-        (beginning-of-line)
-        (skip-chars-forward " \r\t\n" end)
-        (when (< (point) end)
-          (goto-char (if p end begin))
-          (when p
-            (skip-chars-backward " \r\t\n")
-            (beginning-of-line)))))))
+    (interactive "P")
+    (let* ((element (org-element-at-point)))
+      (when (or (eq (org-element-type element) 'example-block)
+                (eq (org-element-type element) 'src-block) )
+        (let ((begin (org-element-property :begin element))
+              (end (org-element-property :end element)))
+          ;; Ensure point is not on a blank line after the block.
+          (beginning-of-line)
+          (skip-chars-forward " \r\t\n" end)
+          (when (< (point) end)
+            (goto-char (if p end begin))
+            (when p
+              (skip-chars-backward " \r\t\n")
+              (beginning-of-line)))))))
 
-(bind-key "u" 'my-org-babel-goto-block-corner org-babel-map))
+  ;; (define-key (org-babel-map) [remap org-babel-goto-src-block-head] 'my-org-babel-goto-block-corner)
+  )
 #+end_src
 
-** Org Capture
+** Capture
 #+begin_src emacs-lisp
 (after! org-capture
   (setq org-capture-templates
@@ -490,26 +503,7 @@ Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is le
          :jump-to-captured t :empty-lines 1))))
 #+end_src
 
-** Org Edit Structure
-#+begin_src emacs-lisp
-(setq org-blank-before-new-entry '((heading . t) (plain-list-item . auto)))
-#+end_src
-
-#+begin_src emacs-lisp
-(after! org
-  (setq org-src-window-setup 'current-window))
-#+end_src
-
-Easy templates for org-version ≥ 9.2. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
-#+begin_src emacs-lisp
-(after! org
-  (add-to-list 'org-structure-template-alist '("sc" . "src c++"))
-  (add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
-  (add-to-list 'org-structure-template-alist '("sp" . "src python"))
-  (add-to-list 'org-structure-template-alist '("ss" . "src bash")))
-#+end_src
-
-** Org ID
+** ID
 #+begin_src emacs-lisp
 (setq org-id-locations-file (expand-file-name ".org-id-locations" doom-private-dir))
 #+end_src
@@ -522,7 +516,7 @@ Also note that setting this to true will create an ID for every entry which coul
 (setq org-id-link-to-org-use-id 'create-if-interactive)
 #+end_src
 
-** Org Refile
+** Refile
 
 #+begin_src emacs-lisp
 (after! org-refile
@@ -600,7 +594,7 @@ Store the timestamp when an entry is refiled
 )  ; END of (after! org-refile
 #+end_src
 
-** Org Startup
+** Startup
 #+begin_src emacs-lisp
 (setq org-startup-align-all-tables nil  ; This slows down startup of large org files considerably!
       org-startup-folded t
@@ -608,7 +602,33 @@ Store the timestamp when an entry is refiled
       org-ellipsis " ▼ ")
 #+end_src
 
-** Org TODO
+** Structure
+#+begin_src emacs-lisp
+(after! org
+#+end_src
+
+#+begin_src emacs-lisp
+(setq org-blank-before-new-entry '((heading . t) (plain-list-item . auto))
+      org-cycle-emulate-tab nil  ; Prevents TAB from, well, inserting a TAB in normal mode
+      org-src-window-setup 'current-window)
+#+end_src
+
+#+begin_src emacs-lisp
+#+end_src
+
+Easy templates for org-version ≥ 9.2. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
+#+begin_src emacs-lisp
+(add-to-list 'org-structure-template-alist '("sc" . "src c++"))
+(add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
+(add-to-list 'org-structure-template-alist '("sp" . "src python"))
+(add-to-list 'org-structure-template-alist '("ss" . "src bash"))
+#+end_src
+
+#+begin_src emacs-lisp
+)
+#+end_src
+
+** TODO
 Custom keywords
 #+begin_src emacs-lisp
 (setq org-todo-keywords '((sequence "TODO(t!)" "WAIT(w@/!)" "|" "DONE(d@/!)" "DEFER(f@/!)" "CANCEL(c@)")
@@ -674,18 +694,24 @@ Use =org-goto= instead of =semantic-or-imenu= when in org files
 
 * rcirc
 #+begin_src emacs-lisp
-(setq rcirc-kill-channel-buffers t
-      rcirc-fill-column 'window-text-width)
+(setq rcirc-fill-column 'window-text-width
+      rcirc-kill-channel-buffers t
+      rcirc-prompt "%t> "
+      rcirc-server-alist '(("irc.freenode.net" :channels ("#emacs" "#vim")))
+      rcirc-time-format "[%H:%M] ")
 #+end_src
 
-* workspaces
-Using persp-mode
-
+* workspaces (using persp-mode)
 #+begin_src emacs-lisp
 (map! :after persp-mode
       :map doom-leader-workspace-map
-      :desc "Swap Left"  "<" #'+workspace/swap-left
-      :desc "Swap Right" ">" #'+workspace/swap-right)
+      :desc "Swap Left"               "<"   #'+workspace/swap-left
+      :desc "Swap Right"              ">"   #'+workspace/swap-right
+      :desc "Add buffer"              "b a" #'persp-add-buffer
+      :desc "Add buffers by Regex"    "b A" #'persp-add-buffers-by-regexp
+      :desc "Remove buffer"           "b d" #'persp-remove-buffer
+      :desc "Remove buffers by Regex" "b D" #'persp-remove-buffers-by-regexp
+      )
 #+end_src
 
 ** FIXME COMMENT Automatically create new workspace when opening IRC buffers
