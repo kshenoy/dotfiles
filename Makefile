@@ -28,7 +28,7 @@ bash: ${HOME}/.bashrc bash/dircolors ripgreprc
 ${HOME}/.bashrc bash/dircolors ripgreprc &: bash/bashrc.org
 	${TANGLE} $<
 	@mkdir -p ${XDG_DATA_HOME}/bash_history
-	@if [ -f ${HOME}/.bash_history ]; then rm -i ${HOME}/.bash_history; fi
+	@if [ -f ${HOME}/.bash_history ]; then rm ${HOME}/.bash_history; fi
 	@cp ${HOME}/.bashrc bash/bashrc_literate
 
 
@@ -49,7 +49,7 @@ emacs: chemacs emacs-doom emacs-vanilla ${HOME}/bin/emacs_daemon
 
 chemacs: ${HOME}/.emacs ${HOME}/.emacs-profiles.el
 ${HOME}/.emacs:
-	wget -O $@ https://raw.githubusercontent.com/plexus/chemacs/master/.emacs
+	if [ ! -f $@ ]; then wget -O $@ https://raw.githubusercontent.com/plexus/chemacs/master/.emacs; fi
 ${HOME}/.emacs-profiles.el:
 	@${MKLINK} ${PWD}/emacs/emacs-profiles.el $@
 

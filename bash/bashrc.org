@@ -6,6 +6,7 @@
 :PROPERTIES:
 :header-args+: :tangle (concat (getenv "HOME") "/.bashrc")
 :END:
+
 #+begin_src bash :export none
 # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
 # Use =org-babel-tangle-jump-to-org= to jump back to it from any code block.
@@ -25,6 +26,9 @@ Proceed only if its an interactive shell
 
 ** local init
 Any local settings that need to be set initially go here
+#+begin_src bash
+[[ -f ~/.bashrc_local_init ]] && . ~/.bashrc_local_init
+#+end_src
 
 ** interactive, login shell settings
 Turn off TTY "start" and "stop" commands in all interactive shells.
@@ -1070,9 +1074,8 @@ cd() {
 
         ...)
             if hash fzf 2> /dev/null; then
-                local _dir=$PWD;
-                FZF_ALT_C_COMMAND='_dir=$PWD; while [[ -n "$_dir" ]]; do _dir="${_dir%/[^/]*}"; echo ${_dir:-/}; done' \
-                    FZF_ALT_C_OPTS="${FZF_ALT_C_OPTS} --select-1 ${2+ --query=$2}" __fzf_cd__
+                $(FZF_ALT_C_COMMAND='_dir=$PWD; while [[ -n "$_dir" ]]; do _dir="${_dir%/[^/]*}"; echo ${_dir:-/}; done' \
+                    FZF_ALT_C_OPTS="${FZF_ALT_C_OPTS} --select-1 ${2+ --query=$2}" __fzf_cd__)
             fi
             return
             ;;
@@ -1084,7 +1087,7 @@ cd() {
 
             if hash fzf 2> /dev/null; then
                 # Find '_path' for all dirs that match the glob expr '_pattern' and select with FZF from the results
-                FZF_ALT_C_COMMAND="find ${_path} -type d -path '*${_pattern}*'" __fzf_cd__
+                $(FZF_ALT_C_COMMAND="find ${_path} -type d -path '*${_pattern}*'" __fzf_cd__)
                 return
             else
                 _dir=$(find $_path -type d -path "*${_pattern}*" -print -quit)
@@ -1533,7 +1536,7 @@ export DISPLAY=192.168.1.122:0
 *** bashrc_local
 And finally, check for a .bashrc_local and load it
 #+begin_src bash
-[[ -f ~/.bashrc_local ]] && . ~/.bashrc_local
+[[ -f ~/.bashrc_local_override ]] && . ~/.bashrc_local_override
 #+end_src
 
 ** completion
