@@ -9,6 +9,11 @@ if !filereadable(s:plug_path)
   augroup END
 endif
 
+if !filereadable(s:plug_path)
+  echoe "ERROR: Unable to find plug.vim"
+  exit
+endif
+
 call plug#begin(expand(g:dotvim . '/bundles/'))
 
 runtime! macros/matchit.vim
