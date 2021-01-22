@@ -288,7 +288,11 @@ fi
 #+begin_src bash
 export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
 [[ -n "$PS1" ]] && [[ -s $BASE16_SHELL/profile_helper.sh ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
-base16_solarized-light &> /dev/null
+if [[ -f ~/.base16_theme ]]; then
+  . ~/.base16_theme
+else
+  base16_solarized-light &> /dev/null
+fi
 #+end_src
 
 *** colored man pages with less
@@ -760,10 +764,14 @@ alias sosc='. ~/.bashrc && clnpath'
 *** grep
 #+begin_src bash
 export GREP_COLORS='1;32'
-
 alias grep='grep -sP --color=always'
-alias gi='grep -i'
-alias gv='grep -v'
+#+end_src
+
+I use ~g~ as a generic alias for grep and all its replacements. Hence create a generic alias
+#+begin_src bash
+alias g=grep
+alias gi='g -i'
+alias gv='g -v'
 #+end_src
 
 *** git
