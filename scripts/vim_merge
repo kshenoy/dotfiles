@@ -6,9 +6,4 @@
 # 3 : local/yours
 # 4 : merged
 
-# Perforce:
-# $1 : base
-# $2 : remote/theirs
-# $3 : local/yours
-# $4 : merged
-gvim -f -c "call perforce#MergeInit()" -c "set nobackup" -geometry 420x70 "$@"
+vim -f -c "call perforce#MergeInit()" -c "set nobackup" "$@"

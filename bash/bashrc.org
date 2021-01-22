@@ -1538,7 +1538,7 @@ Only for home WSL
 #+begin_src bash :tangle (if (string-match "windows" (system-name)) (concat (getenv "HOME") "/.bashrc") "no")
 export LIBGL_ALWAYS_INDIRECT=1
 # Need to specify the IP of the host
-export DISPLAY=192.168.1.122:0
+export DISPLAY=192.168.1.11:0
 #+end_src
 
 *** bashrc_local
