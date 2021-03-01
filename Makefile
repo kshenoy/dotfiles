@@ -6,7 +6,7 @@ XDG_DATA_HOME ?= ${HOME}/.local/share
 MKLINK := ln -svTf
 
 
-all: dotfiles-priv base16-fzf base16-shell bash emacs git tmux misc
+all: dotfiles-priv base16-fzf base16-shell bash emacs git tmux links
 # Rules not included in all: xmonad
 
 
@@ -111,8 +111,8 @@ vim/pack/rc_local:
 	@${MKLINK} ${XDG_CONFIG_HOME}/dotfiles-priv/$@ $@
 
 
-#== misc ===============================================================================================================
-misc: ${HOME}/.ssh/config ${HOME}/.Xresources ${HOME}/.ctags ${HOME}/.fzf.bash ${HOME}/bin/rgf ${HOME}/.unison/dotfiles.prf ${HOME}/.xinitrc ${HOME}/pipe
+#== links ===============================================================================================================
+links: ${HOME}/.ssh/config ${HOME}/.Xresources ${HOME}/.ctags ${HOME}/bin/rgf ${HOME}/.unison/dotfiles.prf ${HOME}/pipe
 ${HOME}/.ssh/config:
 	@mkdir -p $(dir $@)
 	@${MKLINK} ${XDG_CONFIG_HOME}/dotfiles-priv/ssh/config $@
@@ -120,17 +120,13 @@ ${HOME}/.Xresources:
 	@${MKLINK} ${PWD}/Xresources $@
 ${HOME}/.ctags:
 	@${MKLINK} ${PWD}/ctags $@
-${HOME}/.fzf.bash:
-	@${MKLINK} ${PWD}/fzf/fzf.bash $@
 ${HOME}/bin/rgf:
 	@${MKLINK} ${PWD}/scripts/rgf $@
 ${HOME}/.unison/dotfiles.prf:
 	@mkdir -p $(dir $@)
 	@${MKLINK} ${PWD}/unison/dotfiles.prf $@
-${HOME}/.xinitrc:
-	@${MKLINK} ${PWD}/xinitrc $@
 ${HOME}/pipe:
-	mkfifo $@
+	if [ ! -p $@ ]; then mkfifo $@; fi
 
 
 #== xmonad et al. ======================================================================================================
