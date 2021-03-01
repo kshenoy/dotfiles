@@ -89,10 +89,10 @@ ${XDG_CONFIG_HOME}/git/ignore:
 
 
 #== tmux ===============================================================================================================
-tmux: tmux/tmux.conf ${XDG_CONFIG_HOME}/tmux/.tmux.conf
+tmux: tmux/tmux.conf ${XDG_CONFIG_HOME}/tmux/tmux.conf
 tmux/tmux.conf: tmux/tmux.org
 	${TANGLE} $<
-${XDG_CONFIG_HOME}/tmux/.tmux.conf:
+${XDG_CONFIG_HOME}/tmux/tmux.conf:
 	@mkdir -p $(dir $@)
 	@${MKLINK} ${PWD}/tmux/tmux.conf $@
 

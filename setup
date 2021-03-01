@@ -10,4 +10,5 @@ if (( $UID == 0 )); then
     [[ ! -d ${_xdg_config_home}/$i  ]] && ln -s ~kshenoy/.config/$i  ${_xdg_config_home}/$i
   done
   ln -s ~kshenoy/.local/share/bash_history ${_xdg_data_home}/bash_history
+  ln -s ~kshenoy/.bashrc ~
 fi

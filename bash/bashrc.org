@@ -44,7 +44,7 @@ stty ixany # let any character restart output, not only start character
 ** configuration
 default permissions
 #+begin_src bash
-umask 007
+umask 002
 #+end_src
 
 [[https://unix.stackexchange.com/questions/32409/set-and-shopt-why-two][shopt v/s set]]

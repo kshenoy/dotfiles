@@ -5,7 +5,7 @@
 
 # Wrapper around tmux to add more functionality. This file must be sourced
 
-# [[file:tmux.org::*tmux++][tmux++:1]]
+# [[file:~/.config/dotfiles/tmux/tmux.org::*tmux++][tmux++:1]]
 #!/usr/bin/env bash
 # tmux++:1 ends here
 
@@ -13,7 +13,7 @@
 
 # Wrapper around the tmux command
 
-# [[file:tmux.org::*tmux++][tmux++:2]]
+# [[file:~/.config/dotfiles/tmux/tmux.org::*tmux++][tmux++:2]]
 tmux::exe() {
     LANG=en_US.UTF-8 TMUX_DEFAULT_OPTS="$TMUX_DEFAULT_OPTS ${TMUX_DEFAULT_SOCKET:+-L $TMUX_DEFAULT_SOCKET}" command tmux "$@"
 }
@@ -23,7 +23,7 @@ tmux::exe() {
 
 # Attach to existing session or else create a new one
 
-# [[file:tmux.org::*tmux++][tmux++:3]]
+# [[file:~/.config/dotfiles/tmux/tmux.org::*tmux++][tmux++:3]]
 tmux::attach_or_new() {
     if [[ ! -z "$TMUX" ]]; then return; fi
 
@@ -50,7 +50,7 @@ tmux::attach_or_new() {
 
 # Update environment variables in TMUX. From https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
 
-# [[file:tmux.org::*tmux++][tmux++:4]]
+# [[file:~/.config/dotfiles/tmux/tmux.org::*tmux++][tmux++:4]]
 tmux::update_env() {
     echo "Updating to latest tmux environment...";
 
@@ -73,7 +73,7 @@ tmux::update_env() {
 
 # Helper functions to simplify sending keys
 
-# [[file:tmux.org::*tmux++][tmux++:5]]
+# [[file:~/.config/dotfiles/tmux/tmux.org::*tmux++][tmux++:5]]
 tmux::send_keys_other_panes() {
     local _pane_current=$(tmux display-message -p '#P')
     for _pane in $(tmux list-panes -F '#P'); do
@@ -102,7 +102,7 @@ tmux::send_keys_all() {
 
 # Custom layout for work
 
-# [[file:tmux.org::*tmux++][tmux++:6]]
+# [[file:~/.config/dotfiles/tmux/tmux.org::*tmux++][tmux++:6]]
 tmux::_select_layout_work() {
     local num_panes=$(tmux::exe display-message -p "#{window_panes}")
     local win_width=$(tmux::exe display-message -p "#{window_width}")
@@ -143,7 +143,7 @@ tmux::_select_layout_work() {
 
 # Top-level wrapper function
 
-# [[file:tmux.org::*tmux++][tmux++:7]]
+# [[file:~/.config/dotfiles/tmux/tmux.org::*tmux++][tmux++:7]]
 tmuxw() {
     if (( $# == 0 )); then
         tmux::exe

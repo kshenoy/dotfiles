@@ -17,6 +17,13 @@
 [[ $- == *i* ]] || return
 # bashrc:3 ends here
 
+# local init
+# Any local settings that need to be set initially go here
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*local%20init][local init:1]]
+[[ -f ~/.bashrc_local_init ]] && . ~/.bashrc_local_init
+# local init:1 ends here
+
 # interactive, login shell settings
 # Turn off TTY "start" and "stop" commands in all interactive shells.
 # They default to ~C-q~ and ~C-s~. I want to use ~C-s~ to do forward history search.
@@ -33,7 +40,7 @@ stty ixany # let any character restart output, not only start character
 # default permissions
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
-umask 007
+umask 002
 # configuration:1 ends here
 
 
@@ -1177,9 +1184,8 @@ cd() {
 
         ...)
             if hash fzf 2> /dev/null; then
-                local _dir=$PWD;
-                FZF_ALT_C_COMMAND='_dir=$PWD; while [[ -n "$_dir" ]]; do _dir="${_dir%/[^/]*}"; echo ${_dir:-/}; done' \
-                    FZF_ALT_C_OPTS="${FZF_ALT_C_OPTS} --select-1 ${2+ --query=$2}" __fzf_cd__
+                $(FZF_ALT_C_COMMAND='_dir=$PWD; while [[ -n "$_dir" ]]; do _dir="${_dir%/[^/]*}"; echo ${_dir:-/}; done' \
+                    FZF_ALT_C_OPTS="${FZF_ALT_C_OPTS} --select-1 ${2+ --query=$2}" __fzf_cd__)
             fi
             return
             ;;
@@ -1191,7 +1197,7 @@ cd() {
 
             if hash fzf 2> /dev/null; then
                 # Find '_path' for all dirs that match the glob expr '_pattern' and select with FZF from the results
-                FZF_ALT_C_COMMAND="find ${_path} -type d -path '*${_pattern}*'" __fzf_cd__
+                $(FZF_ALT_C_COMMAND="find ${_path} -type d -path '*${_pattern}*'" __fzf_cd__)
                 return
             else
                 _dir=$(find $_path -type d -path "*${_pattern}*" -print -quit)
@@ -1610,21 +1616,11 @@ if [[ "$SHLVL" = 1 ]]; then
 fi
 # home:1 ends here
 
-
-
-# Only for home WSL
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:4]]
-export LIBGL_ALWAYS_INDIRECT=1
-# Need to specify the IP of the host
-export DISPLAY=192.168.1.122:0
-# home:4 ends here
-
 # bashrc_local
 # And finally, check for a .bashrc_local and load it
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*bashrc_local][bashrc_local:1]]
-[[ -f ~/.bashrc_local ]] && . ~/.bashrc_local
+[[ -f ~/.bashrc_local_override ]] && . ~/.bashrc_local_override
 # bashrc_local:1 ends here
 
 # command completion
