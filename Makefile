@@ -6,7 +6,7 @@ XDG_DATA_HOME ?= ${HOME}/.local/share
 MKLINK := ln -svTf
 
 
-all: dotfiles-priv base16-fzf base16-shell bash emacs git tmux links
+all: dotfiles-priv base16-fzf base16-shell bash emacs git tmux vim links
 # Rules not included in all: xmonad
 
 
