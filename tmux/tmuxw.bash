@@ -141,9 +141,29 @@ tmux::_select_layout_work() {
 
 
 
-# Top-level wrapper function
+# Helper function to name a pane
 
 # [[file:~/.config/dotfiles/tmux/tmux.org::*tmux++][tmux++:7]]
+tmux::_rename_pane() {
+    local _name
+    if [[ -n "$1" ]]; then
+        _name="$1"
+    else
+        read -p "Enter Pane Name: " _name;
+    fi
+    printf "\033]2;%s\033\\r:r" "${_name}";
+
+    if [[ $(tmux display-message -p "#{pane-border-status}") == "off" ]]; then
+        tmux setw -g pane-border-status top
+    fi
+}
+# tmux++:7 ends here
+
+
+
+# Top-level wrapper function
+
+# [[file:~/.config/dotfiles/tmux/tmux.org::*tmux++][tmux++:8]]
 tmuxw() {
     if (( $# == 0 )); then
         tmux::exe
@@ -165,19 +185,6 @@ tmuxw() {
             tmux::exe display-message "$@"
             ;;
 
-        update-env|ue)
-            if (( $# > 0 )); then echo "Ignoring extra arguments: '$@'"; fi
-            tmux::update_env
-            ;;
-
-        update-env-all-panes|ueap)
-            tmuxw send-keys-all-panes "tmuxw ue" C-m
-            ;;
-
-        update-env-all|uea)
-            tmuxw send-keys-all "tmuxw ue" C-m
-            ;;
-
         resize-p*|resizep)
             # From https://github.com/tmux/tmux/issues/888#issuecomment-297637138
             if [[ "$*" =~ -[xy][[:space:]]+[[:digit:]]+% ]]; then
@@ -194,14 +201,26 @@ tmuxw() {
             fi
             ;;
 
+        rename-pane)
+            tmux::_rename_pane "$@"
+            ;;
+
         respawn)
             # From https://github.com/tmux/tmux/issues/1036
             pkill -USR1 tmux
             ;;
 
+        restore-session)
+            ${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tmux-resurrect/scripts/restore.sh
+            ;;
+
         save-layout)
             eval $1=$(tmux::exe display-message -p "#{window_layout}")
             echo "Saved current layout to $1"
+            ;;
+
+        save-session)
+            ${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tmux-resurrect/scripts/save.sh
             ;;
 
         select-layout|sl)
@@ -212,32 +231,37 @@ tmuxw() {
             fi
             ;;
 
-        save-session)
-            ${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tmux-resurrect/scripts/save.sh
-            ;;
-
-        restore-session)
-            ${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tmux-resurrect/scripts/restore.sh
-            ;;
-
-        sk)
-            tmux::exe send-keys "$@"
-            ;;
-
-        send-keys-other-panes|skop)
-            tmux::send_keys_other_panes "$@"
+        send-keys-all|ska)
+            tmux::send_keys_all "$@"
             ;;
 
         send-keys-all-panes|skap)
             tmux::send_keys_all_panes "$@"
             ;;
 
-        send-keys-all|ska)
-            tmux::send_keys_all "$@"
+        send-keys-other-panes|skop)
+            tmux::send_keys_other_panes "$@"
+            ;;
+
+        sk)
+            tmux::exe send-keys "$@"
+            ;;
+
+        update-env|ue)
+            if (( $# > 0 )); then echo "Ignoring extra arguments: '$@'"; fi
+            tmux::update_env
+            ;;
+
+        update-env-all|uea)
+            tmuxw send-keys-all "tmuxw ue" C-m
+            ;;
+
+        update-env-all-panes|ueap)
+            tmuxw send-keys-all-panes "tmuxw ue" C-m
             ;;
 
         *)
             tmux::exe ${cmd} "$@"
     esac
 }
-# tmux++:7 ends here
+# tmux++:8 ends here

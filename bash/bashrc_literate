@@ -3,6 +3,7 @@
 # :header-args+: :tangle (concat (getenv "HOME") "/.bashrc")
 # :END:
 
+
 # [[file:~/.config/dotfiles/bash/bashrc.org::*bashrc][bashrc:1]]
 # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
 # Use =org-babel-tangle-jump-to-org= to jump back to it from any code block.
@@ -374,7 +375,11 @@ fi
 # [[file:~/.config/dotfiles/bash/bashrc.org::*base16%20themes][base16 themes:1]]
 export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
 [[ -n "$PS1" ]] && [[ -s $BASE16_SHELL/profile_helper.sh ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
-base16_solarized-light &> /dev/null
+if [[ -f ~/.base16_theme ]]; then
+  . ~/.base16_theme
+else
+  base16_solarized-light &> /dev/null
+fi
 # base16 themes:1 ends here
 
 # colored man pages with less
@@ -845,11 +850,18 @@ alias sosc='. ~/.bashrc && clnpath'
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*grep][grep:1]]
 export GREP_COLORS='1;32'
-
 alias grep='grep -sP --color=always'
-alias gi='grep -i'
-alias gv='grep -v'
 # grep:1 ends here
+
+
+
+# I use ~g~ as a generic alias for grep and all its replacements. Hence create a generic alias
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*grep][grep:2]]
+alias g=grep
+alias gi='g -i'
+alias gv='g -v'
+# grep:2 ends here
 
 # git
 
@@ -1615,6 +1627,27 @@ if [[ "$SHLVL" = 1 ]]; then
     [[ -x /usr/bin/clear_console ]] && /usr/bin/clear_console -q
 fi
 # home:1 ends here
+
+
+
+# To connect to work-vpn
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:2]]
+alias gp=globalprotect
+
+work_vpn() {
+    # if command grep Connected <<< $(globalprotect show --status); then
+    if command grep gpd0 <<< $(ifconfig -s) >& /dev/null; then
+        echo "VPN is already connected"
+    else
+        globalprotect connect --portal vpn.amd.com --username kshenoy
+    fi
+}
+# home:2 ends here
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:3]]
+alias boot2win='sudo grub-reboot Windows && shutdown -r 0'
+# home:3 ends here
 
 # bashrc_local
 # And finally, check for a .bashrc_local and load it
