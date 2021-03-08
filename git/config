@@ -107,6 +107,9 @@ helper = cache --timeout=3600
 
 [push]
 default = matching
+
+[pull]
+rebase = false
 # misc:1 ends here
 
 # aliases

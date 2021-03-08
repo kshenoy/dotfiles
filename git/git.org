@@ -101,7 +101,6 @@ cmd = meld --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $MERGED $REMOT
 cmd = vim_merge -g $BASE $REMOTE $LOCAL $MERGED
 trustExitCode = true
 
-
 [mergetool "vim"]
 cmd = vim_merge $BASE $REMOTE $LOCAL $MERGED
 trustExitCode = true
