@@ -2,7 +2,12 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("Inbox"
+(("org-refile-last-stored"
+ (filename . "~/.config/dotfiles/bash/bashrc.org")
+ (front-context-string . "*** [[https://gi")
+ (rear-context-string . " ..'\n#+end_src\n\n")
+ (position . 29762))
+("Inbox"
  (filename . "~/Documents/Notes/Inbox.org")
  (position . 1))
 ("Cfg: dotfiles"

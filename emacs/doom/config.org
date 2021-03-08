@@ -136,19 +136,8 @@ I can either set =doom-theme= or manually load a theme with the =load-theme= fun
 (setq doom-theme 'doom-one)
 #+end_src
 
-Set theme based on time of day
-#+begin_src emacs-lisp
-(use-package! theme-changer
-  :init
-  (setq calendar-location-name "Fort Collins, CO")
-  (setq calendar-latitude 32.85)
-  (setq calendar-longitude -96.85)
-  :config
-  (change-theme 'doom-solarized-light 'doom-zenburn))
-#+end_src
-
 *** load-theme hook
-Emacs doesn't have a native hook that is called after a theme has loaded. So we've to create one. (from [[https://www.reddit.com/r/emacs/comments/4v7tcj/does_emacs_have_a_hook_for_when_the_theme_changes/d5wyu1r/][reddit]])
+Emacs doesn't have a native hook that is called after a theme has loaded. So I've to create one. (from [[https://www.reddit.com/r/emacs/comments/4v7tcj/does_emacs_have_a_hook_for_when_the_theme_changes/d5wyu1r/][reddit]])
 #+begin_src emacs-lisp
 (defvar after-load-theme-hook nil
   "Hook run after a color theme is loaded using `load-theme'.")
@@ -170,7 +159,7 @@ Usage examples
 #+end_src
 
 *** doom-solarized-light
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (add-hook 'after-load-theme-hook
           (lambda()
             (when (eq doom-theme 'doom-solarized-light)
@@ -384,28 +373,15 @@ Change faces
     (set-face-attribute 'org-level-3               nil :height 1.15)
     (set-face-attribute 'org-level-4               nil :height 1.1))
 
-  (defun my-update-org-faces-after-load-doom-solarized-light ()
-    "Update some org-mode faces for doom-solarized-light theme"
-    (my-update-org-faces-after-load-all-themes)
-    ;; (set-face-attribute 'org-document-title nil :foreground "#586e75")
-    ;; (set-face-attribute 'org-level-1        nil :foreground "#cb4b16")
-    ;; (set-face-attribute 'org-level-2        nil :foreground "#859900")
-    ;; (set-face-attribute 'org-level-3        nil :foreground "#268bd2")
-    ;; (set-face-attribute 'org-level-4        nil :foreground "#b58900")
-    ;; (set-face-attribute 'org-level-5        nil :foreground "#2aa198")
-    ;; (set-face-attribute 'org-level-6        nil :foreground "#859900")
-    ;; (set-face-attribute 'org-level-7        nil :foreground "#dc322f")
-    ;; (set-face-attribute 'org-level-8        nil :foreground "#268bd2")
-    ;; (set-face-attribute 'org-todo           nil :foreground "#2aa198")
-    ;; (set-face-attribute 'org-done           nil :foreground "#859900")
-    ;; (set-face-attribute 'org-meta-line      nil :foreground "#93a1a1")
-    ;; (set-face-attribute 'org-drawer         nil :foreground "#2aa198")
-    )
+  ;; (defun my-update-org-faces-after-load-doom-solarized-light ()
+  ;;   "Update some org-mode faces for doom-solarized-light theme")
 
   (defun my-update-org-faces-after-load-theme ()
     ""
-    (cond ((eq doom-theme 'doom-solarized-light) (my-update-org-faces-after-load-doom-solarized-light))
-          (t (my-update-org-faces-after-load-all-themes))))
+    (my-update-org-faces-after-load-all-themes)
+    ;; (cond ((eq doom-theme 'doom-solarized-light) (my-update-org-faces-after-load-doom-solarized-light))
+    ;;       (t nil))
+    )
 #+end_src
 
 Add a hook to update faces after a theme is loaded
@@ -504,10 +480,6 @@ Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is le
 #+end_src
 
 ** ID
-#+begin_src emacs-lisp
-(setq org-id-locations-file (expand-file-name ".org-id-locations" doom-private-dir))
-#+end_src
-
 Create an ID when storing the link. Curiously this also causes =org-store-link= to store IDs by default
 Also note that setting this to true will create an ID for every entry which could become expensive when =org-id-track-globally= is enabled
 
@@ -526,11 +498,11 @@ Resources:
 - [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Aaron Bieber - Organizing Notes with Refile]]
 
 By [[https://www.reddit.com/r/emacs/comments/4366f9/how_do_orgrefiletargets_work/czg008y/][/u/awalker4 on reddit]].
-Show upto 9 levels of headings from the current file and 5 levels of headings from all agenda files
+Show upto 5 levels of headings from the current file and 3 levels of headings from all agenda files
 #+begin_src emacs-lisp
 (setq org-refile-targets
-      '((nil . (:maxlevel . 9))
-        (org-agenda-files . (:maxlevel . 5))))
+      '((nil . (:maxlevel . 5))
+        (org-agenda-files . (:maxlevel . 3))))
 #+end_src
 
 Additionally, I'm using a more selective org-refile-targets which is limited based on the current file.
@@ -547,11 +519,11 @@ A way to do it is by writing a function that sets /org-refile-targets/ in a let 
     If NOMOD is non-nil then just return org-refile-targets"
   (if nomod
       org-refile-targets
-    `((nil . (:maxlevel . 9))
+    `((nil . (:maxlevel . 5))
       (,(seq-intersection
          org-agenda-files
          (directory-files-recursively (file-name-directory (buffer-file-name)) "\\.org$"))
-       . (:maxlevel . 5)))))
+       . (:maxlevel . 3)))))
 
 (defun my-org-refile (&optional p)
   "Refile the current heading to another location using a custom
@@ -571,7 +543,10 @@ A way to do it is by writing a function that sets /org-refile-targets/ in a let 
 #+begin_src emacs-lisp
 (map! :map org-mode-map
       :localleader
-      :prefix ("r" . "refile")
+      :prefix "r"
+      :desc "org-refile" "r" #'my-org-refile
+      :desc "org-refile-copy" "y" #'my-org-refile-copy
+      :prefix "s"
       :desc "org-refile" "r" #'my-org-refile
       :desc "org-refile-copy" "y" #'my-org-refile-copy)
 #+end_src
@@ -728,16 +703,12 @@ Use =org-goto= instead of =semantic-or-imenu= when in org files
 #+end_src
 
 * local settings
-#+name:lcl_cfg_windows-lp
-#+begin_src emacs-lisp :tangle no
-(defun browse-url-xdg-open-wsl (url &optional ignored)
-  (interactive (browse-url-interactive-arg "URL: "))
-  (shell-command-to-string (concat "explorer.exe " url)))
-(advice-add #'browse-url-xdg-open :override #'browse-url-xdg-open-wsl)
-#+end_src
 
+For WSL:
 #+begin_src emacs-lisp
 (when (and (eq system-type 'gnu/linux) (string-match-p "microsoft" (shell-command-to-string "uname -a")))
-<<lcl_cfg_windows-lp>>
-)
+  (defun browse-url-xdg-open-wsl (url &optional ignored)
+    (interactive (browse-url-interactive-arg "URL: "))
+    (shell-command-to-string (concat "explorer.exe " url)))
+  (advice-add #'browse-url-xdg-open :override #'browse-url-xdg-open-wsl))
 #+end_src
