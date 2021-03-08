@@ -398,109 +398,354 @@ man() {
 }
 # colored man pages with less:1 ends here
 
-# vcs
-# Collection of utilities to deal with all VCS related stuff
+# @: a simpler and faster alternative to globstar
+# :LOGBOOK:
+# - Refiled on [2021-03-08 Mon 06:33]
+# :END:
+# =@ ls /some/long/path/**/that/I/dont/want/to/type= is converted to =ls $(find /some/long/path/ -path '*/that/I/dont/want/to/type')=
 
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*vcs][vcs:1]]
-vcs::is_in_git_repo() {
-    local _cwd=$PWD
-    if (( $# > 0 )); then
-        command cd $1
-    fi
+# [[file:~/.config/dotfiles/bash/bashrc.org::*@:%20a%20simpler%20and%20faster%20alternative%20to%20globstar][@: a simpler and faster alternative to globstar:1]]
+unset -f @
+function @ {
+    # Description:
+    # @ ls /some/long/path/**/that/I/dont/want/to/type is converted to
+    #   ls $(find /some/long/path/ -path '*/that/I/dont/want/to/type')
 
-    git rev-parse HEAD &> /dev/null
-    local _ret=$?
-
-    if (( $# > 0 )); then
-        command cd $_cwd
-    fi
-
-    return $_ret
-}
-
-vcs::is_in_perforce_repo() {
-    local _cwd=$PWD
-    if (( $# > 0 )); then
-        command cd $1
-    fi
-
-    p4 info &> /dev/null
-    local _ret=$?
-
-    if (( $# > 0 )); then
-        command cd $_cwd
-    fi
-
-    return $_ret
-}
-
-vcs::is_in_repo() {
-    vcs::is_in_git_repo "$@" || vcs::is_in_perforce_repo "$@"
-}
-
-vcs::get_type() {
-    # Description: Check if specified directory is under a Version-controlled system
-    # Arguments: 1 - Variable to return VCS type
-    #            2 - Directory to check. If skipped, defaults to PWD
-
-    if vcs::is_in_git_repo "$@"; then
-        echo "git"
-    elif vcs::is_in_perforce_repo "$@"; then
-        echo "p4"
-    else
-        # No VCS. Return empty string
-        echo ""
-    fi
-}
-
-vcs::get_branch() {
-    # Description: If PWD is under a VCS, return the branch. If not, return an empty string
-    # Arguments:
-    # - $1 (optional): Use that as the VCS type instead of calculating it
-
-    local _vcs_type=${1-$(vcs::get_type)}
-    #echo "DEBUG: VCS Type=$_vcs_type (vcs::get_branch)"
-
-    if [[ $_vcs_type == "git" ]]; then
-        git symbolic-ref --short HEAD 2> /dev/null
-    elif [[ $_vcs_type == "p4" ]] && [[ -n "$REPO_PATH" ]] && [[ -f "$REPO_PATH/configuration_id" ]]; then
-        echo "$(sed 's/@.*//' "$REPO_PATH/configuration_id" 2> /dev/null)"
-    else
-        echo ""
-    fi
-}
-
-vcs::get_status() {
-    # Description: Get the status of the VCS - works only for git at the moment
-    # Arguments:
-    # - $1 (optional): Use as the VCS type instead of calculating it
-    # - $2 (optional): Use as the VCS branch instead of calculating it
-
-    local _vcs_type=${1-$(vcs::get_type)}
-    local _vcs_branch=${2-$(vcs::get_branch $_vcs_type)}
-
-    if [[ "$_vcs_type" == "git" ]]; then
-        if $(echo "$(git log origin/$_vcs_branch..HEAD 2> /dev/null)" | grep '^commit' &> /dev/null); then
-            echo "staged"
-        elif [[ -n $(git status -s --ignore-submodules=dirty  2> /dev/null) ]]; then
-            echo "modified"
+    local _cmd=()
+    for i in "$@"; do
+        if [[ $i =~ '**' ]]; then
+            _cmd+=('$(find'    $(command awk 'BEGIN {FS="**"} {print $1}' <<< "$i"))
+            _cmd+=('-path' "'*"$(command awk 'BEGIN {FS="**"} {print $2}' <<< "$i")"')")
         else
-            echo "committed"
+            _cmd+=("$i")
         fi
+    done
+    # echo "${_cmd[@]}"
+    # echo
+    eval "${_cmd[@]}"
+}
+# @: a simpler and faster alternative to globstar:1 ends here
+
+# alert
+# :LOGBOOK:
+# - Refiled on [2021-03-08 Mon 06:33]
+# :END:
+# Simply function to "alert" when a command completes.
+# NOTE: This must be used as a function to have access to the history via the fc command
+
+# Use like this: =sleep 10 && alert=
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*alert][alert:1]]
+unset -f alert
+alert() {
+    # Pick up display message if provided as argument. If not show the last command that was run
+    local _msg=${1:-"'$(fc -nl -1 | sed -e 's/^\s*//' -e 's/\s*[;&|]\+\s*alert$//')' has completed"}
+
+    # Add TMUX information if available
+    if [[ -n $TMUX ]]; then
+        _msg="$(tmux display-message -p "[#S:#I.#P]") $_msg"
+    else
+        _msg="[$$] $_msg"
     fi
+
+    # Indicate normal completion or error
+    local _icon=$( (($? == 0)) && echo terminal || echo error)
+
+    notify-send --urgency=low -i $_icon "$_msg"
+}
+# alert:1 ends here
+
+# calc
+# :LOGBOOK:
+# - Refiled on [2021-03-08 Mon 06:33]
+# :END:
+# Simple wrapper around =irb= to make it more natural to use. eg. ~= 4 + 5~
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*calc][calc:1]]
+unset -f =
+=() {                                                                                                             # {{{1
+    local _input="${@:-$(</dev/stdin)}"
+    # echo $_input
+
+    # if [[ $_input =~ [:xdigit:]+\[[:digit:]+:[:digit:]+\] ]]; then
+    #   _input=${_input#.*[}
+    #   echo $_input
+    #   return
+    # fi
+    # = "($_input >> $_lsb) & ($_msb - $_lsb)"
+
+    # If there's no explicit output formatting, try to infer from the input
+    if [[ ! $_input =~ to_s ]]; then
+        if [[ $_input =~ 0x ]] || [[ $_input =~ [a-fA-F] ]]; then
+            local _base=16
+        elif [[ $_input =~ 0b ]]; then
+            local _base=2
+        fi
+        _input="($_input).to_s($_base)"
+    fi
+
+    local _result=$(echo "$_input" | irb -m --noverbose | command sed 's/"//g')
+
+    # Pretty-print formatted output
+    if [[ $_input =~ 'to_s(16)' ]]; then
+        _result="0x${_result}"
+    elif [[ $_input =~ 'to_s(2)' ]]; then
+        _result="0b${_result}"
+    fi
+
+    echo $_result
+}
+# calc:1 ends here
+
+
+
+# Simple base-converter
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*calc][calc:2]]
+unset -f =base
+=base() (                                                                                                         # {{{1
+    _help () { #{{{
+        echo 'SYNTAX:'
+        echo '  =base NUM TO [FROM=10]'
+        echo '  echo NUM | =base TO [FROM=10]'
+        echo '  =base TO [FROM=10] <<< "NUM"'
+    } # }}}
+
+    if (( $# <= 1 )); then
+        echo -e "ERROR: Insufficient arguments. At least two required\n"; _help
+        return 1
+    fi
+
+    if [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
+        # From pipe or from redirection respectively
+        local _num=$(</dev/stdin)
+    else
+        local _num=$1
+        shift
+    fi
+
+    local _obase=$1
+    local _ibase=${2:-10}
+
+    case $_ibase in
+        2)  _num=${_num#0[bB]} ;;
+        16) _num=$(tr '[a-f]' '[A-F]' <<< "${_num#0[xX]}") ;;
+    esac
+
+    local _result=$(echo "obase=$_obase; ibase=$_ibase; $_num" | bc)
+    case $_obase in
+        2)  _result="0b${_result}" ;;
+        16) _result="0x${_result}" ;;
+    esac
+
+    echo $_result
+)
+
+=bin() { =base $1  2 ${2:-10}; }  # Convert to binary, by default from decimal
+=dec() { =base $1 10 ${2:-16}; }  # Convert to decimal, by default from hexadecimal
+=hex() { =base $1 16 ${2:-10}; }  # Convert to hexadecimal, by default from decimal
+# calc:2 ends here
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*calc][calc:3]]
+unset -f =slice
+=slice() (
+    _help() {
+        echo 'SYNTAX:'
+        echo '  =slice NUM MSB LSB'
+        echo '  =slice NUM BIT'
+        echo '  echo NUM | =slice MSB LSB'
+        echo '  =slice MSB LSB <<< "NUM"'
+        echo
+        echo "NOTE: MSB >= LSB"
+    }
+
+    if (( $# >= 3 )); then
+        local _num=$1
+        shift
+    elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
+        # From pipe or from redirection respectively
+        local _num=$(</dev/stdin)
+    elif (( $# < 1 )); then
+        echo -e "ERROR: Insufficient arguments. At least one more required\n"; _help
+        return 1
+    else
+        local _num=$1
+        shift
+    fi
+
+    local _msb=$1
+    local _lsb=${2:-$_msb}
+
+    if (( $_lsb > $_msb )); then
+        echo -e "ERROR: MSB must be greater than or equal to LSB when slicing\n"; _help
+        return 1
+    fi
+
+    # echo "in=$_num, msb=$_msb, lsb=$_lsb"
+    = "($_num >> $_lsb) & ((1 << ($_msb - $_lsb + 1)) - 1)"
+)
+# calc:3 ends here
+
+# dir related
+# :LOGBOOK:
+# - Refiled on [2021-03-08 Mon 06:33]
+# :END:
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir related:1]]
+alias md='mkdir -p'
+
+# Create new dir(s) and enter it (last directory if multiple arguments are given)
+unset -f mcd
+mcd() {
+    command mkdir -p "$@" || return
+    cd -- "${@: -1}"
+}
+# dir related:1 ends here
+
+
+
+# NOTE: The use of $* is deliberate here as it produces all the scripts arguments separated by the first character of $IFS which, by default, is a space. This allows me to match all arguments against a regex in one go instead of looping over them
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir related:2]]
+dirs() {
+    if (( $# == 0 )); then
+        builtin dirs -v
+    elif [[ "$*" =~ [-+][0-9]+ ]]; then
+        # Use long-listing format. Without this, the home directory is display as '~' preventing me from doing something
+        # like `cp $(dirs +1)` as it results in an error: pushd: ~/.vim: No such file or directory
+        builtin dirs "$@" -l
+    else
+        builtin dirs "$@"
+    fi
+}
+# dir related:2 ends here
+
+
+
+# Silent pushd and uniquifies while pushing
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir related:3]]
+pushd() {
+    builtin pushd "$@" > /dev/null;
+
+    # Remove any duplicate entries. The 1st entry will be the PWD so skip it
+    local _dir_pos=$(dirs -l -v | tail -n+2 | grep "$PWD$" | sed 's/^\s*//' | cut -d ' ' -f1 | paste -s)
+    command popd -n +$_dir_pos &> /dev/null
+}
+# dir related:3 ends here
+
+
+
+# Better dirstack. Adds the following to the usual =cd= behavior:
+# - =cd ==           Lists the contents of the stack and use fzf to select from it
+# - =cd=             (with no args) Goes to $REPO_PATH if it's set else goes to $HOME
+# - =cd ... [TARG]=  Jump to a directory in the path that starts with TARG.
+#                  If TARG is not given, show all directories in the filepath and use fzf to select
+
+# Note that =pushd= calls =cd= under the hood. So =cdable_vars= and =cdspell= apply to =pushd= as well
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir related:4]]
+cd() {
+    if (( "$#" == 0 )); then
+        if vcs::is_in_repo > /dev/null; then
+            cd "$(vcs::get_root)"
+        else
+            cd "$HOME"
+        fi
+        return
+    fi
+
+    case "$1" in
+        -)
+            pushd
+            return
+            ;;
+
+        =)
+            if hash fzf 2> /dev/null; then
+                $(FZF_ALT_C_COMMAND='command dirs -l -p' __fzf_cd__)
+            else
+                dirs
+            fi
+            return
+            ;;
+
+        ...)
+            if hash fzf 2> /dev/null; then
+                $(FZF_ALT_C_COMMAND='_dir=$PWD; while [[ -n "$_dir" ]]; do _dir="${_dir%/[^/]*}"; echo ${_dir:-/}; done' \
+                    FZF_ALT_C_OPTS="${FZF_ALT_C_OPTS} --select-1 ${2+ --query=$2}" __fzf_cd__)
+            fi
+            return
+            ;;
+
+        *\*\**)
+            # Split $1 about the first ** into '_path' and '_pattern'.
+            local _path=${1%%\*\**}; _path=${_path:-.}
+            local _pattern="*$(tr -s '*' <<< ${1#*\*\*})*"
+
+            if hash fzf 2> /dev/null; then
+                # Find '_path' for all dirs that match the glob expr '_pattern' and select with FZF from the results
+                $(FZF_ALT_C_COMMAND="find ${_path} -type d -path '*${_pattern}*'" __fzf_cd__)
+                return
+            else
+                _dir=$(find $_path -type d -path "*${_pattern}*" -print -quit)
+                if [[ -n $_dir ]]; then
+                    pushd "$_dir"
+                fi
+            fi
+            ;;
+    esac
+
+    pushd "$@"
 }
 
-vcs::get_root() {
-    if vcs::is_in_git_repo "$@"; then
-        echo "$(git rev-parse --show-toplevel)"
-    elif vcs::is_in_perforce_repo "$@"; then
-        echo "$REPO_PATH"
-    else
-        echo ""
+alias ..='cd ..'
+# dir related:4 ends here
+
+# [[https://github.com/junegunn/fzf][fzf]]
+# :LOGBOOK:
+# - Refiled on [2021-03-08 Mon 06:33]
+# :END:
+
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*%5B%5Bhttps://github.com/junegunn/fzf%5D%5Bfzf%5D%5D][[[https://github.com/junegunn/fzf][fzf]]:1]]
+if [[ -d /opt/fzf ]]; then
+    export FZF_PATH=/opt/fzf
+elif [[ -d $HOME/.local/install/fzf ]]; then
+    export FZF_PATH="$HOME/.local/install/fzf"
+else
+    echo "$(tput setaf 1)ERROR$(tput sgr0): FZF_PATH is not set"
+fi
+
+if [[ -n "$FZF_PATH" ]]; then
+    [[ ! "$PATH" == *$FZF_PATH/bin* ]] && export PATH="$PATH:$FZF_PATH/bin"
+
+    # Key bindings
+    # Note the order is important because some functions get overridden
+    source $FZF_PATH/shell/key-bindings.bash
+    source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf_vcs.bash
+    source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/key-bindings.bash
+
+    # Customisations
+    if hash fd 2> /dev/null; then
+        export FZF_DEFAULT_COMMAND="fd --color=never --hidden --exclude .git --type f"
+        export FZF_ALT_C_COMMAND="fd --color=never --hidden --exclude .git --type d"
+        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
     fi
-}
-# vcs:1 ends here
+
+    # Clear out old env vars
+    export FZF_DEFAULT_OPTS="--ansi --select-1 --exit-0 --inline-info --reverse --tiebreak=length,end --bind=shift-tab:toggle-all,ctrl-n:down,ctrl-p:up"
+    unset FZF_ALT_C_OPTS
+    unset FZF_CTRL_T_OPTS
+    # export FZF_CTRL_T_OPTS='--expect=alt-v,alt-e,alt-c'
+
+    # base16 fzf colorscheme is applied by appending to the FZF_DEFAULT_OPTS env var
+    # Thus, I "set" it first before sourcing the base16 file which appends to it
+    export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
+    [[ -n "$BASE16_THEME" ]] && source "$BASE16_FZF/bash/base16-${BASE16_THEME}.config"
+fi
+# [[https://github.com/junegunn/fzf][fzf]]:1 ends here
 
 # query
 # :LOGBOOK:
@@ -782,6 +1027,110 @@ __query_pp() {                                                                  
 alias que=query
 # query:2 ends here
 
+# vcs
+# Collection of utilities to deal with all VCS related stuff
+
+
+# [[file:~/.config/dotfiles/bash/bashrc.org::*vcs][vcs:1]]
+vcs::is_in_git_repo() {
+    local _cwd=$PWD
+    if (( $# > 0 )); then
+        command cd $1
+    fi
+
+    git rev-parse HEAD &> /dev/null
+    local _ret=$?
+
+    if (( $# > 0 )); then
+        command cd $_cwd
+    fi
+
+    return $_ret
+}
+
+vcs::is_in_perforce_repo() {
+    local _cwd=$PWD
+    if (( $# > 0 )); then
+        command cd $1
+    fi
+
+    p4 info &> /dev/null
+    local _ret=$?
+
+    if (( $# > 0 )); then
+        command cd $_cwd
+    fi
+
+    return $_ret
+}
+
+vcs::is_in_repo() {
+    vcs::is_in_git_repo "$@" || vcs::is_in_perforce_repo "$@"
+}
+
+vcs::get_type() {
+    # Description: Check if specified directory is under a Version-controlled system
+    # Arguments: 1 - Variable to return VCS type
+    #            2 - Directory to check. If skipped, defaults to PWD
+
+    if vcs::is_in_git_repo "$@"; then
+        echo "git"
+    elif vcs::is_in_perforce_repo "$@"; then
+        echo "p4"
+    else
+        # No VCS. Return empty string
+        echo ""
+    fi
+}
+
+vcs::get_branch() {
+    # Description: If PWD is under a VCS, return the branch. If not, return an empty string
+    # Arguments:
+    # - $1 (optional): Use that as the VCS type instead of calculating it
+
+    local _vcs_type=${1-$(vcs::get_type)}
+    #echo "DEBUG: VCS Type=$_vcs_type (vcs::get_branch)"
+
+    if [[ $_vcs_type == "git" ]]; then
+        git symbolic-ref --short HEAD 2> /dev/null
+    elif [[ $_vcs_type == "p4" ]] && [[ -n "$REPO_PATH" ]] && [[ -f "$REPO_PATH/configuration_id" ]]; then
+        echo "$(sed 's/@.*//' "$REPO_PATH/configuration_id" 2> /dev/null)"
+    else
+        echo ""
+    fi
+}
+
+vcs::get_status() {
+    # Description: Get the status of the VCS - works only for git at the moment
+    # Arguments:
+    # - $1 (optional): Use as the VCS type instead of calculating it
+    # - $2 (optional): Use as the VCS branch instead of calculating it
+
+    local _vcs_type=${1-$(vcs::get_type)}
+    local _vcs_branch=${2-$(vcs::get_branch $_vcs_type)}
+
+    if [[ "$_vcs_type" == "git" ]]; then
+        if $(echo "$(git log origin/$_vcs_branch..HEAD 2> /dev/null)" | grep '^commit' &> /dev/null); then
+            echo "staged"
+        elif [[ -n $(git status -s --ignore-submodules=dirty  2> /dev/null) ]]; then
+            echo "modified"
+        else
+            echo "committed"
+        fi
+    fi
+}
+
+vcs::get_root() {
+    if vcs::is_in_git_repo "$@"; then
+        echo "$(git rev-parse --show-toplevel)"
+    elif vcs::is_in_perforce_repo "$@"; then
+        echo "$REPO_PATH"
+    else
+        echo ""
+    fi
+}
+# vcs:1 ends here
+
 
 # Now, if I run =g SOMETHING= followed by =vq= then =vq= doesn't run as expected because ~!!~ expands to 'g SOMETHING'.
 # However, in the expanded form, 'g' doesn't get replaced with grep because of the afore-mentioned limitation.
@@ -932,340 +1281,6 @@ rm_rf_silent() {
 }
 alias rdj='rm_rf_silent'
 # rm:1 ends here
-
-# @: a simpler and faster alternative to globstar
-# =@ ls /some/long/path/**/that/I/dont/want/to/type= is converted to =ls $(find /some/long/path/ -path '*/that/I/dont/want/to/type')=
-
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*@:%20a%20simpler%20and%20faster%20alternative%20to%20globstar][@: a simpler and faster alternative to globstar:1]]
-unset -f @
-function @ {
-    # Description:
-    # @ ls /some/long/path/**/that/I/dont/want/to/type is converted to
-    #   ls $(find /some/long/path/ -path '*/that/I/dont/want/to/type')
-
-    local _cmd=()
-    for i in "$@"; do
-        if [[ $i =~ '**' ]]; then
-            _cmd+=('$(find'    $(command awk 'BEGIN {FS="**"} {print $1}' <<< "$i"))
-            _cmd+=('-path' "'*"$(command awk 'BEGIN {FS="**"} {print $2}' <<< "$i")"')")
-        else
-            _cmd+=("$i")
-        fi
-    done
-    # echo "${_cmd[@]}"
-    # echo
-    eval "${_cmd[@]}"
-}
-# @: a simpler and faster alternative to globstar:1 ends here
-
-# alert
-# Simply function to "alert" when a command completes.
-# NOTE: This must be used as a function to have access to the history via the fc command
-
-# Use like this: =sleep 10 && alert=
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*alert][alert:1]]
-unset -f alert
-alert() {
-    # Pick up display message if provided as argument. If not show the last command that was run
-    local _msg=${1:-"'$(fc -nl -1 | sed -e 's/^\s*//' -e 's/\s*[;&|]\+\s*alert$//')' has completed"}
-
-    # Add TMUX information if available
-    if [[ -n $TMUX ]]; then
-        _msg="$(tmux display-message -p "[#S:#I.#P]") $_msg"
-    else
-        _msg="[$$] $_msg"
-    fi
-
-    # Indicate normal completion or error
-    local _icon=$( (($? == 0)) && echo terminal || echo error)
-
-    notify-send --urgency=low -i $_icon "$_msg"
-}
-# alert:1 ends here
-
-# calc
-# Simple wrapper around =irb= to make it more natural to use. eg. ~= 4 + 5~
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*calc][calc:1]]
-unset -f =
-=() {                                                                                                             # {{{1
-    local _input="${@:-$(</dev/stdin)}"
-    # echo $_input
-
-    # if [[ $_input =~ [:xdigit:]+\[[:digit:]+:[:digit:]+\] ]]; then
-    #   _input=${_input#.*[}
-    #   echo $_input
-    #   return
-    # fi
-    # = "($_input >> $_lsb) & ($_msb - $_lsb)"
-
-    # If there's no explicit output formatting, try to infer from the input
-    if [[ ! $_input =~ to_s ]]; then
-        if [[ $_input =~ 0x ]] || [[ $_input =~ [a-fA-F] ]]; then
-            local _base=16
-        elif [[ $_input =~ 0b ]]; then
-            local _base=2
-        fi
-        _input="($_input).to_s($_base)"
-    fi
-
-    local _result=$(echo "$_input" | irb -m --noverbose | command sed 's/"//g')
-
-    # Pretty-print formatted output
-    if [[ $_input =~ 'to_s(16)' ]]; then
-        _result="0x${_result}"
-    elif [[ $_input =~ 'to_s(2)' ]]; then
-        _result="0b${_result}"
-    fi
-
-    echo $_result
-}
-# calc:1 ends here
-
-
-
-# Simple base-converter
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*calc][calc:2]]
-unset -f =base
-=base() (                                                                                                         # {{{1
-    _help () { #{{{
-        echo 'SYNTAX:'
-        echo '  =base NUM TO [FROM=10]'
-        echo '  echo NUM | =base TO [FROM=10]'
-        echo '  =base TO [FROM=10] <<< "NUM"'
-    } # }}}
-
-    if (( $# <= 1 )); then
-        echo -e "ERROR: Insufficient arguments. At least two required\n"; _help
-        return 1
-    fi
-
-    if [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
-        # From pipe or from redirection respectively
-        local _num=$(</dev/stdin)
-    else
-        local _num=$1
-        shift
-    fi
-
-    local _obase=$1
-    local _ibase=${2:-10}
-
-    case $_ibase in
-        2)  _num=${_num#0[bB]} ;;
-        16) _num=$(tr '[a-f]' '[A-F]' <<< "${_num#0[xX]}") ;;
-    esac
-
-    local _result=$(echo "obase=$_obase; ibase=$_ibase; $_num" | bc)
-    case $_obase in
-        2)  _result="0b${_result}" ;;
-        16) _result="0x${_result}" ;;
-    esac
-
-    echo $_result
-)
-
-=bin() { =base $1  2 ${2:-10}; }  # Convert to binary, by default from decimal
-=dec() { =base $1 10 ${2:-16}; }  # Convert to decimal, by default from hexadecimal
-=hex() { =base $1 16 ${2:-10}; }  # Convert to hexadecimal, by default from decimal
-# calc:2 ends here
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*calc][calc:3]]
-unset -f =slice
-=slice() (
-    _help() {
-        echo 'SYNTAX:'
-        echo '  =slice NUM MSB LSB'
-        echo '  =slice NUM BIT'
-        echo '  echo NUM | =slice MSB LSB'
-        echo '  =slice MSB LSB <<< "NUM"'
-        echo
-        echo "NOTE: MSB >= LSB"
-    }
-
-    if (( $# >= 3 )); then
-        local _num=$1
-        shift
-    elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
-        # From pipe or from redirection respectively
-        local _num=$(</dev/stdin)
-    elif (( $# < 1 )); then
-        echo -e "ERROR: Insufficient arguments. At least one more required\n"; _help
-        return 1
-    else
-        local _num=$1
-        shift
-    fi
-
-    local _msb=$1
-    local _lsb=${2:-$_msb}
-
-    if (( $_lsb > $_msb )); then
-        echo -e "ERROR: MSB must be greater than or equal to LSB when slicing\n"; _help
-        return 1
-    fi
-
-    # echo "in=$_num, msb=$_msb, lsb=$_lsb"
-    = "($_num >> $_lsb) & ((1 << ($_msb - $_lsb + 1)) - 1)"
-)
-# calc:3 ends here
-
-# dir related
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir related:1]]
-alias md='mkdir -p'
-
-# Create new dir(s) and enter it (last directory if multiple arguments are given)
-unset -f mcd
-mcd() {
-    command mkdir -p "$@" || return
-    cd -- "${@: -1}"
-}
-# dir related:1 ends here
-
-
-
-# NOTE: The use of $* is deliberate here as it produces all the scripts arguments separated by the first character of $IFS which, by default, is a space. This allows me to match all arguments against a regex in one go instead of looping over them
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir related:2]]
-dirs() {
-    if (( $# == 0 )); then
-        builtin dirs -v
-    elif [[ "$*" =~ [-+][0-9]+ ]]; then
-        # Use long-listing format. Without this, the home directory is display as '~' preventing me from doing something
-        # like `cp $(dirs +1)` as it results in an error: pushd: ~/.vim: No such file or directory
-        builtin dirs "$@" -l
-    else
-        builtin dirs "$@"
-    fi
-}
-# dir related:2 ends here
-
-
-
-# Silent pushd and uniquifies while pushing
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir related:3]]
-pushd() {
-    builtin pushd "$@" > /dev/null;
-
-    # Remove any duplicate entries. The 1st entry will be the PWD so skip it
-    local _dir_pos=$(dirs -l -v | tail -n+2 | grep "$PWD$" | sed 's/^\s*//' | cut -d ' ' -f1 | paste -s)
-    command popd -n +$_dir_pos &> /dev/null
-}
-# dir related:3 ends here
-
-
-
-# Better dirstack. Adds the following to the usual =cd= behavior:
-# - =cd ==           Lists the contents of the stack and use fzf to select from it
-# - =cd=             (with no args) Goes to $REPO_PATH if it's set else goes to $HOME
-# - =cd ... [TARG]=  Jump to a directory in the path that starts with TARG.
-#                  If TARG is not given, show all directories in the filepath and use fzf to select
-
-# Note that =pushd= calls =cd= under the hood. So =cdable_vars= and =cdspell= apply to =pushd= as well
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*dir%20related][dir related:4]]
-cd() {
-    if (( "$#" == 0 )); then
-        if vcs::is_in_repo > /dev/null; then
-            cd "$(vcs::get_root)"
-        else
-            cd "$HOME"
-        fi
-        return
-    fi
-
-    case "$1" in
-        -)
-            pushd
-            return
-            ;;
-
-        =)
-            if hash fzf 2> /dev/null; then
-                $(FZF_ALT_C_COMMAND='command dirs -l -p' __fzf_cd__)
-            else
-                dirs
-            fi
-            return
-            ;;
-
-        ...)
-            if hash fzf 2> /dev/null; then
-                $(FZF_ALT_C_COMMAND='_dir=$PWD; while [[ -n "$_dir" ]]; do _dir="${_dir%/[^/]*}"; echo ${_dir:-/}; done' \
-                    FZF_ALT_C_OPTS="${FZF_ALT_C_OPTS} --select-1 ${2+ --query=$2}" __fzf_cd__)
-            fi
-            return
-            ;;
-
-        *\*\**)
-            # Split $1 about the first ** into '_path' and '_pattern'.
-            local _path=${1%%\*\**}; _path=${_path:-.}
-            local _pattern="*$(tr -s '*' <<< ${1#*\*\*})*"
-
-            if hash fzf 2> /dev/null; then
-                # Find '_path' for all dirs that match the glob expr '_pattern' and select with FZF from the results
-                $(FZF_ALT_C_COMMAND="find ${_path} -type d -path '*${_pattern}*'" __fzf_cd__)
-                return
-            else
-                _dir=$(find $_path -type d -path "*${_pattern}*" -print -quit)
-                if [[ -n $_dir ]]; then
-                    pushd "$_dir"
-                fi
-            fi
-            ;;
-    esac
-
-    pushd "$@"
-}
-
-alias ..='cd ..'
-# dir related:4 ends here
-
-# [[https://github.com/junegunn/fzf][fzf]]
-
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*%5B%5Bhttps://github.com/junegunn/fzf%5D%5Bfzf%5D%5D][[[https://github.com/junegunn/fzf][fzf]]:1]]
-if [[ -d /opt/fzf ]]; then
-    export FZF_PATH=/opt/fzf
-elif [[ -d $HOME/.local/install/fzf ]]; then
-    export FZF_PATH="$HOME/.local/install/fzf"
-else
-    echo "$(tput setaf 1)ERROR$(tput sgr0): FZF_PATH is not set"
-fi
-
-if [[ -n "$FZF_PATH" ]]; then
-    [[ ! "$PATH" == *$FZF_PATH/bin* ]] && export PATH="$PATH:$FZF_PATH/bin"
-
-    # Key bindings
-    # Note the order is important because some functions get overridden
-    source $FZF_PATH/shell/key-bindings.bash
-    source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf_vcs.bash
-    source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/key-bindings.bash
-
-    # Customisations
-    if hash fd 2> /dev/null; then
-        export FZF_DEFAULT_COMMAND="fd --color=never --hidden --exclude .git --type f"
-        export FZF_ALT_C_COMMAND="fd --color=never --hidden --exclude .git --type d"
-        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-    fi
-
-    # Clear out old env vars
-    export FZF_DEFAULT_OPTS="--ansi --select-1 --exit-0 --inline-info --reverse --tiebreak=length,end --bind=shift-tab:toggle-all,ctrl-n:down,ctrl-p:up"
-    unset FZF_ALT_C_OPTS
-    unset FZF_CTRL_T_OPTS
-    # export FZF_CTRL_T_OPTS='--expect=alt-v,alt-e,alt-c'
-
-    # base16 fzf colorscheme is applied by appending to the FZF_DEFAULT_OPTS env var
-    # Thus, I "set" it first before sourcing the base16 file which appends to it
-    export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
-    [[ -n "$BASE16_THEME" ]] && source "$BASE16_FZF/bash/base16-${BASE16_THEME}.config"
-fi
-# [[https://github.com/junegunn/fzf][fzf]]:1 ends here
 
 # [[https://github.com/BurntSushi/ripgrep][ripgrep]]
 # :PROPERTIES:
@@ -1608,10 +1623,10 @@ export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 clnpath
 # PATH:1 ends here
 
-# home
+# local override
 # Update permissions of the history when exiting as root
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:1]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*local%20override][local override:1]]
 __histfile_perm_update__() {
     if [[ -f $HISTFILE ]]; then
         echo "Changing permissions of HISTFILE..."
@@ -1626,13 +1641,12 @@ trap __histfile_perm_update__ EXIT
 if [[ "$SHLVL" = 1 ]]; then
     [[ -x /usr/bin/clear_console ]] && /usr/bin/clear_console -q
 fi
-# home:1 ends here
+# local override:1 ends here
 
-
-
+# home
 # To connect to work-vpn
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:2]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:1]]
 alias gp=globalprotect
 
 work_vpn() {
@@ -1643,11 +1657,11 @@ work_vpn() {
         globalprotect connect --portal vpn.amd.com --username kshenoy
     fi
 }
-# home:2 ends here
+# home:1 ends here
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:3]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*home][home:2]]
 alias boot2win='sudo grub-reboot Windows && shutdown -r 0'
-# home:3 ends here
+# home:2 ends here
 
 # bashrc_local
 # And finally, check for a .bashrc_local and load it
