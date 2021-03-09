@@ -9,7 +9,7 @@ if !has('python3')
   finish
 endif
 
-let g:UltiSnipsEditSplit = "vertical"
+let g:UltiSnipsEditSplit = "tabdo"
 " Location of snippets
 execute 'let g:UltiSnipsSnippetDirectories=["' . g:dotvim . '/pack/bundles/opt/UltiSnips/snippets"]'
 let g:UltiSnipsEnableSnipMate=0

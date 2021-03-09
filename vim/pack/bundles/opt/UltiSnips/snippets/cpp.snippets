@@ -29,9 +29,7 @@ opts.sort()
 if snip.basename:
   opts.insert(0, snip.basename + '.h')
 snip.rv = complete(t[1], opts)
-`${2:`!p
-snip.rv = '"' if (t[1][-2:] == '.h') else ">"
-`}$0
+`${2:`!p snip.rv = '"' if (t[1][-2:] == '.h') else ">" `}$0
 endsnippet
 
 
@@ -42,15 +40,13 @@ endsnippet
 snippet ns "namespace ..." b
 namespace${1/.+/ /m}${1:nCh} {
 
-  ${VISUAL}${0}
+  ${0:${VISUAL}}
 
-} // END `!p
-snip.rv = "anonymous " if (len(t[1]) == 0) else ""
-`namespace${1/.+/ /m}$1
+} // END `!p snip.rv = "anonymous " if (len(t[1]) == 0) else ""`namespace${1/.+/ /m}$1
 endsnippet
 
 snippet uns "using namespace ..." b
-using namespace $1`!p snip.rv = complete(t[1], ['std', 'std::literals::string_literals'])`;
+using namespace ${1:std}`!p snip.rv = complete(t[1], ['std', 'std::literals::string_literals'])`;
 endsnippet
 
 
@@ -58,13 +54,13 @@ endsnippet
 #=======================================================================================================================
 # Loops                                                                                                             {{{1
 #
-snippet for "C++ style for..." b
+snippet fori "C++ style for..." b
 for (auto ${1:i} = 0; $1 < ${2:count}; $1++) {
   ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
 }
 endsnippet
 
-snippet forr "Ranged for loop" b
+snippet for "Ranged for loop" b
 for (auto ${1:i}: ${2:v}) {
   ${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
 }
@@ -113,68 +109,52 @@ endsnippet
 #=======================================================================================================================
 # Smart Pointers                                                                                                    {{{1
 #
-snippet sp "std::shared_ptr" w
-std::shared_ptr<${1:${VISUAL}}>
+snippet sp "{boost,std}::{shared,weak,unique}_pointer" w
+${2:boost}`!p snip.rv = complete(t[2], ['boost', 'std'])
+`::${3:shared}`!p snip.rv = complete(t[3], ['shared', 'unique', 'weak'])
+`_ptr<${1:${VISUAL:T}}> $0
 endsnippet
 
-snippet ms "std::make_shared" w
-std::make_shared<${1:${VISUAL}}>($0)
-endsnippet
-
-snippet ssp "std::smart_ptr" w
-std::$1`!p snip.rv = complete(t[1], ['shared', 'unique', 'weak'])`_ptr<${2:${VISUAL}}>
-endsnippet
-
-snippet sms "std::make_smart" w
-std::make_$1`!p snip.rv = complete(t[1], ['shared', 'unique', 'weak'])`<${2:${VISUAL}}>($0)
+snippet ms "{boost,std}::make_{shared,weak,unique}" w
+${2:boost}`!p snip.rv = complete(t[2], ['boost', 'std'])
+`::make_${3:shared}`!p snip.rv = complete(t[3], ['shared', 'unique', 'weak'])
+`<${1:${VISUAL:T}}>($0)
 endsnippet
 
 snippet bsp "boost::shared_ptr" w
-boost::shared_ptr<${1:${VISUAL}}>
+boost::shared_ptr<${1:${VISUAL:T}}> $0
 endsnippet
 
 snippet bms "boost::make_shared" w
-boost::make_shared<${1:${VISUAL}}>($0)
+boost::make_shared<${1:${VISUAL:T}}>($0)
 endsnippet
+
+snippet ssp "std::shared_ptr" w
+std::shared_ptr<${1:${VISUAL:T}}> $0
+endsnippet
+
+snippet sms "std::make_shared" w
+std::make_shared<${1:${VISUAL:T}}>($0)
+endsnippet
+
 
 
 #=======================================================================================================================
 # Casting                                                                                                           {{{1
 #
+snippet ca "{static,const,dynamic}_cast<T>()" w
+${2:static}`!p snip.rv = complete(t[2], ['const', 'dynamic', 'static'])
+`_cast<${1:T}>(${0:${VISUAL}})
+endsnippet
+
+snippet pca "{boost,std}::{static,const,dynamic}_pointer_cast<T>()" w
+${2:boost}`!p snip.rv = complete(t[2], ['boost', 'std'])
+`::${3:static}`!p snip.rv = complete(t[3], ['const', 'dynamic', 'static'])
+`_pointer_cast<${1:T}>(${0:${VISUAL}})
+endsnippet
+
 snippet sca "static_cast<T>()" w
-static_cast<$1>(${0:${VISUAL}})
-endsnippet
-
-snippet dca "dynamic_cast<T>()" w
-dynamic_cast<$1>(${0:${VISUAL}})
-endsnippet
-
-snippet cca "const_cast<T>()" w
-const_cast<$1>(${0:${VISUAL}})
-endsnippet
-
-snippet spc "std::static_pointer_cast<T>()" w
-std::static_pointer_cast<$1>(${0:${VISUAL}})
-endsnippet
-
-snippet dpc "std::dynamic_pointer_cast<T>()" w
-std::dynamic_pointer_cast<$1>(${0:${VISUAL}})
-endsnippet
-
-snippet cpc "std::const_pointer_cast<T>()" w
-std::const_pointer_cast<$1>(${0:${VISUAL}})
-endsnippet
-
-snippet bspc "boost::static_pointer_cast<T>()" w
-boost::static_pointer_cast<$1>(${0:${VISUAL}})
-endsnippet
-
-snippet bdpc "boost::dynamic_pointer_cast<T>()" w
-boost::dynamic_pointer_cast<$1>(${0:${VISUAL}})
-endsnippet
-
-snippet bcpc "boost::const_pointer_cast<T>()" w
-boost::const_pointer_cast<$1>(${0:${VISUAL}})
+static_cast<${1:T}>(${0:${VISUAL}})
 endsnippet
 
 
@@ -189,35 +169,36 @@ endsnippet
 
 # Containers -------------------------------------------------------------------------------------------------------{{{2
 snippet arr "std::array" w
-std::array<${1:${VISUAL:T}}, ${2:N}>$0
+std::array<${1:${VISUAL:T}}, ${2:N}> $0
 endsnippet
 
 snippet list "std::list" w
-std::list<${1:${VISUAL:T}}>$0
+std::list<${1:${VISUAL}}> $0
 endsnippet
 
 snippet map "std::map" w
-std::map<${1:key}, ${2:value}>$0
+std::map<${1:key}, ${2:value}> $0
 endsnippet
 
 snippet umap "std::unordered_map" w
-std::unordered_map<${1:key}, ${2:value}>$0
+std::unordered_map<${1:key}, ${2:value}> $0
 endsnippet
 
-snippet opt "std::experimental::optional" w
-std::experimental::optional<${1:${VISUAL:T}}>$0
+snippet opt "{boost,std::experimental}::optional" w
+${2:boost}`!p snip.rv = complete(t[2], ['boost', 'std::experimental'])
+`::optional<${1:${VISUAL}}> $0
 endsnippet
 
 snippet set "std::set" w
-std::set<${1:key}>$0
+std::set<${1:${VISUAL:T}}> $0
 endsnippet
 
 snippet uset "std::unordered_set" w
-std::unordered_set<${1:key}>$0
+std::unordered_set<${1:${VISUAL:T}}> $0
 endsnippet
 
 snippet vec "std::vector" w
-std::vector<${1:${VISUAL:T}}>$0
+std::vector<${1:${VISUAL:T}}> $0
 endsnippet
 
 
@@ -306,7 +287,7 @@ if (k_searchIt != end($1)) {
 endsnippet
 
 snippet cnn "Contains element using std::find"
-std::find(begin(${1:${VISUAL:container}}), end($1), ${2:<value>}) ${3:=}= end($1)$0
+std::find(begin(${1:${VISUAL:container}}), end($1), ${2:value}) ${3:=}= end($1)$0
 endsnippet
 
 

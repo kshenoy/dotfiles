@@ -61,16 +61,9 @@ function! utils#GuiTabLabel()                                                   
   let label = ''
   let bufnrlist = tabpagebuflist(v:lnum)
 
-  " Add '+' if one of the buffers in the tab page is modified
-  " for bufnr in bufnrlist
-  "   if getbufvar(bufnr, "&modified")
-  "     let label = '+'
-  "     break
-  "   endif
-  " endfor
-
   " Append the tab number
   let label .= v:lnum.': '
+
   " Append the buffer name
   let name = bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
   if name == ''
@@ -82,7 +75,7 @@ function! utils#GuiTabLabel()                                                   
     endif
   else
     " get only the file name
-    let name = fnamemodify(name,":t")
+    let name = fnamemodify(name,":.")
   endif
   let label .= name
 

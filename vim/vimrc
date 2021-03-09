@@ -275,6 +275,7 @@ if DISABLE_FROM == 17 | finish | endif
 if has("patch-8.1.0360")
   set diffopt+=algorithm:minimal
 endif
+" set diffopt+=iwhiteall,iblank
 
 
 "

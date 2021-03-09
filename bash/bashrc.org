@@ -1131,6 +1131,14 @@ pfo() {
     pf opened "$@" | command column -s# -o ' #' -t | command column -o ' ' -t | command sed 's/#/   #/'
 }
 
+pfrel() {
+    if [[ ! -t 0 ]]; then
+        pf where $(command sed -e 's/#.*//' < /dev/stdin)
+    elif [[ -n "$1" ]]; then
+        pf where $(command sed -e 's/#.*//' "$@")
+    fi |  awk "{ if (\$3 != \"$REPO_PATH/...\") { print \$3; } }" | sed -e "s:$REPO_PATH/::"
+}
+
 pfor() {
     pf where $(pf opened "$@" | command sed -e 's/#.*//') |
         awk "{ if (\$3 != \"$REPO_PATH/...\") { print \$3; } }" | sed -e "s:$REPO_PATH/::"
