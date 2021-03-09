@@ -213,12 +213,6 @@ Move by visual lines
       :desc "evil-redo" "U" #'evil-redo)
 #+end_src
 
-This changes evil-exchange default binding from =g x= to =c x=
-#+begin_src emacs-lisp
-(after! evil-exchange
-  (evil-exchange-cx-install))
-#+end_src
-
 * Org
 #+begin_src emacs-lisp
 (setq org-directory "~/Documents/Notes"
@@ -227,20 +221,16 @@ This changes evil-exchange default binding from =g x= to =c x=
 
 ** Agenda
 #+begin_src emacs-lisp
-(after! org-agenda
-#+end_src
-
-#+begin_src emacs-lisp
 (setq org-agenda-inhibit-startup nil)
 #+end_src
 
 Filter out any unwanted files from the notes that I don't want to add to the agenda
 #+begin_src emacs-lisp
-  (setq org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
-                                                 (not (string-match-p ".bak" x))
-                                                 (not (string-match-p "Work/" x))
-                                                 (not (string-match-p "Spanish.org" x))))
-                                     (directory-files-recursively org-directory "\\.org$")))
+(setq org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
+                                                    (not (string-match-p ".bak" x))
+                                                    (not (string-match-p "Work/" x))
+                                                    (not (string-match-p "Spanish.org" x))))
+                                   (directory-files-recursively org-directory "\\.org$")))
 #+end_src
 
 Make agenda start on a Monday. By default, the agenda only shows the next 7 days. I want to see the previous 7 days as well just in case I missed something. Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
@@ -265,10 +255,6 @@ Open org-agenda in the only window and remove the fluff
 #+begin_src emacs-lisp
 (setq org-agenda-window-setup 'current-window
       org-agenda-show-all-dates nil)
-#+end_src
-
-#+begin_src emacs-lisp
-)  ; END of (after! org-agenda
 #+end_src
 
 *** Agenda custom commands
@@ -302,9 +288,6 @@ These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/
       '(("d" "Daily agenda and TODOs"
          (
           <<daily-agenda-cmds>>
-          )
-         (
-          <<daily-agenda-settings>>
           ))))
 #+end_src
 
@@ -329,13 +312,6 @@ All the remaining todos minus the high-priority ones
                                          (org-agenda-skip-if nil '(scheduled deadline))))))
 #+end_src
 
-Restrict agenda to non-work files and filter out any other unwanted files
-#+begin_src emacs-lisp :noweb-ref daily-agenda-settings :tangle no
-(org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
-                                               (not (string-match-p "Work/" x))))
-                              org-agenda-files))
-#+end_src
-
 #+begin_src emacs-lisp
 )  ; END of (after! org-agenda
 #+end_src
@@ -344,25 +320,18 @@ Restrict agenda to non-work files and filter out any other unwanted files
 :PROPERTIES:
 :END:
 
-- org-superstart default: "◉ ○ ✸ ✿"
-- Large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
-- Small: ► • ★ ▸
-
 #+begin_src emacs-lisp
 (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
-(setq org-superstar-headline-bullets-list '(10040))
 #+end_src
 
 Prevent DONE org-headlines from being highlighted a different color
 #+begin_src emacs-lisp
-(after! org
-  (setq org-fontify-done-headline nil))
+(setq org-fontify-done-headline nil)
 #+end_src
 
-Change faces
+*** Change faces
 #+begin_src emacs-lisp
 (after! org
-
   (defun my-update-org-faces-after-load-all-themes ()
     "Update some org-mode faces for all themes"
     (set-face-attribute 'org-document-info-keyword nil :inherit 'org-meta-line :foreground nil)
@@ -392,6 +361,41 @@ Add a hook to update faces after a theme is loaded
 Also call it immediately as theme is loaded before org mode
 #+begin_src emacs-lisp
 (my-update-org-faces-after-load-theme))
+#+end_src
+
+*** Pretty symbols
+- org-superstar default: "◉ ○ ✸ ✿"
+- Large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
+- Small: ► • ★ ▸
+- More symbols here: http://xahlee.info/comp/unicode_punctuation_symbols.html
+
+Use ✿ for levels 1-2, ✸ for level 3-5 and ◉ for levels 6-8
+#+begin_src emacs-lisp
+(after! org
+(setq org-superstar-headline-bullets-list '(10047 10047 10040 10040 10040 9673 9673 9673))
+#+end_src
+
+Replace - and + in plain list with ➤ and ✜ respectively
+#+begin_src emacs-lisp
+(setq org-superstar-item-bullet-alist '((42 . 8226) (43 . 10012) (45 . 10148)))
+#+end_src
+
+Prettier priorities
+#+begin_src emacs-lisp
+(setq org-fancy-priorities-list '("❰1❱" "❰2❱" "❰3❱" ""))
+#+end_src
+
+#+begin_src emacs-lisp
+  (prettify-utils-add-hook org-mode
+                           ("[ ]" "☐")
+                           ("[X]" "✔")
+                           ("[-]" "❍")
+                           (":LOGBOOK:" "☰")
+                           (":PROPERTIES:" "⚙")
+                           (":END:" "⏏")
+                           ("DEADLINE:" "⏰D")
+                           ("SCHEDULED:" "⏲S")
+                           ))
 #+end_src
 
 ** Babel
@@ -447,8 +451,7 @@ Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is le
 
 ** Capture
 #+begin_src emacs-lisp
-(after! org-capture
-  (setq org-capture-templates
+(setq org-capture-templates
       '(("t" "TODO" entry
          (file org-default-notes-file)
          "* TODO %?\n:LOGBOOK:\n- State \"TODO\"       from              %U\n:END:"
@@ -476,7 +479,7 @@ Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is le
         ("sv" "Vim snippets" entry
          (file "Software/vim.org")
          "* %?"
-         :jump-to-captured t :empty-lines 1))))
+         :jump-to-captured t :empty-lines 1)))
 #+end_src
 
 ** ID
@@ -604,17 +607,18 @@ Easy templates for org-version ≥ 9.2. =C-c C-,= was also added in 9.2 and prov
 #+end_src
 
 ** TODO
-Custom keywords
-#+begin_src emacs-lisp
-(setq org-todo-keywords '((sequence "TODO(t!)" "WAIT(w@/!)" "|" "DONE(d@/!)" "DEFER(f@/!)" "CANCEL(c@)")
-                          (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")))
-#+end_src
-
 =@=   - Log timestamp and note
 =!=   - Log timestamp only
 =x/y= - =x= takes affect when entering the state and
       =y= takes affect when exiting if the state being entered doesn't have any logging
 Refer [[http://orgmode.org/manual/Tracking-TODO-state-changes.html][Tracking-TODO-state-changes]] for details
+
+Custom keywords
+#+begin_src emacs-lisp
+(after! org
+(setq org-todo-keywords '((sequence "TODO(t!)" "WAIT(w@/!)" "|" "DONE(d@/!)" "DEFER(f@/!)" "CANCEL(c@)")
+                          (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)"))))
+#+end_src
 
 Change from any todo state to any other state using =C-c C-t KEY=, provided selection keys have been defined
 #+begin_src emacs-lisp
@@ -642,14 +646,17 @@ Setting this to nil allows a convenient way to select a TODO state and bypass an
               ("CANCEL" :foreground "forest green" bold))))
 #+end_src
 
+*** Priorities
+#+begin_src emacs-lisp
+(setq org-highest-priority 65
+      org-lowest-priority 68
+      org-default-priority 68)
+#+end_src
+
 *** Inline Tasks
 #+begin_src emacs-lisp
 (add-to-list 'org-modules 'org-inlinetask)
 #+end_src
-
-*************** TODO Better fontify inline-tasks
-Also look into reducing the indent
-*************** END
 
 ** Keybindings
 Use =org-goto= instead of =semantic-or-imenu= when in org files
@@ -704,11 +711,17 @@ Use =org-goto= instead of =semantic-or-imenu= when in org files
 
 * local settings
 
-For WSL:
+WSL:
 #+begin_src emacs-lisp
 (when (and (eq system-type 'gnu/linux) (string-match-p "microsoft" (shell-command-to-string "uname -a")))
   (defun browse-url-xdg-open-wsl (url &optional ignored)
     (interactive (browse-url-interactive-arg "URL: "))
     (shell-command-to-string (concat "explorer.exe " url)))
   (advice-add #'browse-url-xdg-open :override #'browse-url-xdg-open-wsl))
+#+end_src
+
+Work:
+#+begin_src emacs-lisp
+(when (string-match-p "atletx" system-name)
+(load (expand-file-name "~/.config/dotfiles-priv/emacs/work.el") t))
 #+end_src
