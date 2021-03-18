@@ -1237,6 +1237,7 @@ Open results of the last shell command in vim quickfix.
 Very useful for searching something using =rg= etc. and iterating through the results in vim
 #+begin_src bash
 vq() { v -q <(eval "$(fc -nl -1) $@"); }
+vqg() { v -q <(g --vimgrep "$@"); }
 #+end_src
 
 Opening up vimdiff takes noticeable amount of time. This will run it only if required.

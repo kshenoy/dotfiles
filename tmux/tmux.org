@@ -280,11 +280,6 @@ Thus change it to =C-Space=. =C-a= is the default prefix used by screen but it c
   # bind C-Space send-prefix
 #+end_src
 
-Unbind that everywhere as well
-#+begin_src bash
-  unbind -T copy-mode 'C-Space'
-#+end_src
-
 Disable wait for escape sequence to enable faster command sequence
 #+begin_src conf
   set -sg escape-time 0
@@ -448,7 +443,7 @@ Allows fast scrolling through a pane's history. -e specifies that scrolling to t
   bind PageUp copy-mode -eu
 #+end_src
 
-copy-paste.
+Copy-Paste
 Use =prefix+]= to paste. =prefix+p= would be the logical choice for paste but it's better used in next/previous context
 #+begin_src conf
   bind -T copy-mode-vi 'v'   send -X begin-selection

@@ -184,7 +184,7 @@ fzf::vcs::filelog() {                                                           
   [[ -z "$_file" ]] && return
 
   p4 filelog -s "$@" $_file |
-    grep '^\.\.\.' | column -s' ' -o' ' -t | sed -r 's/@\S*//' |
+    grep '^\.\.\. *#' | sed -r 's/@\S*//' | column -s' ' -o' ' -t |
     fzf --ansi --header='filelog for '$(basename $_file) --multi --no-sort --with-nth='2..9' \
     --preview 'p4 describe -s {4}' --preview-window right:70% |
     cut -d' ' -f4

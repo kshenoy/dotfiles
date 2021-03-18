@@ -226,6 +226,7 @@ Move by visual lines
 
 Filter out any unwanted files from the notes that I don't want to add to the agenda
 #+begin_src emacs-lisp
+(require 'seq)
 (setq org-agenda-files (seq-filter (lambda (x) (and 'file-exists-p
                                                     (not (string-match-p ".bak" x))
                                                     (not (string-match-p "Work/" x))
@@ -258,10 +259,6 @@ Open org-agenda in the only window and remove the fluff
 #+end_src
 
 *** Agenda custom commands
-#+begin_src emacs-lisp
-(after! org-agenda
-#+end_src
-
 These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html][Aaron Bieber: An agenda for life with org-mode]]
 #+begin_src emacs-lisp
 (defun my-org-skip-subtree-if-habit ()
@@ -310,10 +307,6 @@ All the remaining todos minus the high-priority ones
           (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
                                          (my-org-skip-subtree-if-priority ?A)
                                          (org-agenda-skip-if nil '(scheduled deadline))))))
-#+end_src
-
-#+begin_src emacs-lisp
-)  ; END of (after! org-agenda
 #+end_src
 
 ** Appearance
@@ -388,6 +381,7 @@ Prettier priorities
 #+begin_src emacs-lisp
   (prettify-utils-add-hook org-mode
                            ("[ ]" "☐")
+                           ("[x]" "✔")
                            ("[X]" "✔")
                            ("[-]" "❍")
                            (":LOGBOOK:" "☰")
