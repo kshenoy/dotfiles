@@ -98,7 +98,7 @@ conflictstyle = diff3
 cmd = meld --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $MERGED $REMOTE
 
 [mergetool "gvim"]
-cmd = vim_merge -g $BASE $REMOTE $LOCAL $MERGED
+cmd = vim_merge -g -geometry 420x70 $BASE $REMOTE $LOCAL $MERGED
 trustExitCode = true
 
 [mergetool "vim"]

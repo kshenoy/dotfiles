@@ -538,6 +538,17 @@ Swap panes. These are the default bindings
   bind -r } swap-pane -D
 #+end_src
 
+**** FIXME Zoom vertically/horizontally
+From https://github.com/tmux/tmux/issues/1868#issuecomment-520240204
+
+#+begin_src conf :tangle no
+bind -n M-z if -F '#{@layout_save}' \
+    {run 'tmux select-layout "#{@layout_save}" \; set -up @layout_save'} \
+    {set -Fp @layout_save "#{window_layout}" ; run 'tmux resizep -y "#{window_height}"'}
+#+end_src
+
+Instead of creating a bind, maybe expand tmux's =<prefix> >= menu
+
 *** Window bindings
 
 #+begin_src conf

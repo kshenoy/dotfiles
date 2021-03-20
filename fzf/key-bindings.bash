@@ -55,7 +55,7 @@ fzf::cmd_opts() {                                                               
 
 #=======================================================================================================================
 fzf::tmux::select_session() {                                                                                      #{{{1
-# Create new tmux session, or switch to existing one. Works from within tmux too
+  # Create new tmux session, or switch to existing one. Works from within tmux too
   if [[ -n "$TMUX" ]]; then
     local cmd="switch-client"
   else

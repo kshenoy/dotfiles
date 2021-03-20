@@ -1181,17 +1181,13 @@ alias rdj='rm_rf_silent'
 :PROPERTIES:
 :header-args+: :tangle (if (executable-find "rg") (concat (getenv "HOME") "/.bashrc") "no")
 :END:
-This will be tangled only if =rg= exists
+These will be tangled only if =rg= exists
 #+begin_src bash
 export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgreprc
 alias g='command rg'
 #+end_src
 
-**** ripgrep config file
-:PROPERTIES:
-:header-args+: :tangle (if (executable-find "rg") "../ripgreprc" "no")
-:END:
-#+begin_src conf
+#+begin_src conf :tangle (if (executable-find "rg") "../ripgreprc" "no")
 # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
 # Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
 # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
