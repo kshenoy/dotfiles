@@ -1136,12 +1136,13 @@ pfrel() {
         pf where $(command sed -e 's/#.*//' < /dev/stdin)
     elif [[ -n "$1" ]]; then
         pf where $(command sed -e 's/#.*//' "$@")
+    else
+        return
     fi |  awk "{ if (\$3 != \"$REPO_PATH/...\") { print \$3; } }" | sed -e "s:$REPO_PATH/::"
 }
 
 pfor() {
-    pf where $(pf opened "$@" | command sed -e 's/#.*//') |
-        awk "{ if (\$3 != \"$REPO_PATH/...\") { print \$3; } }" | sed -e "s:$REPO_PATH/::"
+    pfo | pfrel
 }
 #+end_src
 

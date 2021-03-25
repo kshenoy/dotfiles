@@ -157,7 +157,7 @@ fzf::vcs::commits() {                                                           
     if [[ ! "$*" =~ -m\ \[0-9]+ ]]; then
       local _limit="-m 1000"
     fi
-    local -selected=$(p4 changes $_limit -t "$@" $STEM/... | sed -r 's/@\S*//' |
+    local _selected=$(p4 changes $_limit -t "$@" $STEM/... | sed -r 's/@\S*//' |
       fzf --ansi --multi --no-sort --with-nth='..6' \
       --preview 'p4 describe -s {2}' --preview-window right:70% |
       cut -d' ' -f2)
@@ -183,11 +183,15 @@ fzf::vcs::filelog() {                                                           
   fi
   [[ -z "$_file" ]] && return
 
-  p4 filelog -s "$@" $_file |
-    grep '^\.\.\. *#' | sed -r 's/@\S*//' | column -s' ' -o' ' -t |
-    fzf --ansi --header='filelog for '$(basename $_file) --multi --no-sort --with-nth='2..9' \
-    --preview 'p4 describe -s {4}' --preview-window right:70% |
-    cut -d' ' -f4
+  local _selected=$(p4 filelog -s "$@" $_file |
+    grep '^\.\.\. *#' | sed -r 's/@\S*//' | cut -d ' ' -f 2-9 | tr -s ' ' | column -s' ' -o' ' -t |
+    fzf --ansi --header='filelog for '$(basename $_file) --multi --no-sort --preview-window right:70% \
+    --preview "p4 describe {3} | sed -n -e '1,/Differences .../p' -e \"/^====.*$(basename $_file)/,/^====/p\" | head -n -2" |
+    cut -d' ' -f4)
+    # --preview 'p4 describe -s {3}' --preview-window right:70% |
+
+  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$_selected${READLINE_LINE:$READLINE_POINT}"
+  READLINE_POINT=$(( READLINE_POINT + ${#_selected} ))
 }
 
 #=======================================================================================================================

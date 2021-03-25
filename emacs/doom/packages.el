@@ -54,3 +54,6 @@
 ;; Reddit discussion on the topic: https://www.reddit.com/r/emacs/comments/brt0sk/prettifysymbolsmode_is_so_cool/eogn7fi?utm_source=share&utm_medium=web2x&context=3
 (package! prettify-utils
   :recipe (:host github :repo "Ilazki/prettify-utils.el"))
+
+;; Disabling org-fancy-priorities as it significantly slows things when opening a large org file
+(package! org-fancy-priorities :disable t)

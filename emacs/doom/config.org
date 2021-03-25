@@ -95,7 +95,7 @@ Also note that using the same name with multiple blocks concatenates them
 * General
 Some functionality uses this to identify you, e.g. GPG configuration, email clients, file templates and snippets.
 #+begin_src emacs-lisp
-  (setq user-full-name "Kartik Shenoy")
+(setq user-full-name "Kartik Shenoy")
 #+end_src
 
 ** Better defaults
@@ -180,14 +180,21 @@ Usage examples
       :desc "Switch buffer" "SPC" #'+ivy/switch-buffer)
 #+end_src
 
+* counsel/ivy/swiper
+#+begin_src emacs-lisp
+(map! :after swiper
+      :map doom-leader-search-map
+      :desc "Search all buffers" "B" #'swiper-all)
+#+end_src
+
 * evil
 The default behavior of evil is to create windows to the left and the top and go there.
 However, this makes it seem like it's creating a split but not jumping to it.
 The following makes it behave more like vim
 #+begin_src emacs-lisp
 (after! evil
-(setq evil-vsplit-window-right t
-      evil-split-window-below t))
+  (setq evil-vsplit-window-right t
+        evil-split-window-below t))
 #+end_src
 
 ** Keybindings
@@ -357,6 +364,9 @@ Also call it immediately as theme is loaded before org mode
 #+end_src
 
 *** Pretty symbols
+:PROPERTIES:
+:ID:       b3d9e6d2-b197-4a77-b055-5f8e4b0baf37
+:END:
 - org-superstar default: "◉ ○ ✸ ✿"
 - Large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
 - Small: ► • ★ ▸
@@ -374,10 +384,6 @@ Replace - and + in plain list with ➤ and ✜ respectively
 
 Prettier priorities
 #+begin_src emacs-lisp
-(setq org-fancy-priorities-list '("❰1❱" "❰2❱" "❰3❱" ""))
-#+end_src
-
-#+begin_src emacs-lisp
 (prettify-utils-add-hook org-mode
                          ("[ ]" "☐")
                          ("[x]" "✔")
@@ -388,6 +394,9 @@ Prettier priorities
                          (":END:" "⏏")
                          ("DEADLINE:" "⏰D")
                          ("SCHEDULED:" "⏲S")
+                         ("[#A]" "❰P1❱")
+                         ("[#B]" "❰P2❱")
+                         ("[#C]" "❰P3❱")
                          )
 #+end_src
 
@@ -608,9 +617,8 @@ Refer [[http://orgmode.org/manual/Tracking-TODO-state-changes.html][Tracking-TOD
 
 Custom keywords
 #+begin_src emacs-lisp
-(after! org
 (setq org-todo-keywords '((sequence "TODO(t!)" "WAIT(w@/!)" "|" "DONE(d@/!)" "DEFER(f@/!)" "CANCEL(c@)")
-                          (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)"))))
+                          (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")))
 #+end_src
 
 Change from any todo state to any other state using =C-c C-t KEY=, provided selection keys have been defined
@@ -641,10 +649,12 @@ Setting this to nil allows a convenient way to select a TODO state and bypass an
 
 *** Priorities
 #+begin_src emacs-lisp
-(setq org-highest-priority 65
-      org-lowest-priority 68
-      org-default-priority 68)
+(setq org-highest-priority ?A
+      org-lowest-priority ?D
+      org-default-priority ?D)
 #+end_src
+
+More customization in [[id:b3d9e6d2-b197-4a77-b055-5f8e4b0baf37][Pretty symbols]]
 
 *** Inline Tasks
 #+begin_src emacs-lisp

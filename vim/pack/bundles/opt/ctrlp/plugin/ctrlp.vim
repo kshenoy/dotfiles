@@ -46,27 +46,17 @@ let g:ctrlp_prompt_mappings = {
   \ 'PrtHistory(-1)':       ['<Down>'],
   \ 'PrtHistory(1)':        ['<Up>']
   \ }
-" \ 'CreateNewFile()':      ['<c-y>'],
-" \ 'MarkToOpen()':         ['<c-z>'],
-" \ 'OpenMulti()':          ['<c-o>'],
-" \ 'PrtInsert()':          ['<c-\>'],
-" \ 'ToggleByFname()':      ['<c-d>'],
-" \ 'ToggleRegex()':        ['<c-r>'],
-" \ 'ToggleType(-1)':       ['<c-b>', '<c-down>'],
-" \ 'ToggleType(-1)':       ['<c-h>'],
-" \ 'ToggleType(1)':        ['<c-f>', '<c-up>'],
-" \ 'ToggleType(1)':        ['<c-l>'],
 
 map      <leader>f <Plug>my(Finder)
-nnoremap <silent>  <Plug>my(Finder)b :CtrlPBuffer<CR>
-nnoremap <silent>  <Plug>my(Finder)e :CtrlPCurWD<CR>
+" nnoremap <silent>  <Plug>my(Finder)b :CtrlPBuffer<CR>
+" nnoremap <silent>  <Plug>my(Finder)e :CtrlPCurWD<CR>
 nnoremap <silent>  <Plug>my(Finder)f :CtrlP<CR>
 nnoremap <silent>  <Plug>my(Finder)j :CtrlPMixed<CR>
-nnoremap <silent>  <Plug>my(Finder)r :CtrlPMRU<CR>
+" nnoremap <silent>  <Plug>my(Finder)r :CtrlPMRU<CR>
 nnoremap <silent>  <Plug>my(Finder)q :CtrlPQuickfix<CR>
 nnoremap <silent>  <Plug>my(Finder)o :CtrlPFunky<CR>
 xnoremap <silent>  <Plug>my(Finder)o :<C-U>CtrlPFunky <C-R>*<CR>
-nnoremap <silent>  <leader><leader> :CtrlPBuffer<CR>
+" nnoremap <silent>  <leader><leader> :CtrlPBuffer<CR>
 
 let g:ctrlp_funky_after_jump = {
       \ 'default' : 'zxzt'

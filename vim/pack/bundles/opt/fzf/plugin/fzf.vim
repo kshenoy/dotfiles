@@ -19,10 +19,16 @@ let g:fzf_action = {
 let g:fzf_history_dir = '~/.local/share/fzf-history'
 let $FZF_DEFAULT_OPTS=substitute($FZF_DEFAULT_OPTS, '--reverse', '--no-reverse', '')
 
-" nnoremap <silent> <Plug>my(Finder)b :FzfBuffers<CR>
-" nnoremap <silent> <Plug>my(Finder)o :FzfFunky<CR>
+nnoremap <silent> <Plug>bb :FzfBuffers<CR>
+nnoremap <silent> <Plug>fF :FzfFiles .<CR>
+nnoremap <silent> <Plug>fr :FzfHistory<CR>
 nnoremap <silent> <Plug>my(Finder)m :FzfMarks<CR>
+" nnoremap <silent> <Plug>my(Finder)o :FzfFunky<CR>
 nnoremap <silent> <Plug>my(Finder)t :FzfTags<CR>
+nnoremap <silent> <leader>sb :FzfBLines<CR>
+nnoremap <silent> <leader>sB :FzfLines<CR>
+nnoremap <silent> <leader>sd :FzfRg<CR>
+nnoremap <silent> <leader><leader> :FzfBuffers<CR>
 
 imap <C-X><C-L> <plug>(fzf-complete-line)
 inoremap <expr> <plug>(fzf-complete-file-fd) fzf#vim#complete#path('fd --color=never --follow --hidden --exclude .git --type f')
