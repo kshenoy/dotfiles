@@ -112,7 +112,10 @@ vim/pack/rc_local:
 
 
 #== links ===============================================================================================================
-links: ${HOME}/.ssh/config ${HOME}/.Xresources ${HOME}/.ctags ${HOME}/bin/rgf ${HOME}/.unison/dotfiles.prf ${HOME}/pipe
+links: ${XDG_CONFIG_HOME}/bat/config ${HOME}/.ssh/config ${HOME}/.Xresources ${HOME}/.ctags ${HOME}/bin/rgf ${HOME}/.unison/dotfiles.prf ${HOME}/pipe
+${XDG_CONFIG_HOME}/bat/config:
+	@mkdir -p $(dir $@)
+	@${MKLINK} ${PWD}/bat.cfg $@
 ${HOME}/.ssh/config:
 	@mkdir -p $(dir $@)
 	@${MKLINK} ${XDG_CONFIG_HOME}/dotfiles-priv/ssh/config $@

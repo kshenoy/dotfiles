@@ -537,7 +537,7 @@ pushd() {
 
 Better dirstack. Adds the following to the usual =cd= behavior:
 - =cd ==           Lists the contents of the stack and use fzf to select from it
-- =cd=             (with no args) Goes to $REPO_PATH if it's set else goes to $HOME
+- =cd=             (with no args) Goes to $REPO_PATH if it's set. If not, or if already on $REPO_PATH, goes to $HOME
 - =cd ... [TARG]=  Jump to a directory in the path that starts with TARG.
                  If TARG is not given, show all directories in the filepath and use fzf to select
 
@@ -546,10 +546,13 @@ Note that =pushd= calls =cd= under the hood. So =cdable_vars= and =cdspell= appl
 cd() {
     if (( "$#" == 0 )); then
         if vcs::is_in_repo > /dev/null; then
-            cd "$(vcs::get_root)"
-        else
-            cd "$HOME"
+            local _dir="$(vcs::get_root)"
+            if [[ "$PWD" != "$_dir" ]]; then
+                cd "$_dir"
+                return
+            fi
         fi
+        cd "$HOME"
         return
     fi
 
