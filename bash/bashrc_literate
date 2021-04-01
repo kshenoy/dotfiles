@@ -639,7 +639,7 @@ pushd() {
 
 # Better dirstack. Adds the following to the usual =cd= behavior:
 # - =cd ==           Lists the contents of the stack and use fzf to select from it
-# - =cd=             (with no args) Goes to $REPO_PATH if it's set else goes to $HOME
+# - =cd=             (with no args) Goes to $REPO_PATH if it's set. If not, or if already on $REPO_PATH, goes to $HOME
 # - =cd ... [TARG]=  Jump to a directory in the path that starts with TARG.
 #                  If TARG is not given, show all directories in the filepath and use fzf to select
 
@@ -649,10 +649,13 @@ pushd() {
 cd() {
     if (( "$#" == 0 )); then
         if vcs::is_in_repo > /dev/null; then
-            cd "$(vcs::get_root)"
-        else
-            cd "$HOME"
+            local _dir="$(vcs::get_root)"
+            if [[ "$PWD" != "$_dir" ]]; then
+                cd "$_dir"
+                return
+            fi
         fi
+        cd "$HOME"
         return
     fi
 
@@ -1245,12 +1248,13 @@ pfrel() {
         pf where $(command sed -e 's/#.*//' < /dev/stdin)
     elif [[ -n "$1" ]]; then
         pf where $(command sed -e 's/#.*//' "$@")
+    else
+        return
     fi |  awk "{ if (\$3 != \"$REPO_PATH/...\") { print \$3; } }" | sed -e "s:$REPO_PATH/::"
 }
 
 pfor() {
-    pf where $(pf opened "$@" | command sed -e 's/#.*//') |
-        awk "{ if (\$3 != \"$REPO_PATH/...\") { print \$3; } }" | sed -e "s:$REPO_PATH/::"
+    pfo | pfrel
 }
 # perforce:2 ends here
 
@@ -1294,7 +1298,7 @@ alias rdj='rm_rf_silent'
 # :PROPERTIES:
 # :header-args+: :tangle (if (executable-find "rg") (concat (getenv "HOME") "/.bashrc") "no")
 # :END:
-# This will be tangled only if =rg= exists
+# These will be tangled only if =rg= exists
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*%5B%5Bhttps://github.com/BurntSushi/ripgrep%5D%5Bripgrep%5D%5D][[[https://github.com/BurntSushi/ripgrep][ripgrep]]:1]]
 export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgreprc
@@ -1315,6 +1319,7 @@ alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*vim][vim:2]]
 vq() { v -q <(eval "$(fc -nl -1) $@"); }
+vqg() { v -q <(g --vimgrep "$@"); }
 # vim:2 ends here
 
 
