@@ -1,6 +1,5 @@
 #+TITLE: Doom emacs private configuration
 #+PROPERTY: header-args :results output silent :noweb tangle :comments both :mkdirp yes
-#+TODO: FIXME | FIXED
 
 Running =doom sync= is not required after modifying this file!
 
@@ -162,6 +161,13 @@ Doom provides a =dooom-load-theme-hook= eg.
       :desc "Search all buffers" "B" #'swiper-all)
 #+end_src
 
+* doom-modeline
+#+begin_src emacs-lisp
+(setq doom-modeline-buffer-encoding nil
+      doom-modeline-major-mode-icon t
+      doom-modeline-persp-name t)
+#+end_src
+
 * evil
 The default behavior of evil is to create windows to the left and the top and go there.
 However, this makes it seem like it's creating a split but not jumping to it.
@@ -197,7 +203,7 @@ Move by visual lines
 
 * Org
 #+begin_src emacs-lisp
-(setq org-directory "~/Documents/Notes"
+(setq org-directory (file-truename "~/Documents/Notes")
       org-default-notes-file (expand-file-name "Personal/Inbox.org" org-directory))
 #+end_src
 
@@ -240,7 +246,7 @@ Open org-agenda in the only window and remove the fluff
       org-agenda-show-all-dates nil)
 #+end_src
 
-*** Agenda custom commands
+*** Custom commands
 These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html][Aaron Bieber: An agenda for life with org-mode]]
 #+begin_src emacs-lisp
 (defun my-org-skip-subtree-if-habit ()
@@ -310,13 +316,14 @@ Prevent DONE org-headlines from being highlighted a different color
 (defun my-update-org-faces-after-load-theme ()
   "Update some org-mode faces for all themes"
   (set-face-attribute 'org-document-info-keyword nil :inherit 'org-meta-line :foreground nil)
-  (set-face-attribute 'org-drawer                nil :inherit 'org-meta-line :foreground nil)
+  (set-face-attribute 'org-drawer                nil :inherit 'org-meta-line :foreground nil :weight 'bold)
   (set-face-attribute 'org-document-title        nil :height 1.5)
   (set-face-attribute 'org-level-1               nil :height 1.3)
   (set-face-attribute 'org-level-2               nil :height 1.2)
   (set-face-attribute 'org-level-3               nil :height 1.15)
   (set-face-attribute 'org-level-4               nil :height 1.1)
-  (set-face-attribute 'org-tag                   nil :height (face-attribute 'default :height))
+  (set-face-attribute 'org-special-keyword       nil :weight 'bold)
+  (set-face-attribute 'org-tag                   nil :height (face-attribute 'default :height) :weight 'bold)
   ;; (cond ((eq doom-theme 'doom-solarized-light) (my-update-org-faces-after-load-doom-solarized-light))
   ;;       (t nil))
   )
@@ -386,7 +393,7 @@ Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
 
 Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
 #+begin_src emacs-lisp
-  (define-key key-translation-map (kbd "C-c C-v C-k") (kbd "C-c C-v k")))
+(define-key key-translation-map (kbd "C-c C-v C-k") (kbd "C-c C-v k")))
 #+end_src
 
 *** Jump to head/tail of any block, not just src blocks
@@ -532,7 +539,7 @@ Creating new parents - To create new heading, add =/HeadingName= to the end when
 
 Store the timestamp when an entry is refiled
 #+begin_src emacs-lisp
-(setq org-log-refile 'time)
+(setq org-log-refile 'note)
 #+end_src
 
 #+begin_src emacs-lisp
@@ -573,7 +580,13 @@ Easy templates for org-version ≥ 9.2. =C-c C-,= was also added in 9.2 and prov
 )
 #+end_src
 
-** TODO
+*** TODO Archive trees hierarchically
+*** Sparse Trees
+#+begin_src emacs-lisp
+(setq org-highlight-sparse-tree-matches nil)
+#+end_src
+
+** Org TODO
 =@=   - Log timestamp and note
 =!=   - Log timestamp only
 =x/y= - =x= takes affect when entering the state and
@@ -692,7 +705,7 @@ Use =org-goto= instead of =semantic-or-imenu= when in org files
       :desc "Remove buffers by Regex" "b R" #'persp-remove-buffers-by-regexp)
 #+end_src
 
-** FIXME COMMENT Automatically create new workspace when opening IRC buffers
+** TODO COMMENT Automatically create new workspace when opening IRC buffers
 #+begin_src emacs-lisp
 (after! persp-mode
         (persp-def-auto-persp "IRC"
