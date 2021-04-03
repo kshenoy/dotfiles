@@ -1,9 +1,4 @@
-# ripgrep config file
-# :PROPERTIES:
-# :header-args+: :tangle (if (executable-find "rg") "../ripgreprc" "no")
-# :END:
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*ripgrep%20config%20file][ripgrep config file:1]]
+# [[file:~/.config/dotfiles/bash/bashrc.org::*%5B%5Bhttps://github.com/BurntSushi/ripgrep%5D%5Bripgrep%5D%5D][[[https://github.com/BurntSushi/ripgrep][ripgrep]]:2]]
 # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
 # Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
 # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
@@ -37,4 +32,4 @@ hdl:*.x
 
 # Because who cares about case!?
 --smart-case
-# ripgrep config file:1 ends here
+# [[https://github.com/BurntSushi/ripgrep][ripgrep]]:2 ends here

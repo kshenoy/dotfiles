@@ -721,16 +721,14 @@ Use =org-goto= instead of =semantic-or-imenu= when in org files
 * local settings
 
 WSL:
-#+begin_src emacs-lisp
-(when (and (eq system-type 'gnu/linux) (string-match-p "microsoft" (shell-command-to-string "uname -a")))
-  (defun browse-url-xdg-open-wsl (url &optional ignored)
-    (interactive (browse-url-interactive-arg "URL: "))
-    (shell-command-to-string (concat "explorer.exe " url)))
-  (advice-add #'browse-url-xdg-open :override #'browse-url-xdg-open-wsl))
+#+begin_src emacs-lisp :tangle (if (and (eq system-type 'gnu/linux) (string-match-p "microsoft" (shell-command-to-string "uname -a"))) "config.el" "no")
+(defun browse-url-xdg-open-wsl (url &optional ignored)
+  (interactive (browse-url-interactive-arg "URL: "))
+  (shell-command-to-string (concat "explorer.exe " url)))
+(advice-add #'browse-url-xdg-open :override #'browse-url-xdg-open-wsl)
 #+end_src
 
 Work:
-#+begin_src emacs-lisp
-(when (string-match-p "atletx" system-name)
-  (load (expand-file-name "~/.config/dotfiles-priv/emacs/work.el") t))
+#+begin_src emacs-lisp :tangle (if (string-match-p "atletx" system-name) "config.el" "no")
+(load (expand-file-name "~/.config/dotfiles-priv/emacs/work.el") t)
 #+end_src
