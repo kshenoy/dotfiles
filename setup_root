@@ -15,6 +15,7 @@ done
 
 [[ -f ~/.bashrc ]]       && rm ~/.bashrc
 [[ -f ~/.bash_history ]] && rm ~/.bash_history
+
 ln -svTf ~kshenoy/.local/share/bash_history  ${_xdg_data_home}/bash_history
 
 for i in .bashrc .emacs .emacs-profiles.el .vim; do
