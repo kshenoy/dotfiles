@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# bashrc file for home-wsl
+
+# Start by grabbing all the regular settings that I use at home
+[[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/bashrc_local ]] &&
+  . ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/bashrc_local
+
+# Now, add more stuff specific to the WSL
+export LIBGL_ALWAYS_INDIRECT=1
+# Need to specify the IP of the host
+export DISPLAY=$(grep nameserver /etc/resolv.conf | awk '{print $2}'):0
+
+# WSL-specific aliases
+alias emacs='setsid emacs'

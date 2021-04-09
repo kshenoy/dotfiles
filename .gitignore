@@ -7,7 +7,7 @@ bash/history
 compiz/
 
 # emacs
-emacs/doom/config.el
+emacs/doom/config*.el
 emacs/vanilla/init.el
 emacs/*/bookmarks
 emacs/*/elpa

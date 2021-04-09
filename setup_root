@@ -9,15 +9,15 @@ _xdg_config_home=${XDG_CONFIG_HOME:-$HOME/.config}
 _xdg_data_home=${XDG_DATA_HOME:-$HOME/.local/share}
 command mkdir -p ${_xdg_config_home} ${_xdg_data_home} ~/bin
 
-for i in base16-fzf base16-shell doom doom-emacs dotfiles dotfiles-priv git tmux; do
+for i in base16-fzf base16-shell chemacs doom doom-emacs dotfiles dotfiles-priv emacs git tmux; do
   [[ ! -d ${_xdg_config_home}/$i  ]] && ln -svTf ~kshenoy/.config/$i ${_xdg_config_home}/$i
 done
 
 [[ -f ~/.bashrc ]]       && rm ~/.bashrc
 [[ -f ~/.bash_history ]] && rm ~/.bash_history
 
-ln -svTf ~kshenoy/.local/share/bash_history  ${_xdg_data_home}/bash_history
+ln -svTf ~kshenoy/.local/share/bash_history ${_xdg_data_home}/bash_history
 
-for i in .bashrc .emacs .emacs-profiles.el .vim; do
+for i in .bashrc .vim; do
   [[ ! -f $HOME/$i  ]] && ln -svTf ~kshenoy/$i $HOME/$i
 done

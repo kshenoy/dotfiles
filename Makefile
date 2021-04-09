@@ -47,11 +47,12 @@ ${XDG_CONFIG_HOME}/base16-shell:
 #== emacs ==============================================================================================================
 emacs: chemacs emacs-doom emacs-vanilla ${HOME}/bin/emacs_daemon
 
-chemacs: ${HOME}/.emacs ${HOME}/.emacs-profiles.el
-${HOME}/.emacs:
-	if [ ! -f $@ ]; then wget -O $@ https://raw.githubusercontent.com/plexus/chemacs/master/.emacs; fi
-${HOME}/.emacs-profiles.el:
-	@${MKLINK} ${PWD}/emacs/emacs-profiles.el $@
+chemacs: ${XDG_CONFIG_HOME}/emacs ${XDG_CONFIG_HOME}/chemacs/profiles.el
+${XDG_CONFIG_HOME}/emacs:
+	if [ ! -d $@ ]; then git clone https://github.com/plexus/chemacs2 $@; fi
+${XDG_CONFIG_HOME}/chemacs/profiles.el:
+	@mkdir -p $(dir $@)
+	@${MKLINK} ${PWD}/emacs/chemacs-profiles.el $@
 
 emacs-doom: ${XDG_CONFIG_HOME}/doom-emacs ${XDG_CONFIG_HOME}/doom emacs/doom/config.el emacs/doom/init.el emacs/doom/packages.el emacs/doom/bookmarks
 ${XDG_CONFIG_HOME}/doom-emacs:

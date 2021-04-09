@@ -1,6 +1,5 @@
 #+TITLE: bash configuration
 #+PROPERTY: header-args+ :results output silent :noweb tangle :comments both :mkdirp yes
-#+TODO: FIXME | FIXED
 
 * bashrc
 :PROPERTIES:
@@ -1558,12 +1557,14 @@ work_vpn() {
 alias boot2win='sudo grub-reboot Windows && shutdown -r 0'
 #+end_src
 
-Only for home WSL
+*** WSL
 #+begin_src bash :tangle (if (string-match "windows" (system-name)) (concat (getenv "HOME") "/.bashrc") "no")
 export LIBGL_ALWAYS_INDIRECT=1
 # Need to specify the IP of the host
 export DISPLAY=192.168.1.11:0
 #+end_src
+
+**** TODO Move WSL specific bash_profile and bashrc_local_override settings here
 
 *** bashrc_local
 And finally, check for a .bashrc_local and load it
@@ -1632,7 +1633,7 @@ Rest of fzf configuration defined above: [[*\[\[https://github.com/junegunn/fzf\
 [[ $- == *i* ]] && source "$FZF_PATH/shell/completion.bash" 2> /dev/null
 #+end_src
 
-*** FIXME COMMENT tmux completion
+*** TODO COMMENT tmux completion
 Use tmux/tmux_completion.bash
 
 *** alias completion

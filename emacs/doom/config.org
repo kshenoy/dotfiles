@@ -729,9 +729,11 @@ Use =org-goto= instead of =semantic-or-imenu= when in org files
 #+end_src
 
 * local settings
+There's a bug in org-mode tangling logic which deletes any old versions of the files while tangling ([[https://github.com/hlissner/doom-emacs/issues/3867#issuecomment-686300907][reference]])
+The solution suggested in the link didn't work for me so instead I dump any local settings to a separate file and load that
 
 WSL:
-#+begin_src emacs-lisp :tangle (if (and (eq system-type 'gnu/linux) (string-match-p "microsoft" (shell-command-to-string "uname -a"))) "config.el" "no")
+#+begin_src emacs-lisp :tangle (if (and (eq system-type 'gnu/linux) (string-match-p "microsoft" (shell-command-to-string "uname -r"))) "config_local.el" "no")
 (defun browse-url-xdg-open-wsl (url &optional ignored)
   (interactive (browse-url-interactive-arg "URL: "))
   (shell-command-to-string (concat "explorer.exe " url)))
@@ -739,6 +741,10 @@ WSL:
 #+end_src
 
 Work:
-#+begin_src emacs-lisp :tangle (if (string-match-p "atletx" system-name) "config.el" "no")
+#+begin_src emacs-lisp :tangle (if (string-match-p "atletx" system-name) "config_local.el" "no")
 (load (expand-file-name "~/.config/dotfiles-priv/emacs/work.el") t)
+#+end_src
+
+#+begin_src emacs-lisp
+(load (concat doom-private-dir "config_local.el"))
 #+end_src
