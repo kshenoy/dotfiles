@@ -207,6 +207,7 @@ set shortmess=ilsI                                         " To avoid intro scre
 set showcmd                                              " Display an incomplete command in lower right corner of window
 set ruler                                                      " Display cursor position in lower-right corner of window
 set report=0                          " Show a report when N lines were changed. report=0 thus means "show all changes"!
+set belloff=all
 
 
 "
