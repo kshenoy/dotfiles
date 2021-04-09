@@ -54,15 +54,18 @@ ${XDG_CONFIG_HOME}/chemacs/profiles.el:
 	@mkdir -p $(dir $@)
 	@${MKLINK} ${PWD}/emacs/chemacs-profiles.el $@
 
-emacs-doom: ${XDG_CONFIG_HOME}/doom-emacs ${XDG_CONFIG_HOME}/doom emacs/doom/config.el emacs/doom/init.el emacs/doom/packages.el emacs/doom/bookmarks
-${XDG_CONFIG_HOME}/doom-emacs:
-	if [ ! -d $@ ]; then git clone https://github.com/hlissner/doom-emacs $@; fi
+emacs-doom: ${XDG_CONFIG_HOME}/emacs-doom ${XDG_CONFIG_HOME}/doom emacs/doom/config.el emacs/doom/init.el emacs/doom/packages.el emacs/doom/bookmarks
+${XDG_CONFIG_HOME}/emacs-doom:
+	if [ ! -d $@ ]; then \
+	  git clone https://github.com/hlissner/doom-emacs $@; \
+	  $@/bin/doom install; \
+	fi
 ${XDG_CONFIG_HOME}/doom:
 	@${MKLINK} ${PWD}/emacs/doom $@
 emacs/doom/config.el: emacs/doom/config.org
-	${XDG_CONFIG_HOME}/doom-emacs/bin/doom sync
+	${XDG_CONFIG_HOME}/emacs-doom/bin/doom sync
 emacs/doom/init.el emacs/doom/packages.el:
-	${XDG_CONFIG_HOME}/doom-emacs/bin/doom sync
+	${XDG_CONFIG_HOME}/emacs-doom/bin/doom sync
 emacs/doom/bookmarks:
 	@${MKLINK} ${PWD}/emacs/bookmarks $@
 
