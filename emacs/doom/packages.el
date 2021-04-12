@@ -57,3 +57,15 @@
 
 ;; Disabling org-fancy-priorities as it significantly slows things when opening a large org file
 (package! org-fancy-priorities :disable t)
+
+;; Saner regexps!
+(package! pcre2el)
+(package! visual-regexp-steroids)
+
+
+(package! org-super-agenda)
+(use-package! org-super-agenda
+  :after org-agenda
+  :config
+  (setq org-super-agenda-groups '((:auto-dir-name t)))
+  (org-super-agenda-mode))

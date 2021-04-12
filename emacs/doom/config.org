@@ -124,8 +124,8 @@ Doom exposes five (optional) variables for controlling fonts in Doom. The three 
 
 They all accept either a font-spec, font string ("Input Mono-12"), or xlfd font string. Generally only two are needed
 #+begin_src emacs-lisp
-(setq doom-font "Iosevka-10"
-      doom-variable-pitch-font "Iosevka-10")
+(setq doom-font (font-spec :family "Iosevka" :size 13 :weight 'Medium))
+(setq doom-variable-pitch-font doom-font)
 #+end_src
 
 ** Themes
@@ -252,6 +252,18 @@ Open org-agenda in the only window and remove the fluff
 #+begin_src emacs-lisp
 (setq org-agenda-window-setup 'current-window
       org-agenda-show-all-dates nil)
+#+end_src
+
+Customize the agenda display to indent todo items by level to show nesting, and enable showing holidays in the Org agenda display.
+#+begin_src emacs-lisp
+(after! org-agenda
+  (setq org-agenda-prefix-format
+        '((agenda . " %i %-12:c%?-12t% s")
+          ;; Indent todo items by level to show nesting
+          (todo . " %i %-12:c%l")
+          (tags . " %i %-12:c")
+          (search . " %i %-12:c")))
+  (setq org-agenda-include-diary t))
 #+end_src
 
 *** Custom commands

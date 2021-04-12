@@ -23,13 +23,13 @@
  (filename . "~/Documents/Notes/Software/")
  (position . 1))
 ("Notes: Work @work"
- (filename . "/ssh:work:/home/kshenoy/Documents/Notes/Work/")
+ (filename . "/sshx:work:/home/kshenoy/Documents/Notes/Work/")
  (position . 1))
 ("~kshenoy @work"
- (filename . "/ssh:work:/home/kshenoy/")
+ (filename . "/sshx:work:/home/kshenoy/")
  (rear-context-string . "0K Nov 13 09:21 ")
  (position . 1))
 ("~/proj @work"
- (filename . "/ssh:work:/home/kshenoy/proj/")
+ (filename . "/sshx:work:/home/kshenoy/proj/")
  (position . 1))
 )
