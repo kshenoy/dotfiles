@@ -14,7 +14,7 @@ To get information about any of these functions/macros, move the cursor over the
 
 Also, =gd= (or =C-c c d=) will jump to their definition and see how they are implemented.
 
-* Literate config
+* COMMENT Literate config
 [[https://org-babel.readthedocs.io/en/latest/header-args/][header-args]]:
 - =:tangle yes=
 This allows me to run =org-babel-tangle= in the org file to generate the el file without having to restart emacs and rely on =org-babel-load-file=
@@ -109,11 +109,16 @@ This determines the style of line numbers in effect. If set to
 - =nil=: line numbers are disabled.
 - ='relative= - relative line numbers
 #+begin_src emacs-lisp
-  (setq display-line-numbers-type 'relative)
+(setq display-line-numbers-type 'relative)
 #+end_src
 
 #+begin_src emacs-lisp
 (setq bookmark-default-file (concat doom-private-dir "bookmarks"))
+#+end_src
+
+Change emacs and insert-state leader
+#+begin_src emacs-lisp
+(setq doom-leader-alt-key "C-SPC")
 #+end_src
 
 ** Fonts
@@ -124,7 +129,7 @@ Doom exposes five (optional) variables for controlling fonts in Doom. The three 
 
 They all accept either a font-spec, font string ("Input Mono-12"), or xlfd font string. Generally only two are needed
 #+begin_src emacs-lisp
-(setq doom-font (font-spec :family "Iosevka" :size 13 :weight 'Medium))
+(setq doom-font (font-spec :family "Iosevka" :size 14 :weight 'Medium))
 (setq doom-variable-pitch-font doom-font)
 #+end_src
 
@@ -252,18 +257,6 @@ Open org-agenda in the only window and remove the fluff
 #+begin_src emacs-lisp
 (setq org-agenda-window-setup 'current-window
       org-agenda-show-all-dates nil)
-#+end_src
-
-Customize the agenda display to indent todo items by level to show nesting, and enable showing holidays in the Org agenda display.
-#+begin_src emacs-lisp
-(after! org-agenda
-  (setq org-agenda-prefix-format
-        '((agenda . " %i %-12:c%?-12t% s")
-          ;; Indent todo items by level to show nesting
-          (todo . " %i %-12:c%l")
-          (tags . " %i %-12:c")
-          (search . " %i %-12:c")))
-  (setq org-agenda-include-diary t))
 #+end_src
 
 *** Custom commands

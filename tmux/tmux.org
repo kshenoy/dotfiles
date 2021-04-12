@@ -384,8 +384,8 @@ I'm making the active pane stand-out by changing its background color.
 I don't really need a border for the active-pane so I'm setting it to the background color itself so that I get some space around the active pane.
 Also, I set the border only for the inactive panes to provide visual separation when multiple inactive panes are adjacent to each other
 #+begin_src conf
-  set -g pane-active-border-style 'bg=colour18 fg=colour18'
-  set -g pane-border-style 'bg=colour18 fg=colour18'
+  set -g pane-active-border-style 'bg=colour18 fg=colour19'
+  set -g pane-border-style        'bg=colour18 fg=colour19'
 #+end_src
 
 ** Window configuration
@@ -396,8 +396,8 @@ Set the starting window index to 1
 
 Make active pane stand out. Colors as set by solarized theme
 #+begin_src conf
-  setw -g window-active-style 'bg=colour0'  # bg color of active pane
-  setw -g window-style        'bg=colour18'  # bg color of inactive panes
+  setw -g window-active-style 'bg=colour0'
+  setw -g window-style        'bg=colour18'
 #+end_src
 
 Status Bar display
