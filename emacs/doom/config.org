@@ -364,7 +364,7 @@ Add a hook to update faces after a theme is loaded. Also call it immediately as 
 
 Use ✿ for levels 1-2, ✸ for level 3-5 and ◉ for levels 6-8
 #+begin_src emacs-lisp
-(setq org-superstar-headline-bullets-list '(?✿ ?✿ ?✸ ?✸ ?✸ ?○ ?○ ?○ ?○ ?○))
+(setq org-superstar-headline-bullets-list '(?✿ ?✿ ?✿ ?✸ ?✸ ?✸ ?○ ?○ ?○))
 #+end_src
 
 Replace - and + in plain list with ➤ and ✜ respectively
@@ -383,11 +383,13 @@ Prettier priorities
                          (":PROPERTIES:" "⚙")
                          (":END:" "⋯")
                          ("DEADLINE:" "⏰D")
-                         ("SCHEDULED:" "⏲S")
+                         ("SCHEDULED:" "⏰S")
+                         ("CLOCK:" "⏲")
                          ("[#A]" "❰P1❱")
                          ("[#B]" "❰P2❱")
                          ("[#C]" "❰P3❱")
                          )
+(setq prettify-symbols-unprettify-at-point nil)
 #+end_src
 
 ** Babel
@@ -755,5 +757,8 @@ Work:
 #+end_src
 
 #+begin_src emacs-lisp
-(load (concat doom-private-dir "config_local.el"))
+(let
+    ((cfg_lcl  (concat doom-private-dir "config_local.el")))
+  (when (file-exists-p cfg_lcl)
+    (load cfg_lcl)))
 #+end_src
