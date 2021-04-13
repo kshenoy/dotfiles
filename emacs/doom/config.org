@@ -46,16 +46,16 @@ Use =C-u C-M-x= with the point over the function to debug. This puts us into deb
 
 Setting this gives a backtrace
 #+begin_src emacs-lisp :tangle no
-  (setq debug-on-error t)
+(setq debug-on-error t)
 #+end_src
 
 ** Detangling
 [[https://www.youtube.com/watch?v=BLomb52wjvE][Yisrael Dov - Emacs is Great ep. 11]]
 
 #+begin_src emacs-lisp :export none
-  ;; This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
-  ;; - Use `org-babel-tangle-jump-back-to-org' to jump back to it from any code block.
-  ;; - Use `org-babel-detangle' to propagate any changes made here back to the original Org mode file.
+;; This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
+;; - Use `org-babel-tangle-jump-back-to-org' to jump back to it from any code block.
+;; - Use `org-babel-detangle' to propagate any changes made here back to the original Org mode file.
 #+end_src
 
 ** Using noweb references
@@ -64,29 +64,29 @@ Occasionally I use noweb references to insert text from one source block in anot
 
 There are two ways I go about it:
 1. The first way is to specify =:noweb-ref NAME= in the source block's header-args eg.
-   #+begin_example
-     #+begin_src emacs-lisp :noweb-ref MY_BLK_NAME
-     #+end_src
-   #+end_example
+#+begin_example
+,#+begin_src emacs-lisp :noweb-ref MY_BLK_NAME
+,#+end_src
+#+end_example
 
 2. The other way is by specifying an explicit name for the source block
-   #+begin_example
-     #+name: MY_BLK_NAME
-     #+begin_src emacs-lisp
-     #+end_src
-   #+end_example
+#+begin_example
+,#+name: MY_BLK_NAME
+,#+begin_src emacs-lisp
+,#+end_src
+#+end_example
 
-   and it can be used in the same way. However, this has the added advantage of allowing me to create links to it:
-   #+begin_example
-     [[MY_BLK_NAME][Link to block called MY_BLK_NAME]]
-   #+end_example
+and it can be used in the same way. However, this has the added advantage of allowing me to create links to it:
+#+begin_example
+[[MY_BLK_NAME][Link to block called MY_BLK_NAME]]
+#+end_example
 
 In both cases, I can then use this in another block like this.
 The only thing is that care must be taken to ensure that the noweb reference is on its own line
 #+begin_example
-  #+begin_src emacs-lisp
-    <<MY_BLK_NAME>>
-  #+end_src
+,#+begin_src emacs-lisp
+<<MY_BLK_NAME>>
+,#+end_src
 #+end_example
 
 Also note that using the same name with multiple blocks concatenates them
@@ -107,9 +107,9 @@ Some functionality uses this to identify you, e.g. GPG configuration, email clie
 
 This determines the style of line numbers in effect. If set to
 - =nil=: line numbers are disabled.
-- ='relative= - relative line numbers
+- =relative= - relative line numbers
 #+begin_src emacs-lisp
-(setq display-line-numbers-type 'relative)
+(setq display-line-numbers-type 'nil)
 #+end_src
 
 #+begin_src emacs-lisp
@@ -129,8 +129,8 @@ Doom exposes five (optional) variables for controlling fonts in Doom. The three 
 
 They all accept either a font-spec, font string ("Input Mono-12"), or xlfd font string. Generally only two are needed
 #+begin_src emacs-lisp
-(setq doom-font (font-spec :family "Iosevka" :size 14 :weight 'Medium))
-(setq doom-variable-pitch-font doom-font)
+(setq doom-font (font-spec :family "Iosevka" :size 13 :weight 'Medium))
+(setq doom-variable-pitch-font (font-spec :family "Iosevka Slab" :size 13 :weight 'Medium))
 #+end_src
 
 ** Themes
@@ -329,6 +329,7 @@ Prevent DONE org-headlines from being highlighted a different color
 (defun my-update-org-faces-after-load-theme ()
   "Update some org-mode faces for all themes"
   (when (eq major-mode 'org-mode)
+    (variable-pitch-mode)
     (set-face-attribute 'org-document-info-keyword nil :inherit 'org-meta-line :foreground nil)
     (set-face-attribute 'org-drawer                nil :inherit 'org-meta-line :foreground nil :weight 'bold)
     (set-face-attribute 'org-document-title        nil :height 1.5)
@@ -338,6 +339,9 @@ Prevent DONE org-headlines from being highlighted a different color
     (set-face-attribute 'org-level-4               nil :height 1.1)
     (set-face-attribute 'org-special-keyword       nil :weight 'bold)
     (set-face-attribute 'org-tag                   nil :height (face-attribute 'default :height) :weight 'bold)
+    (set-face-attribute 'org-block                 nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-block-begin-line      nil :inherit 'org-block)
+    (set-face-attribute 'org-block-end-line        nil :inherit 'org-block)
     ;; (cond ((eq doom-theme 'doom-solarized-light) (my-update-org-faces-after-load-doom-solarized-light))
     ;;       (t nil))
     ))
