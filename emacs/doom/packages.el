@@ -63,9 +63,9 @@
 (package! visual-regexp-steroids)
 
 
-(package! org-super-agenda)
-(use-package! org-super-agenda
-  :after org-agenda
-  :config
-  (setq org-super-agenda-groups '((:auto-dir-name t)))
-  (org-super-agenda-mode))
+;; (package! org-super-agenda)
+;; (use-package! org-super-agenda
+;;   :after org-agenda
+;;   :config
+;;   (setq org-super-agenda-groups '((:auto-dir-name t)))
+;;   (org-super-agenda-mode))
