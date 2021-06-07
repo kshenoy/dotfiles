@@ -711,6 +711,26 @@ Use =org-goto= instead of =semantic-or-imenu= when in org files
       :desc "org-goto-or-semantic-or-imenu" "i" #'my-org-goto-or-semantic-or-imenu)
 #+end_src
 
+Doom changes what =C-RET=, =M-RET= etc. does so reverting back to the vanilla bindings
+A slight enhancement I'm adding is to have =Shift= always insert the TODO version
+#+begin_src emacs-lisp :tangle no
+(after! org
+  (defun my-org-insert-heading-binder (func &optional p)
+    "Create sane bindings for inserting headings by calling FUNC
+     When called with universal-arg, demotes the inserted heading."
+    (funcall func)
+    (when p (org-demote))))
+
+(map! (:after org
+       :map org-mode-map
+       :desc "org-insert-heading-respect-content" "C-<return>" (cmd! (my-org-insert-heading-binder #'org-insert-heading-respect-content))
+       :desc "org-insert-heading-respect-content" "C-RET"      (cmd! (my-org-insert-heading-binder #'org-insert-heading-respect-content)))
+      (:after (org evil)
+       :map evil-org-mode-map
+       :ni "C-<return>" (cmd! (my-org-insert-heading-binder #'org-insert-heading-respect-content))
+       :ni "C-RET"      (cmd! (my-org-insert-heading-binder #'org-insert-heading-respect-content))))
+#+end_src
+
 *** TODO Create binding for opening the default notes file
 
 * rcirc
@@ -724,14 +744,17 @@ Use =org-goto= instead of =semantic-or-imenu= when in org files
 
 * workspaces (using persp-mode)
 #+begin_src emacs-lisp
-(map! :after persp-mode
+(map! :when (featurep! :ui workspaces)
       :map doom-leader-workspace-map
-      :desc "Swap Left"               "{"   #'+workspace/swap-left
-      :desc "Swap Right"              "}"   #'+workspace/swap-right
-      :desc "Add buffer"              "b a" #'persp-add-buffer
-      :desc "Add buffers by Regex"    "b A" #'persp-add-buffers-by-regexp
-      :desc "Remove buffer"           "b r" #'persp-remove-buffer
-      :desc "Remove buffers by Regex" "b R" #'persp-remove-buffers-by-regexp)
+      :desc "Swap Left"  "<" #'+workspace/swap-left
+      :desc "Swap Right" ">" #'+workspace/swap-right
+
+      (:after persp-mode
+       (:prefix-map ("b" . "buffers")
+        :desc "Add buffer"              "a" #'persp-add-buffer
+        :desc "Add buffers by Regex"    "A" #'persp-add-buffers-by-regexp
+        :desc "Remove buffer"           "d" #'persp-remove-buffer
+        :desc "Remove buffers by Regex" "D" #'persp-remove-buffers-by-regexp)))
 #+end_src
 
 ** TODO COMMENT Automatically create new workspace when opening IRC buffers
