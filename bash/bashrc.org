@@ -1716,8 +1716,9 @@ set editing-mode emacs
 
 * LS_COLORS/dircolors
 :PROPERTIES:
-:header-args+: :tangle dircolors
+:header-args+: :tangle generated/dircolors
 :END:
+
 #+begin_src bash :export none
 # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
 # Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
