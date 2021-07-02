@@ -16,9 +16,9 @@
     " Note that this doesn't include Cygwin or Mingw
     set guifont=
     " set guifont+=Fira\ Code\ Medium\ 9
-    set guifont+=Iosevka\ 9
+    set guifont+=Iosevka\ 10
     " set guifont+=Hack\ 9
-    set guifont+=Monospace\ 9
+    set guifont+=Monospace\ 10
     set linespace=2
   elseif g:env ==? 'windows'
     set guifont=

@@ -63,9 +63,13 @@
 (package! visual-regexp-steroids)
 
 
+;; To add CREATED timestamps to org entries
+(use-package! org-expiry
+  :after org)
+
 ;; (package! org-super-agenda)
 ;; (use-package! org-super-agenda
 ;;   :after org-agenda
 ;;   :config
-;;   (setq org-super-agenda-groups '((:auto-dir-name t)))
+;;   (org-super-agenda-groups '((:auto-dir-name t)))
 ;;   (org-super-agenda-mode))

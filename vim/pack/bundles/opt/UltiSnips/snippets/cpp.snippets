@@ -202,32 +202,6 @@ std::vector<${1:${VISUAL:T}}> $0
 endsnippet
 
 
-# Removing elements ------------------------------------------------------------------------------------------------{{{2
-snippet rm "std::remove"
-auto pos = std::remove(begin(${1:container}), end($1), ${2:value});
-endsnippet
-
-snippet rmi "std::remove_if"
-auto pos = std::remove_if(begin(${1:container}), end($1), []($2) {
-  $3
-});
-endsnippet
-
-snippet erm ".erase(std::remove(...))"
-${1:${VISUAL:container}}.erase(std::remove(begin($1), end($1), ${2:value}), end($1));
-endsnippet
-
-snippet ermi ".erase(std::remove_if(...))"
-${1:${VISUAL:container}}.erase(std::remove_if(begin($1), end($1), []($0){}), end($1));
-endsnippet
-
-
-# Sorting operations -----------------------------------------------------------------------------------------------{{{2
-snippet srt "std::sort"
-std::sort(begin(${1:${VISUAL:container}}), end($1))
-endsnippet
-
-
 # Non-modifying sequence operations --------------------------------------------------------------------------------{{{2
 snippet alo "std::all_of"
 std::all_of(begin(${1:${VISUAL:container}}), end($1), [](auto const & ${2:i}) {
@@ -241,13 +215,13 @@ std::any_of(begin(${1:${VISUAL:container}}), end($1), [](auto const & ${2:i}) {
 })
 endsnippet
 
-snippet nno "std::none_of"
+snippet nono "std::none_of"
 std::none_of(begin(${1:${VISUAL:container}}), end($1), [](auto const & ${2:i}) {
   $0
 })
 endsnippet
 
-snippet fre "std::for_each"
+snippet fore "std::for_each"
 std::for_each(begin(${1:${VISUAL:container}}), end($1), [](auto const & ${2:i}) {
   $0
 });
@@ -286,17 +260,17 @@ if (k_searchIt != end($1)) {
 }
 endsnippet
 
-snippet cnn "Contains element using std::find"
+snippet has "Checks if container has element using std::find"
 std::find(begin(${1:${VISUAL:container}}), end($1), ${2:value}) ${3:=}= end($1)$0
 endsnippet
 
 
 # Modifying sequence operations ------------------------------------------------------------------------------------{{{2
-snippet mov "std::move"
+snippet mv "std::move"
 std::move(begin(${1:${VISUAL:src}}), end($1), back_inserter(${2:dest}));
 endsnippet
 
-snippet cpy "std::copy"
+snippet cp "std::copy"
 std::copy(begin(${1:${VISUAL:src}}), end($1), back_inserter(${2:dest}));
 endsnippet
 
@@ -307,7 +281,56 @@ std::copy_if(begin(${1:${VISUAL:src}}), end($1), back_inserter(${2:dest}), [](au
 endsnippet
 
 snippet fil "std::fill"
-std::fill(begin(${1:${VISUAL:container}}), end($1), ${2:value});
+std::fill(begin(${1:${VISUAL:container}}), end($1), ${0:value});
+endsnippet
+
+
+snippet rm "std::remove"
+auto pos = std::remove(begin(${1:container}), end($1), ${2:value});
+endsnippet
+
+snippet rmi "std::remove_if"
+auto pos = std::remove_if(begin(${1:container}), end($1), []($2) {
+  $3
+});
+endsnippet
+
+snippet erm ".erase(std::remove(...))"
+${1:${VISUAL:container}}.erase(std::remove(begin($1), end($1), ${2:value}), end($1));
+endsnippet
+
+snippet ermi ".erase(std::remove_if(...))"
+${1:${VISUAL:container}}.erase(std::remove_if(begin($1), end($1), []($0){}), end($1));
+endsnippet
+
+
+# Sorting operations -----------------------------------------------------------------------------------------------{{{2
+snippet sort "std::sort"
+std::sort(begin(${1:${VISUAL:container}}), end($1));
+endsnippet
+
+
+# Set operations (on sorted ranges) --------------------------------------------------------------------------------{{{2
+snippet seta "Set algorithms"
+std::set_`
+!p snip.rv = complete(t[2], ['difference', 'intersection', 'symmetric_difference', 'union'])
+`(begin(${1:sorted src1}), end($1), begin(${2:sorted src2}), end($2), back_inserter(${3:dest}));
+endsnippet
+
+snippet setd "std::set_difference"
+std::set_difference(begin(${1:sorted src1}), end($1), begin(${2:sorted src2}), end($2), back_inserter(${3:dest}));
+endsnippet
+
+snippet seti "std::set_intersection"
+std::set_intersection(begin(${1:sorted src1}), end($1), begin(${2:sorted src2}), end($2), back_inserter(${3:dest}));
+endsnippet
+
+snippet stsd "std::set_symmetric_difference"
+std::set_symmetric_difference(begin(${1:sorted src1}), end($1), begin(${2:sorted src2}), end($2), back_inserter(${3:dest}));
+endsnippet
+
+snippet setu "std::set_union"
+std::set_union(begin(${1:sorted src1}), end($1), begin(${2:sorted src2}), end($2), back_inserter(${3:dest}));
 endsnippet
 
 
@@ -327,7 +350,11 @@ endsnippet
 
 # Numeric operations -----------------------------------------------------------------------------------------------{{{2
 snippet acc "std::accumulate"
-std::accumulate(begin(${1:${VISUAL:container}}), end($1), ${2:0});
+std::accumulate(begin(${1:${VISUAL:container}}), end($1), ${0:init_val});
+endsnippet
+
+snippet iot "std::iota"
+std::iota(begin(${1:${VISUAL:container}}), end($1), ${0:start_val});
 endsnippet
 
 
@@ -343,7 +370,8 @@ std::copy(begin(${2:${VISUAL:src}}), end($2), std::experimental::make_ostream_jo
 endsnippet
 
 snippet codbg "std::cout with File and Line specifiers"
-std::cout << "DEBUG: " << $0" (" << __FILE__ << ":" << std::dec << __LINE__ << ")\n";
+std::cout << "DEBUG: $0"
+  << " (" << __FILE__ << ":" << std::dec << __LINE__ << ")\n";
 endsnippet
 
 snippet sshx "std::hex << std::showbase"

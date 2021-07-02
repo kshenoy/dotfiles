@@ -157,10 +157,9 @@ fzf::vcs::commits() {                                                           
     if [[ ! "$*" =~ -m\ \[0-9]+ ]]; then
       local _limit="-m 1000"
     fi
-    local _selected=$(p4 changes $_limit -t "$@" $STEM/... | sed -r 's/@\S*//' |
-      fzf --ansi --multi --no-sort --with-nth='..6' \
-      --preview 'p4 describe -s {2}' --preview-window right:70% |
-      cut -d' ' -f2)
+    local _selected=$(p4 changes $_limit -t "$@" $STEM/... | sed -r 's/@.*//' | cut -d ' ' -f2- |
+      fzf --ansi --multi --no-sort --preview 'p4 describe -s {1}' --preview-window right:70% |
+      cut -d' ' -f1)
   fi
 
   READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$_selected${READLINE_LINE:$READLINE_POINT}"
@@ -201,7 +200,7 @@ fzf::vcs::status() {                                                            
       FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m --nth=2 | awk '{print $NF}' | paste -s -d ' ')
   elif vcs::is_in_perforce_repo; then
     local _selected=$(p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" |
-      column -s# -o "    #" -t | column -s- -o- -t |
+      column -s# -o "    #" -t | column -o" " -t |
       FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m --nth=1 | awk '{print $1}' |
       while read -r item; do
         path=${STEM}/$item

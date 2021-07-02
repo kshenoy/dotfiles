@@ -1122,7 +1122,7 @@ alias gv='g -v'
 #+begin_src bash
 alias pf='p4'
 alias pfd='pf diff'
-alias pfdg='P4DIFF= pf diff -du | grepdiff --output-matching=hunk'
+alias pfdg='P4DIFF= pf diff -du | grepdiff --output-matching=hunk --remove-timestamps'
 alias pfe='pf edit'
 alias pflog='pf filelog -stl -m 5'
 #+end_src
@@ -1144,7 +1144,7 @@ pfrel() {
 }
 
 pfor() {
-    pfo | pfrel
+    pfo "$@" | pfrel
 }
 #+end_src
 
@@ -1338,15 +1338,15 @@ This is based on [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/]
 The function has to be called '__setprompt' as that's what =PROMPT_COMMAND= is set to
 #+begin_src bash
 __setprompt() {
+    # This has to be placed first so that we correctly capture the exit status of the last run command
+    local _exit_status="$?"
+
     # Colors and line-graphics that I use commonly
     <<prompt-common>>
 #+end_src
 
 This is all the information I need to set my prompt!
 #+begin_src bash
-# This has to be placed first
-local _exit_status="$?"
-
 # We use this instead of $COLUMNS as when a shell is starting, the $COLUMNS variable is not set
 local _columns=$(tput cols)
 

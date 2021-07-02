@@ -170,6 +170,9 @@ Some generic toggle bindings
 
 * counsel/ivy/swiper
 #+begin_src emacs-lisp
+(after! ivy
+  (setq ivy-auto-select-single-candidate t))
+
 (map! :after swiper
       :map doom-leader-search-map
       :desc "Search all buffers" "B" #'swiper-all)
@@ -223,7 +226,16 @@ Move by visual lines
 Doom overwrites this so setting this after doom is done loading
 #+begin_src emacs-lisp
 (after! org
-  org-default-notes-file (expand-file-name "Personal/Inbox.org" org-directory))
+  org-default-notes-file (expand-file-name "Personal/Inbox.org" org-directory)
+#+end_src
+
+To add CREATED timestamps to org entries
+#+begin_src emacs-lisp
+(setq org-expiry-inactive-timestamps t)
+#+end_src
+
+#+begin_src emacs-lisp
+)
 #+end_src
 
 ** Agenda
@@ -499,8 +511,12 @@ Also note that setting this to true will create an ID for every entry which coul
 (setq org-id-link-to-org-use-id 'create-if-interactive)
 #+end_src
 
-** Refile
+** Progress
+#+begin_src emacs-lisp
+(setq org-clock-history-length 9)
+#+end_src
 
+** Refile
 #+begin_src emacs-lisp
 (after! org-refile
 #+end_src

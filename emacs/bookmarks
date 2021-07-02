@@ -2,16 +2,11 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("org-capture-last-stored"
- (filename . "/mnt/Data/home/kshenoy/Documents/Notes/Personal/Inbox.org")
- (front-context-string . "** [2021-06-27 S")
- (rear-context-string . "kmonad/\n* Inbox\n")
- (position . 1058))
-("org-refile-last-stored"
- (filename . "~/.config/dotfiles/bash/bashrc.org")
- (front-context-string . "*** [[https://gi")
- (rear-context-string . " ..'\n#+end_src\n\n")
- (position . 29762))
+(("org-refile-last-stored"
+ (filename . "~/Documents/Notes/Work/Eldora.org")
+ (front-context-string . "** Register chan")
+ (rear-context-string . "eby preventing\n\n")
+ (position . 21793))
 ("Inbox"
  (filename . "~/Documents/Notes/Inbox.org")
  (position . 1))

@@ -6,27 +6,18 @@
 # vile (VI-Less-Emulator)
 # use vim like a pager
 
-_cmd="vim -R -u ~/.vim/vimrc_pager -U NORC --noplugins"
-
 if [[ -t 1 ]]; then
-  if (( $# == 0 )); then
-    if [[ -t 0 ]]; then
-      echo "Missing filename" 1>&2
-      exit
-    fi
-    eval "$_cmd -"
-  else
+  # STDOUT is a terminal. Need this check because I haven't figured out how to pipe the edits onwards
+
+  _cmd="command vim -R -u ~/.vim/vimrc_pager -U NORC --noplugins"
+
+  if (( $# != 0 )); then
     eval "$_cmd $@"
-  fi
-else
-  # Output is not a terminal, cat arguments or stdin
-  if (( $# == 0 )); then
-    if [[ -t 0 ]]; then
-      echo "Missing filename" 1>&2
-      exit
-    fi
-    cat
-  else
-    cat "$@"
+    exit 0
+  elif [[ -t 0 ]]; then
+    echo "$_cmd - $@"
+    exit 0
   fi
 fi
+
+cat "$@"
