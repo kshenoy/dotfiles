@@ -278,7 +278,7 @@ export LANG=en_US.UTF-8
 See [[id:2823d31a-572c-44ec-80e1-84acbbb6412e][dircolors]]
 #+begin_src bash
 if [[ -x /usr/bin/dircolors ]]; then
-    _dircolors=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/dircolors
+    _dircolors=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/dircolors
     [[ -r $_dircolors ]] && eval "$(/usr/bin/dircolors -b $_dircolors)" || eval "$(/usr/bin/dircolors -b)"
 fi
 #+end_src
@@ -1716,7 +1716,7 @@ set editing-mode emacs
 
 * LS_COLORS/dircolors
 :PROPERTIES:
-:header-args+: :tangle generated/dircolors
+:header-args+: :tangle dircolors
 :END:
 
 #+begin_src bash :export none

@@ -6,7 +6,7 @@ XDG_DATA_HOME ?= ${HOME}/.local/share
 MKLINK := ln -svTf
 
 
-all: dotfiles-priv base16-fzf base16-shell bash emacs git tmux vim links
+all: dotfiles-priv base16-fzf base16-shell bash emacs fish git tmux vim links
 # Rules not included in all: xmonad
 
 
@@ -23,13 +23,12 @@ ${XDG_CONFIG_HOME}/dotfiles-priv:
 # However, this approach doesn't work on files which have machine-specific configuration as everytime I tangle it,
 # the saved version of the file gets updated, thereby affecting the link
 # Hence, a workaround at the moment is to tangle to the location and copy it over to the repo
-bash: ${HOME}/.bashrc bash/generated/dircolors ripgreprc
+bash: ${HOME}/.bashrc dircolors ripgreprc
 # Using grouped targets here to run tangle bash/bashrc.org only once. Supported only for make versions >= 4.3
-${HOME}/.bashrc bash/dircolors ripgreprc &: bash/bashrc.org
+${HOME}/.bashrc dircolors ripgreprc &: bash/bashrc.org
 	${TANGLE} $<
 	@mkdir -p ${XDG_DATA_HOME}/bash_history
 	@if [ -f ${HOME}/.bash_history ]; then rm ${HOME}/.bash_history; fi
-	@cp ${HOME}/.bashrc bash/bashrc_literate
 
 
 #== base16-fzf =========================================================================================================
@@ -79,6 +78,13 @@ emacs/vanilla/snippets:
 
 ${HOME}/bin/emacs_daemon:
 	@${MKLINK} ${PWD}/scripts/emacs_daemon $@
+
+
+#== fish ===============================================================================================================
+fish: ${HOME}/.config/fish/config.fish ${HOME}/.config/fish/functions/aliases.fish
+# Using grouped targets here to run tangle only once. Supported only for make versions >= 4.3
+${HOME}/.config/fish/config.fish ${HOME}/.config/fish/functions/aliases.fish &: fish.org
+	${TANGLE} $<
 
 
 #== git ================================================================================================================

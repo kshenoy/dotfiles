@@ -265,6 +265,11 @@ Open org-agenda in the only window and remove the fluff
       org-agenda-show-all-dates nil)
 #+end_src
 
+Make it pretty!
+#+begin_src emacs-lisp
+(setq org-agenda-block-separator ?─)
+#+end_src
+
 *** Custom commands
 These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html][Aaron Bieber: An agenda for life with org-mode]]
 #+begin_src emacs-lisp
@@ -450,36 +455,39 @@ Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is le
 #+end_src
 
 ** Capture
-#+begin_src emacs-lisp
-(setq org-capture-templates
-      '(("t" "TODO" entry
-         (file org-default-notes-file)
-         "* TODO %?\n:LOGBOOK:\n- State \"TODO\"       from              %U\n:END:"
-         :jump-to-captured t :empty-lines 1)
+#+begin_src emacs-lisp :tangle no
+  (setq +org-capture-notes-file org-default-notes-file
+        +org-capture-todo-file  org-default-notes-file)
 
-        ("r" "Recommendation" item (file "Personal/Recommendations.org") "" :jump-to-captured t)
+  (setq org-capture-templates
+        '(("t" "TODO" entry
+           (file org-default-notes-file)
+           "* TODO %?\n:LOGBOOK:\n- State \"TODO\"       from              %U\n:END:"
+           :jump-to-captured t :empty-lines 1)
 
-        ("x" "Misc etc." entry
-         (file org-default-notes-file)
-         "* %?"
-         :jump-to-captured t :empty-lines 1)
+          ("n" "Misc note" entry
+           (file org-default-notes-file)
+           "* %?"
+           :jump-to-captured t :empty-lines 1)
 
-        ("s" "Snippets")
+          ("r" "Recommendation" item (file "Personal/Recommendations.org") "" :jump-to-captured t)
 
-        ("se" "Emacs snippets" entry
-         (file "Software/emacs.org")
-         "* %?"
-         :jump-to-captured t :empty-lines 1)
+          ("s" "Snippets")
 
-        ("ss" "Shell snippets" entry
-         (file "Software/shell.org")
-         "* %?"
-         :jump-to-captured t :empty-lines 1)
+          ("se" "Emacs snippets" entry
+           (file "Software/emacs.org")
+           "* %?"
+           :jump-to-captured t :empty-lines 1)
 
-        ("sv" "Vim snippets" entry
-         (file "Software/vim.org")
-         "* %?"
-         :jump-to-captured t :empty-lines 1)))
+          ("ss" "Shell snippets" entry
+           (file "Software/shell.org")
+           "* %?"
+           :jump-to-captured t :empty-lines 1)
+
+          ("sv" "Vim snippets" entry
+           (file "Software/vim.org")
+           "* %?"
+           :jump-to-captured t :empty-lines 1)))
 #+end_src
 
 ** ID

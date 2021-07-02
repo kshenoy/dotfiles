@@ -1,8 +1,13 @@
-;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8-emacs -*- 
+;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8-emacs -*-
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("org-refile-last-stored"
+(("org-capture-last-stored"
+ (filename . "/mnt/Data/home/kshenoy/Documents/Notes/Personal/Inbox.org")
+ (front-context-string . "** [2021-06-27 S")
+ (rear-context-string . "kmonad/\n* Inbox\n")
+ (position . 1058))
+("org-refile-last-stored"
  (filename . "~/.config/dotfiles/bash/bashrc.org")
  (front-context-string . "*** [[https://gi")
  (rear-context-string . " ..'\n#+end_src\n\n")

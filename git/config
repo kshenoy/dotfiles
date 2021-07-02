@@ -133,6 +133,7 @@ ec = config --global -e
 # aliases:2 ends here
 
 # [[file:git.org::*aliases][aliases:3]]
+s  = status
 d  = diff
 dw = diff --word-diff
 dt = difftool

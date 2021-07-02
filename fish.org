@@ -1,0 +1,104 @@
+#+TITLE: fish configuration
+#+PROPERTY: header-args+ :results output silent :noweb tangle :comments both :mkdirp yes
+
+* config.fish
+:PROPERTIES:
+:header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/config.fish")
+:END:
+
+#+begin_src sh
+starship init fish | source
+#+end_src
+
+* aliases
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/l.fish")
+function l --wraps=ls
+  ls $argv;
+end
+#+end_src
+
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/la.fish")
+function la --wraps=ls
+  ls -A $argv;
+end
+#+end_src
+
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/c.fish")
+function c --wraps=clear
+  clear $argv
+end
+#+end_src
+
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/cl.fish")
+function cl
+  clear
+  ls
+end
+#+end_src
+
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/mv.fish")
+function mv
+  command mv -vi $argv
+end
+#+end_src
+
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/cp.fish")
+function cp
+  command cp -vi $argv
+end
+#+end_src
+
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/rm.fish")
+function rm
+  command rm -vi $argv
+end
+#+end_src
+
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/rd.fish")
+function rd --wraps=rm
+  rm -rf $argv
+end
+#+end_src
+
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/ln.fish")
+function ln
+  command ln -svi $argv
+end
+#+end_src
+
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/C.fish")
+function C --wraps=cat
+  cat $argv
+end
+#+end_src
+
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/j.fish")
+function j --wraps=jobs
+  jobs -l $argv
+end
+#+end_src
+
+** grep, rg etc.
+#+begin_src sh :tangle (if (executable-find "rg") "no" (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/g.fish"))
+function g --wraps=grep
+  grep $argv
+end
+#+end_src
+
+#+begin_src sh :tangle (if (executable-find "rg") (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/g.fish") "no")
+function g --wraps=rg
+  rg $argv
+end
+#+end_src
+
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/gi.fish")
+function gi --wraps=g
+  g -i $argv
+end
+#+end_src
+
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/gv.fish")
+function gv --wraps=g
+  g -v $argv
+end
+#+end_src
