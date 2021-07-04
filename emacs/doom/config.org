@@ -467,39 +467,51 @@ Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is le
 #+end_src
 
 ** Capture
-#+begin_src emacs-lisp :tangle no
-  (setq +org-capture-notes-file org-default-notes-file
-        +org-capture-todo-file  org-default-notes-file)
-
+#+begin_src emacs-lisp
+(after! org
   (setq org-capture-templates
-        '(("t" "TODO" entry
-           (file org-default-notes-file)
+        '(("t" "TODO" entry (file org-default-notes-file)
            "* TODO %?\n:LOGBOOK:\n- State \"TODO\"       from              %U\n:END:"
-           :jump-to-captured t :empty-lines 1)
+           :jump-to-captured t :empty-lines-before 1)
 
-          ("n" "Misc note" entry
-           (file org-default-notes-file)
-           "* %?"
-           :jump-to-captured t :empty-lines 1)
+          ("n" "Misc note" entry (file org-default-notes-file)
+           "* %?" :jump-to-captured t :empty-lines-before 1)
 
-          ("r" "Recommendation" item (file "Personal/Recommendations.org") "" :jump-to-captured t)
+          ("c" "Code Snippets")
+          ("ce" "Emacs" entry (file "Software/emacs.org")
+           "* %?" :jump-to-captured t :empty-lines-before 1)
+          ("cs" "Shell" entry (file "Software/shell.org")
+           "* %?" :jump-to-captured t :empty-lines-before 1)
+          ("cv" "Vim" entry (file "Software/vim.org")
+           "* %?" :jump-to-captured t :empty-lines-before 1)
 
-          ("s" "Snippets")
+          ("f" "Food/Recipes" entry (file "Personal/Cooking.org")
+           "" :jump-to-captured t :empty-lines-before 1)
 
-          ("se" "Emacs snippets" entry
-           (file "Software/emacs.org")
-           "* %?"
-           :jump-to-captured t :empty-lines 1)
+          ("m" "Media")
+          ("mb" "Book"    checkitem (file+headline "Personal/Media.org" "Books")
+           "" :jump-to-captured t)
+          ("mc" "Comedy"  checkitem (file+headline "Personal/Media.org" "Stand-up Comedy")
+           "" :jump-to-captured t)
+          ("mg" "Game"    checkitem (file+headline "Personal/Media.org" "Games")
+           "" :jump-to-captured t)
+          ("mm" "Movie"   checkitem (file+headline "Personal/Media.org" "Movies")
+           "" :jump-to-captured t)
+          ("mp" "Podcast" checkitem (file+headline "Personal/Media.org" "Podcasts")
+           "" :jump-to-captured t)
+          ("mq" "Quote"   checkitem (file+headline "Personal/Media.org" "Quotes")
+           "" :jump-to-captured t)
+          ("mt" "TV Show" checkitem (file+headline "Personal/Media.org" "TV Shows")
+           "" :jump-to-captured t))))
 
-          ("ss" "Shell snippets" entry
-           (file "Software/shell.org")
-           "* %?"
-           :jump-to-captured t :empty-lines 1)
+#+end_src
 
-          ("sv" "Vim snippets" entry
-           (file "Software/vim.org")
-           "* %?"
-           :jump-to-captured t :empty-lines 1)))
+#+begin_src emacs-lisp
+(map! :after org
+      :map doom-leader-map
+      :desc "Org Capture" "X" #'counsel-org-capture
+      :map doom-leader-notes-map
+      :desc "Org Capture" "n" #'counsel-org-capture)
 #+end_src
 
 ** ID
