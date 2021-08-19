@@ -78,6 +78,12 @@ function j --wraps=jobs
 end
 #+end_src
 
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/x.fish")
+function x --wraps=exit
+  exit $argv
+end
+#+end_src
+
 ** grep, rg etc.
 #+begin_src sh :tangle (if (executable-find "rg") "no" (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/g.fish"))
 function g --wraps=grep
@@ -100,5 +106,18 @@ end
 #+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/gv.fish")
 function gv --wraps=g
   g -v $argv
+end
+#+end_src
+
+** vim
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/v.fish")
+function v --wraps=vim
+  vim $argv
+end
+#+end_src
+
+#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/vd.fish")
+function vd --wraps=vim
+  vim -d $argv
 end
 #+end_src
