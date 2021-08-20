@@ -2,12 +2,6 @@
 " Maintainer:   Tim Pope <http://tpo.pe/>
 " Version:      1.1
 
-if exists('g:loaded_sensible') || &compatible
-  finish
-else
-  let g:loaded_sensible = 1
-endif
-
 if has('autocmd')
   filetype plugin indent on
 endif
@@ -23,6 +17,8 @@ set whichwrap=b,s,<,>,h,l,[,]
 set complete-=i
 set smarttab
 set expandtab
+set softtabstop=2
+set shiftwidth=2
 
 set nrformats-=octal
 
