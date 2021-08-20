@@ -263,9 +263,8 @@ Make agenda start on a Monday. By default, the agenda only shows the next 7 days
 
 Prevent same entry from showing up multiple times
 #+begin_src emacs-lisp
-(setq org-agenda-skip-deadline-if-done t
-      org-agenda-skip-scheduled-if-done t
-      org-agenda-skip-scheduled-if-deadline-is-shown t
+(setq org-agenda-skip-scheduled-if-done t
+      org-agenda-skip-deadline-prewarning-if-scheduled t
       org-agenda-skip-timestamp-if-done t
       org-agenda-skip-timestamp-if-deadline-is-shown t
       org-agenda-skip-additional-timestamps-same-entry t)
@@ -294,8 +293,7 @@ These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/
 
 (defun my-org-skip-subtree-if-priority (priority)
   "Skip an agenda subtree if it has a priority of PRIORITY.
-
-  PRIORITY may be one of the characters ?A, ?B, or ?C."
+  PRIORITY may be one of the characters A, B, C or D."
   (let ((subtree-end (save-excursion (org-end-of-subtree t)))
         (pri-value (* 1000 (- org-lowest-priority priority)))
         (pri-current (org-get-priority (thing-at-point 'line t))))
@@ -312,6 +310,11 @@ These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/
           ))))
 #+end_src
 
+An agenda showing the previous week and the next couple of weeks [[org-agenda-span][configured above]]
+#+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
+(agenda "" ((org-agenda-span 21)))
+#+end_src
+
 All the high-priority tasks that are still pending
 #+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
 (tags "PRIORITY=\"A\""
@@ -319,12 +322,16 @@ All the high-priority tasks that are still pending
        (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
 #+end_src
 
-An agenda showing the previous week and the next couple of weeks [[org-agenda-span][configured above]]
+Todos that are in-progress minus the high-priority ones, habits and ones that are scheduled or have a deadline
 #+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
-(agenda "")
+                    (todo "START"
+                             ((org-agenda-overriding-header "Tasks in progress:")
+                              (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
+                                                             (my-org-skip-subtree-if-priority ?A)
+                                                             (org-agenda-skip-if nil '(scheduled deadline))))))
 #+end_src
 
-All the remaining todos minus the high-priority ones
+Rest of the todos minus the ones from the previous sections
 #+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
 (alltodo ""
          ((org-agenda-overriding-header "ALL normal priority tasks:")
@@ -407,8 +414,12 @@ Prettier priorities
                          ("CLOCK:" "⏲")
                          ("[#A]" "❰P1❱")
                          ("[#B]" "❰P2❱")
-                         ("[#C]" "❰P3❱")
-                         )
+                         ("[#C]" "❰P3❱"))
+
+(prettify-utils-add-hook org-agenda-mode
+                         ("[#A]" "❰P1❱")
+                         ("[#B]" "❰P2❱")
+                         ("[#C]" "❰P3❱"))
 (setq prettify-symbols-unprettify-at-point nil)
 #+end_src
 
@@ -695,10 +706,10 @@ Setting this to nil allows a convenient way to select a TODO state and bypass an
 (after! org
   (setq org-todo-keyword-faces
         '(("[-]"    . +org-todo-active)
-          ("STRT"   . +org-todo-active)
+          ("START"  . +org-todo-active)
           ("[?]"    . +org-todo-onhold)
           ("WAIT"   . +org-todo-onhold)
-          ("NO"     . +org-todo-cancel)
+          ("DEFER"  . +org-todo-cancel)
           ("CANCEL" . +org-todo-cancel))))
 #+end_src
 
