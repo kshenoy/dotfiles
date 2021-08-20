@@ -186,8 +186,7 @@ fzf::vcs::filelog() {                                                           
     grep '^\.\.\. *#' | sed -r 's/@\S*//' | cut -d ' ' -f 2-9 | tr -s ' ' | column -s' ' -o' ' -t |
     fzf --ansi --header='filelog for '$(basename $_file) --multi --no-sort --preview-window right:70% \
     --preview "p4 describe {3} | sed -n -e '1,/Differences .../p' -e \"/^====.*$(basename $_file)/,/^====/p\" | head -n -2" |
-    cut -d' ' -f4)
-    # --preview 'p4 describe -s {3}' --preview-window right:70% |
+    cut -d' ' -f1 | while read -r item; do printf '%q ' "$_file$item"; done)
 
   READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$_selected${READLINE_LINE:$READLINE_POINT}"
   READLINE_POINT=$(( READLINE_POINT + ${#_selected} ))
