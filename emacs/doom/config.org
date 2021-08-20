@@ -14,7 +14,10 @@ To get information about any of these functions/macros, move the cursor over the
 
 Also, =gd= (or =C-c c d=) will jump to their definition and see how they are implemented.
 
-* COMMENT Literate config
+* Literate config
+ :PROPERTIES:
+ :header-args: :tangle no
+ :END:
 [[https://org-babel.readthedocs.io/en/latest/header-args/][header-args]]:
 - =:tangle yes=
 This allows me to run =org-babel-tangle= in the org file to generate the el file without having to restart emacs and rely on =org-babel-load-file=
@@ -240,7 +243,9 @@ To add CREATED timestamps to org entries
 
 ** Agenda
 #+begin_src emacs-lisp
-(setq org-agenda-inhibit-startup nil)
+(setq org-agenda-inhibit-startup nil
+      org-agenda-sticky t)
+
 #+end_src
 
 Filter out any unwanted files from the notes that I don't want to add to the agenda
@@ -356,7 +361,6 @@ Prevent DONE org-headlines from being highlighted a different color
 (defun my-update-org-faces-after-load-theme ()
   "Update some org-mode faces for all themes"
   (when (eq major-mode 'org-mode)
-    (variable-pitch-mode)
     (set-face-attribute 'org-document-info-keyword nil :inherit 'org-meta-line :foreground nil)
     (set-face-attribute 'org-drawer                nil :inherit 'org-meta-line :foreground nil :weight 'bold)
     (set-face-attribute 'org-document-title        nil :height 1.5)
@@ -366,18 +370,23 @@ Prevent DONE org-headlines from being highlighted a different color
     (set-face-attribute 'org-level-4               nil :height 1.1)
     (set-face-attribute 'org-special-keyword       nil :weight 'bold)
     (set-face-attribute 'org-tag                   nil :height (face-attribute 'default :height) :weight 'bold)
+    (set-face-attribute 'org-todo                  nil :height (face-attribute 'default :height))
+    (set-face-attribute 'org-done                  nil :height (face-attribute 'default :height))
     (set-face-attribute 'org-block                 nil :inherit 'fixed-pitch)
     (set-face-attribute 'org-block-begin-line      nil :inherit 'org-block)
     (set-face-attribute 'org-block-end-line        nil :inherit 'org-block)
     ;; (cond ((eq doom-theme 'doom-solarized-light) (my-update-org-faces-after-load-doom-solarized-light))
     ;;       (t nil))
-    ))
+    )
+  (when (eq major-mode 'org-agenda-mode)
+    (set-face-attribute 'org-agenda-structure      nil :height 1.2)))
 #+end_src
 
 Add a hook to update faces after a theme is loaded. Also call it immediately as theme is loaded before org mode
 #+begin_src emacs-lisp
 (add-hook 'doom-load-theme-hook 'my-update-org-faces-after-load-theme)
 (add-hook 'org-mode-hook 'my-update-org-faces-after-load-theme)
+(add-hook 'org-agenda-mode-hook 'my-update-org-faces-after-load-theme)
 #+end_src
 
 *** Pretty symbols
@@ -650,7 +659,6 @@ Easy templates for org-version ≥ 9.2. =C-c C-,= was also added in 9.2 and prov
 )
 #+end_src
 
-*** TODO Archive trees hierarchically
 *** Sparse Trees
 #+begin_src emacs-lisp
 (setq org-highlight-sparse-tree-matches nil)
@@ -702,14 +710,13 @@ Setting this to nil allows a convenient way to select a TODO state and bypass an
 (setq org-treat-S-cursor-todo-selection-as-state-change nil)
 #+end_src
 
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
 (after! org
   (setq org-todo-keyword-faces
         '(("[-]"    . +org-todo-active)
           ("START"  . +org-todo-active)
           ("[?]"    . +org-todo-onhold)
           ("WAIT"   . +org-todo-onhold)
-          ("DEFER"  . +org-todo-cancel)
           ("CANCEL" . +org-todo-cancel))))
 #+end_src
 
