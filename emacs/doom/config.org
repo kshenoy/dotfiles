@@ -261,9 +261,10 @@ Filter out any unwanted files from the notes that I don't want to add to the age
 Make agenda start on a Monday. By default, the agenda only shows the next 7 days. I want to see the previous 7 days as well just in case I missed something. Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
 #+name: org-agenda-span
 #+begin_src emacs-lisp
-(setq org-agenda-start-day "-6d"
-      org-agenda-start-on-weekday 1
-      org-agenda-span 'month)
+(after! org-agenda
+  (setq org-agenda-start-day "-6d"
+        org-agenda-start-on-weekday 1
+        org-agenda-span 'month))
 #+end_src
 
 Prevent same entry from showing up multiple times
@@ -309,7 +310,7 @@ These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/
 
 #+begin_src emacs-lisp
 (setq org-agenda-custom-commands
-      '(("d" "Daily agenda and TODOs"
+      '(("p" "Personal agenda and TODOs"
          (
           <<daily-agenda-cmds>>
           ))))
@@ -317,23 +318,24 @@ These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/
 
 An agenda showing the previous week and the next couple of weeks [[org-agenda-span][configured above]]
 #+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
-(agenda "" ((org-agenda-span 21)))
+(agenda "")
 #+end_src
 
 All the high-priority tasks that are still pending
 #+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
 (tags "PRIORITY=\"A\""
       ((org-agenda-overriding-header "High-priority unfinished tasks:")
-       (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
+       (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
+                                      (org-agenda-skip-entry-if 'todo 'done)))))
 #+end_src
 
 Todos that are in-progress minus the high-priority ones, habits and ones that are scheduled or have a deadline
 #+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
-                    (todo "START"
-                             ((org-agenda-overriding-header "Tasks in progress:")
-                              (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
-                                                             (my-org-skip-subtree-if-priority ?A)
-                                                             (org-agenda-skip-if nil '(scheduled deadline))))))
+(todo "START"
+      ((org-agenda-overriding-header "Tasks in progress:")
+       (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
+                                      (org-agenda-skip-if nil '(scheduled deadline))
+                                      (my-org-skip-subtree-if-priority ?A)))))
 #+end_src
 
 Rest of the todos minus the ones from the previous sections
@@ -341,8 +343,9 @@ Rest of the todos minus the ones from the previous sections
 (alltodo ""
          ((org-agenda-overriding-header "ALL normal priority tasks:")
           (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
+                                         (org-agenda-skip-if nil '(scheduled deadline))
                                          (my-org-skip-subtree-if-priority ?A)
-                                         (org-agenda-skip-if nil '(scheduled deadline))))))
+                                         (org-agenda-skip-entry-if 'todo '("START"))))))
 #+end_src
 
 ** Appearance
@@ -821,7 +824,7 @@ WSL:
 
 Work:
 #+begin_src emacs-lisp :tangle (if (string-match-p "atletx" system-name) "config_local.el" "no")
-(load (expand-file-name "~/.config/dotfiles-priv/emacs/work.el") t)
+(org-babel-load-file (expand-file-name "~/.config/dotfiles-priv/emacs/config.org"))
 #+end_src
 
 #+begin_src emacs-lisp
