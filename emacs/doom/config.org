@@ -258,7 +258,8 @@ Filter out any unwanted files from the notes that I don't want to add to the age
                                    (directory-files-recursively org-directory "\\.org$")))
 #+end_src
 
-Make agenda start on a Monday. By default, the agenda only shows the next 7 days. I want to see the previous 7 days as well just in case I missed something. Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
+Make agenda start on a Monday. By default, the agenda only shows the next week. I want to see the next 3 weeks as well the previous week just in case I missed something.
+Hence, these combined will show entries starting from the previous Monday. [[https://old.reddit.com/r/orgmode/comments/8r70oh/make_orgagenda_show_this_month_and_also_previous/][Source]]
 #+name: org-agenda-span
 #+begin_src emacs-lisp
 (after! org-agenda
@@ -308,21 +309,22 @@ These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/
       nil)))
 #+end_src
 
+Note that the ~agenda-cmds~ noweb-ref must be on its own line or it breaks code tangling
 #+begin_src emacs-lisp
 (setq org-agenda-custom-commands
       '(("p" "Personal agenda and TODOs"
          (
-          <<daily-agenda-cmds>>
+          <<agenda-cmds>>
           ))))
 #+end_src
 
 An agenda showing the previous week and the next couple of weeks [[org-agenda-span][configured above]]
-#+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
+#+begin_src emacs-lisp :noweb-ref agenda-cmds :tangle no
 (agenda "")
 #+end_src
 
 All the high-priority tasks that are still pending
-#+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
+#+begin_src emacs-lisp :noweb-ref agenda-cmds :tangle no
 (tags "PRIORITY=\"A\""
       ((org-agenda-overriding-header "High-priority unfinished tasks:")
        (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
@@ -330,16 +332,16 @@ All the high-priority tasks that are still pending
 #+end_src
 
 Todos that are in-progress minus the high-priority ones, habits and ones that are scheduled or have a deadline
-#+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
+#+begin_src emacs-lisp :noweb-ref agenda-cmds :tangle no
 (todo "START"
       ((org-agenda-overriding-header "Tasks in progress:")
        (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
-                                      (org-agenda-skip-if nil '(scheduled deadline))
-                                      (my-org-skip-subtree-if-priority ?A)))))
+                                      (my-org-skip-subtree-if-priority ?A)
+                                      (org-agenda-skip-if nil '(scheduled deadline))))))
 #+end_src
 
 Rest of the todos minus the ones from the previous sections
-#+begin_src emacs-lisp :noweb-ref daily-agenda-cmds :tangle no
+#+begin_src emacs-lisp :noweb-ref agenda-cmds :tangle no
 (alltodo ""
          ((org-agenda-overriding-header "ALL normal priority tasks:")
           (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)

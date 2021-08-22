@@ -135,7 +135,7 @@ ec = config --global -e
 #+end_src
 
 #+begin_src conf
-s  = status
+st = status
 d  = diff
 dw = diff --word-diff
 dt = difftool

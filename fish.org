@@ -6,8 +6,14 @@
 :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/config.fish")
 :END:
 
+Use [[https://starship.rs/][starship prompt]]
 #+begin_src sh
 starship init fish | source
+base16 solarized-light
+#+end_src
+
+#+begin_src sh
+fish_add_path ~/bin
 #+end_src
 
 * aliases
