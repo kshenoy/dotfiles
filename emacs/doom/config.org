@@ -769,8 +769,7 @@ A slight enhancement I'm adding is to have =Shift= always insert the TODO versio
 #+begin_src emacs-lisp
 (map! :after evil-org
       :map evil-org-mode-map
-      :ni [C-return] #'org-insert-heading-respect-content
-      :ni [C-S-return] #'org-insert-todo-heading-respect-content)
+      :ni [C-M-S-return] #'org-insert-todo-subheading)
 #+end_src
 
 *** TODO Create binding for opening the default notes file
