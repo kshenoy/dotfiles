@@ -1,10 +1,6 @@
 let s:config_file = glob('~/.vimrc_background')
 
 function! s:ReadBase16Config()                                                                                     "{{{1
-  if has('gui_running')
-    return
-  endif
-
   if filereadable(expand('~/.vimrc_background'))
     silent! source ~/.vimrc_background
     call s:After()

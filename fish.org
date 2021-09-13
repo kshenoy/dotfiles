@@ -9,7 +9,11 @@
 Use [[https://starship.rs/][starship prompt]]
 #+begin_src sh
 starship init fish | source
-base16 solarized-light
+#+end_src
+
+Set the theme. Check if ~$BASE16_THEME~ is defined and set the theme only if it isn't
+#+begin_src sh
+test -z "$BASE16_THEME" && base16 solarized-light
 #+end_src
 
 #+begin_src sh

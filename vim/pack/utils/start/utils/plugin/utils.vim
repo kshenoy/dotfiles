@@ -1,6 +1,6 @@
 " Vim Functions file
 
-function! utils#FoldText()                                                                                        " {{{1
+function! utils#FoldText()                                                                                         "{{{1
   " Description: Dhruv Sagar's foldtext
   let line             = getline(v:foldstart)
   let lines_count      = v:foldend - v:foldstart + 1
@@ -15,7 +15,7 @@ function! utils#FoldText()                                                      
 endfunction
 
 
-function! utils#LoadCscopeDB()                                                                                    " {{{1
+function! utils#LoadCscopeDB()                                                                                     "{{{1
   if !has('cscope')
     return
   endif
@@ -37,7 +37,7 @@ function! utils#LoadCscopeDB()                                                  
 endfunction
 
 
-function! utils#SearchSaveAndRestore(...)                                                                         " {{{1
+function! utils#SearchSaveAndRestore(...)                                                                          "{{{1
   " Description: Save and restore search strings
   if a:0 && a:1 ==# "get"
     return s:search_str
@@ -52,7 +52,7 @@ function! utils#SearchSaveAndRestore(...)                                       
 endfunction
 
 
-function! utils#GuiTabLabel()                                                                                     " {{{1
+function! utils#GuiTabLabel()                                                                                      "{{{1
   " Description: Set up tab labels with tab number, buffer name, number of windows
   if (exists('t:guitablabel'))
     return t:guitablabel
@@ -87,7 +87,7 @@ function! utils#GuiTabLabel()                                                   
 endfunction
 
 
-function! utils#GuiTabToolTip()                                                                                   " {{{1
+function! utils#GuiTabToolTip()                                                                                    "{{{1
   " Description: Set up tab tooltips to show every buffer name
   let tip = ''
   let bufnrlist = tabpagebuflist(v:lnum)
@@ -122,7 +122,7 @@ function! utils#GuiTabToolTip()                                                 
 endfunction
 
 
-function! utils#GetHighlightInfo(hl_group)                                                                        " {{{1
+function! utils#GetHighlightInfo(hl_group)                                                                         "{{{1
   " Description: Copy/modify highlight groups
   let l:hlTrace = [a:hl_group]
   redir => l:hl_info_str
@@ -151,7 +151,7 @@ function! utils#GetHighlightInfo(hl_group)                                      
 endfunction
 
 
-function! utils#SetEnvInfo()
+function! utils#SetEnvInfo()                                                                                       "{{{1
   " Description: Define a global variable containing current environment's name
   "              From: https://gist.github.com/romainl/4df4cde3498fada91032858d7af213c2
 
@@ -167,7 +167,7 @@ function! utils#SetEnvInfo()
 endfunction
 
 
-function! utils#SetHighlightInfo(hl_group, hl_info)                                                               " {{{1
+function! utils#SetHighlightInfo(hl_group, hl_info)                                                                "{{{1
   let l:hl_cmd = 'highlight ' . a:hl_group . ' '
   for l:attr in keys(a:hl_info)
     if (l:attr ==? 'trace')
@@ -184,7 +184,7 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Temporary functions only
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! utils#_RemoveAllErrInBut_(num)                                                                          " {{{1
+function! utils#_RemoveAllErrInBut_(num)                                                                           "{{{1
   " Delete everything but the entry we're interested in just the ErrIn field
   silent! execute '%g/cErrPkt/ .s/\vErrIn(\w*)\=\[(\w+,\s*){' . a:num . '}(\w+)(,\s*\w+)*\]/ErrIn\1[' . a:num . ']=\3/g'
 endfunction

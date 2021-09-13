@@ -41,6 +41,3 @@
 
   " Make 'File Open' use current directory
   set browsedir=buffer
-
-  set background=light
-  colorscheme base16-solarized-light
