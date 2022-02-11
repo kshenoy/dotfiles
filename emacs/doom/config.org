@@ -408,7 +408,7 @@ Replace - and + in plain list with ➤ and ✜ respectively
 (setq org-superstar-item-bullet-alist '((?* . ?•) (?+ . ?✜) (?- . ?➤)))
 #+end_src
 
-Prettier priorities
+More pretty symbols
 #+begin_src emacs-lisp
 (prettify-utils-add-hook org-mode
                          ("[ ]" "☐")
@@ -429,6 +429,7 @@ Prettier priorities
                          ("[#A]" "❰P1❱")
                          ("[#B]" "❰P2❱")
                          ("[#C]" "❰P3❱"))
+
 (setq prettify-symbols-unprettify-at-point nil)
 #+end_src
 
@@ -768,6 +769,13 @@ A slight enhancement I'm adding is to have =Shift= always insert the TODO versio
 #+end_src
 
 *** TODO Create binding for opening the default notes file
+
+** org-pretty-table
+Redraw org tables in the buffer with box-drawing characters.
+#+begin_src emacs-lisp
+(use-package! org-pretty-table
+  :commands (org-pretty-table-mode global-org-pretty-table-mode))
+#+end_src
 
 * rcirc
 #+begin_src emacs-lisp

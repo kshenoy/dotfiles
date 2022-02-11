@@ -58,6 +58,9 @@
 ;; Disabling org-fancy-priorities as it significantly slows things when opening a large org file
 (package! org-fancy-priorities :disable t)
 
+(package! org-pretty-table
+  :recipe (:host github :repo "Fuco1/org-pretty-table"))
+
 ;; Saner regexps!
 (package! pcre2el)
 (package! visual-regexp-steroids)
