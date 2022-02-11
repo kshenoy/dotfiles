@@ -802,6 +802,18 @@ Redraw org tables in the buffer with box-drawing characters.
       rcirc-time-format "[%H:%M] ")
 #+end_src
 
+* which-key
+Hide verbose prefixes eg. =evil-= =evilem-motion-= etc.
+#+begin_src emacs-lisp
+(setq which-key-allow-multiple-replacements t)
+(after! which-key
+  (pushnew!
+   which-key-replacement-alist
+   '(("" . "\\`+?evil[-:]?\\(?:a-\\)?\\(.*\\)") . (nil . "\\1"))
+   '(("\\`g s" . "\\`evilem--?motion-\\(.*\\)") . (nil . "\\1"))
+   ))
+#+end_src
+
 * workspaces (using persp-mode)
 #+begin_src emacs-lisp
 (map! :when (featurep! :ui workspaces)
