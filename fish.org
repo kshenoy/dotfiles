@@ -13,7 +13,17 @@ starship init fish | source
 
 Set the theme. Check if ~$BASE16_THEME~ is defined and set the theme only if it isn't
 #+begin_src sh
-test -z "$BASE16_THEME" && base16 solarized-light
+if status --is-interactive
+    if set -q XDG_CONFIG_HOME
+        set -Ux BASE16_SHELL $XDG_CONFIG_HOME/base16-shell
+    else
+        set -Ux BASE16_SHELL ~/.config/base16-shell
+    end
+
+    if set -q BASE16_SHELL
+        source "$BASE16_SHELL/profile_helper.fish"
+    end
+end
 #+end_src
 
 #+begin_src sh

@@ -4,11 +4,11 @@
 Running =doom sync= is not required after modifying this file!
 
 Some additional functions/macros to help configure Doom:
-- =load!= for loading external *.el files relative to this one
-- =use-package!= for configuring packages
-- =after!= for running code after a package has loaded
-- =add-load-path!= for adding directories to the =load-path=, relative to this file. Emacs searches the =load-path= when you load packages with =require= or =use-package=.
-- =map!= for binding new keys
+- ~load!~ for loading external *.el files relative to this one
+- ~use-package!~ for configuring packages
+- ~after!~ for running code after a package has loaded
+- ~add-load-path!~ for adding directories to the =load-path=, relative to this file. Emacs searches the =load-path= when you load packages with =require= or =use-package=.
+- ~map!~ for binding new keys
 
 To get information about any of these functions/macros, move the cursor over the highlighted symbol at press =K= (non-evil users must press =C-c c k=). This will open documentation for it, including demos of how they are used.
 
@@ -19,10 +19,10 @@ Also, =gd= (or =C-c c d=) will jump to their definition and see how they are imp
  :header-args: :tangle no
  :END:
 [[https://org-babel.readthedocs.io/en/latest/header-args/][header-args]]:
-- =:tangle yes=
-This allows me to run =org-babel-tangle= in the org file to generate the el file without having to restart emacs and rely on =org-babel-load-file=
+- ~:tangle yes~
+This allows me to run ~org-babel-tangle~ in the org file to generate the el file without having to restart emacs and rely on ~org-babel-load-file~
 
-- =:comments both=
+- ~:comments both~
 This adds all the non-code related text as comments in the tangled file. It also adds comments wrappers with links back to the heading in the original Org mode file.
 
 Resources:
@@ -109,7 +109,7 @@ Some functionality uses this to identify you, e.g. GPG configuration, email clie
 #+end_src
 
 This determines the style of line numbers in effect. If set to
-- =nil=: line numbers are disabled.
+- =nil= - line numbers are disabled.
 - =relative= - relative line numbers
 #+begin_src emacs-lisp
 (setq display-line-numbers-type 'nil)
@@ -119,7 +119,7 @@ This determines the style of line numbers in effect. If set to
 (setq bookmark-default-file (concat doom-private-dir "bookmarks"))
 #+end_src
 
-Change emacs and insert-state leader as ~M-Spc~ is often used in linux to activate the application menu
+Change emacs and insert-state leader as =M-Spc= is often used in linux to activate the application menu
 #+begin_src emacs-lisp
 (setq doom-leader-alt-key "C-SPC")
 (setq doom-localleader-alt-key (concat doom-leader-alt-key " m"))
@@ -139,7 +139,7 @@ They all accept either a font-spec, font string ("Input Mono-12"), or xlfd font 
 
 ** Themes
 There are two ways to load a theme. Both assume the theme is installed and available.
-I can either set =doom-theme= or manually load a theme with the =load-theme= function.
+I can either set =doom-theme= or manually load a theme with the ~load-theme~ function.
 #+begin_src emacs-lisp
 (setq doom-theme 'doom-solarized-light)
 #+end_src
@@ -156,13 +156,6 @@ Doom provides a =dooom-load-theme-hook= eg.
       :desc "avy-goto-line" "M-g" #'avy-goto-line)
 #+end_src
 
-=SPC SPC= is too valuable to use to find files in project. Rebind to =switch-buffer= instead
-#+begin_src emacs-lisp
-(map! :after ivy
-      :leader
-      :desc "Switch buffer" "SPC" #'+ivy/switch-buffer)
-#+end_src
-
 Some generic toggle bindings
 #+begin_src emacs-lisp
 (map! :map doom-leader-toggle-map
@@ -170,6 +163,12 @@ Some generic toggle bindings
 #+end_src
 
 *** TODO Description is not displayed correctly when using which-key
+
+* avy
+#+begin_src emacs-lisp
+(after! avy
+  (setq avy-single-candidate-jump t))
+#+end_src
 
 * counsel/ivy/swiper
 #+begin_src emacs-lisp
@@ -179,6 +178,14 @@ Some generic toggle bindings
 (map! :after swiper
       :map doom-leader-search-map
       :desc "Search all buffers" "B" #'swiper-all)
+#+end_src
+
+=SPC SPC= is too valuable to use to find files in project. Rebind to ~switch-workspace-buffer~ instead
+#+begin_src emacs-lisp
+(map! :after ivy
+      :leader
+      :desc "Switch workspace buffer" "SPC" #'+ivy/switch-workspace-buffer
+      :desc "Switch buffer"           ","   #'+ivy/switch-buffer)
 #+end_src
 
 * doom-modeline
@@ -210,9 +217,6 @@ Move by visual lines
       :desc "evil-end-of-visual-line"   "$"   #'evil-end-of-visual-line
       :desc "evil-end-of-line"          "g $" #'evil-end-of-line
       :desc "evil-beginning-of-line"    "g 0" #'evil-beginning-of-line)
-
-(after! evil-maps
-  (evil-redirect-digit-argument evil-motion-state-map "0" 'evil-beginning-of-visual-line))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -223,22 +227,13 @@ Move by visual lines
 
 * Org
 #+begin_src emacs-lisp
-(setq org-directory (file-truename "~/Documents/Notes"))
-#+end_src
-
-Doom overwrites this so setting this after doom is done loading
-#+begin_src emacs-lisp
-(after! org
-  org-default-notes-file (expand-file-name "Personal/Inbox.org" org-directory)
+(setq org-directory (file-truename "~/Documents/Notes")
+      +org-capture-notes-file "Inbox.org")
 #+end_src
 
 To add CREATED timestamps to org entries
 #+begin_src emacs-lisp
 (setq org-expiry-inactive-timestamps t)
-#+end_src
-
-#+begin_src emacs-lisp
-)
 #+end_src
 
 ** Agenda
@@ -410,7 +405,7 @@ Use ✿ for levels 1-3, ✸ for level 4-6 and ◉ for levels 7 onwards
 
 Replace - and + in plain list with ➤ and ✜ respectively
 #+begin_src emacs-lisp
-(setq org-superstar-item-bullet-alist '((42 . ?•) (43 . ?✜) (45 . ?➤)))
+(setq org-superstar-item-bullet-alist '((?* . ?•) (?+ . ?✜) (?- . ?➤)))
 #+end_src
 
 Prettier priorities
@@ -419,10 +414,10 @@ Prettier priorities
                          ("[ ]" "☐")
                          ("[x]" "✔")
                          ("[X]" "✔")
-                         ("[-]" "❍")
+                         ("[-]" "⬓")
                          (":LOGBOOK:" "☰")
                          (":PROPERTIES:" "⚙")
-                         (":END:" "⋯")
+                         (":END:" "«")
                          ("DEADLINE:" "⏰D")
                          ("SCHEDULED:" "⏰S")
                          ("CLOCK:" "⏲")
@@ -537,8 +532,8 @@ Repurpose =C-c C-v u= to jump to beginning/end of any block. =C-c C-v C-u= is le
 #+end_src
 
 ** ID
-Create an ID when storing the link. Curiously this also causes =org-store-link= to store IDs by default
-Also note that setting this to true will create an ID for every entry which could become expensive when =org-id-track-globally= is enabled
+Create an ID when storing the link. Curiously this also causes ~org-store-link~ to store IDs by default
+Also note that setting this to true will create an ID for every entry which could become expensive when ~org-id-track-globally~ is enabled
 
 #+begin_src emacs-lisp
 (add-to-list 'org-modules 'org-id)
@@ -547,7 +542,7 @@ Also note that setting this to true will create an ID for every entry which coul
 
 ** Progress
 #+begin_src emacs-lisp
-(setq org-clock-history-length 9)
+(setq org-clock-history-length 35)
 #+end_src
 
 ** Refile
