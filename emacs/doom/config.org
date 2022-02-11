@@ -40,12 +40,14 @@ Resources:
 
 Use =C-u C-M-x= with the point over the function to debug. This puts us into debugging minor mode in which the following bindings are useful
 
+|-----+----------------|
 | SPC | Step next      |
 | b   | Set breakpoint |
 | g   | Go (run)       |
 | h   | Goto here      |
 | i   | Step into      |
 | q   | Quit           |
+|-----+----------------|
 
 Setting this gives a backtrace
 #+begin_src emacs-lisp :tangle no
@@ -769,6 +771,20 @@ A slight enhancement I'm adding is to have =Shift= always insert the TODO versio
 #+end_src
 
 *** TODO Create binding for opening the default notes file
+
+** org-appear
+While =org-hide-emphasis-markers= is very nice, it can sometimes make edits which occur at the border a bit more fiddly.
+This package automagically reveals the emphasis markers
+#+begin_src emacs-lisp
+(use-package! org-appear
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autoemphasis t
+        org-appear-autosubmarkers t
+        org-appear-autolinks nil)
+  ;; for proper first-time setup, `org-appear--set-elements' needs to be run after other hooks have acted.
+  (run-at-time nil nil #'org-appear--set-elements))
+#+end_src
 
 ** org-pretty-table
 Redraw org tables in the buffer with box-drawing characters.
