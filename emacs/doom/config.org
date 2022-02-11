@@ -1,5 +1,5 @@
-#+TITLE: Doom emacs private configuration
-#+PROPERTY: header-args :results output silent :noweb tangle :comments both :mkdirp yes
+#+title: Doom emacs private configuration
+#+property: header-args :results output silent :noweb tangle :comments both :mkdirp yes
 
 Running =doom sync= is not required after modifying this file!
 
@@ -15,9 +15,9 @@ To get information about any of these functions/macros, move the cursor over the
 Also, =gd= (or =C-c c d=) will jump to their definition and see how they are implemented.
 
 * Literate config
- :PROPERTIES:
- :header-args: :tangle no
- :END:
+:PROPERTIES:
+:header-args: :tangle no
+:END:
 [[https://org-babel.readthedocs.io/en/latest/header-args/][header-args]]:
 - ~:tangle yes~
 This allows me to run ~org-babel-tangle~ in the org file to generate the el file without having to restart emacs and rely on ~org-babel-load-file~
@@ -410,29 +410,111 @@ Replace - and + in plain list with ➤ and ✜ respectively
 (setq org-superstar-item-bullet-alist '((?* . ?•) (?+ . ?✜) (?- . ?➤)))
 #+end_src
 
-More pretty symbols
+There seem to be two ways of replacing text with symbols - using =prettify-symbols-mode= and by using ligatures
+I don't know the pros v/s cons of each approach. However this seems to work pretty well and seems to be what doom-emacs
+is doing so might as well use this
+
+**** More pretty symbols using ligatures
+Here I define what symbols to use.
+Note that this should not contain any symbols from the Unicode Private Area as there is no universal way of getting the correct symbol as that area varies from font to font.
+However, I'm only using FontAwesome at the moment as the symbols it provides are a lot nicer than the standard offering so it kinda works
+
 #+begin_src emacs-lisp
-(prettify-utils-add-hook org-mode
-                         ("[ ]" "☐")
-                         ("[x]" "✔")
-                         ("[X]" "✔")
-                         ("[-]" "⬓")
-                         (":LOGBOOK:" "☰")
-                         (":PROPERTIES:" "⚙")
-                         (":END:" "«")
-                         ("DEADLINE:" "⏰D")
-                         ("SCHEDULED:" "⏰S")
-                         ("CLOCK:" "⏲")
-                         ("[#A]" "❰P1❱")
-                         ("[#B]" "❰P2❱")
-                         ("[#C]" "❰P3❱"))
+(appendq! +ligatures-extra-symbols
+          `(:arrow_left    "←"
+            :arrow_right   "→"
+            :attr_html     "🄗"
+            :attr_latex    "🄛"
+            :attr_org      "⒪"
+            :author        "𝘼"
+            :beamer_header "🅑"
+            :begin_export  "⏩"
+            :begin_quote   "❝"
+            :caption       "☰"
+            :checkbox      "☐"
+            :checkedbox    "✔"
+            :clock         "⏲"
+            :date          "𝘿"
+            :deadline      ""
+            :ellipses      "…"
+            :em_dash       "—"
+            :end           "«"
+            :end_export    "⏪"
+            :end_quote     "❞"
+            :header        "›"
+            :html          "🅗"
+            :html_head     "🅷"
+            :latex         "🅛"
+            :latex_class   "🄻"
+            :latex_header  "🅻"
+            :list_property "∷"
+            :logbook       ""
+            :macro         "𝓜"
+            :options       "⌥"
+            :pending       "⬓"
+            :priority_a   ,(propertize "❰P1❱" 'face 'error)
+            :priority_b   ,(propertize "❰P2❱" 'face 'warning)
+            :priority_c   ,(propertize "❰P3❱" 'face 'success)
+            :priority_d    " "
+            :properties    "⚙"
+            :property      "⚙"
+            :results       "🠶"
+            :scheduled     ""
+            :startup       "⏻"
+            :subtitle      "𝙩"
+            :title         "𝙏"
+))
+#+end_src
 
-(prettify-utils-add-hook org-agenda-mode
-                         ("[#A]" "❰P1❱")
-                         ("[#B]" "❰P2❱")
-                         ("[#C]" "❰P3❱"))
-
-(setq prettify-symbols-unprettify-at-point nil)
+Next I map what "string" they should map to
+#+begin_src emacs-lisp
+(set-ligatures! 'org-mode
+  :merge t
+  ;; :arrow_left       "<-"
+  ;; :arrow_right      "->"
+  ;; :attr_html        "#+attr_html:"
+  ;; :attr_latex       "#+attr_latex:"
+  ;; :attr_org         "#+attr_org:"
+  ;; :author           "#+author:"
+  ;; :beamer_header    "#+beamer_header:"
+  ;; :begin_export     "#+begin_export"
+  :begin_quote      "#+begin_quote"
+  ;; :caption          "#+caption:"
+  :checkbox         "[ ]"
+  :checkedbox       "[X]"
+  :clock            "CLOCK:"
+  ;; :date             "#+date:"
+  :deadline         "DEADLINE:"
+  :ellipsis         "..."
+  :em_dash          "---"
+  :end              ":END:"
+  :end              ":end:"
+  ;; :end_export       "#+end_export"
+  :end_quote        "#+end_quote"
+  ;; :header           "#+header:"
+  ;; :html             "#+html:"
+  ;; :html_head        "#+html_head:"
+  ;; :latex            "#+latex:"
+  ;; :latex_class      "#+latex_class:"
+  ;; :latex_header     "#+latex_header:"
+  :list_property    "::"
+  :logbook          ":LOGBOOK:"
+  ;; :macro            "#+macro:"
+  ;; :options          "#+options:"
+  ;; :options          "#+OPTIONS:"
+  :pending          "[-]"
+  :priority_a       "[#A]"
+  :priority_b       "[#B]"
+  :priority_c       "[#C]"
+  :priority_d       "[#D]"
+  :property         "#+property:"
+  :property         ":PROPERTIES:"
+  ;; :results          "#+RESULTS:"
+  :scheduled        "SCHEDULED:"
+  ;; :startup          "#+startup:"
+  ;; :subtitle         "#+subtitle:"
+  ;; :title            "#+title:"
+)
 #+end_src
 
 ** Babel
@@ -726,17 +808,16 @@ Setting this to nil allows a convenient way to select a TODO state and bypass an
 *** Priorities
 #+begin_src emacs-lisp
 (setq org-highest-priority ?A
-      org-lowest-priority ?D
+      org-lowest-priority  ?D
       org-default-priority ?D)
 #+end_src
 
-**** Set custom priority faces
+Set custom priority faces
 Need to put this in an ~after!~ block to make sure it gets set after the defaults provided by Doom
 #+begin_src emacs-lisp
-(after! org
-        (setq org-priority-faces `((?A . (:height ,(face-attribute 'default :height) :foreground ,(face-attribute 'error   :foreground)))
-                                   (?B . (:height ,(face-attribute 'default :height) :foreground ,(face-attribute 'warning :foreground)))
-                                   (?C . (:height ,(face-attribute 'default :height) :foreground ,(face-attribute 'success :foreground))))))
+(setq org-priority-faces `((?A . (:height ,(face-attribute 'default :height) :foreground ,(face-attribute 'error   :foreground)))
+                           (?B . (:height ,(face-attribute 'default :height) :foreground ,(face-attribute 'warning :foreground)))
+                           (?C . (:height ,(face-attribute 'default :height) :foreground ,(face-attribute 'success :foreground)))))
 #+end_src
 
 More customization in [[id:b3d9e6d2-b197-4a77-b055-5f8e4b0baf37][Pretty symbols]]

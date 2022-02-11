@@ -49,12 +49,6 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
 
-;; This makes it easier to add symbols to prettify-symbols-alist.
-;; More importantly it gets very complicated if the replacement needs to be more than one character and that's where this comes really handy
-;; Reddit discussion on the topic: https://www.reddit.com/r/emacs/comments/brt0sk/prettifysymbolsmode_is_so_cool/eogn7fi
-(package! prettify-utils
-  :recipe (:host github :repo "Ilazki/prettify-utils.el"))
-
 ;; Disabling org-fancy-priorities as it significantly slows things when opening a large org file
 (package! org-fancy-priorities :disable t)
 
