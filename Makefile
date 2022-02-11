@@ -3,7 +3,7 @@
 TANGLE := emacs --batch --no-init-file --load emacs/tangle.el --funcall literate-dotfiles-tangle
 XDG_CONFIG_HOME ?= ${HOME}/.config
 XDG_DATA_HOME ?= ${HOME}/.local/share
-MKLINK := ln -svTf
+MKLINK := ln -svf
 
 
 all: dotfiles-priv base16-fzf base16-shell bash emacs fish git tmux vim links
