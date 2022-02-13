@@ -11,9 +11,13 @@ Use [[https://starship.rs/][starship prompt]]
 starship init fish | source
 #+end_src
 
+** login options
+These options need to be set only when logging in i.e. the first time
+
 Set the theme. Check if ~$BASE16_THEME~ is defined and set the theme only if it isn't
+I need to figure out when this should be called. I probably don't want to invoke this for non-login shells
 #+begin_src sh
-if status --is-interactive
+if status --is-login
     if set -q XDG_CONFIG_HOME
         set -Ux BASE16_SHELL $XDG_CONFIG_HOME/base16-shell
     else
