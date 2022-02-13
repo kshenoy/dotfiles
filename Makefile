@@ -24,7 +24,7 @@ ${XDG_CONFIG_HOME}/dotfiles-priv:
 # the saved version of the file gets updated, thereby affecting the link
 # Hence, a workaround at the moment is to tangle to the location and copy it over to the repo
 bash: ${HOME}/.bashrc dircolors ripgreprc
-# Using grouped targets here to run tangle bash/bashrc.org only once. Supported only for make versions >= 4.3
+# Using grouped targets here to run tangle only once. Supported only for make versions >= 4.3
 ${HOME}/.bashrc dircolors ripgreprc &: bash/bashrc.org
 	${TANGLE} $<
 	@mkdir -p ${XDG_DATA_HOME}/bash_history
@@ -81,20 +81,27 @@ ${HOME}/bin/emacs_daemon:
 
 
 #== fish ===============================================================================================================
-fish: ${HOME}/.config/fish/config.fish ${HOME}/.config/fish/functions/aliases.fish
-# Using grouped targets here to run tangle only once. Supported only for make versions >= 4.3
-${HOME}/.config/fish/config.fish ${HOME}/.config/fish/functions/aliases.fish &: fish.org
+fish: fish/config.fish ${XDG_CONFIG_HOME}/fish/config.fish ${XDG_CONFIG_HOME}/fish/functions
+fish/config.fish: fish.org
 	${TANGLE} $<
+${XDG_CONFIG_HOME}/fish/config.fish:
+	@mkdir -p $(dir $@)
+	@${MKLINK} ${PWD}/fish/config.fish $@
+${XDG_CONFIG_HOME}/fish/functions:
+	@mkdir -p $(dir $@)
+	@${MKLINK} ${PWD}/fish/functions $@
 
 
 #== git ================================================================================================================
-git: git/config ${XDG_CONFIG_HOME}/git/config ${XDG_CONFIG_HOME}/git/ignore
-git/config: git/git.org
+git: git/config git/ignore ${XDG_CONFIG_HOME}/git/config ${XDG_CONFIG_HOME}/git/ignore
+# Using grouped targets here to run tangle only once. Supported only for make versions >= 4.3
+git/config git/ignore &: git.org
 	${TANGLE} $<
 ${XDG_CONFIG_HOME}/git/config:
 	@mkdir -p $(dir $@)
 	@${MKLINK} ${PWD}/git/config $@
 ${XDG_CONFIG_HOME}/git/ignore:
+	@mkdir -p $(dir $@)
 	@${MKLINK} ${PWD}/git/ignore $@
 
 
