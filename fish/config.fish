@@ -1,20 +1,22 @@
 # config.fish
 # :PROPERTIES:
-# :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/config.fish")
+# :header-args+: :tangle generated/fish/config.fish
 # :END:
 
 # Use [[https://starship.rs/][starship prompt]]
 
-# [[file:../dotfiles/fish.org::*config.fish][config.fish:1]]
+# [[file:../../fish.org::*config.fish][config.fish:1]]
 starship init fish | source
 # config.fish:1 ends here
 
-
+# login options
+# These options need to be set only when logging in i.e. the first time
 
 # Set the theme. Check if ~$BASE16_THEME~ is defined and set the theme only if it isn't
+# I need to figure out when this should be called. I probably don't want to invoke this for non-login shells
 
-# [[file:../dotfiles/fish.org::*config.fish][config.fish:2]]
-if status --is-interactive
+# [[file:../../fish.org::*login options][login options:1]]
+if status --is-login
     if set -q XDG_CONFIG_HOME
         set -Ux BASE16_SHELL $XDG_CONFIG_HOME/base16-shell
     else
@@ -25,8 +27,8 @@ if status --is-interactive
         source "$BASE16_SHELL/profile_helper.fish"
     end
 end
-# config.fish:2 ends here
+# login options:1 ends here
 
-# [[file:../dotfiles/fish.org::*config.fish][config.fish:3]]
+# [[file:../../fish.org::*login options][login options:2]]
 fish_add_path ~/bin
-# config.fish:3 ends here
+# login options:2 ends here

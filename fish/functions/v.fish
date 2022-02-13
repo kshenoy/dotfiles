@@ -1,6 +1,6 @@
 # vim
 
-# [[file:../../dotfiles/fish.org::*vim][vim:1]]
+# [[file:../../../fish.org::*vim][vim:1]]
 function v --wraps=vim
   vim $argv
 end

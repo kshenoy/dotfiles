@@ -1,4 +1,4 @@
-# [[file:../../dotfiles/fish.org::*aliases][aliases:4]]
+# [[file:../../../fish.org::*aliases][aliases:4]]
 function cl
   clear
   ls

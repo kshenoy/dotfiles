@@ -1,9 +1,9 @@
 # config
 # :PROPERTIES:
-# :header-args+: :tangle config
+# :header-args+: :tangle generated/git/config
 # :END:
 
-# [[file:git.org::*config][config:1]]
+# [[file:../../git.org::*config][config:1]]
 # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
 # Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
 # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
@@ -11,7 +11,7 @@
 
 # user
 
-# [[file:git.org::*user][user:1]]
+# [[file:../../git.org::*user][user:1]]
 [user]
 name  = Kartik Shenoy
 email = theresmorethanoneway@gmail.com
@@ -19,7 +19,7 @@ email = theresmorethanoneway@gmail.com
 
 # core
 
-# [[file:git.org::*core][core:1]]
+# [[file:../../git.org::*core][core:1]]
 [core]
 editor   = gvim --nofork
 fileMode = false
@@ -29,13 +29,13 @@ fileMode = false
 
 # Centralize all hooks instead of configuring them on a per-repository basis
 
-# [[file:git.org::*core][core:3]]
+# [[file:../../git.org::*core][core:3]]
 hooksPath = ~/.config/git/hooks/
 # core:3 ends here
 
 # color
 
-# [[file:git.org::*color][color:1]]
+# [[file:../../git.org::*color][color:1]]
 [color]
 ui     = auto
 branch = auto
@@ -61,7 +61,7 @@ untracked = cyan
 
 # diff
 
-# [[file:git.org::*diff][diff:1]]
+# [[file:../../git.org::*diff][diff:1]]
 [diff]
 tool = gvim
 
@@ -82,7 +82,7 @@ cmd = meld --diff $LOCAL $REMOTE
 
 # merge
 
-# [[file:git.org::*merge][merge:1]]
+# [[file:../../git.org::*merge][merge:1]]
 [merge]
 tool = gvim
 conflictstyle = diff3
@@ -101,7 +101,7 @@ trustExitCode = true
 
 # misc
 
-# [[file:git.org::*misc][misc:1]]
+# [[file:../../git.org::*misc][misc:1]]
 [credential]
 helper = cache --timeout=3600
 
@@ -119,7 +119,7 @@ rebase = false
 # Using =!= as prefix allows running any command in the shell and it doesn't have to be a git command.
 # Thus, if we want to create an alias to run multiple commands by chaining them together, we have to use =!=
 
-# [[file:git.org::*aliases][aliases:1]]
+# [[file:../../git.org::*aliases][aliases:1]]
 [alias]
 alias = !git config -l | grep alias | cut -c 7-
 # aliases:1 ends here
@@ -128,11 +128,11 @@ alias = !git config -l | grep alias | cut -c 7-
 
 # Open gitconfig file with my default editor
 
-# [[file:git.org::*aliases][aliases:2]]
+# [[file:../../git.org::*aliases][aliases:2]]
 ec = config --global -e
 # aliases:2 ends here
 
-# [[file:git.org::*aliases][aliases:3]]
+# [[file:../../git.org::*aliases][aliases:3]]
 st = status
 d  = diff
 dw = diff --word-diff
@@ -148,7 +148,7 @@ br = branch -a
 
 # Aliases for deleting the branch from various places
 
-# [[file:git.org::*aliases][aliases:4]]
+# [[file:../../git.org::*aliases][aliases:4]]
 br-rm-remote = !"f() { branch=${1-$(git symbolic-ref --short HEAD)}; git push origin :$branch; }; f"
 br-rm-local  = !"f() { branch=${1-$(git symbolic-ref --short HEAD)}; git branch -D $branch; }; f"
 br-rm-all    = !"f() { branch=${1-$(git symbolic-ref --short HEAD)}; git push origin :$branch; git branch -D $branch; }; f"
@@ -158,11 +158,11 @@ br-rm-all    = !"f() { branch=${1-$(git symbolic-ref --short HEAD)}; git push or
 
 # This scrubs away all local branches that are merged.
 
-# [[file:git.org::*aliases][aliases:5]]
+# [[file:../../git.org::*aliases][aliases:5]]
 br-scrub = !git branch --merged | egrep -v '(^\\*|master)' | xargs git branch -d
 # aliases:5 ends here
 
-# [[file:git.org::*aliases][aliases:6]]
+# [[file:../../git.org::*aliases][aliases:6]]
 lg = log --color --graph --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(red)%d%C(reset)' --abbrev-commit --all
 ls = log --color --graph --pretty=format:' %C(yellow)%h%C(reset) %s %C(red)%d%C(reset)' --abbrev-commit --all
 # aliases:6 ends here
@@ -171,7 +171,7 @@ ls = log --color --graph --pretty=format:' %C(yellow)%h%C(reset) %s %C(red)%d%C(
 
 # Pull changes from the remote. Any local commits will be rebased to come after the commits from remote. =--prune= option removes remote-tracking branches that no longer exist on the remote.
 
-# [[file:git.org::*aliases][aliases:7]]
+# [[file:../../git.org::*aliases][aliases:7]]
 sync = !git pull --rebase --prune && git submodule update --init --recursive
 # aliases:7 ends here
 
@@ -181,6 +181,6 @@ sync = !git pull --rebase --prune && git submodule update --init --recursive
 # This commits everything and then does a hard reset to remove that commit. The nice thing is, the commit is still there, but it’s just unreachable. Unreachable commits are a bit inconvenient to restore, but at least they are still there.
 # I can run the =git reflog= command and find the SHA of the commit if I realize later that I made a mistake with the reset. The commit message will be “WIPE SAVEPOINT” in this case.
 
-# [[file:git.org::*aliases][aliases:8]]
+# [[file:../../git.org::*aliases][aliases:8]]
 wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
 # aliases:8 ends here

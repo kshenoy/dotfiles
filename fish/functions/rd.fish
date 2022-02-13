@@ -1,4 +1,4 @@
-# [[file:../../dotfiles/fish.org::*aliases][aliases:8]]
+# [[file:../../../fish.org::*aliases][aliases:8]]
 function rd --wraps=rm
   rm -rf $argv
 end

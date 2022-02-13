@@ -1,4 +1,4 @@
-# [[file:../../dotfiles/fish.org::*aliases][aliases:5]]
+# [[file:../../../fish.org::*aliases][aliases:5]]
 function mv
   command mv -vi $argv
 end

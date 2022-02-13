@@ -1,4 +1,4 @@
-# [[file:../../dotfiles/fish.org::*aliases][aliases:11]]
+# [[file:../../../fish.org::*aliases][aliases:11]]
 function j --wraps=jobs
   jobs -l $argv
 end

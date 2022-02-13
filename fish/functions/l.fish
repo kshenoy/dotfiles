@@ -1,6 +1,6 @@
 # aliases
 
-# [[file:../../dotfiles/fish.org::*aliases][aliases:1]]
+# [[file:../../../fish.org::*aliases][aliases:1]]
 function l --wraps=ls
   ls $argv;
 end

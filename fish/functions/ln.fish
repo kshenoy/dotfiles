@@ -1,4 +1,4 @@
-# [[file:../../dotfiles/fish.org::*aliases][aliases:9]]
+# [[file:../../../fish.org::*aliases][aliases:9]]
 function ln
   command ln -svi $argv
 end

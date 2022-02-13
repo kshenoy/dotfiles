@@ -1,7 +1,12 @@
+# ignore
+# :PROPERTIES:
+# :header-args+: :tangle generated/git/ignore
+# :END:
 # Created by https://www.gitignore.io/api/c,c++,dropbox,emacs,vim,tags
-/CHECKIN
 
-### C ###
+# For C
+
+# [[file:../../git.org::*ignore][ignore:1]]
 # Object files
 *.o
 *.ko
@@ -35,9 +40,13 @@
 # Debug files
 *.dSYM/
 *.su
+# ignore:1 ends here
 
 
-### C++ ###
+
+# For C++
+
+# [[file:../../git.org::*ignore][ignore:2]]
 # Compiled Object files
 *.slo
 *.lo
@@ -66,16 +75,24 @@
 *.exe
 *.out
 *.app
+# ignore:2 ends here
 
 
-### Dropbox ###
+
+# For Dropbox
+
+# [[file:../../git.org::*ignore][ignore:3]]
 # Dropbox settings and caches
 .dropbox
 .dropbox.attr
 .dropbox.cache
+# ignore:3 ends here
 
 
-### Emacs ###
+
+# For Emacs
+
+# [[file:../../git.org::*ignore][ignore:4]]
 # -*- mode: gitignore; -*-
 *~
 \#*\#
@@ -118,8 +135,13 @@ flycheck_*.el
 
 # projectiles files
 .projectile
+# ignore:4 ends here
 
-### Vim ###
+
+
+# For Vim
+
+# [[file:../../git.org::*ignore][ignore:5]]
 # swap
 [._]*.s[a-w][a-z]
 [._]s[a-w][a-z]
@@ -131,9 +153,13 @@ NetrwTreeListing*
 *~
 # auto-generated tag files
 tags
+# ignore:5 ends here
 
 
-### Tags ###
+
+# For Tags
+
+# [[file:../../git.org::*ignore][ignore:6]]
 # Ignore tags created by etags, ctags, gtags (GNU global) and cscope
 TAGS
 .TAGS
@@ -149,7 +175,12 @@ cscope.files
 cscope.out
 cscope.in.out
 cscope.po.out
+# ignore:6 ends here
 
 
-### Git ###
+
+# For Git
+
+# [[file:../../git.org::*ignore][ignore:7]]
 *.orig
+# ignore:7 ends here
