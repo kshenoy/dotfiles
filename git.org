@@ -4,7 +4,7 @@
 
 * config
 :PROPERTIES:
-:header-args+: :tangle git/config
+:header-args+: :tangle generated/git/config
 :END:
 #+begin_src conf :export none
 # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
@@ -177,7 +177,7 @@ wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
 
 * ignore
 :PROPERTIES:
-:header-args+: :tangle git/ignore
+:header-args+: :tangle generated/git/ignore
 :END:
 Created by https://www.gitignore.io/api/c,c++,dropbox,emacs,vim,tags
 

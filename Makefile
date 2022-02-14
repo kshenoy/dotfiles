@@ -81,28 +81,22 @@ ${HOME}/bin/emacs_daemon:
 
 
 #== fish ===============================================================================================================
-fish: fish/config.fish ${XDG_CONFIG_HOME}/fish/config.fish ${XDG_CONFIG_HOME}/fish/functions
-fish/config.fish: fish.org
+fish: generated/fish/config.fish ${XDG_CONFIG_HOME}/fish/config.fish ${XDG_CONFIG_HOME}/fish/functions
+generated/fish/config.fish: fish.org
 	${TANGLE} $<
-${XDG_CONFIG_HOME}/fish/config.fish:
-	@mkdir -p $(dir $@)
-	@${MKLINK} ${PWD}/fish/config.fish $@
-${XDG_CONFIG_HOME}/fish/functions:
-	@mkdir -p $(dir $@)
-	@${MKLINK} ${PWD}/fish/functions $@
+# Using grouped targets here to create links only once. Supported only for make versions >= 4.3
+${XDG_CONFIG_HOME}/fish/config.fish ${XDG_CONFIG_HOME}/fish/functions &:
+	make -f generated/Makefile fish
 
 
 #== git ================================================================================================================
-git: git/config git/ignore ${XDG_CONFIG_HOME}/git/config ${XDG_CONFIG_HOME}/git/ignore
+git: generated/git/config generated/git/ignore ${XDG_CONFIG_HOME}/git/config ${XDG_CONFIG_HOME}/git/ignore
 # Using grouped targets here to run tangle only once. Supported only for make versions >= 4.3
-git/config git/ignore &: git.org
+generated/git/config generated/git/ignore &: git.org
 	${TANGLE} $<
-${XDG_CONFIG_HOME}/git/config:
-	@mkdir -p $(dir $@)
-	@${MKLINK} ${PWD}/git/config $@
-${XDG_CONFIG_HOME}/git/ignore:
-	@mkdir -p $(dir $@)
-	@${MKLINK} ${PWD}/git/ignore $@
+# Using grouped targets here to create links only once. Supported only for make versions >= 4.3
+${XDG_CONFIG_HOME}/git/config ${XDG_CONFIG_HOME}/git/ignore &:
+	make -f generated/Makefile git
 
 
 #== tmux ===============================================================================================================

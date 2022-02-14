@@ -29,5 +29,4 @@ zsh/history
 zsh/oh-my-zsh/
 
 # generated files
-fish/
-git/
+generated/
