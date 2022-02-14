@@ -3,7 +3,7 @@
 XDG_CONFIG_HOME ?= ${HOME}/.config
 XDG_DATA_HOME ?= ${HOME}/.local/share
 MKLINK := ln -svf
-DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+CWD := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 
 all: dotfiles-priv base16-fzf base16-shell bash emacs fish git tmux vim links
@@ -14,20 +14,20 @@ all: dotfiles-priv base16-fzf base16-shell bash emacs fish git tmux vim links
 fish: ${XDG_CONFIG_HOME}/fish/config.fish ${XDG_CONFIG_HOME}/fish/functions
 ${XDG_CONFIG_HOME}/fish/config.fish:
 	@mkdir -p $(dir $@)
-	@${MKLINK} ${PWD}/${DIR}/fish/config.fish $@
+	@${MKLINK} ${CWD}/fish/config.fish $@
 ${XDG_CONFIG_HOME}/fish/functions:
 	@mkdir -p $(dir $@)
-	@${MKLINK} ${PWD}/${DIR}/fish/functions $@
+	@${MKLINK} ${CWD}/fish/functions $@
 
 
 #== git ================================================================================================================
 git: ${XDG_CONFIG_HOME}/git/config ${XDG_CONFIG_HOME}/git/ignore
 ${XDG_CONFIG_HOME}/git/config:
 	@mkdir -p $(dir $@)
-	@${MKLINK} ${PWD}/${DIR}/git/config $@
+	@${MKLINK} ${CWD}/git/config $@
 ${XDG_CONFIG_HOME}/git/ignore:
 	@mkdir -p $(dir $@)
-	@${MKLINK} ${PWD}/${DIR}/git/ignore $@
+	@${MKLINK} ${CWD}/git/ignore $@
 
 
 #=======================================================================================================================
