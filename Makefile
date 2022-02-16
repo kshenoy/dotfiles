@@ -6,11 +6,10 @@ MKLINK := ln -svf
 CWD := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 
-all: dotfiles-priv base16-fzf base16-shell bash emacs fish git tmux vim links
-# Rules not included in all: xmonad
+all: fish git nvim
 
 
-#== fish ===============================================================================================================
+#== fish =================================================================================================================
 fish: ${XDG_CONFIG_HOME}/fish/config.fish ${XDG_CONFIG_HOME}/fish/functions
 ${XDG_CONFIG_HOME}/fish/config.fish:
 	@mkdir -p $(dir $@)
@@ -20,7 +19,7 @@ ${XDG_CONFIG_HOME}/fish/functions:
 	@${MKLINK} ${CWD}/fish/functions $@
 
 
-#== git ================================================================================================================
+#== git ==================================================================================================================
 git: ${XDG_CONFIG_HOME}/git/config ${XDG_CONFIG_HOME}/git/ignore
 ${XDG_CONFIG_HOME}/git/config:
 	@mkdir -p $(dir $@)
@@ -30,7 +29,14 @@ ${XDG_CONFIG_HOME}/git/ignore:
 	@${MKLINK} ${CWD}/git/ignore $@
 
 
-#=======================================================================================================================
+#== nvim =================================================================================================================
+nvim: ${XDG_CONFIG_HOME}/nvim/init.lua
+${XDG_CONFIG_HOME}/nvim/init.lua:
+	@mkdir -p $(dir $@)
+	@${MKLINK} ${CWD}/nvim/init.lua $@
+
+
+#=========================================================================================================================
 info:
 	$(info EUID=${EUID})
 	$(info XDG_CONFIG_HOME=${XDG_CONFIG_HOME})
