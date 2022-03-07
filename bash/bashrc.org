@@ -545,13 +545,10 @@ Note that =pushd= calls =cd= under the hood. So =cdable_vars= and =cdspell= appl
 cd() {
     if (( "$#" == 0 )); then
         if vcs::is_in_repo > /dev/null; then
-            local _dir="$(vcs::get_root)"
-            if [[ "$PWD" != "$_dir" ]]; then
-                cd "$_dir"
-                return
-            fi
+            pushd "$(vcs::get_root)"
+        else
+            pushd "$HOME"
         fi
-        cd "$HOME"
         return
     fi
 
