@@ -3,7 +3,7 @@
 
 * config.fish
 :PROPERTIES:
-:header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/config.fish")
+:header-args+: :tangle generated/fish/config.fish
 :END:
 
 Use [[https://starship.rs/][starship prompt]]
@@ -11,9 +11,23 @@ Use [[https://starship.rs/][starship prompt]]
 starship init fish | source
 #+end_src
 
+** login options
+These options need to be set only when logging in i.e. the first time
+
 Set the theme. Check if ~$BASE16_THEME~ is defined and set the theme only if it isn't
+I need to figure out when this should be called. I probably don't want to invoke this for non-login shells
 #+begin_src sh
-test -z "$BASE16_THEME" && base16 solarized-light
+if status --is-login
+    if set -q XDG_CONFIG_HOME
+        set -Ux BASE16_SHELL $XDG_CONFIG_HOME/base16-shell
+    else
+        set -Ux BASE16_SHELL ~/.config/base16-shell
+    end
+
+    if set -q BASE16_SHELL
+        source "$BASE16_SHELL/profile_helper.fish"
+    end
+end
 #+end_src
 
 #+begin_src sh
@@ -21,112 +35,112 @@ fish_add_path ~/bin
 #+end_src
 
 * aliases
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/l.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/l.fish
 function l --wraps=ls
   ls $argv;
 end
 #+end_src
 
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/la.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/la.fish
 function la --wraps=ls
   ls -A $argv;
 end
 #+end_src
 
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/c.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/c.fish
 function c --wraps=clear
   clear $argv
 end
 #+end_src
 
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/cl.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/cl.fish
 function cl
   clear
   ls
 end
 #+end_src
 
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/mv.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/mv.fish
 function mv
   command mv -vi $argv
 end
 #+end_src
 
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/cp.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/cp.fish
 function cp
   command cp -vi $argv
 end
 #+end_src
 
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/rm.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/rm.fish
 function rm
   command rm -vi $argv
 end
 #+end_src
 
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/rd.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/rd.fish
 function rd --wraps=rm
   rm -rf $argv
 end
 #+end_src
 
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/ln.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/ln.fish
 function ln
   command ln -svi $argv
 end
 #+end_src
 
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/C.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/C.fish
 function C --wraps=cat
   cat $argv
 end
 #+end_src
 
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/j.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/j.fish
 function j --wraps=jobs
   jobs -l $argv
 end
 #+end_src
 
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/x.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/x.fish
 function x --wraps=exit
   exit $argv
 end
 #+end_src
 
 ** grep, rg etc.
-#+begin_src sh :tangle (if (executable-find "rg") "no" (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/g.fish"))
+#+begin_src sh :tangle (if (executable-find "rg") "no" "generated/fish/functions/g.fish")
 function g --wraps=grep
   grep $argv
 end
 #+end_src
 
-#+begin_src sh :tangle (if (executable-find "rg") (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/g.fish") "no")
+#+begin_src sh :tangle (if (executable-find "rg") "generated/fish/functions/g.fish" "no")
 function g --wraps=rg
   rg $argv
 end
 #+end_src
 
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/gi.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/gi.fish
 function gi --wraps=g
   g -i $argv
 end
 #+end_src
 
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/gv.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/gv.fish
 function gv --wraps=g
   g -v $argv
 end
 #+end_src
 
 ** vim
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/v.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/v.fish
 function v --wraps=vim
   vim $argv
 end
 #+end_src
 
-#+begin_src sh :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/fish/functions/vd.fish")
+#+begin_src sh :header-args+: :tangle generated/fish/functions/vd.fish
 function vd --wraps=vim
   vim -d $argv
 end

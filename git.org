@@ -4,7 +4,7 @@
 
 * config
 :PROPERTIES:
-:header-args+: :tangle config
+:header-args+: :tangle generated/git/config
 :END:
 #+begin_src conf :export none
 # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
@@ -173,6 +173,174 @@ This commits everything and then does a hard reset to remove that commit. The ni
 I can run the =git reflog= command and find the SHA of the commit if I realize later that I made a mistake with the reset. The commit message will be “WIPE SAVEPOINT” in this case.
 #+begin_src conf
 wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
+#+end_src
+
+* ignore
+:PROPERTIES:
+:header-args+: :tangle generated/git/ignore
+:END:
+Created by https://www.gitignore.io/api/c,c++,dropbox,emacs,vim,tags
+
+For C
+#+begin_src conf
+# Object files
+,*.o
+,*.ko
+,*.obj
+,*.elf
+
+# Precompiled Headers
+,*.gch
+,*.pch
+
+# Libraries
+,*.lib
+,*.a
+,*.la
+,*.lo
+
+# Shared objects (inc. Windows DLLs)
+,*.dll
+,*.so
+,*.so.*
+,*.dylib
+
+# Executables
+,*.exe
+,*.out
+,*.app
+,*.i*86
+,*.x86_64
+,*.hex
+
+# Debug files
+,*.dSYM/
+,*.su
+#+end_src
+
+For C++
+#+begin_src conf
+# Compiled Object files
+,*.slo
+,*.lo
+,*.o
+,*.obj
+
+# Precompiled Headers
+,*.gch
+,*.pch
+
+# Compiled Dynamic libraries
+,*.so
+,*.dylib
+,*.dll
+
+# Fortran module files
+,*.mod
+
+# Compiled Static libraries
+,*.lai
+,*.la
+,*.a
+,*.lib
+
+# Executables
+,*.exe
+,*.out
+,*.app
+#+end_src
+
+For Dropbox
+#+begin_src conf
+# Dropbox settings and caches
+.dropbox
+.dropbox.attr
+.dropbox.cache
+#+end_src
+
+For Emacs
+#+begin_src conf
+# -*- mode: gitignore; -*-
+,*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+,*.elc
+auto-save-list/
+tramp
+.\#*
+
+# Org-mode
+.org-id-locations
+,*_archive
+
+# flymake-mode
+,*_flymake.*
+
+# eshell files
+/eshell/history
+/eshell/lastdir
+
+# elpa packages
+/elpa/
+
+# reftex files
+,*.rel
+
+# AUCTeX auto folder
+/auto/
+
+# cask packages
+.cask/
+dist/
+
+# Flycheck
+flycheck_*.el
+
+# server auth directory
+/server/
+
+# projectiles files
+.projectile
+#+end_src
+
+For Vim
+#+begin_src conf
+# swap
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+# session
+Session.vim
+# temporary
+.netrwhist
+NetrwTreeListing*
+,*~
+# auto-generated tag files
+tags
+#+end_src
+
+For Tags
+#+begin_src conf
+# Ignore tags created by etags, ctags, gtags (GNU global) and cscope
+TAGS
+.TAGS
+!TAGS/
+tags
+.tags
+!tags/
+gtags.files
+GTAGS
+GRTAGS
+GPATH
+cscope.files
+cscope.out
+cscope.in.out
+cscope.po.out
+#+end_src
+
+For Git
+#+begin_src conf
+,*.orig
 #+end_src
 
 * Local variables

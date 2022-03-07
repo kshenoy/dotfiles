@@ -1,0 +1,69 @@
+#+TITLE: neovim configuration
+#+PROPERTY: header-args+ :results output silent :noweb tangle :comments both :mkdirp yes :tangle generated/nvim/init.lua
+#+TODO: FIXME | FIXED
+
+This neovim configuration is meant to be used in both a stand-alone manner as well as with VSCode
+VSCode+neovim integration - https://github.com/CozyPenguin/vscode-nvim-setup
+
+* global settings
+These settings apply to both stand-alone neovim as well when used in VSCode
+
+** Package management
+[[https://github.com/wbthomason/packer.nvim#bootstrapping][Bootstrap packer.nvim]]
+#+begin_src lua
+local fn = vim.fn
+local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+if fn.empty(fn.glob(install_path)) > 0 then
+    packer_bootstrap = fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+end
+#+end_src
+
+Initialize packer
+#+begin_src lua
+require('packer').startup(function(use)
+    <<packer-startup>>
+
+    -- This must be at the end after all plugins
+    if packer_bootstrap then
+        require('packer').sync()
+    end
+end
+)
+#+end_src
+
+*** [[https://github.com/b0o/mapx.nvim][mapx]]
+#+begin_src lua :noweb-ref packer-startup :tangle no
+use 'b0o/mapx.nvim'
+#+end_src
+
+#+begin_src lua
+require('mapx').setup{ global = true }
+#+end_src
+
+*** [[https://github.com/machakann/vim-sandwich][sandwich.vim]] - surround text-objects
+#+begin_src lua :noweb-ref packer-startup :tangle no
+use 'machakann/vim-sandwich'
+#+end_src
+
+*** [[https://github.com/numToStr/Comment.nvim][Comment.nvim]]
+#+begin_src lua :noweb-ref packer-startup :tangle no
+use {
+    'numToStr/Comment.nvim',
+    config = function()
+        require'Comment'.setup()
+    end
+}
+#+end_src
+
+* vscode-only settings
+#+begin_src lua
+if vim.g.vscode then
+    nnoremap('z=', "<Cmd>call VSCodeNotify('keyboard-quickfix.openQuickFix')<Cr>")
+end
+#+end_src
+
+* nvim-only settings
+#+begin_src lua
+if not vim.g.vscode then
+end
+#+end_src

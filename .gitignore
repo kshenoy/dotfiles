@@ -3,8 +3,6 @@
 *unison.tmp
 .nfs*
 *sync.ffs_db
-bash/history
-compiz/
 
 # emacs
 emacs/doom/config*.el
@@ -29,3 +27,6 @@ nvim/bundles
 wallpapers/
 zsh/history
 zsh/oh-my-zsh/
+
+# generated files
+generated/
