@@ -16,7 +16,7 @@ endif
 "
 " 23. RUNNING MAKE AND JUMPING TO ERRORS
 "
-setl makeprg=clang++\ -Wall\ -Wextra\ -std=c++14\ -L$HOME/.local/lib\ -I$HOME/.local/include\ -o\ %:r\ %
+setl makeprg=clang++\ -std=c++14\ -static-libstdc++\ -Wall\ -Wextra\ -Werror\ -L$LLVM_HOME/lib\ -L$BOOST_HOME/lib\ -I$BOOST_HOME/include\ -Wl,-rpath\ $BOOST_HOME/lib\ -L$HOME/.local/lib\ -I$HOME/.local/include\ -o\ %:r\ %
 
 
 "
