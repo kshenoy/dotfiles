@@ -29,6 +29,8 @@ if hash fd 2> /dev/null; then
   export FZF_DEFAULT_COMMAND="fd --color=never --hidden --exclude .git --type f"
   export FZF_ALT_C_COMMAND="fd --color=never --hidden --exclude .git --type d"
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+else
+  export FZF_ALT_C_COMMAND="find -mindepth 1 -name '.git' -prune -o -type d -print"
 fi
 
 # Clear out old env vars
