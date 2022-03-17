@@ -569,30 +569,44 @@ cd() {
 
         ...)
             if hash fzf 2> /dev/null; then
-                $(FZF_ALT_C_COMMAND='_dir=$PWD; while [[ -n "$_dir" ]]; do _dir="${_dir%/[^/]*}"; echo ${_dir:-/}; done' \
-                    FZF_ALT_C_OPTS="${FZF_ALT_C_OPTS} --select-1 ${2+ --query=$2}" __fzf_cd__)
+                local _selected=$(_dir=$PWD;
+                                  while [[ -n "$_dir" ]]; do
+                                      _dir="${_dir%/[^/]*}";
+                                      echo ${_dir:-/};
+                                  done | fzf::_down --select-1 --delimiter='/' --nth=-1 ${2+ --query=$2})
+                pushd $_selected
             fi
             return
             ;;
 
         ,*\*\**)
-            # Split $1 about the first ** into '_path' and '_pattern'.
+            # Split $1 about the first ** into '_path' and '_pattern' and replace all '**' in _pattern with '*'
             local _path=${1%%\*\**}; _path=${_path:-.}
-            local _pattern="*$(tr -s '*' <<< ${1#*\*\*})*"
+            local _pattern="*$(tr -s '*' <<< ${1#*\*\*})"
 
+            local _selected
             if hash fzf 2> /dev/null; then
                 # Find '_path' for all dirs that match the glob expr '_pattern' and select with FZF from the results
-                $(FZF_ALT_C_COMMAND="find ${_path} -type d -path '*${_pattern}*'" __fzf_cd__)
-                return
+                _selected=$(if hash fd 2> /dev/null; then
+                                ${FZF_ALT_C_COMMAND} --full-path --glob "${_pattern}" "${_path}"
+                            else
+                                find "${_path}" -type d -path "${_pattern}"
+                            fi | fzf::_down --select-1)
             else
-                _dir=$(find $_path -type d -path "*${_pattern}*" -print -quit)
-                if [[ -n $_dir ]]; then
-                    pushd "$_dir"
+                # Select only the first match since without FZF we don't have a good way of handling multiple matches
+                if hash fd 2> /dev/null; then
+                    _selected=$(fd --color=never --hidden --exclude .git --type d --glob "${_pattern}" ${_path} | head -n 1)
+                else
+                    _selected=$(find $_path -type d -path "${_pattern}" -print -quit)
                 fi
             fi
+
+            pushd "$_selected"
+            return
             ;;
     esac
 
+    # Fall-through to the default command
     pushd "$@"
 }
 
@@ -607,10 +621,8 @@ alias ..='cd ..'
 #+begin_src bash
 if [[ -d /opt/fzf ]]; then
     export FZF_PATH=/opt/fzf
-elif [[ -d $HOME/.local/install/fzf ]]; then
-    export FZF_PATH="$HOME/.local/install/fzf"
-else
-    echo "$(tput setaf 1)ERROR$(tput sgr0): FZF_PATH is not set"
+# elif [[ -z "$FZF_PATH" ]]; then
+#     echo "$(tput setaf 1)ERROR$(tput sgr0): FZF_PATH is not set"
 fi
 
 if [[ -n "$FZF_PATH" ]]; then
