@@ -271,7 +271,8 @@ Prevent same entry from showing up multiple times
       org-agenda-skip-deadline-prewarning-if-scheduled t
       org-agenda-skip-timestamp-if-done t
       org-agenda-skip-timestamp-if-deadline-is-shown t
-      org-agenda-skip-additional-timestamps-same-entry t)
+      org-agenda-skip-additional-timestamps-same-entry t
+      org-deadline-warning-days 0)
 #+end_src
 
 Open org-agenda in the only window and remove the fluff
@@ -295,13 +296,13 @@ These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/
         subtree-end
       nil)))
 
-(defun my-org-skip-subtree-if-priority (priority)
-  "Skip an agenda subtree if it has a priority of PRIORITY.
-  PRIORITY may be one of the characters A, B, C or D."
+(defun my-org-skip-subtree-if-priorities (priorities)
+  "Skip an agenda subtree if it has a priority specified in PRIORITY.
+  PRIORITY is a list of valid characte priorities eg. A, B, C etc."
   (let ((subtree-end (save-excursion (org-end-of-subtree t)))
-        (pri-value (* 1000 (- org-lowest-priority priority)))
+        (pri-values (mapcar (lambda (priority) (* 1000 (- org-lowest-priority priority))) priorities))
         (pri-current (org-get-priority (thing-at-point 'line t))))
-    (if (= pri-value pri-current)
+    (if (member pri-current pri-values)
         subtree-end
       nil)))
 #+end_src
@@ -309,7 +310,7 @@ These are some helper functions Based on [[https://blog.aaronbieber.com/2016/09/
 Note that the ~agenda-cmds~ noweb-ref must be on its own line or it breaks code tangling
 #+begin_src emacs-lisp
 (setq org-agenda-custom-commands
-      '(("p" "Personal agenda and TODOs"
+      '(("d" "Dashboard"
          (
           <<agenda-cmds>>
           ))))
@@ -323,28 +324,39 @@ An agenda showing the previous week and the next couple of weeks [[org-agenda-sp
 All the high-priority tasks that are still pending
 #+begin_src emacs-lisp :noweb-ref agenda-cmds :tangle no
 (tags "PRIORITY=\"A\""
-      ((org-agenda-overriding-header "High-priority unfinished tasks:")
-       (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
-                                      (org-agenda-skip-entry-if 'todo 'done)))))
+      ((org-agenda-overriding-header "High-priority tasks:")
+       (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
+#+end_src
+
+Tasks that have a medium/normal priority
+#+begin_src emacs-lisp :noweb-ref agenda-cmds :tangle no
+(tags-todo "PRIORITY=\"B\"|PRIORITY=\"C\""
+      ((org-agenda-overriding-header "Medium/normal priority tasks:")
+       (org-agenda-skip-function '(or (org-agenda-skip-entry-if '(scheduled deadline))
+                                      (org-agenda-skip-entry-if 'todo 'done)
+                                      (org-agenda-skip-entry-if 'todo '("STRT" "HOLD" "WAIT"))))))
 #+end_src
 
 Todos that are in-progress minus the high-priority ones, habits and ones that are scheduled or have a deadline
 #+begin_src emacs-lisp :noweb-ref agenda-cmds :tangle no
-(todo "START"
-      ((org-agenda-overriding-header "Tasks in progress:")
-       (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
-                                      (my-org-skip-subtree-if-priority ?A)
-                                      (org-agenda-skip-if nil '(scheduled deadline))))))
+(todo "STRT"
+      ((org-agenda-overriding-header "In-progress tasks:")))
+#+end_src
+
+Todos that have stalled minus the high-priority ones, habits and ones that are scheduled or have a deadline
+#+begin_src emacs-lisp :noweb-ref agenda-cmds :tangle no
+(todo "HOLD|WAIT"
+      ((org-agenda-overriding-header "Stalled tasks:")))
 #+end_src
 
 Rest of the todos minus the ones from the previous sections
 #+begin_src emacs-lisp :noweb-ref agenda-cmds :tangle no
 (alltodo ""
-         ((org-agenda-overriding-header "ALL normal priority tasks:")
-          (org-agenda-skip-function '(or (my-org-skip-subtree-if-habit)
-                                         (org-agenda-skip-if nil '(scheduled deadline))
-                                         (my-org-skip-subtree-if-priority ?A)
-                                         (org-agenda-skip-entry-if 'todo '("START"))))))
+         ((org-agenda-overriding-header "Other tasks:")
+          (org-agenda-skip-function '(or (org-agenda-skip-entry-if '(scheduled deadline))
+                                         (org-agenda-skip-entry-if 'todo 'done)
+                                         (org-agenda-skip-entry-if 'todo '("STRT" "HOLD" "WAIT" "IDEA"))
+                                         (my-org-skip-subtree-if-priorities '(?A ?B ?C))))))
 #+end_src
 
 ** Appearance
@@ -360,9 +372,12 @@ Prevent DONE org-headlines from being highlighted a different color
 
 *** Change faces
 #+begin_src emacs-lisp
-(defun my-update-org-faces-after-load-theme ()
+(defun my-update-org-agenda-faces ()
+  "Update some org-agenda-mode faces for all themes"
+    (set-face-attribute 'org-agenda-structure      nil :height 1.2))
+
+(defun my-update-org-faces ()
   "Update some org-mode faces for all themes"
-  (when (eq major-mode 'org-mode)
     (set-face-attribute 'org-document-info-keyword nil :inherit 'org-meta-line :foreground nil)
     (set-face-attribute 'org-drawer                nil :inherit 'org-meta-line :foreground nil :weight 'bold)
     (set-face-attribute 'org-document-title        nil :height 1.5)
@@ -371,24 +386,22 @@ Prevent DONE org-headlines from being highlighted a different color
     (set-face-attribute 'org-level-3               nil :height 1.15)
     (set-face-attribute 'org-level-4               nil :height 1.1)
     (set-face-attribute 'org-special-keyword       nil :weight 'bold)
-    (set-face-attribute 'org-tag                   nil :height (face-attribute 'default :height) :weight 'bold)
-    (set-face-attribute 'org-todo                  nil :height (face-attribute 'default :height))
-    (set-face-attribute 'org-done                  nil :height (face-attribute 'default :height))
+    (set-face-attribute 'org-tag                   nil :inherit 'fixed-pitch :weight 'bold)
+    (set-face-attribute 'org-todo                  nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-done                  nil :inherit '(fixed-pitch org-headline-done))
     (set-face-attribute 'org-block                 nil :inherit 'fixed-pitch)
     (set-face-attribute 'org-block-begin-line      nil :inherit 'org-block)
     (set-face-attribute 'org-block-end-line        nil :inherit 'org-block)
     ;; (cond ((eq doom-theme 'doom-solarized-light) (my-update-org-faces-after-load-doom-solarized-light))
     ;;       (t nil))
     )
-  (when (eq major-mode 'org-agenda-mode)
-    (set-face-attribute 'org-agenda-structure      nil :height 1.2)))
 #+end_src
 
 Add a hook to update faces after a theme is loaded. Also call it immediately as theme is loaded before org mode
 #+begin_src emacs-lisp
-(add-hook 'doom-load-theme-hook 'my-update-org-faces-after-load-theme)
-(add-hook 'org-mode-hook 'my-update-org-faces-after-load-theme)
-(add-hook 'org-agenda-mode-hook 'my-update-org-faces-after-load-theme)
+;; (add-hook 'doom-load-theme-hook 'my-update-org-faces-after-load-theme)
+(add-hook 'org-mode-hook 'my-update-org-faces)
+(add-hook 'org-agenda-mode-hook 'my-update-org-agenda-faces)
 #+end_src
 
 *** Pretty symbols
@@ -452,10 +465,10 @@ However, I'm only using FontAwesome at the moment as the symbols it provides are
             :macro         "𝓜"
             :options       "⌥"
             :pending       "⬓"
-            :priority_a   ,(propertize "❰P1❱" 'face 'error)
-            :priority_b   ,(propertize "❰P2❱" 'face 'warning)
-            :priority_c   ,(propertize "❰P3❱" 'face 'success)
-            :priority_d    " "
+            ;; :priority_a   ,(propertize "❰P1❱" 'face 'error)
+            ;; :priority_b   ,(propertize "❰P2❱" 'face 'warning)
+            ;; :priority_c   ,(propertize "❰P3❱" 'face 'success)
+            ;; :priority_d    " "
             :properties    "⚙"
             :property      "⚙"
             :results       "🠶"
@@ -503,10 +516,10 @@ Next I map what "string" they should map to
   ;; :options          "#+options:"
   ;; :options          "#+OPTIONS:"
   :pending          "[-]"
-  :priority_a       "[#A]"
-  :priority_b       "[#B]"
-  :priority_c       "[#C]"
-  :priority_d       "[#D]"
+  ;; :priority_a       "[#A]"
+  ;; :priority_b       "[#B]"
+  ;; :priority_c       "[#C]"
+  ;; :priority_d       "[#D]"
   :property         "#+property:"
   :property         ":PROPERTIES:"
   ;; :results          "#+RESULTS:"
@@ -762,12 +775,14 @@ Custom keywords. Need to put it in an ~after!~ block to make sure it gets set af
   (setq org-todo-keywords
         '((sequence
            "TODO(t!)"     ; A task that needs doing & is ready to do
-           "START(s)"     ; A task that is in progress
-           "WAIT(w@/!)"   ; Something is holding up work on this task
+           "STRT(s!)"     ; A task that is in progress
+           "WAIT(w@/!)"   ; I'm waiting on something external
+           "HOLD(h@/!)"   ; This task is paused/on hold because of me
+           "IDEA(i)"      ; An unconfirmed and unapproved task or notion
            "|"
            "DONE(d@/!)"   ; Task successfully completed
-           "DEFER(f@/!)"
-           "CANCEL(c@)")  ; Task was cancelled, aborted or is no longer applicable
+           "DEFR(f@/!)"
+           "CNCL(c@)")    ; Task was cancelled, aborted or is no longer applicable
           (sequence
            "[ ](T)"       ; A task that needs doing
            "[-](S)"       ; Task is in progress
@@ -799,10 +814,10 @@ Setting this to nil allows a convenient way to select a TODO state and bypass an
 (after! org
   (setq org-todo-keyword-faces
         '(("[-]"    . +org-todo-active)
-          ("START"  . +org-todo-active)
+          ("STRT"  . +org-todo-active)
           ("[?]"    . +org-todo-onhold)
           ("WAIT"   . +org-todo-onhold)
-          ("CANCEL" . +org-todo-cancel))))
+          ("CNCL" . +org-todo-cancel))))
 #+end_src
 
 *** Priorities
