@@ -23,9 +23,9 @@ ${XDG_CONFIG_HOME}/dotfiles-priv:
 # However, this approach doesn't work on files which have machine-specific configuration as everytime I tangle it,
 # the saved version of the file gets updated, thereby affecting the link
 # Hence, a workaround at the moment is to tangle to the location and copy it over to the repo
-bash: ${HOME}/.bashrc dircolors ripgreprc
+bash: generated/bash/bashrc generated/dircolors generated/ripgreprc
 # Using grouped targets here to run tangle only once. Supported only for make versions >= 4.3
-${HOME}/.bashrc dircolors ripgreprc &: bash/bashrc.org
+generated/bash/bashrc generated/dircolors generated/ripgreprc &: bashrc.org
 	${TANGLE} $<
 	@mkdir -p ${XDG_DATA_HOME}/bash_history
 	@if [ -f ${HOME}/.bash_history ]; then rm ${HOME}/.bash_history; fi

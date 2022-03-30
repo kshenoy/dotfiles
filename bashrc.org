@@ -3,7 +3,7 @@
 
 * bashrc
 :PROPERTIES:
-:header-args+: :tangle (concat (getenv "HOME") "/.bashrc")
+:header-args+: :tangle "generated/bash/bashrc"
 :END:
 
 #+begin_src bash :export none
@@ -278,7 +278,7 @@ export LANG=en_US.UTF-8
 See [[id:2823d31a-572c-44ec-80e1-84acbbb6412e][dircolors]]
 #+begin_src bash
 if [[ -x /usr/bin/dircolors ]]; then
-    _dircolors=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/dircolors
+    _dircolors=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/generated/dircolors.rc
     [[ -r $_dircolors ]] && eval "$(/usr/bin/dircolors -b $_dircolors)" || eval "$(/usr/bin/dircolors -b)"
 fi
 #+end_src
@@ -1191,15 +1191,15 @@ alias rdj='rm_rf_silent'
 
 *** [[https://github.com/BurntSushi/ripgrep][ripgrep]]
 :PROPERTIES:
-:header-args+: :tangle (if (executable-find "rg") (concat (getenv "HOME") "/.bashrc") "no")
+:header-args+: :tangle (if (executable-find "rg") "generated/bash/bashrc" "no")
 :END:
 These will be tangled only if =rg= exists
 #+begin_src bash
-export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgreprc
+export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/generated/ripgreprc
 alias g='command rg'
 #+end_src
 
-#+begin_src conf :tangle (if (executable-find "rg") "../ripgreprc" "no")
+#+begin_src conf :tangle (if (executable-find "rg") "generated/ripgreprc" "no")
 # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
 # Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
 # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
@@ -1549,7 +1549,7 @@ fi
 
 *** home
 To connect to work-vpn
-#+begin_src bash :tangle (if (string-match "buntu" (system-name)) (concat (getenv "HOME") "/.bashrc") "no")
+#+begin_src bash :tangle (if (string-match "buntu" (system-name)) "generated/bash/bashrc" "no")
 alias gp=globalprotect
 
 work_vpn() {
@@ -1562,12 +1562,12 @@ work_vpn() {
 }
 #+end_src
 
-#+begin_src bash :tangle (if (string-match "buntu" (system-name)) (concat (getenv "HOME") "/.bashrc") "no")
+#+begin_src bash :tangle (if (string-match "buntu" (system-name)) "generated/bash/bashrc" "no")
 alias boot2win='sudo grub-reboot Windows && shutdown -r 0'
 #+end_src
 
 *** WSL
-#+begin_src bash :tangle (if (string-match "windows" (system-name)) (concat (getenv "HOME") "/.bashrc") "no")
+#+begin_src bash :tangle (if (string-match "windows" (system-name)) "generated/bash/bashrc" "no")
 export LIBGL_ALWAYS_INDIRECT=1
 # Need to specify the IP of the host
 export DISPLAY=192.168.1.11:0
@@ -1725,7 +1725,7 @@ set editing-mode emacs
 
 * LS_COLORS/dircolors
 :PROPERTIES:
-:header-args+: :tangle dircolors
+:header-args+: :tangle generated/dircolors.rc
 :END:
 
 #+begin_src bash :export none
