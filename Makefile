@@ -9,6 +9,12 @@ CWD := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 all: fish git nvim
 
 
+#== bash =================================================================================================================
+bash: ${HOME}/.bashrc
+${HOME}/.bashrc:
+	@${MKLINK} ${CWD}/bash/bashrc $@
+
+
 #== fish =================================================================================================================
 fish: ${XDG_CONFIG_HOME}/fish/config.fish ${XDG_CONFIG_HOME}/fish/functions
 ${XDG_CONFIG_HOME}/fish/config.fish:

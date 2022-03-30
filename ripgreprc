@@ -1,0 +1,35 @@
+# [[file:~/.config/dotfiles/bashrc.org::*[[https://github.com/BurntSushi/ripgrep\][ripgrep]\]][[[https://github.com/BurntSushi/ripgrep][ripgrep]]:2]]
+# This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
+# Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
+# If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
+
+# Redefine the cpp extension to make it easier to parse and use it with fd. Start by first clearing it
+--type-clear
+cpp
+# Next, instead of simply flattening it out, let's be a little smarter about it
+# First define separate types for header and source files
+--type-add
+chdr:*.h, *.H, *.h.in, *.H.in, *.hpp, *.hpp.in, *.hxx, *.hxx.in, *.hh, *.hh.in
+--type-add
+csrc:*.C, *.C.in, *.cpp, *.cpp.in, *.cxx, *.cxx.in, *.cc, *.cc.in, *.inl, *.ipp, *.tpp
+# Now, define cpp to be a union of the two
+--type-add
+cpp:include:chdr
+--type-add
+cpp:include:csrc
+
+--type-add
+rdl:*.rdl
+
+--type-add
+sbs:*.sbs
+
+--type-add
+hdl:include:verilog
+
+--type-add
+hdl:*.x
+
+# Because who cares about case!?
+--smart-case
+# [[https://github.com/BurntSushi/ripgrep][ripgrep]]:2 ends here
