@@ -359,6 +359,14 @@ Rest of the todos minus the ones from the previous sections
                                          (my-org-skip-subtree-if-priorities '(?A ?B ?C))))))
 #+end_src
 
+**** Keybinds
+#+begin_src emacs-lisp
+(map! :after org-agenda
+      :map org-agenda-mode-map
+      :localleader
+      :g "o" 'org-set-property)
+#+end_src
+
 ** Appearance
 #+begin_src emacs-lisp
 (setq org-hide-emphasis-markers t)  ; Hide markers for bold/italics etc.
