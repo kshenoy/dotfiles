@@ -946,6 +946,19 @@ Hide verbose prefixes eg. =evil-= =evilem-motion-= etc.
           :switch 'window))
 #+end_src
 
+** Automatically create new workspace when opening org-agenda
+#+begin_src emacs-lisp
+(after! persp-mode
+  (persp-def-auto-persp "Agenda"
+   :parameters '((dont-save-to-file . t))
+   :mode 'org-agenda-mode
+   :dyn-env '(doom-switch-buffer-hook
+              persp-add-buffer-on-find-file
+              persp-add-buffer-on-after-change-major-mode)
+   :hooks '(doom-switch-buffer-hook)
+   :switch 'window))
+#+end_src
+
 * local settings
 There's a bug in org-mode tangling logic which deletes any old versions of the files while tangling ([[https://github.com/hlissner/doom-emacs/issues/3867#issuecomment-686300907][reference]])
 The solution suggested in the link didn't work for me so instead I dump any local settings to a separate file and load that
