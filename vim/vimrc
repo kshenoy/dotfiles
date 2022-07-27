@@ -45,8 +45,6 @@ filetype plugin indent on
 "
 if DISABLE_FROM == 2 | finish | endif
 
-set whichwrap=b,s,<,>,h,l,[,]                     " Allows backspace, space, left, right arrow keys, as well as h and l,
-                                                                        " to wrap when used at beginning or end of lines
 set nostartofline                             " Prevent cursor from jumping to start of line in case of certain commands
 set path=.,/usr/local/include,/usr/include,**;
 set autochdir                                                                       " Change directory to file in buffer
@@ -132,7 +130,6 @@ set spelllang=en_us
 if DISABLE_FROM == 6 | finish | endif
 
 set laststatus=2                                                                                 " Status line always-on
-set statusline=
 set hidden                                                                 " Allow buffer switching without saving files
 set switchbuf=useopen,usetab                                                " Which window to use when switching buffers
 set splitbelow                                                      " Open new split below current one when using :split
@@ -249,7 +246,7 @@ set nojoinspaces                                   " Don't insert two spaces aft
 if DISABLE_FROM == 15 | finish | endif
 
 set expandtab                                                                                 " Replace tabs with spaces
-set softtabstop=2                                          " No. of spaces to insert for a tab when expandtab is enabled
+set softtabstop=-1                                         " No. of spaces to insert for a tab when expandtab is enabled
 set shiftwidth=2                                                  " Set software tab-width (for eg in case of << and >>)
 set shiftround                                                                 " Round to 'shiftwidth' for "<<" and ">>"
 set autoindent                                                                                   " Auto-indent new lines

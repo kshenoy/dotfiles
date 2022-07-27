@@ -1,13 +1,3 @@
-let s:config_file = glob('~/.vimrc_background')
-
-function! s:ReadBase16Config()                                                                                     "{{{1
-  if filereadable(expand('~/.vimrc_background'))
-    silent! source ~/.vimrc_background
-    call s:After()
-  endif
-endfunction
-
-
 function! s:After()                                                                                                "{{{1
   " Description: Find any additional settings related to the current colorscheme in after/colors and load it
   "              This order is important. We let statusline set the general colors first based on the colorscheme and
@@ -92,7 +82,7 @@ endfunction
 if has('autocmd')
   augroup Color
     autocmd!
-    autocmd VimEnter,FocusGained * call s:ReadBase16Config()
+    autocmd VimEnter,FocusGained * ++nested silent! source ~/.vimrc_background
     autocmd Colorscheme * call s:After()
   augroup END
 endif
