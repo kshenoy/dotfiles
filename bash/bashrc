@@ -1303,6 +1303,17 @@ rm_rf_silent() {
 alias rdj='rm_rf_silent'
 # rm:1 ends here
 
+# [[https://github.com/BurntSushi/ripgrep][ripgrep]]
+# :PROPERTIES:
+# :header-args+: :tangle (if (executable-find "rg") "generated/bash/bashrc" "no")
+# :END:
+# These will be tangled only if =rg= exists
+
+# [[file:~/.config/dotfiles/bashrc.org::*[[https://github.com/BurntSushi/ripgrep\][ripgrep]\]][[[https://github.com/BurntSushi/ripgrep][ripgrep]]:1]]
+export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/generated/ripgreprc
+alias g='command rg'
+# [[https://github.com/BurntSushi/ripgrep][ripgrep]]:1 ends here
+
 # vim
 
 # [[file:~/.config/dotfiles/bashrc.org::*vim][vim:1]]

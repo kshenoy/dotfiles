@@ -1,52 +1,35 @@
 -- Package management
--- [[https://github.com/wbthomason/packer.nvim#bootstrapping][Bootstrap packer.nvim]]
+-- :PROPERTIES:
+-- :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/nvim/lua/packages.lua")
+-- :END:
+-- Put all packages in a separate file
 
--- [[file:../../nvim.org::*Package management][Package management:1]]
-local fn = vim.fn
-local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
-if fn.empty(fn.glob(install_path)) > 0 then
-    packer_bootstrap = fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
-end
+-- [[file:../dotfiles/nvim.org::*Package management][Package management:1]]
+require('packages')
 -- Package management:1 ends here
 
+-- Neovim-only config
+-- :PROPERTIES:
+-- :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/nvim/lua/neovim-only.lua")
+-- :END:
 
+-- Load Neovim-only settings
 
--- Initialize packer
-
--- [[file:../../nvim.org::*Package management][Package management:2]]
-require('packer').startup(function(use)
-    use 'b0o/mapx.nvim'
-    use 'machakann/vim-sandwich'
-    use {
-        'numToStr/Comment.nvim',
-        config = function()
-            require'Comment'.setup()
-        end
-    }
-
-    -- This must be at the end after all plugins
-    if packer_bootstrap then
-        require('packer').sync()
-    end
-end
-)
--- Package management:2 ends here
-
--- [[file:../../nvim.org::*\[\[https:/github.com/b0o/mapx.nvim\]\[mapx\]\]][[[https://github.com/b0o/mapx.nvim][mapx]]:2]]
-require('mapx').setup{ global = true }
--- [[https://github.com/b0o/mapx.nvim][mapx]]:2 ends here
-
--- vscode-only settings
-
--- [[file:../../nvim.org::*vscode-only settings][vscode-only settings:1]]
-if vim.g.vscode then
-    nnoremap('z=', "<Cmd>call VSCodeNotify('keyboard-quickfix.openQuickFix')<Cr>")
-end
--- vscode-only settings:1 ends here
-
--- nvim-only settings
-
--- [[file:../../nvim.org::*nvim-only settings][nvim-only settings:1]]
+-- [[file:../dotfiles/nvim.org::*Neovim-only config][Neovim-only config:1]]
 if not vim.g.vscode then
+    require('neovim-only')
 end
--- nvim-only settings:1 ends here
+-- Neovim-only config:1 ends here
+
+-- VSCode-only config
+-- :PROPERTIES:
+-- :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/nvim/lua/vscode-only.lua")
+-- :END:
+
+-- Load VSCode-only settings
+
+-- [[file:../dotfiles/nvim.org::*VSCode-only config][VSCode-only config:1]]
+if vim.g.vscode then
+    require('vscode-only')
+end
+-- VSCode-only config:1 ends here
