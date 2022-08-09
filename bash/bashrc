@@ -1317,7 +1317,7 @@ alias g='command rg'
 # vim
 
 # [[file:~/.config/dotfiles/bashrc.org::*vim][vim:1]]
-alias v=vim
+alias v=nvim
 alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
 # vim:1 ends here
 
