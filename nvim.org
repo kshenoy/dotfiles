@@ -1,38 +1,256 @@
 #+TITLE: neovim configuration
-#+PROPERTY: header-args+ :results output silent :noweb tangle :comments both :mkdirp yes :tangle generated/nvim/init.lua
+#+PROPERTY: header-args+ :results output silent :noweb tangle :comments both :mkdirp yes :padline yes :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/nvim/init.lua")
 #+TODO: FIXME | FIXED
 
-This neovim configuration is meant to be used in both a stand-alone manner as well as with VSCode
-VSCode+neovim integration - https://github.com/CozyPenguin/vscode-nvim-setup
+This neovim configuration is meant to be used only in a stand-alone manner. All VSCode related settings are in a separate file
+#+begin_src lua
+if vim.g.vscode then
+    return nil
+end
+#+end_src
 
-* global settings
-These settings apply to both stand-alone neovim as well when used in VSCode
+* Package management
+:PROPERTIES:
+:header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/nvim/lua/packages.lua")
+:END:
 
-** Package management
-[[https://github.com/wbthomason/packer.nvim#bootstrapping][Bootstrap packer.nvim]]
+Put all packages in a separate file
+#+begin_src lua :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/nvim/init.lua")
+require('packages')
+#+end_src
+
+** [[https://github.com/wbthomason/packer.nvim][packer.nvim]]
+I'm using packer for package management. [[https://github.com/wbthomason/packer.nvim#bootstrapping][Bootstrap packer.nvim]]
 #+begin_src lua
 local fn = vim.fn
 local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
 if fn.empty(fn.glob(install_path)) > 0 then
     packer_bootstrap = fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+    vim.cmd [[packadd packer.nvim]]
 end
 #+end_src
 
 Initialize packer
 #+begin_src lua
 require('packer').startup(function(use)
-    <<packer-startup>>
+    <<package_spec>>
 
-    -- This must be at the end after all plugins
+    -- Automatically set up the configuration after cloning packer.nvim
+    -- Put this at the end after all plugins
     if packer_bootstrap then
         require('packer').sync()
     end
-end
-)
+end)
 #+end_src
 
-*** [[https://github.com/b0o/mapx.nvim][mapx]]
-#+begin_src lua :noweb-ref packer-startup :tangle no
+Let packer manage itself
+#+begin_src lua :noweb-ref package_spec :tangle no
+use 'wbthomason/packer.nvim'
+#+end_src
+
+A lot of plugins have this as a dependency
+#+begin_src lua :noweb-ref package_spec :tangle no
+use 'nvim-lua/plenary.nvim'
+#+end_src
+
+** base16
+#+begin_src lua :noweb-ref package_spec :tangle no
+use {
+    'wincent/base16-nvim',
+}
+#+end_src
+
+** [[https://github.com/numToStr/Comment.nvim][Comment.nvim]]
+#+begin_src lua :noweb-ref package_spec :tangle no
+use {
+    'numToStr/Comment.nvim',
+    config = function()
+        require('Comment').setup()
+    end,
+}
+#+end_src
+
+** Fzf
+#+begin_src lua :noweb-ref package_spec :tangle no
+use {
+    'ibhagwan/fzf-lua',
+    config = function()
+#+end_src
+
+Out-of-the-box fzf-lua only supports sending selection quickfix list. This adds an action to send to LocationList.
+From https://github.com/ibhagwan/fzf-lua/issues/435
+#+begin_src lua :noweb-ref package_spec :tangle no
+_G.sel_to_ll = function(selected, opts)
+    local loc_list = {}
+    for i = 1, #selected do
+      local file = require('fzf-lua').path.entry_to_file(selected[i], opts)
+      local text = selected[i]:match(":%d+:%d?%d?%d?%d?:?(.*)$")
+      table.insert(loc_list, {
+        filename = file.path,
+        lnum = file.line,
+        col = file.col,
+        text = text,
+      })
+    end
+    vim.fn.setloclist(0, loc_list)
+    -- open the location list
+    vim.cmd [[
+        lopen
+        syntax match qfFileName /^[^|]*|[^|]*| / transparent conceal
+    ]]
+end
+
+-- Add as an action to buffer providers
+require('fzf-lua').setup {
+    actions = {
+        buffers = { ["alt-l"] = _G.sel_to_ll }
+    }
+}
+#+end_src
+
+#+begin_src lua :noweb-ref package_spec :tangle no
+require('fzf-lua').setup({
+    winopts = {
+        preview = {
+            -- hidden = 'hidden',  -- The previewer is a bit slower than fzf.vim so disabling it by default
+        }
+    }
+})
+#+end_src
+
+Create maps
+#+begin_src lua :noweb-ref package_spec :tangle no
+local map = vim.keymap
+#+end_src
+
+Buffers
+#+begin_src lua :noweb-ref package_spec :tangle no
+map.set('n', '<Plug>(leader-buffer-map)b', "<Cmd>lua require('fzf-lua').buffers({ winopts = { preview = { hidden='hidden' }}})<CR>", {desc="Switch buffer", silent=true})
+#+end_src
+
+Files
+#+begin_src lua :noweb-ref package_spec :tangle no
+map.set('n', '<Plug>(leader-file-map)f', "<Cmd>lua require('fzf-lua').files()<CR>", {desc="Find file", silent=true})
+map.set('n', '<Plug>(leader-file-map)F', "<Cmd>lua require('fzf-lua').files({cwd='.'})<CR>", {desc="Find file from here", silent=true})
+map.set('n', '<Plug>(leader-file-map)r', "<Cmd>lua require('fzf-lua').oldfiles()<CR>", {desc="Recent files", silent=true})
+#+end_src
+
+Misc
+#+begin_src lua :noweb-ref package_spec :tangle no
+map.set('n', "<Leader>'",                "<Cmd>lua require('fzf-lua').resume()<CR>",  {desc="Resume last Fzf op", silent=true})
+map.set('n', '<Plug>(leader-help-map)b', "<Cmd>lua require('fzf-lua').keymaps()<CR>", {desc="Describe bindings", silent=true})
+#+end_src
+
+Open
+#+begin_src lua :noweb-ref package_spec :tangle no
+map.set('n', '<Plug>(leader-open-map)l', "<Cmd>lua require('fzf-lua').loclist()<CR>",  {desc="Open Location List", silent=true})
+map.set('n', '<Plug>(leader-open-map)q', "<Cmd>lua require('fzf-lua').quickfix()<CR>", {desc="Open QuickFix", silent=true})
+#+end_src
+
+#+begin_src lua :noweb-ref package_spec :tangle no
+map.set('n', '<Plug>(leader-open-map)l', "<Cmd>lua require('fzf-lua').loclist()<CR>",  {desc="Open Location List", silent=true})
+map.set('n', '<Plug>(leader-open-map)q', "<Cmd>lua require('fzf-lua').quickfix()<CR>", {desc="Open QuickFix", silent=true})
+#+end_src
+
+Search
+#+begin_src lua :noweb-ref package_spec :tangle no
+map.set('n', '<Plug>(leader-search-map)b', "<Cmd>lua require('fzf-lua').blines()<CR>", {desc="Search current buffer", silent=true})
+map.set('n', '<Plug>(leader-search-map)B', "<Cmd>lua require('fzf-lua').lines()<CR>", {desc="Search all buffers", silent=true})
+#+end_src
+
+#+begin_src lua :noweb-ref package_spec :tangle no
+    end,
+}
+#+end_src
+
+Generic map to use the VCS specific files command if in a VCS repo and default to the =files= command if not
+#+begin_src lua
+vim.keymap.set('n', '<Plug>(leader-project-map)f', function()
+    if require('fzf-lua.path').is_git_repo({}, true) then
+        return require('fzf-lua').git_files()
+    elseif require('fzf-lua.perforce').is_p4_repo({}, true) then
+        return require('fzf-lua.perforce').files()
+    else
+        return require('fzf-lua').files()
+    end
+end, {desc = "Find file"})
+
+vim.keymap.set('n', '<Plug>(leader-project-map)F', function()
+    if require('fzf-lua.path').is_git_repo({cwd='.'}, true) then
+        return require('fzf-lua').git_files({cwd='.'})
+    elseif require('fzf-lua.perforce').is_p4_repo({cwd='.'}, true) then
+        return require('fzf-lua.perforce').files({cwd='.'})
+    else
+        return require('fzf-lua').files({cwd='.'})
+    end
+
+end, {desc = "Find file from here"})
+#+end_src
+
+*** perforce support
+:PROPERTIES:
+:header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/nvim/lua/fzf-lua/perforce.lua")
+:END:
+
+#+begin_src lua
+local core  = require "fzf-lua.core"
+local utils = require "fzf-lua.utils"
+local config = require "fzf-lua.config"
+
+local M = {}
+#+end_src
+
+Check if currently in a Perforce repo
+#+begin_src lua
+M.is_p4_repo = function(opts, noerr)
+    local _, err = utils.io_systemlist("p4 info")
+    return not (err ~= 0)
+end
+#+end_src
+
+Get the root of the repo
+#+begin_src lua
+M.get_root = function(opts, noerr)
+    local output, err = utils.io_systemlist("p4 info")
+    if err ~= 0 then
+        if not noerr then utils.info(unpack(output)) end
+        return nil
+    end
+    return utils.strsplit(output[4], ' ')[3]
+end
+#+end_src
+
+Get the files in the repo
+#+begin_src lua
+M.files = function(opts)
+    if not opts then opts = {} end
+    opts.cwd = opts.cwd or M.get_root(opts)
+    if not opts.cwd then return end
+    opts.cmd = opts.cmd or "p4 have " .. opts.cwd .. "/..."
+    opts.prompt = opts.prompt or "P4Files> "
+    opts.fn_transform = function(x)
+        return utils.strsplit(x, ' ')[3]
+    end
+
+    -- Set other options from git and override as required
+    opts = config.normalize_opts(opts, config.globals.git.files)
+    opts.git_icons = false
+    local contents = core.mt_cmd_wrapper(opts)
+    opts = core.set_header(opts, opts.headers or {"cwd"})
+    return core.fzf_exec(contents, opts)
+end
+#+end_src
+
+Get the status
+Diff the file
+Checkout the file
+
+#+begin_src lua
+return M
+#+end_src
+
+** COMMENT [[https://github.com/b0o/mapx.nvim][mapx]]
+#+begin_src lua :noweb-ref package_spec :tangle no
 use 'b0o/mapx.nvim'
 #+end_src
 
@@ -40,30 +258,271 @@ use 'b0o/mapx.nvim'
 require('mapx').setup{ global = true }
 #+end_src
 
-*** [[https://github.com/machakann/vim-sandwich][sandwich.vim]] - surround text-objects
-#+begin_src lua :noweb-ref packer-startup :tangle no
-use 'machakann/vim-sandwich'
-#+end_src
-
-*** [[https://github.com/numToStr/Comment.nvim][Comment.nvim]]
-#+begin_src lua :noweb-ref packer-startup :tangle no
+** [[https://github.com/jakemason/ouroboros.nvim][ouroboros.nvim]] - switch between header and implementation files
+#+begin_src lua :noweb-ref package_spec :tangle no
 use {
-    'numToStr/Comment.nvim',
+    'jakemason/ouroboros',
+    requires = { {'nvim-lua/plenary.nvim'} },
     config = function()
-        require'Comment'.setup()
-    end
+        vim.api.nvim_create_autocmd({"Filetype"}, {
+            desc = "Switch between header and implementation",
+            callback = function()
+                vim.keymap.set('n', "<Leader>ma", "<Cmd>Ouroboros<CR>", {desc="Switch between header and implementation", buffer=true, silent=true})
+            end,
+        })
+    end,
 }
 #+end_src
 
-* vscode-only settings
+** COMMENT [[https://github.com/machakann/vim-sandwich][vim-sandwich]] - surround text-objects
+#+begin_src lua :noweb-ref package_spec :tangle no
+use 'machakann/vim-sandwich'
+#+end_src
+
+* Settings
+:PROPERTIES:
+:header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/nvim/lua/settings.lua")
+:END:
+
+Put all settings in a separate file
+#+begin_src lua :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/nvim/init.lua")
+require('settings')
+#+end_src
+
+Neovim already has a lot of sane defaults. Here's some more.
+The options are arranged according to how they're specified in 'options.txt'
 #+begin_src lua
-if vim.g.vscode then
-    nnoremap('z=', "<Cmd>call VSCodeNotify('keyboard-quickfix.openQuickFix')<Cr>")
+local opt = vim.opt
+#+end_src
+
+Moving around, searching and patterns
+#+begin_src lua
+opt.autochdir  = true    -- change directory to file in window
+opt.ignorecase = true
+opt.smartcase  = true    -- ignore 'ignorecase' if search has uppercase characters
+#+end_src
+
+Tags
+#+begin_src lua
+opt.tags = "./tags;,./.tags;"
+#+end_src
+
+Displaying text
+#+begin_src lua
+opt.scrolloff     = 3        -- no. of lines to show around the cursor for context
+opt.showbreak     = "↪"     -- string to put at the start of wrapped lines
+opt.sidescroll    = 3        -- minimal number of columns to scroll horizontally
+opt.sidescrolloff = 10       -- no. of columns to show around the cursor for context
+opt.cmdheight     = 2        -- number of screen lines to use for the command-line. Helps avoiding 'hit-enter' prompts
+opt.list          = true     -- make it easier to see whitespace
+opt.listchars     = {tab='➤ ', extends='»', precedes='«', nbsp='˽', trail='…'}
+opt.conceallevel  = 2
+opt.concealcursor = "nc"
+#+end_src
+
+Syntax, highlighting and spelling
+#+begin_src lua
+opt.termguicolors = true    -- enable 24-bit RGB color in the TUI
+opt.cursorline    = true    -- highlight the screen line of the cursor
+opt.colorcolumn   = "+1"    -- highlight Column 121 (textwidth+1)
+#+end_src
+
+Multiple windows, tab pages
+#+begin_src lua
+opt.laststatus = 3       -- enable global statusline
+
+opt.splitbelow = true
+opt.splitright = true
+#+end_src
+
+Using the mouse
+#+begin_src lua
+opt.mouse = "ar"    -- use mouse in all modes
+#+end_src
+
+Selecting text
+#+begin_src lua
+opt.clipboard = "unnamed"    -- use the * register for all yank, delete, change and put operations
+#+end_src
+
+Editing text
+#+begin_src lua
+opt.undofile  = true
+opt.textwidth = 120
+opt.completeopt:append('noinsert')    -- do not insert any text for a match until I select it
+opt.completeopt:append('noselect')    -- do not select a match in the menu automatically
+opt.showmatch  = true                 -- show matching brackets
+#+end_src
+
+Tabs and indenting
+#+begin_src lua
+opt.expandtab   = true
+opt.shiftwidth  = 2
+opt.softtabstop = -1  -- Use value from shiftwidth
+opt.shiftround  = true
+#+end_src
+
+Reading and writing files, swap file
+#+begin_src lua
+opt.backup   = true
+opt.backupdir:remove(".")
+opt.swapfile = false
+#+end_src
+
+Command line editing
+#+begin_src lua
+opt.suffixes:remove(".h")             -- always show all .h files with :e
+opt.wildmode = "longest:full,full"    -- insert longest match and show a menu of completions upon first Tab-press
+                                      -- cycle through possible matches with consecutive Tab-presses
+#+end_src
+
+Running make and jumping to errors (quickfix)
+#+begin_src lua
+if (vim.fn.executable('rg')) then
+    opt.grepformat = "%f:%l:%m"
+    opt.grepprg    = "rg --vimgrep --smart-case"
 end
 #+end_src
 
-* nvim-only settings
-#+begin_src lua
-if not vim.g.vscode then
-end
+* Keybindings
+:PROPERTIES:
+:header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/nvim/lua/keybindings.lua")
+:END:
+#+begin_src lua :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/nvim/init.lua")
+require('keybindings')
 #+end_src
+
+#+begin_src lua
+local map = vim.keymap
+#+end_src
+
+Use Space as the leader key and create generic keymaps
+#+begin_src lua
+vim.g.mapleader = ' '
+map.set('n', '<Leader>b', '<Plug>(leader-buffer-map)',  {remap=true, silent=true})
+map.set('n', '<Leader>f', '<Plug>(leader-file-map)',    {remap=true, silent=true})
+map.set('n', '<Leader>h', '<Plug>(leader-help-map)',    {remap=true, silent=true})
+map.set('n', '<Leader>o', '<Plug>(leader-open-map)',    {remap=true, silent=true})
+map.set('n', '<Leader>p', '<Plug>(leader-project-map)', {remap=true, silent=true})
+map.set('n', '<Leader>s', '<Plug>(leader-search-map)',  {remap=true, silent=true})
+#+end_src
+
+#+begin_src lua
+map.set('n', '<Plug>(leader-open-map)m', '<Cmd>marks<CR>')
+map.set('n', '<Plug>(leader-open-map)r', '<Cmd>reg<CR>')
+#+end_src
+
+** Remapping for convenience
+Remap 'w' to behave as 'w' should in all cases ~:h cw~. Use =ce= to do what =cw= used to
+#+begin_src lua
+map.set('o', 'w', 'v:count > 1 ? "<Cmd>normal! " . v:count . "w<CR>" : "<Cmd>normal! w<CR>"', {expr=true})
+map.set('o', 'W', 'v:count > 1 ? "<Cmd>normal! " . v:count . "W<CR>" : "<Cmd>normal! W<CR>"', {expr=true})
+#+end_src
+
+Display full path and filename
+#+begin_src lua
+map.set('n', '<C-G>', '2<C-G>')
+#+end_src
+
+Make Y consistent with C and D
+#+begin_src lua
+map.set('n', 'Y', 'y$')
+#+end_src
+
+Remap =ZQ= to quit everything. I can always use =:bd= to delete a single buffer
+#+begin_src lua
+map.set('n', 'ZQ', ':qall!<CR>')
+#+end_src
+
+""" Copy the file name to unix visual select buffer
+nnoremap <expr> y<C-G> ':let @' . (has('win_32') ? '+' : '*') . '="' . expand("%:p") . '"<CR>'
+
+""" Show full file path while opening file
+cabbrev %%p <C-R>=fnameescape(expand('%:p'))<CR>
+cabbrev %%h <C-R>=fnameescape(expand('%:p:h'))<CR>
+cabbrev %%t <C-R>=fnameescape(expand('%:p:t'))<CR>
+cabbrev %%r <C-R>=fnameescape(expand('%:p:r'))<CR>
+
+** Indentation and styling
+Preserve visual block after indenting, increment/decrement
+#+begin_src lua
+map.set('v', '>',     '>gv')
+map.set('v', '<',     '<gv')
+map.set('v', '<C-A>', '<C-A>gv')
+map.set('v', '<C-X>', '<C-X>gv')
+#+end_src
+
+** FIXME Search and Replace
+Use very-magic (PCRE-ish) while searching
+#+begin_src lua
+map.set('n', '/',   '/\\v')
+map.set('n', '?',   '?\\v')
+map.set('c', '%s/', '%s/\\v')
+map.set('c', '.s/', '.s/\\v')
+map.set('x', ':s/', ':s/\\%V\\v')
+#+end_src
+
+By default, using search operators in visual mode extends the visual selection till the next match
+Instead, I find that I more commonly need to search with the visually selected text instead
+#+begin_src lua :tangle no
+map.set('v', '*',  "<Esc>/\<<C-R>=escape(@*, '$*[]\/')<CR>\><CR>")
+map.set('v', 'g*', "<Esc>/<C-R>=escape(@*, '$*[]\/')<CR><CR>")
+map.set('v', '#',  "<Esc>?\<<C-R>=escape(@*, '$*[]\/')<CR>\><CR>")
+map.set('v', 'g#', "<Esc>?<C-R>=escape(@*, '$*[]\/')<CR><CR>")
+#+end_src
+
+Set search pattern without moving the cursor
+#+begin_src lua :tangle no
+map.set('n', '<Leader>*',  "<Cmd>let @/='\<'.escape(expand('<cword>'),'$*[]/').'\>'<CR>", {silent=true})
+map.set('v', '<Leader>*',  "<Cmd><C-U>let @/='\<'.escape(@*,'$*[]/').'\>'<CR>",           {silent=true})
+map.set('n', '<Leader>g*', "<Cmd>let @/=escape(expand('<cword>'),'$*[]/')<CR>",           {silent=true})
+map.set('v', '<Leader>g*', "<Cmd><C-U>let @/=escape(@*,'$*[]/')<CR>",                     {silent=true})
+#+end_src
+
+Replace word under the cursor. Type replacement, press =<ESC>=. Use '.' to jump to next occurence of the word and repeat
+#+begin_src lua
+map.set('n', 'c*',  '*<C-O>cgn')
+map.set('n', 'cg*', 'g*<C-O>cgn')
+#+end_src
+
+** buffers
+Switching buffers is something I do often so make that as fast as possible
+#+begin_src lua
+map.set('n', '<Leader><Leader>', '<Plug>(leader-buffer-map)b', {remap=true, silent=true})
+#+end_src
+
+Buffer navigation à la vim-unimpaired
+#+begin_src lua
+map.set('n', '[b', '<Cmd>bprevious<CR>')
+map.set('n', ']b', '<Cmd>bnext<CR>')
+#+end_src
+
+** files
+#+begin_src lua
+map.set('n', '<Leader>f', '<Plug>(leader-file-map)', {remap=true})
+map.set('n', '<Leader>F', '<Plug>(leader-file-map)', {remap=true})
+#+end_src
+
+* Make pretty
+Automatically load the same base16 theme as the shell
+#+begin_src lua
+vim.api.nvim_create_autocmd({"VimEnter", "FocusGained"}, {
+  desc = "Automatically load the same base16 theme as the shell",
+  callback = function()
+    vim.cmd "if filereadable(expand('~/.vimrc_background')) | silent! source ~/.vimrc_background | endif"
+  end,
+  nested = true  -- required to trigger the Colorscheme autocmd to make any tweaks to the colorscheme
+})
+#+end_src
+
+Tweak solarized-light theme
+#+begin_src lua
+vim.api.nvim_create_autocmd('ColorScheme', {
+  pattern = 'base16-solarized-light',
+  callback = function()
+    vim.api.nvim_set_hl(0, 'StatusLine', {link='LineNr'})
+    -- Need to update StatusLineNC's bg color
+  end
+})
+#+end_src
+
