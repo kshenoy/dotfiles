@@ -173,6 +173,28 @@ end
 #+end_src
 
 Get the status
+#+begin_src lua
+M.status = function(opts)
+    if not opts then opts = {} end
+    opts.cmd = opts.cmd or "p4 opened -s | cut -d ' ' -f1 | xargs p4 where | cut -d ' ' -f3"
+    opts.cwd = opts.cwd or M.get_root(opts)
+    opts.prompt = opts.prompt or "P4Status> "
+    opts.fn_transform = function(x)
+        local repo_path = utils.strsplit(x, ' ')[1]
+        -- local output, err = utils.io_systemlist("p4 where " .. repo_path)
+        -- return utils.strsplit(output, ' ')[3]
+        return repo_path
+    end
+
+    -- Set other options from git and override as required
+    opts = config.normalize_opts(opts, config.globals.git.files)
+    opts.git_icons = false
+    local contents = core.mt_cmd_wrapper(opts)
+    opts = core.set_header(opts, opts.headers or {"cwd"})
+    return core.fzf_exec(contents, opts)
+end
+#+end_src
+
 Diff the file
 Checkout the file
 
@@ -238,6 +260,17 @@ vim.keymap.set('n', '<Plug>(leader-vcs-map)F', function()
         return require('fzf-lua.perforce').files({cwd='.'})
     end
 end, {desc = "Find file from here"})
+#+end_src
+
+Use VCS-appropriate status command if in a VCS repo
+#+begin_src lua :noweb-ref package_spec :tangle no
+vim.keymap.set('n', '<Plug>(leader-vcs-map)s', function()
+    if require('fzf-lua.path').is_git_repo({}, true) then
+        return require('fzf-lua').git_status()
+    elseif require('fzf-lua.perforce').is_p4_repo({}, true) then
+        return require('fzf-lua.perforce').status()
+    end
+end, {desc = "Repo status"})
 #+end_src
 
 Generic map to use the VCS-appropriate files command if in a VCS repo and default to the =files= command if not
