@@ -65,10 +65,32 @@ end
 
 
 -- Get the status
+
+-- [[file:../../../dotfiles/nvim.org::*perforce support][perforce support:5]]
+M.status = function(opts)
+    if not opts then opts = {} end
+    opts.cmd = opts.cmd or "p4 opened -s | cut -d ' ' -f1 | xargs p4 where | cut -d ' ' -f3"
+    opts.cwd = opts.cwd or M.get_root(opts)
+    opts.prompt = opts.prompt or "P4Status> "
+    opts.fn_transform = function(x)
+        return utils.strsplit(x, ' ')[1]
+    end
+
+    -- Set other options from git and override as required
+    opts = config.normalize_opts(opts, config.globals.git.files)
+    opts.git_icons = false
+    local contents = core.mt_cmd_wrapper(opts)
+    opts = core.set_header(opts, opts.headers or {"cwd"})
+    return core.fzf_exec(contents, opts)
+end
+-- perforce support:5 ends here
+
+
+
 -- Diff the file
 -- Checkout the file
 
 
--- [[file:../../../dotfiles/nvim.org::*perforce support][perforce support:5]]
+-- [[file:../../../dotfiles/nvim.org::*perforce support][perforce support:6]]
 return M
--- perforce support:5 ends here
+-- perforce support:6 ends here

@@ -76,6 +76,47 @@ require('packer').startup(function(use)
     map.set('n', '<Plug>(leader-open-map)q', "<Cmd>lua require('fzf-lua').quickfix()<CR>", {desc="Open QuickFix", silent=true})
     map.set('n', '<Plug>(leader-search-map)b', "<Cmd>lua require('fzf-lua').blines()<CR>", {desc="Search current buffer", silent=true})
     map.set('n', '<Plug>(leader-search-map)B', "<Cmd>lua require('fzf-lua').lines()<CR>", {desc="Search all buffers", silent=true})
+    vim.keymap.set('n', '<Plug>(leader-vcs-map)f', function()
+        if require('fzf-lua.path').is_git_repo({}, true) then
+            return require('fzf-lua').git_files()
+        elseif require('fzf-lua.perforce').is_p4_repo({}, true) then
+            return require('fzf-lua.perforce').files()
+        end
+    end, {desc = "Find file"})
+    
+    vim.keymap.set('n', '<Plug>(leader-vcs-map)F', function()
+        if require('fzf-lua.path').is_git_repo({cwd='.'}, true) then
+            return require('fzf-lua').git_files({cwd='.'})
+        elseif require('fzf-lua.perforce').is_p4_repo({cwd='.'}, true) then
+            return require('fzf-lua.perforce').files({cwd='.'})
+        end
+    end, {desc = "Find file from here"})
+    vim.keymap.set('n', '<Plug>(leader-vcs-map)s', function()
+        if require('fzf-lua.path').is_git_repo({}, true) then
+            return require('fzf-lua').git_status()
+        elseif require('fzf-lua.perforce').is_p4_repo({}, true) then
+            return require('fzf-lua.perforce').status()
+        end
+    end, {desc = "Repo status"})
+    vim.keymap.set('n', '<Plug>(leader-project-map)f', function()
+        if require('fzf-lua.path').is_git_repo({}, true) then
+            return require('fzf-lua').git_files()
+        elseif require('fzf-lua.perforce').is_p4_repo({}, true) then
+            return require('fzf-lua.perforce').files()
+        else
+            return require('fzf-lua').files()
+        end
+    end, {desc = "Find file"})
+    
+    vim.keymap.set('n', '<Plug>(leader-project-map)F', function()
+        if require('fzf-lua.path').is_git_repo({cwd='.'}, true) then
+            return require('fzf-lua').git_files({cwd='.'})
+        elseif require('fzf-lua.perforce').is_p4_repo({cwd='.'}, true) then
+            return require('fzf-lua.perforce').files({cwd='.'})
+        else
+            return require('fzf-lua').files({cwd='.'})
+        end
+    end, {desc = "Find file from here"})
         end,
     }
     use {
@@ -98,30 +139,3 @@ require('packer').startup(function(use)
     end
 end)
 -- [[https://github.com/wbthomason/packer.nvim][packer.nvim]]:2 ends here
-
-
-
--- Generic map to use the VCS specific files command if in a VCS repo and default to the =files= command if not
-
--- [[file:../../dotfiles/nvim.org::*Fzf][Fzf:12]]
-vim.keymap.set('n', '<Plug>(leader-project-map)f', function()
-    if require('fzf-lua.path').is_git_repo({}, true) then
-        return require('fzf-lua').git_files()
-    elseif require('fzf-lua.perforce').is_p4_repo({}, true) then
-        return require('fzf-lua.perforce').files()
-    else
-        return require('fzf-lua').files()
-    end
-end, {desc = "Find file"})
-
-vim.keymap.set('n', '<Plug>(leader-project-map)F', function()
-    if require('fzf-lua.path').is_git_repo({cwd='.'}, true) then
-        return require('fzf-lua').git_files({cwd='.'})
-    elseif require('fzf-lua.perforce').is_p4_repo({cwd='.'}, true) then
-        return require('fzf-lua.perforce').files({cwd='.'})
-    else
-        return require('fzf-lua').files({cwd='.'})
-    end
-
-end, {desc = "Find file from here"})
--- Fzf:12 ends here

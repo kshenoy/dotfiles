@@ -14,6 +14,7 @@ map.set('n', '<Leader>h', '<Plug>(leader-help-map)',    {remap=true, silent=true
 map.set('n', '<Leader>o', '<Plug>(leader-open-map)',    {remap=true, silent=true})
 map.set('n', '<Leader>p', '<Plug>(leader-project-map)', {remap=true, silent=true})
 map.set('n', '<Leader>s', '<Plug>(leader-search-map)',  {remap=true, silent=true})
+map.set('n', '<Leader>v', '<Plug>(leader-vcs-map)',     {remap=true, silent=true})
 -- Keybindings:3 ends here
 
 -- [[file:../../dotfiles/nvim.org::*Keybindings][Keybindings:4]]
