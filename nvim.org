@@ -118,75 +118,6 @@ require('fzf-lua').setup({
 })
 #+end_src
 
-Create maps
-#+begin_src lua :noweb-ref package_spec :tangle no
-local map = vim.keymap
-#+end_src
-
-Buffers
-#+begin_src lua :noweb-ref package_spec :tangle no
-map.set('n', '<Plug>(leader-buffer-map)b', "<Cmd>lua require('fzf-lua').buffers({ winopts = { preview = { hidden='hidden' }}})<CR>", {desc="Switch buffer", silent=true})
-#+end_src
-
-Files
-#+begin_src lua :noweb-ref package_spec :tangle no
-map.set('n', '<Plug>(leader-file-map)f', "<Cmd>lua require('fzf-lua').files()<CR>", {desc="Find file", silent=true})
-map.set('n', '<Plug>(leader-file-map)F', "<Cmd>lua require('fzf-lua').files({cwd='.'})<CR>", {desc="Find file from here", silent=true})
-map.set('n', '<Plug>(leader-file-map)r', "<Cmd>lua require('fzf-lua').oldfiles()<CR>", {desc="Recent files", silent=true})
-#+end_src
-
-Misc
-#+begin_src lua :noweb-ref package_spec :tangle no
-map.set('n', "<Leader>'",                "<Cmd>lua require('fzf-lua').resume()<CR>",  {desc="Resume last Fzf op", silent=true})
-map.set('n', '<Plug>(leader-help-map)b', "<Cmd>lua require('fzf-lua').keymaps()<CR>", {desc="Describe bindings", silent=true})
-#+end_src
-
-Open
-#+begin_src lua :noweb-ref package_spec :tangle no
-map.set('n', '<Plug>(leader-open-map)l', "<Cmd>lua require('fzf-lua').loclist()<CR>",  {desc="Open Location List", silent=true})
-map.set('n', '<Plug>(leader-open-map)q', "<Cmd>lua require('fzf-lua').quickfix()<CR>", {desc="Open QuickFix", silent=true})
-#+end_src
-
-#+begin_src lua :noweb-ref package_spec :tangle no
-map.set('n', '<Plug>(leader-open-map)l', "<Cmd>lua require('fzf-lua').loclist()<CR>",  {desc="Open Location List", silent=true})
-map.set('n', '<Plug>(leader-open-map)q', "<Cmd>lua require('fzf-lua').quickfix()<CR>", {desc="Open QuickFix", silent=true})
-#+end_src
-
-Search
-#+begin_src lua :noweb-ref package_spec :tangle no
-map.set('n', '<Plug>(leader-search-map)b', "<Cmd>lua require('fzf-lua').blines()<CR>", {desc="Search current buffer", silent=true})
-map.set('n', '<Plug>(leader-search-map)B', "<Cmd>lua require('fzf-lua').lines()<CR>", {desc="Search all buffers", silent=true})
-#+end_src
-
-#+begin_src lua :noweb-ref package_spec :tangle no
-    end,
-}
-#+end_src
-
-Generic map to use the VCS specific files command if in a VCS repo and default to the =files= command if not
-#+begin_src lua
-vim.keymap.set('n', '<Plug>(leader-project-map)f', function()
-    if require('fzf-lua.path').is_git_repo({}, true) then
-        return require('fzf-lua').git_files()
-    elseif require('fzf-lua.perforce').is_p4_repo({}, true) then
-        return require('fzf-lua.perforce').files()
-    else
-        return require('fzf-lua').files()
-    end
-end, {desc = "Find file"})
-
-vim.keymap.set('n', '<Plug>(leader-project-map)F', function()
-    if require('fzf-lua.path').is_git_repo({cwd='.'}, true) then
-        return require('fzf-lua').git_files({cwd='.'})
-    elseif require('fzf-lua.perforce').is_p4_repo({cwd='.'}, true) then
-        return require('fzf-lua.perforce').files({cwd='.'})
-    else
-        return require('fzf-lua').files({cwd='.'})
-    end
-
-end, {desc = "Find file from here"})
-#+end_src
-
 *** perforce support
 :PROPERTIES:
 :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/nvim/lua/fzf-lua/perforce.lua")
@@ -247,6 +178,95 @@ Checkout the file
 
 #+begin_src lua
 return M
+#+end_src
+
+*** keybindings
+Create maps
+#+begin_src lua :noweb-ref package_spec :tangle no
+local map = vim.keymap
+#+end_src
+
+Buffers
+#+begin_src lua :noweb-ref package_spec :tangle no
+map.set('n', '<Plug>(leader-buffer-map)b', "<Cmd>lua require('fzf-lua').buffers({ winopts = { preview = { hidden='hidden' }}})<CR>", {desc="Switch buffer", silent=true})
+#+end_src
+
+Files
+#+begin_src lua :noweb-ref package_spec :tangle no
+map.set('n', '<Plug>(leader-file-map)f', "<Cmd>lua require('fzf-lua').files()<CR>", {desc="Find file", silent=true})
+map.set('n', '<Plug>(leader-file-map)F', "<Cmd>lua require('fzf-lua').files({cwd='.'})<CR>", {desc="Find file from here", silent=true})
+map.set('n', '<Plug>(leader-file-map)r', "<Cmd>lua require('fzf-lua').oldfiles()<CR>", {desc="Recent files", silent=true})
+#+end_src
+
+Misc
+#+begin_src lua :noweb-ref package_spec :tangle no
+map.set('n', "<Leader>'",                "<Cmd>lua require('fzf-lua').resume()<CR>",  {desc="Resume last Fzf op", silent=true})
+map.set('n', '<Plug>(leader-help-map)b', "<Cmd>lua require('fzf-lua').keymaps()<CR>", {desc="Describe bindings", silent=true})
+#+end_src
+
+Open
+#+begin_src lua :noweb-ref package_spec :tangle no
+map.set('n', '<Plug>(leader-open-map)l', "<Cmd>lua require('fzf-lua').loclist()<CR>",  {desc="Open Location List", silent=true})
+map.set('n', '<Plug>(leader-open-map)q', "<Cmd>lua require('fzf-lua').quickfix()<CR>", {desc="Open QuickFix", silent=true})
+#+end_src
+
+#+begin_src lua :noweb-ref package_spec :tangle no
+map.set('n', '<Plug>(leader-open-map)l', "<Cmd>lua require('fzf-lua').loclist()<CR>",  {desc="Open Location List", silent=true})
+map.set('n', '<Plug>(leader-open-map)q', "<Cmd>lua require('fzf-lua').quickfix()<CR>", {desc="Open QuickFix", silent=true})
+#+end_src
+
+Search
+#+begin_src lua :noweb-ref package_spec :tangle no
+map.set('n', '<Plug>(leader-search-map)b', "<Cmd>lua require('fzf-lua').blines()<CR>", {desc="Search current buffer", silent=true})
+map.set('n', '<Plug>(leader-search-map)B', "<Cmd>lua require('fzf-lua').lines()<CR>", {desc="Search all buffers", silent=true})
+#+end_src
+
+Use VCS-appropriate files command if in a VCS repo
+#+begin_src lua :noweb-ref package_spec :tangle no
+vim.keymap.set('n', '<Plug>(leader-vcs-map)f', function()
+    if require('fzf-lua.path').is_git_repo({}, true) then
+        return require('fzf-lua').git_files()
+    elseif require('fzf-lua.perforce').is_p4_repo({}, true) then
+        return require('fzf-lua.perforce').files()
+    end
+end, {desc = "Find file"})
+
+vim.keymap.set('n', '<Plug>(leader-vcs-map)F', function()
+    if require('fzf-lua.path').is_git_repo({cwd='.'}, true) then
+        return require('fzf-lua').git_files({cwd='.'})
+    elseif require('fzf-lua.perforce').is_p4_repo({cwd='.'}, true) then
+        return require('fzf-lua.perforce').files({cwd='.'})
+    end
+end, {desc = "Find file from here"})
+#+end_src
+
+Generic map to use the VCS-appropriate files command if in a VCS repo and default to the =files= command if not
+#+begin_src lua :noweb-ref package_spec :tangle no
+vim.keymap.set('n', '<Plug>(leader-project-map)f', function()
+    if require('fzf-lua.path').is_git_repo({}, true) then
+        return require('fzf-lua').git_files()
+    elseif require('fzf-lua.perforce').is_p4_repo({}, true) then
+        return require('fzf-lua.perforce').files()
+    else
+        return require('fzf-lua').files()
+    end
+end, {desc = "Find file"})
+
+vim.keymap.set('n', '<Plug>(leader-project-map)F', function()
+    if require('fzf-lua.path').is_git_repo({cwd='.'}, true) then
+        return require('fzf-lua').git_files({cwd='.'})
+    elseif require('fzf-lua.perforce').is_p4_repo({cwd='.'}, true) then
+        return require('fzf-lua.perforce').files({cwd='.'})
+    else
+        return require('fzf-lua').files({cwd='.'})
+    end
+end, {desc = "Find file from here"})
+#+end_src
+
+*** END
+#+begin_src lua :noweb-ref package_spec :tangle no
+    end,
+}
 #+end_src
 
 ** COMMENT [[https://github.com/b0o/mapx.nvim][mapx]]
@@ -405,6 +425,7 @@ map.set('n', '<Leader>h', '<Plug>(leader-help-map)',    {remap=true, silent=true
 map.set('n', '<Leader>o', '<Plug>(leader-open-map)',    {remap=true, silent=true})
 map.set('n', '<Leader>p', '<Plug>(leader-project-map)', {remap=true, silent=true})
 map.set('n', '<Leader>s', '<Plug>(leader-search-map)',  {remap=true, silent=true})
+map.set('n', '<Leader>v', '<Plug>(leader-vcs-map)',     {remap=true, silent=true})
 #+end_src
 
 #+begin_src lua
