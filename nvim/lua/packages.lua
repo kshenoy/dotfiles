@@ -18,9 +18,7 @@ end
 require('packer').startup(function(use)
     use 'wbthomason/packer.nvim'
     use 'nvim-lua/plenary.nvim'
-    use {
-        'wincent/base16-nvim',
-    }
+    use 'wincent/base16-nvim'
     use {
         'numToStr/Comment.nvim',
         config = function()
@@ -30,32 +28,6 @@ require('packer').startup(function(use)
     use {
         'ibhagwan/fzf-lua',
         config = function()
-    _G.sel_to_ll = function(selected, opts)
-        local loc_list = {}
-        for i = 1, #selected do
-          local file = require('fzf-lua').path.entry_to_file(selected[i], opts)
-          local text = selected[i]:match(":%d+:%d?%d?%d?%d?:?(.*)$")
-          table.insert(loc_list, {
-            filename = file.path,
-            lnum = file.line,
-            col = file.col,
-            text = text,
-          })
-        end
-        vim.fn.setloclist(0, loc_list)
-        -- open the location list
-        vim.cmd [[
-            lopen
-            syntax match qfFileName /^[^|]*|[^|]*| / transparent conceal
-        ]]
-    end
-    
-    -- Add as an action to buffer providers
-    require('fzf-lua').setup {
-        actions = {
-            buffers = { ["alt-l"] = _G.sel_to_ll }
-        }
-    }
     require('fzf-lua').setup({
         winopts = {
             preview = {
@@ -131,6 +103,57 @@ require('packer').startup(function(use)
             })
         end,
     }
+    use {
+        'nvim-treesitter/nvim-treesitter',
+        run = function()
+            require('nvim-treesitter.install').update({ with_sync = true })
+        end,
+        config = function()
+            require('nvim-treesitter.configs').setup{
+                -- A list of parser names, or "all"
+                ensure_installed = {"cpp", "lua"},
+    
+                -- Automatically install missing parsers when entering buffer
+                auto_install = true,
+    
+                highlight = {
+                    enable = true,
+                },
+                indent = {
+                    enable = true,
+                }
+            }
+    
+            -- Better folding
+            vim.opt.foldmethod = "expr"
+            vim.opt.foldexpr   = "nvim_treesitter#foldexpr()"
+        end,
+    }
+    use 'neovim/nvim-lspconfig'
+    
+    use {
+        'williamboman/nvim-lsp-installer',
+        run = function()
+            require('nvim-treesitter.install').update({ with_sync = true })
+        end,
+        config = function()
+            require('nvim-lsp-installer').on_server_ready(function(server)
+                local opts = {}
+                if server.name == "sumneko_lua" then
+                    opts = {
+                        settings = {
+                            Lua = {
+                                diagnostics = {
+                                    globals = { 'vim', 'use' }
+                                },
+                            }
+                        }
+                    }
+                end
+                server:setup(opts)
+            end)
+        end,
+    }
 
     -- Automatically set up the configuration after cloning packer.nvim
     -- Put this at the end after all plugins
@@ -139,3 +162,37 @@ require('packer').startup(function(use)
     end
 end)
 -- [[https://github.com/wbthomason/packer.nvim][packer.nvim]]:2 ends here
+
+
+
+-- Out-of-the-box fzf-lua only supports sending selection quickfix list. This adds an action to send to LocationList.
+-- From https://github.com/ibhagwan/fzf-lua/issues/435
+
+-- [[file:../../dotfiles/nvim.org::*Fzf][Fzf:2]]
+_G.sel_to_ll = function(selected, opts)
+    local loc_list = {}
+    for i = 1, #selected do
+      local file = require('fzf-lua').path.entry_to_file(selected[i], opts)
+      local text = selected[i]:match(":%d+:%d?%d?%d?%d?:?(.*)$")
+      table.insert(loc_list, {
+        filename = file.path,
+        lnum = file.line,
+        col = file.col,
+        text = text,
+      })
+    end
+    vim.fn.setloclist(0, loc_list)
+    -- open the location list
+    vim.cmd [[
+        lopen
+        syntax match qfFileName /^[^|]*|[^|]*| / transparent conceal
+    ]]
+end
+
+-- Add as an action to buffer providers
+require('fzf-lua').setup {
+    actions = {
+        buffers = { ["alt-l"] = _G.sel_to_ll }
+    }
+}
+-- Fzf:2 ends here
