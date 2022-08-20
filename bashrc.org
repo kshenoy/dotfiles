@@ -1360,22 +1360,22 @@ This is all the information I need to set my prompt!
 local _columns=$(tput cols)
 
 # The info variables
-local _pwd=$(prompt::get_compact_pwd)
+local _pwd="$(prompt::get_compact_pwd)"
+local _pwd_sep=" in "
 
 # Force time to US Mountain Time. I don't want to export TZ as it messes up some other scripts
 local _time="$(TZ=US/Mountain date +%I:%M%P) "
-local _user="$(whoami) "
-local _user_host_sep="@ "
-local _pwd_sep="in "
-local _host="$(hostname) "
+local _user="$(whoami)"
 #+end_src
 
-If root user then colour the arrow red.
+If ssh'ed into a different machine, show the hostname
 #+begin_src bash
-if (( "$UID" == 0 )); then
-    local _fg_user_symbol=$_fg_red
+if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
+    local _user_host_sep=" @ "
+    local _host="$(hostname)"
 else
-    local _fg_user_symbol=${_bold}${_fg_light_black}
+    local _user_host_sep=""
+    local _host=""
 fi
 #+end_src
 
@@ -1384,23 +1384,20 @@ VCS specific
 local _vcs_type=$(vcs::get_type)
 local _vcs_branch=$(vcs::get_branch $_vcs_type)
 local _vcs_sep=" on "
+local _user_symbol=" $"
+#local _user_symbol=" ○"
+#local _user_symbol=" ➤"
 
 if [[ $_vcs_type == "git" ]]; then
     local _user_symbol=" ±"
-elif [[ $_vcs_type == "hg" ]]; then
-    local _user_symbol=" ☿"
-elif [[ $_vcs_type == "p4" ]]; then
-    local _vcs_sep=" on "
-else
-    #local _user_symbol=" ○"
-    #local _user_symbol=" ➤"
-    local _user_symbol=" $"
+elif [[ $_vcs_type == "" ]]; then
     local _vcs_sep=""
 fi
 #+end_src
 
 Here, I try to decide what all to put on the prompt depending on the width of the screen.
 I work backwards by constructing the full prompt and remove stuff if it's longer than the screen width as most of the it won't be.
+I chose to work backwards instead of creating them piece-by-piece as the common case is that width will be enough that I don't have to readjust anything.
 
 Start with everything of interest
 #+begin_src bash
@@ -1412,8 +1409,9 @@ If info is wider than the screen, drop the time
 if (( $_columns < ${#_info} )); then
     _time=""
     _info="${_ulcorner} ${_user}${_user_host_sep}${_host}${_pwd_sep}${_pwd}${_vcs_sep}${_vcs_branch} "
+else
+    _time="${_fg_yellow}${_time}${_reset}"
 fi
-_pwd_sep="${_fg_light_black}${_pwd_sep}${_reset}"
 #+end_src
 
 If the info still can't fit, drop user and domain info
@@ -1424,6 +1422,10 @@ if (( $_columns < ${#_info} )); then
     _host=""
     _pwd_sep=""
     _info="${_ulcorner} ${_pwd}${_vcs_sep}${_vcs_branch} "
+else
+    _pwd_sep="${_fg_light_black}${_pwd_sep}${_reset}"
+    _user="${_fg_red}${_user}${_reset}"
+    _user_host_sep="${_fg_light_black}${_user_host_sep}${_reset}"
 fi
 #+end_src
 
@@ -1449,6 +1451,20 @@ fi
 
 local _fillsize=$(( $_columns - ${#_info} - 1 ))
 local _fill=$(printf "${_dash}%.0s" $(seq 1 $_fillsize))" "
+#+end_src
+
+Now that we've decided what the prompt should contain, start colorizing them
+
+If root user then colour the user symbol red.
+#+begin_src bash
+if (( "$UID" == 0 )); then
+    local _fg_user_symbol=${_fg_red}
+else
+    local _fg_user_symbol=${_bold}${_fg_light_black}
+fi
+#+end_src
+
+#+begin_src bash
 #+end_src
 
 Colorize vcs:
@@ -1484,15 +1500,15 @@ Now that I've decided what all I want to put on the prompt and how, it's time to
 #+begin_src bash
 PS1="\n${_reset}"
 PS1+="${_fg_light_black}${_ulcorner}${_reset} "
-PS1+="${_fg_red}${_user}${_reset}"
-PS1+="${_fg_light_black}${_user_host_sep}${_reset}"
+PS1+="${_user}"
+PS1+="${_user_host_sep}"
 PS1+="${_fg_yellow}${_host}${_reset}"
 PS1+="${_pwd_sep}"
 PS1+="${_fg_blue}${_pwd}${_reset}"
 PS1+="${_fg_light_black}${_vcs_sep}${_reset}"
 PS1+="${_vcs_branch} "
 PS1+="${_fg_light_black}${_fill}${_reset}"
-PS1+="${_fg_yellow}${_time}${_reset}"
+PS1+="${_time}"
 PS1+="\n"
 PS1+="${_fg_light_black}${_llcorner}${_reset}"
 PS1+="${_exit_status}${_reset}"
