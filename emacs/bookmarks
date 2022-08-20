@@ -3,15 +3,15 @@
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-capture-last-stored"
- (filename . "/mnt/Data/home/kshenoy/Documents/Notes/Personal/Recommendations.org")
- (front-context-string . "- test\n\n** Worm\n")
- (rear-context-string . " Dies the fire\n\n")
- (position . 162))
+ (filename . "~/Documents/Notes/Work/Eldora.org")
+ (front-context-string . "* TODO KS Stimul")
+ (rear-context-string . "=>  1:31\n:END:\n\n")
+ (position . 354100))
 ("org-refile-last-stored"
  (filename . "~/Documents/Notes/Work/Eldora.org")
- (front-context-string . "** Register chan")
- (rear-context-string . "eby preventing\n\n")
- (position . 21793))
+ (front-context-string . "*** TODO Make th")
+ (rear-context-string . "e/Kind+SDPPort\n\n")
+ (position . 57707))
 ("Inbox"
  (filename . "~/Documents/Notes/Inbox.org")
  (position . 1))

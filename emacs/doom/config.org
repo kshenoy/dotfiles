@@ -164,8 +164,6 @@ Some generic toggle bindings
       :desc "Highlight cursorline" "c" #'hl-line-mode)
 #+end_src
 
-*** TODO Description is not displayed correctly when using which-key
-
 * avy
 #+begin_src emacs-lisp
 (after! avy
@@ -359,12 +357,25 @@ Rest of the todos minus the ones from the previous sections
                                          (my-org-skip-subtree-if-priorities '(?A ?B ?C))))))
 #+end_src
 
-**** Keybinds
+*** Keybinds
+:PROPERTIES:
+:ID:       45e5ce75-2859-4693-a620-e2be510cf23a
+:END:
 #+begin_src emacs-lisp
 (map! :after org-agenda
       :map org-agenda-mode-map
       :localleader
-      :g "o" 'org-set-property)
+      "o" 'org-set-property)
+
+(map! :map doom-leader-open-map
+      :prefix "a"
+      :desc "Dashboard"       "d" '(lambda (&optional arg) (org-agenda arg "d"))
+      :desc "Tasks by Owners" "o" '(lambda (&optional arg) (org-agenda arg "o"))
+      :desc "todo=IDEA"       "I" '(lambda () (org-agenda "IDEA" "T")))
+
+(which-key-add-key-based-replacements "<SPC> o a d" "Dasboard"
+                                      "<SPC> o a o" "Tasks by Owners"
+                                      "<SPC> o a I" "IDEA tasks")
 #+end_src
 
 ** Appearance
@@ -418,7 +429,7 @@ Add a hook to update faces after a theme is loaded. Also call it immediately as 
 :END:
 - org-superstar default: "◉ ○ ✸ ✿"
 - Large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶ ⁖
-- Small: ► • ★ ▸
+- Small: ► • ★ ▸ ➤ ‣
 - More symbols here: http://xahlee.info/comp/unicode_punctuation_symbols.html
 
 Use ✿ for levels 1-3, ✸ for level 4-6 and ◉ for levels 7 onwards
@@ -426,9 +437,9 @@ Use ✿ for levels 1-3, ✸ for level 4-6 and ◉ for levels 7 onwards
 (setq org-superstar-headline-bullets-list '(?✿ ?✿ ?✿ ?✸ ?✸ ?✸ ?● ?● ?●))
 #+end_src
 
-Replace - and + in plain list with ➤ and ✜ respectively
+Use prettier symbols for plain lists
 #+begin_src emacs-lisp
-(setq org-superstar-item-bullet-alist '((?* . ?•) (?+ . ?✜) (?- . ?➤)))
+(setq org-superstar-item-bullet-alist '((?* . ?•) (?+ . ?+) (?- . ?-)))
 #+end_src
 
 There seem to be two ways of replacing text with symbols - using =prettify-symbols-mode= and by using ligatures
@@ -551,10 +562,10 @@ Some org-babel [[https://github.com/dfeich/org-babel-examples][recipes]]
         '((:session . "none") (:results . "verbatim replace") (:noweb . "strip-export")))
 
   (setq org-babel-default-header-args:C++
-        '((:flags . "-std=c++14 -Wall -Wextra -Werror ${BOOST_HOME+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -L${HOME}/.local/lib -I${HOME}/.local/include -Wl,${BOOST_HOME+-rpath ${BOOST_HOME}/lib}")))
+        '((:flags . "-std=c++14 -static-libstdc++ -Wall -Wextra -Werror ${LLVM_HOME+-L${LLVM_HOME}/lib} ${BOOST_HOME+-L ${BOOST_HOME}/lib -I ${BOOST_HOME}/include} -L${HOME}/.local/lib -I${HOME}/.local/include -Wl,${BOOST_HOME+-rpath ${BOOST_HOME}/lib}")))
+
 
   (setq org-babel-python-command "python3")
-  (setq org-babel-default-header-args:python '((:results . "output")))
 #+end_src
 
 Delete the result block using =C-c C-v C-k= where =C-c C-v= is the /org-babel-key-prefix/
@@ -755,7 +766,7 @@ Store the timestamp when an entry is refiled
 
 Easy templates for org-version ≥ 9.2. =C-c C-,= was also added in 9.2 and provides a menu to select an easy-template
 #+begin_src emacs-lisp
-(add-to-list 'org-structure-template-alist '("sc" . "src c++"))
+(add-to-list 'org-structure-template-alist '("sc" . "src C++"))
 (add-to-list 'org-structure-template-alist '("sl" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("sp" . "src python"))
 (add-to-list 'org-structure-template-alist '("ss" . "src bash"))
@@ -918,6 +929,12 @@ Hide verbose prefixes eg. =evil-= =evilem-motion-= etc.
    ))
 #+end_src
 
+Sometimes which-key doesn't display the description correctly eg. when binding to a lambda. This is because it works by doing some regex magic and therefore does not pick up any key bindings that are added "late".
+To work around this we have to add something like [[id:45e5ce75-2859-4693-a620-e2be510cf23a][this]] for all bindings that aren't displayed correctly
+#+begin_src emacs-lisp :tangle no
+(which-key-add-key-based-replacements "<SPC> o a d" "Dasboard")
+#+end_src
+
 * workspaces (using persp-mode)
 #+begin_src emacs-lisp
 (map! :when (featurep! :ui workspaces)
@@ -946,7 +963,7 @@ Hide verbose prefixes eg. =evil-= =evilem-motion-= etc.
           :switch 'window))
 #+end_src
 
-** Automatically create new workspace when opening org-agenda
+** TODO COMMENT Automatically create new workspace when opening org-agenda
 #+begin_src emacs-lisp
 (after! persp-mode
   (persp-def-auto-persp "Agenda"
