@@ -1,290 +1,378 @@
-#+TITLE: bash configuration
-#+PROPERTY: header-args+ :results output silent :noweb tangle :comments both :mkdirp yes
+# bashrc
+# :PROPERTIES:
+# :header-args+: :tangle "bashrc"
+# :END:
 
-* bashrc
-:PROPERTIES:
-:header-args+: :tangle bashrc
-:END:
 
-#+begin_src bash :export none
+# [[file:../../bashrc.org::*bashrc][bashrc:1]]
 # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
 # Use =org-babel-tangle-jump-to-org= to jump back to it from any code block.
 # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
-#+end_src
+# bashrc:1 ends here
 
-How to check for login v/s interactive shell
-#+begin_src bash :tangle no
-shopt -q login_shell && echo "Login shell" || echo "Not a login shell"
-[[ $- == *i* ]] && echo "This is an interactive shell" || echo "This is a script"
-#+end_src
 
-Proceed only if its an interactive shell
-#+begin_src bash
+
+# Proceed only if its an interactive shell
+
+# [[file:../../bashrc.org::*bashrc][bashrc:3]]
 [[ $- == *i* ]] || return
-#+end_src
+# bashrc:3 ends here
 
-** local init
-Any local settings that need to be set initially go here
-#+begin_src bash
+# local init
+# Any local settings that need to be set initially go here
+
+# [[file:../../bashrc.org::*local init][local init:1]]
 [[ -f ~/.bashrc_local_init ]] && . ~/.bashrc_local_init
-#+end_src
+# local init:1 ends here
 
-** interactive, login shell settings
-Turn off TTY "start" and "stop" commands in all interactive shells.
-They default to ~C-q~ and ~C-s~. I want to use ~C-s~ to do forward history search.
-#+begin_src bash
+# interactive, login shell settings
+# Turn off TTY "start" and "stop" commands in all interactive shells.
+# They default to ~C-q~ and ~C-s~. I want to use ~C-s~ to do forward history search.
+
+# [[file:../../bashrc.org::*interactive, login shell settings][interactive, login shell settings:1]]
 stty start ''
 stty stop  ''
 stty -ixon # disable XON/XOFF flow control
 stty ixoff # enable sending (to app) of start/stop characters
 stty ixany # let any character restart output, not only start character
-#+end_src
+# interactive, login shell settings:1 ends here
 
-** configuration
-default permissions
-#+begin_src bash
+# configuration
+# default permissions
+
+# [[file:../../bashrc.org::*configuration][configuration:1]]
 umask 002
-#+end_src
+# configuration:1 ends here
 
-[[https://unix.stackexchange.com/questions/32409/set-and-shopt-why-two][shopt v/s set]]
 
-Using [[https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html][shopt]]:
-~-s~ : set
-~-u~ : unset
-~-q~ : query whether set/unset
 
-[[http://wiki.bash-hackers.org/internals/shell_options][List of shell options]]
+# [[https://unix.stackexchange.com/questions/32409/set-and-shopt-why-two][shopt v/s set]]
 
-If set, a command name that is the name of a directory is executed as if it were the argument to the cd command.
-#+begin_src bash
+# Using [[https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html][shopt]]:
+# ~-s~ : set
+# ~-u~ : unset
+# ~-q~ : query whether set/unset
+
+# [[http://wiki.bash-hackers.org/internals/shell_options][List of shell options]]
+
+# If set, a command name that is the name of a directory is executed as if it were the argument to the cd command.
+
+# [[file:../../bashrc.org::*configuration][configuration:2]]
 shopt -u autocd
-#+end_src
+# configuration:2 ends here
 
-If this is set, an argument to the cd builtin command that is not a directory is assumed to be the name of a variable whose value is the directory to change to.
-#+begin_src bash
+
+
+# If this is set, an argument to the cd builtin command that is not a directory is assumed to be the name of a variable whose value is the directory to change to.
+
+# [[file:../../bashrc.org::*configuration][configuration:3]]
 shopt -s cdable_vars
-#+end_src
+# configuration:3 ends here
 
-If set, minor errors in the spelling of a directory component in a cd command will be corrected.
-The errors checked for are transposed characters, a missing character, and a character too many.
-If a correction is found, the corrected path is printed, and the command proceeds.
-#+begin_src bash
+
+
+# If set, minor errors in the spelling of a directory component in a cd command will be corrected.
+# The errors checked for are transposed characters, a missing character, and a character too many.
+# If a correction is found, the corrected path is printed, and the command proceeds.
+
+# [[file:../../bashrc.org::*configuration][configuration:4]]
 shopt -s cdspell
-#+end_src
+# configuration:4 ends here
 
-If this is set, Bash checks that a command found in the hash table exists before trying to execute it.
-If a hashed command no longer exists, a normal path search is performed.
-#+begin_src bash
+
+
+# If this is set, Bash checks that a command found in the hash table exists before trying to execute it.
+# If a hashed command no longer exists, a normal path search is performed.
+
+# [[file:../../bashrc.org::*configuration][configuration:5]]
 shopt -s checkhash
-#+end_src
+# configuration:5 ends here
 
-If set, Bash lists the status of any stopped and running jobs before exiting an interactive shell.
-If any jobs are running, this causes the exit to be deferred until a second exit is attempted without an intervening command (see Job Control).
-The shell always postpones exiting if any jobs are stopped.
-#+begin_src bash
+
+
+# If set, Bash lists the status of any stopped and running jobs before exiting an interactive shell.
+# If any jobs are running, this causes the exit to be deferred until a second exit is attempted without an intervening command (see Job Control).
+# The shell always postpones exiting if any jobs are stopped.
+
+# [[file:../../bashrc.org::*configuration][configuration:6]]
 shopt -s checkjobs
-#+end_src
+# configuration:6 ends here
 
-If set, Bash checks the window size after each command and, if necessary, updates the values of LINES and COLUMNS.
-#+begin_src bash
+
+
+# If set, Bash checks the window size after each command and, if necessary, updates the values of LINES and COLUMNS.
+
+# [[file:../../bashrc.org::*configuration][configuration:7]]
 shopt -s checkwinsize
-#+end_src
+# configuration:7 ends here
 
-If set, Bash attempts to save all lines of a multiple-line command in the same history entry.
-#+begin_src bash
+
+
+# If set, Bash attempts to save all lines of a multiple-line command in the same history entry.
+
+# [[file:../../bashrc.org::*configuration][configuration:8]]
 shopt -s cmdhist
-#+end_src
+# configuration:8 ends here
 
-If set, Bash quotes all shell metacharacters in filenames and directory names when performing completion.
-If not set, Bash removes metacharacters such as the dollar sign from the set of characters that will be quoted in completed filenames when these metacharacters appear in shell variable references in words to be completed.
-This means that dollar signs in variable names that expand to directories will not be quoted; however, any dollar signs appearing in filenames will not be quoted, either.
-This is active only when bash is using backslashes to quote completed filenames.
-#+begin_src bash
+
+
+# If set, Bash quotes all shell metacharacters in filenames and directory names when performing completion.
+# If not set, Bash removes metacharacters such as the dollar sign from the set of characters that will be quoted in completed filenames when these metacharacters appear in shell variable references in words to be completed.
+# This means that dollar signs in variable names that expand to directories will not be quoted; however, any dollar signs appearing in filenames will not be quoted, either.
+# This is active only when bash is using backslashes to quote completed filenames.
+
+# [[file:../../bashrc.org::*configuration][configuration:9]]
 shopt -s complete_fullquote
-#+end_src
+# configuration:9 ends here
 
-If set, Bash replaces directory names with the results of word expansion when performing filename completion.
-This changes the contents of the readline editing buffer. If not set, Bash attempts to preserve what the user typed.
-I use it mainly to prevent bash from escaping $ in $dir_variable
-#+begin_src bash
+
+
+# If set, Bash replaces directory names with the results of word expansion when performing filename completion.
+# This changes the contents of the readline editing buffer. If not set, Bash attempts to preserve what the user typed.
+# I use it mainly to prevent bash from escaping $ in $dir_variable
+
+# [[file:../../bashrc.org::*configuration][configuration:10]]
 shopt -s direxpand
-#+end_src
+# configuration:10 ends here
 
-If set, Bash attempts spelling correction on directory names during word completion if the directory name initially supplied does not exist.
-#+begin_src bash
+
+
+# If set, Bash attempts spelling correction on directory names during word completion if the directory name initially supplied does not exist.
+
+# [[file:../../bashrc.org::*configuration][configuration:11]]
 shopt -s dirspell
-#+end_src
+# configuration:11 ends here
 
-If set, Bash includes filenames beginning with a ‘.’ in the results of filename expansion.
-#+begin_src bash
+
+
+# If set, Bash includes filenames beginning with a ‘.’ in the results of filename expansion.
+
+# [[file:../../bashrc.org::*configuration][configuration:12]]
 shopt -s dotglob
-#+end_src
+# configuration:12 ends here
 
-If set, aliases are expanded as described below under Aliases, Aliases.
-#+begin_src bash
+
+
+# If set, aliases are expanded as described below under Aliases, Aliases.
+
+# [[file:../../bashrc.org::*configuration][configuration:13]]
 # shopt -s expand_aliases
-#+end_src
+# configuration:13 ends here
 
-If set, the extended pattern matching features (see [[https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html#Pattern-Matching][Pattern Matching]]) are enabled.
-#+begin_src bash
+
+
+# If set, the extended pattern matching features (see [[https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html#Pattern-Matching][Pattern Matching]]) are enabled.
+
+# [[file:../../bashrc.org::*configuration][configuration:14]]
 # shopt -s extglob
-#+end_src
+# configuration:14 ends here
 
-If set, patterns which fail to match filenames during filename expansion result in an expansion error.
-#+begin_src bash
+
+
+# If set, patterns which fail to match filenames during filename expansion result in an expansion error.
+
+# [[file:../../bashrc.org::*configuration][configuration:15]]
 # shopt -s failglob
-#+end_src
+# configuration:15 ends here
 
-If set, the pattern ‘**’ used in a filename expansion context will match all files and zero or more directories and subdirectories.
-If the pattern is followed by a ‘/’, only directories and subdirectories match.
-#+begin_src bash
+
+
+# If set, the pattern ‘**’ used in a filename expansion context will match all files and zero or more directories and subdirectories.
+# If the pattern is followed by a ‘/’, only directories and subdirectories match.
+
+# [[file:../../bashrc.org::*configuration][configuration:16]]
 # shopt -s globstar
-#+end_src
-Not using this as it's too slow! - Use [[id:2870e3ab-aa92-4006-9899-372135ae00c4][home-brewed @]] instead
+# configuration:16 ends here
 
-If set, shell error messages are written in the standard GNU error message format.
-#+begin_src bash
+
+# Not using this as it's too slow! - Use [[id:2870e3ab-aa92-4006-9899-372135ae00c4][home-brewed @]] instead
+
+# If set, shell error messages are written in the standard GNU error message format.
+
+# [[file:../../bashrc.org::*configuration][configuration:17]]
 # shopt -s gnu_errfmt
-#+end_src
+# configuration:17 ends here
 
-If set, the history list is appended to the file named by the value of the HISTFILE variable when the shell exits, rather than overwriting the file.
-#+begin_src bash
+
+
+# If set, the history list is appended to the file named by the value of the HISTFILE variable when the shell exits, rather than overwriting the file.
+
+# [[file:../../bashrc.org::*configuration][configuration:18]]
 shopt -s histappend
-#+end_src
+# configuration:18 ends here
 
-If set, and Readline is being used, a user is given the opportunity to re-edit a failed history substitution.
-#+begin_src bash
+
+
+# If set, and Readline is being used, a user is given the opportunity to re-edit a failed history substitution.
+
+# [[file:../../bashrc.org::*configuration][configuration:19]]
 shopt -s histreedit
-#+end_src
+# configuration:19 ends here
 
-If set, and Readline is being used, the results of history substitution are not immediately passed to the shell parser.
-Instead, the resulting line is loaded into the Readline editing buffer, allowing further modification.
-eg. commands using (!, !!, etc.) will print to shell first for confirmation and not auto-execute
-#+begin_src bash
+
+
+# If set, and Readline is being used, the results of history substitution are not immediately passed to the shell parser.
+# Instead, the resulting line is loaded into the Readline editing buffer, allowing further modification.
+# eg. commands using (!, !!, etc.) will print to shell first for confirmation and not auto-execute
+
+# [[file:../../bashrc.org::*configuration][configuration:20]]
 shopt -s histverify
-#+end_src
+# configuration:20 ends here
 
-If set, Bash will send SIGHUP to all jobs when an interactive login shell exits (see [[https://www.gnu.org/software/bash/manual/html_node/Signals.html][Signals]]).
-#+begin_src bash
+
+
+# If set, Bash will send SIGHUP to all jobs when an interactive login shell exits (see [[https://www.gnu.org/software/bash/manual/html_node/Signals.html][Signals]]).
+
+# [[file:../../bashrc.org::*configuration][configuration:21]]
 shopt -s huponexit
-#+end_src
+# configuration:21 ends here
 
-If set, and job control is not active, the shell runs the last command of a pipeline not executed in the background
-#+begin_src bash
+
+
+# If set, and job control is not active, the shell runs the last command of a pipeline not executed in the background
+
+# [[file:../../bashrc.org::*configuration][configuration:22]]
 shopt -s lastpipe
-#+end_src
+# configuration:22 ends here
 
-If enabled, and the cmdhist option is enabled, multi-line commands are saved to the history with embedded newlines rather than using semicolon separators where possible.
-#+begin_src bash
+
+
+# If enabled, and the cmdhist option is enabled, multi-line commands are saved to the history with embedded newlines rather than using semicolon separators where possible.
+
+# [[file:../../bashrc.org::*configuration][configuration:23]]
 shopt -s lithist
-#+end_src
+# configuration:23 ends here
 
-If set, and a file that Bash is checking for mail has been accessed since the last time it was checked, the message "The mail in mailfile has been read" is displayed.
-#+begin_src bash
+
+
+# If set, and a file that Bash is checking for mail has been accessed since the last time it was checked, the message "The mail in mailfile has been read" is displayed.
+
+# [[file:../../bashrc.org::*configuration][configuration:24]]
 shopt -s mailwarn
-#+end_src
+# configuration:24 ends here
 
-If set, and Readline is being used, Bash will not attempt to search the PATH for possible completions when completion is attempted on an empty line.
-#+begin_src bash
+
+
+# If set, and Readline is being used, Bash will not attempt to search the PATH for possible completions when completion is attempted on an empty line.
+
+# [[file:../../bashrc.org::*configuration][configuration:25]]
 # shopt -s no_empty_cmd_completion
-#+end_src
+# configuration:25 ends here
 
-If set, Bash matches filenames in a case-insensitive fashion when performing filename expansion.
-#+begin_src bash
+
+
+# If set, Bash matches filenames in a case-insensitive fashion when performing filename expansion.
+
+# [[file:../../bashrc.org::*configuration][configuration:26]]
 # shopt -s nocaseglob
-#+end_src
+# configuration:26 ends here
 
-If set, Bash matches patterns in a case-insensitive fashion when performing matching while executing case or =[[= conditional commands,
-when performing pattern substitution word expansions, or when filtering possible completions as part of programmable completion.
-#+begin_src bash
+
+
+# If set, Bash matches patterns in a case-insensitive fashion when performing matching while executing case or =[[= conditional commands,
+# when performing pattern substitution word expansions, or when filtering possible completions as part of programmable completion.
+
+# [[file:../../bashrc.org::*configuration][configuration:27]]
 # shopt -s nocasematch
-#+end_src
+# configuration:27 ends here
 
-If set, Bash allows filename patterns which match no files to expand to a null string, rather than themselves.
-#+begin_src bash
+
+
+# If set, Bash allows filename patterns which match no files to expand to a null string, rather than themselves.
+
+# [[file:../../bashrc.org::*configuration][configuration:28]]
 # shopt -s nullglob
-#+end_src
+# configuration:28 ends here
 
-If this is set, the shift builtin prints an error message when the shift count exceeds the number of parameters.
-#+begin_src bash
+
+
+# If this is set, the shift builtin prints an error message when the shift count exceeds the number of parameters.
+
+# [[file:../../bashrc.org::*configuration][configuration:29]]
 shopt -s shift_verbose
-#+end_src
+# configuration:29 ends here
 
-#+begin_src bash
+# [[file:../../bashrc.org::*configuration][configuration:30]]
 set -o noclobber
 #set -o vi
 set bell-style none
 # Otherwise some completions will fail
 set +o nounset
-#+end_src
+# configuration:30 ends here
 
-** ENVIRONMENT variables
-*** history
-NOTE: exporting a variable makes it available for child processes via the environment
+# history
+# NOTE: exporting a variable makes it available for child processes via the environment
 
-Increase size of history in the terminal. Default is a measly 512 lines
-#+begin_src bash
+# Increase size of history in the terminal. Default is a measly 512 lines
+
+# [[file:../../bashrc.org::*history][history:1]]
 export HISTSIZE=65535
 export HISTFILESIZE=65535
-#+end_src
+# history:1 ends here
 
-Add timestamps to history
-#+begin_src bash
+
+
+# Add timestamps to history
+
+# [[file:../../bashrc.org::*history][history:2]]
 export HISTTIMEFORMAT="%F %T  "
-#+end_src
+# history:2 ends here
 
-Ignore duplicates and trivial one/two char commands as I've a bad habit of doing =cl= all the time.
-Furthermore, I can add all the commands I want to ignore to it as well.
-#+begin_src bash
+
+
+# Ignore duplicates and trivial one/two char commands as I've a bad habit of doing =cl= all the time.
+# Furthermore, I can add all the commands I want to ignore to it as well.
+
+# [[file:../../bashrc.org::*history][history:3]]
 export HISTIGNORE='?:??:history*:sosc:que*:ll*'
-#+end_src
+# history:3 ends here
 
-=ignoredups= allows me to ignore the same command type multiple times consecutively
-=ignorespace= does not add commands that start with a space to the history just in case I don't want to log something
-=ignoreboth= does both
-#+begin_src bash
+
+
+# =ignoredups= allows me to ignore the same command type multiple times consecutively
+# =ignorespace= does not add commands that start with a space to the history just in case I don't want to log something
+# =ignoreboth= does both
+
+# [[file:../../bashrc.org::*history][history:4]]
 export HISTCONTROL=ignoreboth
-#+end_src
+# history:4 ends here
 
-Keeps history forever. Requires ~PROMPT_COMMAND='history -a; history -r'~
-#+begin_src bash :tangle no
-HISTFILE="${XDG_DATA_HOME:-$HOME/.local/share}/bash_history/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
-[[ -d $(dirname ${HISTFILE}) ]] || mkdir -p $(dirname ${HISTFILE})
-#+end_src
-However, a downside of this is that when sessions span multiple days, commands end up getting logged in the wrong files
-Thus, I've moved this to =PROMPT_COMMAND= instead to keep the HISTFILE current.
+# misc
 
-*** misc
 
-#+begin_src bash
+# [[file:../../bashrc.org::*misc][misc:1]]
 export EDITOR=vim
 export VISUAL=gvim
-#+end_src
+# misc:1 ends here
 
-Make less more friendly for non-text input files, see lesspipe(1)
-#+begin_src bash
+
+
+# Make less more friendly for non-text input files, see lesspipe(1)
+
+# [[file:../../bashrc.org::*misc][misc:2]]
 export MANPAGER=less
 export PAGER=less
 [[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
-#+end_src
+# misc:2 ends here
 
-#+begin_src bash
+# [[file:../../bashrc.org::*misc][misc:3]]
 export HOSTNAME="$(hostname)"
 export LANG=en_US.UTF-8
-#+end_src
+# misc:3 ends here
 
-** colors
-*** ls colors
-See [[id:2823d31a-572c-44ec-80e1-84acbbb6412e][dircolors]]
-#+begin_src bash
+# ls colors
+# See [[id:2823d31a-572c-44ec-80e1-84acbbb6412e][dircolors]]
+
+# [[file:../../bashrc.org::*ls colors][ls colors:1]]
 if [[ -x /usr/bin/dircolors ]]; then
     _dircolors=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/dircolors.rc
     [[ -r $_dircolors ]] && eval "$(/usr/bin/dircolors -b $_dircolors)" || eval "$(/usr/bin/dircolors -b)"
 fi
-#+end_src
+# ls colors:1 ends here
 
-*** base16 themes
-#+begin_src bash
+# base16 themes
+
+# [[file:../../bashrc.org::*base16 themes][base16 themes:1]]
 export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
 [[ -n "$PS1" ]] && [[ -s $BASE16_SHELL/profile_helper.sh ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
 if [[ -f ~/.base16_theme ]]; then
@@ -292,10 +380,11 @@ if [[ -f ~/.base16_theme ]]; then
 else
   base16_solarized-light &> /dev/null
 fi
-#+end_src
+# base16 themes:1 ends here
 
-*** colored man pages with less
-#+begin_src bash
+# colored man pages with less
+
+# [[file:../../bashrc.org::*colored man pages with less][colored man pages with less:1]]
 man() {
     env \
         LESS_TERMCAP_mb=$(printf "\e[1;31m") \
@@ -307,16 +396,16 @@ man() {
         LESS_TERMCAP_us=$(printf "\e[1;32m") \
         man "$@"
 }
-#+end_src
+# colored man pages with less:1 ends here
 
-** utilities
-*** @: a simpler and faster alternative to globstar
-:LOGBOOK:
-- Refiled on [2021-03-08 Mon 06:33]
-:END:
-=@ ls /some/long/path/**/that/I/dont/want/to/type= is converted to =ls $(find /some/long/path/ -path '*/that/I/dont/want/to/type')=
+# @: a simpler and faster alternative to globstar
+# :LOGBOOK:
+# - Refiled on [2021-03-08 Mon 06:33]
+# :END:
+# =@ ls /some/long/path/**/that/I/dont/want/to/type= is converted to =ls $(find /some/long/path/ -path '*/that/I/dont/want/to/type')=
 
-#+begin_src bash
+
+# [[file:../../bashrc.org::*@: a simpler and faster alternative to globstar][@: a simpler and faster alternative to globstar:1]]
 unset -f @
 function @ {
     # Description:
@@ -336,17 +425,18 @@ function @ {
     # echo
     eval "${_cmd[@]}"
 }
-#+end_src
+# @: a simpler and faster alternative to globstar:1 ends here
 
-*** alert
-:LOGBOOK:
-- Refiled on [2021-03-08 Mon 06:33]
-:END:
-Simply function to "alert" when a command completes.
-NOTE: This must be used as a function to have access to the history via the fc command
+# alert
+# :LOGBOOK:
+# - Refiled on [2021-03-08 Mon 06:33]
+# :END:
+# Simply function to "alert" when a command completes.
+# NOTE: This must be used as a function to have access to the history via the fc command
 
-Use like this: =sleep 10 && alert=
-#+begin_src bash
+# Use like this: =sleep 10 && alert=
+
+# [[file:../../bashrc.org::*alert][alert:1]]
 unset -f alert
 alert() {
     # Pick up display message if provided as argument. If not show the last command that was run
@@ -364,14 +454,15 @@ alert() {
 
     notify-send --urgency=low -i $_icon "$_msg"
 }
-#+end_src
+# alert:1 ends here
 
-*** calc
-:LOGBOOK:
-- Refiled on [2021-03-08 Mon 06:33]
-:END:
-Simple wrapper around =irb= to make it more natural to use. eg. ~= 4 + 5~
-#+begin_src bash
+# calc
+# :LOGBOOK:
+# - Refiled on [2021-03-08 Mon 06:33]
+# :END:
+# Simple wrapper around =irb= to make it more natural to use. eg. ~= 4 + 5~
+
+# [[file:../../bashrc.org::*calc][calc:1]]
 unset -f =
 =() {                                                                                                             # {{{1
     local _input="${@:-$(</dev/stdin)}"
@@ -405,10 +496,13 @@ unset -f =
 
     echo $_result
 }
-#+end_src
+# calc:1 ends here
 
-Simple base-converter
-#+begin_src bash
+
+
+# Simple base-converter
+
+# [[file:../../bashrc.org::*calc][calc:2]]
 unset -f =base
 =base() (                                                                                                         # {{{1
     _help () { #{{{
@@ -451,9 +545,9 @@ unset -f =base
 =bin() { =base $1  2 ${2:-10}; }  # Convert to binary, by default from decimal
 =dec() { =base $1 10 ${2:-16}; }  # Convert to decimal, by default from hexadecimal
 =hex() { =base $1 16 ${2:-10}; }  # Convert to hexadecimal, by default from decimal
-#+end_src
+# calc:2 ends here
 
-#+begin_src bash
+# [[file:../../bashrc.org::*calc][calc:3]]
 unset -f =slice
 =slice() (
     _help() {
@@ -491,13 +585,14 @@ unset -f =slice
     # echo "in=$_num, msb=$_msb, lsb=$_lsb"
     = "($_num >> $_lsb) & ((1 << ($_msb - $_lsb + 1)) - 1)"
 )
-#+end_src
+# calc:3 ends here
 
-*** dir related
-:LOGBOOK:
-- Refiled on [2021-03-08 Mon 06:33]
-:END:
-#+begin_src bash
+# dir related
+# :LOGBOOK:
+# - Refiled on [2021-03-08 Mon 06:33]
+# :END:
+
+# [[file:../../bashrc.org::*dir related][dir related:1]]
 alias md='mkdir -p'
 
 # Create new dir(s) and enter it (last directory if multiple arguments are given)
@@ -506,10 +601,13 @@ mcd() {
     command mkdir -p "$@" || return
     cd -- "${@: -1}"
 }
-#+end_src
+# dir related:1 ends here
 
-NOTE: The use of $* is deliberate here as it produces all the scripts arguments separated by the first character of $IFS which, by default, is a space. This allows me to match all arguments against a regex in one go instead of looping over them
-#+begin_src bash
+
+
+# NOTE: The use of $* is deliberate here as it produces all the scripts arguments separated by the first character of $IFS which, by default, is a space. This allows me to match all arguments against a regex in one go instead of looping over them
+
+# [[file:../../bashrc.org::*dir related][dir related:2]]
 dirs() {
     if (( $# == 0 )); then
         builtin dirs -v
@@ -521,10 +619,13 @@ dirs() {
         builtin dirs "$@"
     fi
 }
-#+end_src
+# dir related:2 ends here
 
-Silent pushd and uniquifies while pushing
-#+begin_src bash
+
+
+# Silent pushd and uniquifies while pushing
+
+# [[file:../../bashrc.org::*dir related][dir related:3]]
 pushd() {
     builtin pushd "$@" > /dev/null;
 
@@ -532,16 +633,19 @@ pushd() {
     local _dir_pos=$(dirs -l -v | tail -n+2 | grep "$PWD$" | sed 's/^\s*//' | cut -d ' ' -f1 | paste -s)
     command popd -n +$_dir_pos &> /dev/null
 }
-#+end_src
+# dir related:3 ends here
 
-Better dirstack. Adds the following to the usual =cd= behavior:
-- =cd ==           Lists the contents of the stack and use fzf to select from it
-- =cd=             (with no args) Goes to $REPO_PATH if it's set. If not, or if already on $REPO_PATH, goes to $HOME
-- =cd ... [TARG]=  Jump to a directory in the path that starts with TARG.
-                 If TARG is not given, show all directories in the filepath and use fzf to select
 
-Note that =pushd= calls =cd= under the hood. So =cdable_vars= and =cdspell= apply to =pushd= as well
-#+begin_src bash
+
+# Better dirstack. Adds the following to the usual =cd= behavior:
+# - =cd ==           Lists the contents of the stack and use fzf to select from it
+# - =cd=             (with no args) Goes to $REPO_PATH if it's set. If not, or if already on $REPO_PATH, goes to $HOME
+# - =cd ... [TARG]=  Jump to a directory in the path that starts with TARG.
+#                  If TARG is not given, show all directories in the filepath and use fzf to select
+
+# Note that =pushd= calls =cd= under the hood. So =cdable_vars= and =cdspell= apply to =pushd= as well
+
+# [[file:../../bashrc.org::*dir related][dir related:4]]
 cd() {
     if (( "$#" == 0 )); then
         if vcs::is_in_repo > /dev/null; then
@@ -579,7 +683,7 @@ cd() {
             return
             ;;
 
-        ,*\*\**)
+        *\*\**)
             # Split $1 about the first ** into '_path' and '_pattern' and replace all '**' in _pattern with '*'
             local _path=${1%%\*\**}; _path=${_path:-.}
             local _pattern="*$(tr -s '*' <<< ${1#*\*\*})"
@@ -611,14 +715,15 @@ cd() {
 }
 
 alias ..='cd ..'
-#+end_src
+# dir related:4 ends here
 
-*** [[https://github.com/junegunn/fzf][fzf]]
-:LOGBOOK:
-- Refiled on [2021-03-08 Mon 06:33]
-:END:
+# [[https://github.com/junegunn/fzf][fzf]]
+# :LOGBOOK:
+# - Refiled on [2021-03-08 Mon 06:33]
+# :END:
 
-#+begin_src bash
+
+# [[file:../../bashrc.org::*\[\[https:/github.com/junegunn/fzf\]\[fzf\]\]][[[https://github.com/junegunn/fzf][fzf]]:1]]
 if [[ -d /opt/fzf ]]; then
     export FZF_PATH=/opt/fzf
 # elif [[ -z "$FZF_PATH" ]]; then
@@ -652,17 +757,16 @@ if [[ -n "$FZF_PATH" ]]; then
     export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
     [[ -n "$BASE16_THEME" ]] && source "$BASE16_FZF/bash/base16-${BASE16_THEME}.config"
 fi
-#+end_src
+# [[https://github.com/junegunn/fzf][fzf]]:1 ends here
 
-Completion has to be specified at the end: [[*fzf][fzf]]
+# query
+# :LOGBOOK:
+# - Refiled on [2020-12-15 Tue 06:18]
+# :END:
+# =which= on steroids. Shows aliases and function definitions recursively.
+# Since this function deals with aliases, it cannot be made into a stand-alone script since aliases are not accessible inside subshells.
 
-*** query
-:LOGBOOK:
-- Refiled on [2020-12-15 Tue 06:18]
-:END:
-=which= on steroids. Shows aliases and function definitions recursively.
-Since this function deals with aliases, it cannot be made into a stand-alone script since aliases are not accessible inside subshells.
-#+begin_src bash
+# [[file:../../bashrc.org::*query][query:1]]
 query() (
 # Yep, parentheses is correct. It makes this a subshell function allowing the definition to be inaccessible from outside
 # Thus, no more polluting of shell space with helper functions
@@ -765,7 +869,7 @@ __parse_args() {                                                                
         fi
         ;&
 
-      ,*)
+      *)
         # To support multiple inputs
         while (( $# > 1 )); do
           query ${_cmd_recurse[@]} --level 0 $1
@@ -924,21 +1028,22 @@ __query_pp() {                                                                  
     "alias")
       __query_alias
       ;;
-    ,*)
+    *)
       command type -a -- "${_opts[input]}"
       ;;
   esac
 )
-#+end_src
+# query:1 ends here
 
-#+begin_src bash
+# [[file:../../bashrc.org::*query][query:2]]
   alias que=query
-#+end_src
+# query:2 ends here
 
-*** vcs
-Collection of utilities to deal with all VCS related stuff
+# vcs
+# Collection of utilities to deal with all VCS related stuff
 
-#+begin_src bash
+
+# [[file:../../bashrc.org::*vcs][vcs:1]]
 vcs::is_in_git_repo() {
     local _cwd=$PWD
     if (( $# > 0 )); then
@@ -1036,34 +1141,24 @@ vcs::get_root() {
         echo ""
     fi
 }
-#+end_src
+# vcs:1 ends here
 
-** aliases
-Provide a default alias here for the most commonly found tools eg. =grep=, =find= etc.
-They might be overridden later by other similar tools if available eg. =ag=, =rg=, =fd= etc.
 
-*Aliases v/s Functions*
-A big limitation of aliases is that they are only expanded as the first argument, or after another alias with a trailing space on the end of the command.
+# Now, if I run =g SOMETHING= followed by =vq= then =vq= doesn't run as expected because ~!!~ expands to 'g SOMETHING'.
+# However, in the expanded form, 'g' doesn't get replaced with grep because of the afore-mentioned limitation.
 
-eg. let's say I have the following aliases set up
-#+begin_src bash :tangle no
-alias g=grep
-alias vq='v -q <(!!)'
-#+end_src
-Now, if I run =g SOMETHING= followed by =vq= then =vq= doesn't run as expected because ~!!~ expands to 'g SOMETHING'.
-However, in the expanded form, 'g' doesn't get replaced with grep because of the afore-mentioned limitation.
+# To avoid this, I use functions for my most commonly used aliases so that they work everywhere and, aliases only if I'm sure that they won't be used in the middle of a command.
 
-To avoid this, I use functions for my most commonly used aliases so that they work everywhere and, aliases only if I'm sure that they won't be used in the middle of a command.
 
-#+begin_src bash
+# [[file:../../bashrc.org::*aliases][aliases:2]]
 alias ls='ls -FLH --color=always'
 alias l=ls
 alias la='ls -A'
 alias ll='ls -lh'
 alias lla='ll -A'
-#+end_src
+# aliases:2 ends here
 
-#+begin_src bash
+# [[file:../../bashrc.org::*aliases][aliases:3]]
 alias c=clear
 alias cl="c;l"
 
@@ -1090,54 +1185,69 @@ duh() { du -h "$@" | sort -rh; }
 ec() { emacsclient --alternate-editor="" --no-wait --create-frame --quiet "$@" & }
 alias e=ec
 alias evan='emacs --with-profile vanilla'
-#+end_src
+# aliases:3 ends here
 
-From https://askubuntu.com/a/185746/38952
-Using ww twice ensures that the output is not truncated to the width of the terminal
-#+begin_src bash
+
+
+# From https://askubuntu.com/a/185746/38952
+# Using ww twice ensures that the output is not truncated to the width of the terminal
+
+# [[file:../../bashrc.org::*aliases][aliases:4]]
 psgrep() { ps wwup $(command pgrep -f "$@"); }
-#+end_src
+# aliases:4 ends here
 
-bookmarks for commonly used config files
-#+begin_src bash
+
+
+# bookmarks for commonly used config files
+
+# [[file:../../bashrc.org::*aliases][aliases:5]]
 alias gosc='$VISUAL ~/.bashrc'
 alias gost='$VISUAL ~/.dotfiles/tmux/tmux.conf'
 alias gosx='$VISUAL ~/.Xresources'
 alias sosc='. ~/.bashrc && clnpath'
-#+end_src
+# aliases:5 ends here
 
-*** grep
-#+begin_src bash
+# grep
+
+# [[file:../../bashrc.org::*grep][grep:1]]
 export GREP_COLORS='1;32'
 alias grep='grep -sP --color=always'
-#+end_src
+# grep:1 ends here
 
-I use ~g~ as a generic alias for grep and all its replacements. Hence create a generic alias
-#+begin_src bash
+
+
+# I use ~g~ as a generic alias for grep and all its replacements. Hence create a generic alias
+
+# [[file:../../bashrc.org::*grep][grep:2]]
 alias g=grep
 alias gi='g -i'
 alias gv='g -v'
-#+end_src
+# grep:2 ends here
 
-*** git
-#+begin_src bash
+# git
+
+# [[file:../../bashrc.org::*git][git:1]]
   alias ga='git add'
   alias gA='git add -A .'
   alias gh='git help'
   alias gs='git status'
-#+end_src
+# git:1 ends here
 
-*** perforce
-#+begin_src bash
+# perforce
+
+# [[file:../../bashrc.org::*perforce][perforce:1]]
 alias pf='p4'
 alias pfd='pf diff'
 alias pfdg='P4DIFF= pf diff -du | grepdiff --output-matching=hunk --remove-timestamps'
 alias pfe='pf edit'
 alias pflog='pf filelog -stl -m 5'
-#+end_src
+# perforce:1 ends here
 
-Make opened files prettier by aligning the columns
-#+begin_src bash
+
+
+# Make opened files prettier by aligning the columns
+
+# [[file:../../bashrc.org::*perforce][perforce:2]]
 pfo() {
     pf opened "$@" | command column -s# -o ' #' -t | command column -o ' ' -t | command sed 's/#/   #/'
 }
@@ -1155,10 +1265,13 @@ pfrel() {
 pfor() {
     pfo "$@" | pfrel
 }
-#+end_src
+# perforce:2 ends here
 
-Show top N (default=10) changes
-#+begin_src bash
+
+
+# Show top N (default=10) changes
+
+# [[file:../../bashrc.org::*perforce][perforce:3]]
 pftop() {
     local num=10
     if (( $# > 0 )) && [[ "$1" =~ ^[0-9]+$ ]]; then
@@ -1167,11 +1280,12 @@ pftop() {
     fi
     pf changes -m $num "$@" $STEM/...
 }
-#+end_src
+# perforce:3 ends here
 
-*** rm
-Delete in background
-#+begin_src bash
+# rm
+# Delete in background
+
+# [[file:../../bashrc.org::*rm][rm:1]]
 unset -f rm_rf
 rm_rf_silent() {
     # FIXME: Doesn't work if there are spaces in the filename
@@ -1187,70 +1301,42 @@ rm_rf_silent() {
     done
 }
 alias rdj='rm_rf_silent'
-#+end_src
+# rm:1 ends here
 
-*** [[https://github.com/BurntSushi/ripgrep][ripgrep]]
-:PROPERTIES:
-:header-args+: :tangle (if (executable-find "rg") "bashrc" "no")
-:END:
-These will be tangled only if =rg= exists
-#+begin_src bash
+# [[https://github.com/BurntSushi/ripgrep][ripgrep]]
+# :PROPERTIES:
+# :header-args+: :tangle (if (executable-find "rg") "bashrc" "no")
+# :END:
+# These will be tangled only if =rg= exists
+
+# [[file:../../bashrc.org::*\[\[https:/github.com/BurntSushi/ripgrep\]\[ripgrep\]\]][[[https://github.com/BurntSushi/ripgrep][ripgrep]]:1]]
 export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgrep/config
 alias g='command rg'
-#+end_src
+# [[https://github.com/BurntSushi/ripgrep][ripgrep]]:1 ends here
 
-#+begin_src conf :tangle (if (executable-find "rg") "ripgrep/config" "no")
-# This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
-# Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
-# If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
+# vim
 
-# Redefine the cpp extension to make it easier to parse and use it with fd. Start by first clearing it
---type-clear
-cpp
-# Next, instead of simply flattening it out, let's be a little smarter about it
-# First define separate types for header and source files
---type-add
-chdr:*.h, *.H, *.h.in, *.H.in, *.hpp, *.hpp.in, *.hxx, *.hxx.in, *.hh, *.hh.in
---type-add
-csrc:*.C, *.C.in, *.cpp, *.cpp.in, *.cxx, *.cxx.in, *.cc, *.cc.in, *.inl, *.ipp, *.tpp
-# Now, define cpp to be a union of the two
---type-add
-cpp:include:chdr
---type-add
-cpp:include:csrc
-
---type-add
-rdl:*.rdl
-
---type-add
-sbs:*.sbs
-
---type-add
-hdl:include:verilog
-
---type-add
-hdl:*.x
-
-# Because who cares about case!?
---smart-case
-#+end_src
-
-*** vim
-#+begin_src bash
+# [[file:../../bashrc.org::*vim][vim:1]]
 alias v=nvim
 alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
-#+end_src
+# vim:1 ends here
 
-Open results of the last shell command in vim quickfix.
-Very useful for searching something using =rg= etc. and iterating through the results in vim
-#+begin_src bash
+
+
+# Open results of the last shell command in vim quickfix.
+# Very useful for searching something using =rg= etc. and iterating through the results in vim
+
+# [[file:../../bashrc.org::*vim][vim:2]]
 vq() { v -q <(eval "$(fc -nl -1) $@"); }
 vqg() { v -q <(g --vimgrep "$@"); }
-#+end_src
+# vim:2 ends here
 
-Opening up vimdiff takes noticeable amount of time. This will run it only if required.
-Using -f keeps the window in the foreground and prevents a whole bunch of diffs opening at the same time
-#+begin_src bash
+
+
+# Opening up vimdiff takes noticeable amount of time. This will run it only if required.
+# Using -f keeps the window in the foreground and prevents a whole bunch of diffs opening at the same time
+
+# [[file:../../bashrc.org::*vim][vim:3]]
 gvim_diff() {
     # Check to see if all files are present. If not, return.
     for i in "$@"; do
@@ -1264,70 +1350,42 @@ gvim_diff() {
     gvim -df -c 'set nobackup' "$@"
 }
 alias vd=gvim_diff
-#+end_src
+# vim:3 ends here
 
-*** [[https://github.com/tmux/tmux][tmux]]
-#+begin_src bash
+# [[https://github.com/tmux/tmux][tmux]]
+
+# [[file:../../bashrc.org::*\[\[https:/github.com/tmux/tmux\]\[tmux\]\]][[[https://github.com/tmux/tmux][tmux]]:1]]
 source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/tmux/tmuxw.bash
 alias tmux='tmuxw'
 alias tm='tmux'
-#+end_src
+# [[https://github.com/tmux/tmux][tmux]]:1 ends here
 
-** prompt
-[[https://wiki.archlinux.org/index.php/Bash/Prompt_customization][Prompt Customization on ArchWiki]]:
-=PS1= is the primary prompt displayed before each command.
-=PS2= is the secondary prompt used in case of a multi-line command
-=PROMPT_COMMAND= is evaluated right before PS1 is displayed.
+# prompt
+# [[https://wiki.archlinux.org/index.php/Bash/Prompt_customization][Prompt Customization on ArchWiki]]:
+# =PS1= is the primary prompt displayed before each command.
+# =PS2= is the secondary prompt used in case of a multi-line command
+# =PROMPT_COMMAND= is evaluated right before PS1 is displayed.
 
-I use this by assigning it to a function which updates PS1 and PS2 allowing me to have a dynamic prompt
-#+begin_src bash
+# I use this by assigning it to a function which updates PS1 and PS2 allowing me to have a dynamic prompt
+
+# [[file:../../bashrc.org::*prompt][prompt:1]]
 PROMPT_COMMAND=__setprompt
-#+end_src
+# prompt:1 ends here
 
-Use bash builtin =checkwinsize= option for terminals which fail to properly set the $COLUMNS variable. (bug workaround)
-#+begin_src bash
+
+
+# Use bash builtin =checkwinsize= option for terminals which fail to properly set the $COLUMNS variable. (bug workaround)
+
+# [[file:../../bashrc.org::*prompt][prompt:2]]
 shopt -s checkwinsize
-#+end_src
+# prompt:2 ends here
 
-*** Colors and helper functions
-These are the color init strings for the basic file types. A color init string consists of one or more of the following numeric codes:
-Attribute codes: 00:Normal, 01:Bold, 04:Underline, 05=Blink, 06:Outline, 07:Reverse, 08:Concealed
 
-| Color   | Foreground | Background |
-|---------+------------+------------|
-| black   |         30 |         40 |
-| red     |         31 |         41 |
-| green   |         32 |         42 |
-| yellow  |         33 |         43 |
-| blue    |         34 |         44 |
-| magenta |         35 |         45 |
-| cyan    |         36 |         46 |
-| white   |         37 |         47 |
 
-NOTE: Non-printable sequences should be enclosed in \[ and \] else it'll cause long commands to not wrap correctly
-These are some colors and line-graphics that I use in different prompts so I'm putting them in one place.
-#+begin_src bash :tangle no :noweb-ref prompt-common
-local _reset="\[$(tput sgr0)\]"
-local _bold="\[$(tput bold)\]"
-local _fg_black="\[$(tput setaf 0)\]"
-local _fg_light_black="\[$(tput setaf 8)\]"
-local _fg_red="\[$(tput setaf 1)\]"
-local _fg_yellow="\[$(tput setaf 3)\]"
-local _fg_green="\[$(tput setaf 2)\]"
-local _fg_blue="\[$(tput setaf 4)\]"
-local _fg_purple="\[$(tput setaf 5)\]"
+# Contract the following: /proj/ch_func_dev{1:0}/ASPEN_HIGHLANDS -> ~AH{1:0}
+# Contract more if it's my directory
 
-# Set line graphics
-local _dash="─"
-local _ulcorner="┌"
-# local _ulcorner="╭"
-local _llcorner="└"
-# local _llcorner="╰"
-#+end_src
-
-Contract the following: /proj/ch_func_dev{1:0}/ASPEN_HIGHLANDS -> ~AH{1:0}
-Contract more if it's my directory
-#+begin_src bash
+# [[file:../../bashrc.org::*Colors and helper functions][Colors and helper functions:2]]
 prompt::get_compact_pwd() {
     local _pwd=$PWD
     if [[ "$_pwd" =~ ^"$HOME" ]]; then
@@ -1335,27 +1393,46 @@ prompt::get_compact_pwd() {
     fi
     echo $_pwd
 }
-#+end_src
+# Colors and helper functions:2 ends here
 
-*** prompt
-This is based on [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]] and [[http://aperiodic.net/phil/prompt/][Phil's Zsh prmpt]]. This is what it looks like:
-#+begin_example
-  ┌ kshenoy @ svvgar-nx16 in ~/.vim ───────────────────── 03:57pm Aug 02, Fri
-  └ (^_^) ➤
-#+end_example
+# prompt
+# This is based on [[http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/][SJL's prompt]] and [[http://aperiodic.net/phil/prompt/][Phil's Zsh prmpt]]. This is what it looks like:
+# #+begin_example
+#   ┌ kshenoy @ svvgar-nx16 in ~/.vim ───────────────────── 03:57pm Aug 02, Fri
+#   └ (^_^) ➤
+# #+end_example
 
-The function has to be called '__setprompt' as that's what =PROMPT_COMMAND= is set to
-#+begin_src bash
+# The function has to be called '__setprompt' as that's what =PROMPT_COMMAND= is set to
+
+# [[file:../../bashrc.org::*prompt][prompt:1]]
 __setprompt() {
     # This has to be placed first so that we correctly capture the exit status of the last run command
     local _exit_status="$?"
 
     # Colors and line-graphics that I use commonly
-    <<prompt-common>>
-#+end_src
+    local _reset="\[$(tput sgr0)\]"
+    local _bold="\[$(tput bold)\]"
+    local _fg_black="\[$(tput setaf 0)\]"
+    local _fg_light_black="\[$(tput setaf 8)\]"
+    local _fg_red="\[$(tput setaf 1)\]"
+    local _fg_yellow="\[$(tput setaf 3)\]"
+    local _fg_green="\[$(tput setaf 2)\]"
+    local _fg_blue="\[$(tput setaf 4)\]"
+    local _fg_purple="\[$(tput setaf 5)\]"
+    
+    # Set line graphics
+    local _dash="─"
+    local _ulcorner="┌"
+    # local _ulcorner="╭"
+    local _llcorner="└"
+    # local _llcorner="╰"
+# prompt:1 ends here
 
-This is all the information I need to set my prompt!
-#+begin_src bash
+
+
+# This is all the information I need to set my prompt!
+
+# [[file:../../bashrc.org::*prompt][prompt:2]]
 # We use this instead of $COLUMNS as when a shell is starting, the $COLUMNS variable is not set
 local _columns=$(tput cols)
 
@@ -1366,10 +1443,13 @@ local _pwd_sep=" in "
 # Force time to US Mountain Time. I don't want to export TZ as it messes up some other scripts
 local _time="$(TZ=US/Mountain date +%I:%M%P) "
 local _user="$(whoami)"
-#+end_src
+# prompt:2 ends here
 
-If ssh'ed into a different machine, show the hostname
-#+begin_src bash
+
+
+# If ssh'ed into a different machine, show the hostname
+
+# [[file:../../bashrc.org::*prompt][prompt:3]]
 if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
     local _user_host_sep=" @ "
     local _host="$(hostname)"
@@ -1377,10 +1457,13 @@ else
     local _user_host_sep=""
     local _host=""
 fi
-#+end_src
+# prompt:3 ends here
 
-VCS specific
-#+begin_src bash
+
+
+# VCS specific
+
+# [[file:../../bashrc.org::*prompt][prompt:4]]
 local _vcs_type=$(vcs::get_type)
 local _vcs_branch=$(vcs::get_branch $_vcs_type)
 local _vcs_sep=" on "
@@ -1393,29 +1476,38 @@ if [[ $_vcs_type == "git" ]]; then
 elif [[ $_vcs_type == "" ]]; then
     local _vcs_sep=""
 fi
-#+end_src
+# prompt:4 ends here
 
-Here, I try to decide what all to put on the prompt depending on the width of the screen.
-I work backwards by constructing the full prompt and remove stuff if it's longer than the screen width as most of the it won't be.
-I chose to work backwards instead of creating them piece-by-piece as the common case is that width will be enough that I don't have to readjust anything.
 
-Start with everything of interest
-#+begin_src bash
+
+# Here, I try to decide what all to put on the prompt depending on the width of the screen.
+# I work backwards by constructing the full prompt and remove stuff if it's longer than the screen width as most of the it won't be.
+# I chose to work backwards instead of creating them piece-by-piece as the common case is that width will be enough that I don't have to readjust anything.
+
+# Start with everything of interest
+
+# [[file:../../bashrc.org::*prompt][prompt:5]]
 _info="${_ulcorner} ${_user}${_user_host_sep}${_host}${_pwd_sep}${_pwd}${_vcs_sep}${_vcs_branch} ${_time}"
-#+end_src
+# prompt:5 ends here
 
-If info is wider than the screen, drop the time
-#+begin_src bash
+
+
+# If info is wider than the screen, drop the time
+
+# [[file:../../bashrc.org::*prompt][prompt:6]]
 if (( $_columns < ${#_info} )); then
     _time=""
     _info="${_ulcorner} ${_user}${_user_host_sep}${_host}${_pwd_sep}${_pwd}${_vcs_sep}${_vcs_branch} "
 else
     _time="${_fg_yellow}${_time}${_reset}"
 fi
-#+end_src
+# prompt:6 ends here
 
-If the info still can't fit, drop user and domain info
-#+begin_src bash
+
+
+# If the info still can't fit, drop user and domain info
+
+# [[file:../../bashrc.org::*prompt][prompt:7]]
 if (( $_columns < ${#_info} )); then
     _user=""
     _user_host_sep=""
@@ -1427,19 +1519,25 @@ else
     _user="${_fg_red}${_user}${_reset}"
     _user_host_sep="${_fg_light_black}${_user_host_sep}${_reset}"
 fi
-#+end_src
+# prompt:7 ends here
 
-If the info still can't fit, drop vcs branch
-#+begin_src bash
+
+
+# If the info still can't fit, drop vcs branch
+
+# [[file:../../bashrc.org::*prompt][prompt:8]]
 if (( $_columns < ${#_info} )); then
     _vcs_sep=""
     _vcs_branch=""
     _info="${_ulcorner} ${_pwd} "
 fi
-#+end_src
+# prompt:8 ends here
 
-If the info still can't fit, truncate PWD
-#+begin_src bash
+
+
+# If the info still can't fit, truncate PWD
+
+# [[file:../../bashrc.org::*prompt][prompt:9]]
 if (( $_columns < ${#_info} )); then
     _pwd_sep="..."
     while (( $_columns < ${#_info} )); do
@@ -1451,24 +1549,31 @@ fi
 
 local _fillsize=$(( $_columns - ${#_info} - 1 ))
 local _fill=$(printf "${_dash}%.0s" $(seq 1 $_fillsize))" "
-#+end_src
+# prompt:9 ends here
 
-Now that we've decided what the prompt should contain, start colorizing them
 
-If root user then colour the user symbol red.
-#+begin_src bash
+
+# Now that we've decided what the prompt should contain, start colorizing them
+
+# If root user then colour the user symbol red.
+
+# [[file:../../bashrc.org::*prompt][prompt:10]]
 if (( "$UID" == 0 )); then
     local _fg_user_symbol=${_fg_red}
 else
     local _fg_user_symbol=${_bold}${_fg_light_black}
 fi
-#+end_src
+# prompt:10 ends here
 
-#+begin_src bash
-#+end_src
+# [[file:../../bashrc.org::*prompt][prompt:11]]
 
-Colorize vcs:
-#+begin_src bash
+# prompt:11 ends here
+
+
+
+# Colorize vcs:
+
+# [[file:../../bashrc.org::*prompt][prompt:12]]
 if [[ $_vcs_type == "git" ]]; then
     local _vcs_status=$(vcs::get_status ${_vcs_type} ${_vcs_branch})
     if [[ "${_vcs_status}" == "staged" ]]; then
@@ -1485,19 +1590,25 @@ elif [[ $_vcs_type == "p4" ]]; then
         _vcs_branch="${_fg_green}${_vcs_branch}${_reset}"
     fi
 fi
-#+end_src
+# prompt:12 ends here
 
-Create exit status indicator based on exit status of last command
-#+begin_src bash
+
+
+# Create exit status indicator based on exit status of last command
+
+# [[file:../../bashrc.org::*prompt][prompt:13]]
 if (( "$_exit_status" == 0 )); then
     _exit_status="${_bold}${_fg_green} (^_^)"
 else
     _exit_status="${_fg_red} (@_@)"
 fi
-#+end_src
+# prompt:13 ends here
 
-Now that I've decided what all I want to put on the prompt and how, it's time to set the prompt variables
-#+begin_src bash
+
+
+# Now that I've decided what all I want to put on the prompt and how, it's time to set the prompt variables
+
+# [[file:../../bashrc.org::*prompt][prompt:14]]
 PS1="\n${_reset}"
 PS1+="${_fg_light_black}${_ulcorner}${_reset} "
 PS1+="${_user}"
@@ -1515,38 +1626,49 @@ PS1+="${_exit_status}${_reset}"
 PS1+="${_fg_user_symbol}${_user_symbol}${_reset} "
 
 PS2="      ${_fg_user_symbol}...${_reset}   "
-#+end_src
+# prompt:14 ends here
 
-Evaluate dynamic variables only if dyn_vars is defined (Not required for prompt)
-#+begin_src bash
+
+
+# Evaluate dynamic variables only if dyn_vars is defined (Not required for prompt)
+
+# [[file:../../bashrc.org::*prompt][prompt:15]]
 declare -F dyn_vars &> /dev/null && dyn_vars
-#+end_src
+# prompt:15 ends here
 
-Set HISTFILE here to keep it current when sessions span multiple days
-FIXME: Find a better way to do this i.e. do it once a day instead of everytime the prompt is refreshed
-#+begin_src bash
+
+
+# Set HISTFILE here to keep it current when sessions span multiple days
+# FIXME: Find a better way to do this i.e. do it once a day instead of everytime the prompt is refreshed
+
+# [[file:../../bashrc.org::*prompt][prompt:16]]
 HISTFILE="${XDG_DATA_HOME:-$HOME/.local/share}/bash_history/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
 [[ -d $(dirname ${HISTFILE}) ]] || mkdir -p $(dirname ${HISTFILE})
-#+end_src
+# prompt:16 ends here
 
-Write to the history file immediately instead of waiting till the end of the session
-#+begin_src bash
+
+
+# Write to the history file immediately instead of waiting till the end of the session
+
+# [[file:../../bashrc.org::*prompt][prompt:17]]
 history -a
 }
-#+end_src
+# prompt:17 ends here
 
-** PATH
-#+begin_src bash
+# PATH
+
+# [[file:../../bashrc.org::*PATH][PATH:1]]
 if ((which ruby &> /dev/null) && (which gem &> /dev/null)); then
   export PATH="$(ruby -rubygems -e 'puts Gem.user_dir')/bin:$PATH"
 fi
 export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 clnpath
-#+end_src
+# PATH:1 ends here
 
-** local override
-Update permissions of the history when exiting as root
-#+begin_src bash
+# local override
+# Update permissions of the history when exiting as root
+
+# [[file:../../bashrc.org::*local override][local override:1]]
 __histfile_perm_update__() {
     if [[ -f $HISTFILE ]]; then
         echo "Changing permissions of HISTFILE..."
@@ -1561,47 +1683,18 @@ trap __histfile_perm_update__ EXIT
 if [[ "$SHLVL" = 1 ]]; then
     [[ -x /usr/bin/clear_console ]] && /usr/bin/clear_console -q
 fi
-#+end_src
+# local override:1 ends here
 
-*** home
-To connect to work-vpn
-#+begin_src bash :tangle (if (string-match "buntu" (system-name)) "bashrc" "no")
-alias gp=globalprotect
+# bashrc_local
+# And finally, check for a .bashrc_local and load it
 
-work_vpn() {
-    # if command grep Connected <<< $(globalprotect show --status); then
-    if command grep gpd0 <<< $(ifconfig -s) >& /dev/null; then
-        echo "VPN is already connected"
-    else
-        globalprotect connect --portal vpn.amd.com --username kshenoy
-    fi
-}
-#+end_src
-
-#+begin_src bash :tangle (if (string-match "buntu" (system-name)) "bashrc" "no")
-alias boot2win='sudo grub-reboot Windows && shutdown -r 0'
-#+end_src
-
-*** WSL
-#+begin_src bash :tangle (if (string-match "windows" (system-name)) "bashrc" "no")
-export LIBGL_ALWAYS_INDIRECT=1
-# Need to specify the IP of the host
-export DISPLAY=192.168.1.11:0
-#+end_src
-
-**** TODO Move WSL specific bash_profile and bashrc_local_override settings here
-
-*** bashrc_local
-And finally, check for a .bashrc_local and load it
-#+begin_src bash
+# [[file:../../bashrc.org::*bashrc_local][bashrc_local:1]]
 [[ -f ~/.bashrc_local_override ]] && . ~/.bashrc_local_override
-#+end_src
+# bashrc_local:1 ends here
 
-** completion
-Applying dumber completions first so that the smarter ones can come later and can override them
+# command completion
 
-*** command completion
-#+begin_src bash
+# [[file:../../bashrc.org::*command completion][command completion:1]]
 if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
@@ -1649,23 +1742,22 @@ complete -f -o default -X '!*.gif'  kview
 #complete -f -o default -X '!*.+(jp*g|gif|xpm|png|bmp)' xv gimp
 #complete -f -o default -X '!*.+(mp3|MP3)' mpg123 mpg321
 #complete -f -o default -X '!*.+(ogg|OGG)' ogg123
-#+end_src
+# command completion:1 ends here
 
-*** fzf completion
-Rest of fzf configuration defined above: [[*\[\[https://github.com/junegunn/fzf\]\[fzf\]\]][fzf]]
+# fzf completion
+# Rest of fzf configuration defined above: [[*\[\[https://github.com/junegunn/fzf\]\[fzf\]\]][fzf]]
 
-#+begin_src bash
+
+# [[file:../../bashrc.org::*fzf completion][fzf completion:1]]
 [[ $- == *i* ]] && source "$FZF_PATH/shell/completion.bash" 2> /dev/null
-#+end_src
+# fzf completion:1 ends here
 
-*** TODO COMMENT tmux completion
-Use tmux/tmux_completion.bash
+# alias completion
+# Automatically add completion for all aliases to commands having completion functions
+# This must be called only at the very end
 
-*** alias completion
-Automatically add completion for all aliases to commands having completion functions
-This must be called only at the very end
 
-#+begin_src bash
+# [[file:../../bashrc.org::*alias completion][alias completion:1]]
 _compl_alias() {
     [[ -z "$1" ]] && return
     local _alias="$1"
@@ -1679,10 +1771,13 @@ _compl_alias() {
 
     eval "$(complete -p $_cmd | sed "s/$_cmd$/$_alias/")"
 }
-#+end_src
+# alias completion:1 ends here
 
-Note the order of application is important
-#+begin_src bash
+
+
+# Note the order of application is important
+
+# [[file:../../bashrc.org::*alias completion][alias completion:2]]
 _compl_alias e    emacs
 _compl_alias g    grep
 _compl_alias v    vim
@@ -1691,231 +1786,4 @@ _compl_alias vile less
 for _alias in C P gi gv l la ll lla doomacs; do
     _compl_alias "$_alias"
 done
-#+end_src
-
-* COMMENT inputrc
-The use of ~set keymap~ below doesn't look right. =/etc/inputrc= seems to be using ~$if mode~ instead
-
-#+begin_src bash
-## Readline settings
-
-# prepends a symbol to PS1 to indicate whether we're in emacs/vi mode
-# set show-mode-in-prompt-on
-
-# Handle Meta (Alt) correctly
-set meta-flag on
-set convert-meta off
-set output-meta on
-
-# Rebind C-A-H to ignore hyphens and underscores while deleting a filename
-#$if mode=emacs
-#"\eC-h": unix-filename-rubout
-#$endif
-
-# Don't beep!
-set bell-style none
-
-# Case-insensitive filename matching and completion
-set completion-ignore-case on
-
-set keymap emacs
-# Switch to vi mode
-"\C-x\C-t": vi-editing-mode
-
-# Switch to emacs mode
-set keymap vi-command
-"\C-x\C-t": emacs-editing-mode
-set keymap vi-insert
-"\C-x\C-t": emacs-editing-mode
-
-# Open up $VISUAL to edit command
-set keymap vi-command
-"\C-x\C-e": edit-and-execute-command
-set keymap vi-insert
-"\C-x\C-e": edit-and-execute-command
-
-
-# Set default editing mode
-set editing-mode emacs
-#+end_src
-
-* LS_COLORS/dircolors
-:PROPERTIES:
-:header-args+: :tangle dircolors.rc
-:END:
-
-#+begin_src bash :export none
-# This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
-# Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
-# If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
-#+end_src
-
-=ls= uses the value of the environment variable =LS_COLORS= to display. =dircolors= is a utility to set =LS_COLORS=
-
-=COLOR= needs one of these arguments:
-- ~tty~ colorizes output to ttys, but not pipes.
-- ~all~ adds color characters to all output
-- ~none~ shuts colorization off.
-#+begin_src bash
-COLOR tty
-#+end_src
-
-Extra command line options for ls go here. Basically these ones are:
-~-F~ show '/' for dirs, '*' for executables, etc.
-~-T 0~ don't trust tab spacing when formatting ls output.
-#+begin_src bash :tangle no
-OPTIONS -F -T 0
-#+end_src
-
-There should be one TERM entry for each termtype that is colorizable
-#+begin_src bash
-TERM Eterm
-TERM ansi
-TERM color_xterm
-TERM con132x25
-TERM con132x30
-TERM con132x43
-TERM con132x60
-TERM con80x25
-TERM con80x28
-TERM con80x30
-TERM con80x43
-TERM con80x50
-TERM con80x60
-TERM console
-TERM dtterm
-TERM gnome
-TERM kon
-TERM konsole
-TERM kterm
-TERM linux
-TERM linux-c
-TERM mach-color
-TERM rxvt
-TERM screen
-TERM screen
-TERM screen-w
-TERM screen.linux
-TERM uxterm
-TERM vt100
-TERM xterm
-TERM xterm-256color
-TERM xterm-debian
-#+end_src
-
-These are the color init strings for the basic file types. A color init string consists of one or more of the following numeric codes:
-Attribute codes: 00:Normal, 01:Bold, 04:Underline, 05=Blink, 06:Outline, 07:Reverse, 08:Concealed
-| Color   | Foreground | Background |
-|-----------------------------------|
-| black   |     30     |     40     |
-| red     |     31     |     41     |
-| green   |     32     |     42     |
-| yellow  |     33     |     43     |
-| blue    |     34     |     44     |
-| magenta |     35     |     45     |
-| cyan    |     36     |     46     |
-| white   |     37     |     47     |
-
-#+begin_src bash
-BLK     40;33;01    # block device driver
-CHR     40;33;01    # character device driver
-DIR     00;34       # directory
-DOOR    01;35       # door
-EXEC    00;32       # files with execute permissions
-FIFO    40;33       # pipe
-FILE    00          # normal file
-LINK    00;36       # symbolic link. (If this is set to 'target' instead of a numerical value, the color is as for the file pointed to.)
-MISSING 05;37;41    # ... and the files they point to
-NORMAL  00          # global default, although everything should be something.
-ORPHAN  01;37;41    # orphaned syminks
-SOCK    01;35       # socket
-#+end_src
-
-List any file extensions like '.gz' or '.tar' that you would like ls to colorize below. Put the extension, a space, and the color init string.
-(and any comments you want to add after a '#')
-
-Executables
-#+begin_src bash
-.cmd 00;32
-.exe 00;32
-.com 00;32
-.btm 00;32
-.bat 00;32
-.sh  00;32
-.csh 00;32
-#+end_src
-
-Archives or compressed files
-#+begin_src bash
-.tar  00;31
-.tgz  00;31
-.arj  00;31
-.taz  00;31
-.lzh  00;31
-.zip  00;31
-.z    00;31
-.Z    00;31
-.gz   00;31
-.bz2  00;31
-.deb  00;31
-.rpm  00;31
-.jar  00;31
-.bz   00;31
-.tz   00;31
-.cpio 00;31
-#+end_src
-
-Image formats
-#+begin_src bash
-.jpg  00;35
-.jpeg 00;35
-.gif  00;35
-.bmp  00;35
-.pbm  00;35
-.pgm  00;35
-.ppm  00;35
-.tga  00;35
-.xbm  00;35
-.xpm  00;35
-.tif  00;35
-.tiff 00;35
-.png  00;35
-.mpg  00;35
-.mpeg 00;35
-.avi  00;35
-.fli  00;35
-.gl   00;35
-.dl   00;35
-.xcf  00;35
-.xwd  00;35
-#+end_src
-
-Audio formats
-#+begin_src bash
-.ogg 00;35
-.mp3 00;35
-.wav 00;35
-#+end_src
-
-Documents
-#+begin_src bash :tangle no
-.csv 00;00
-.xls 00;00
-.pdf 00;00
-.doc 00;00
-.txt 00;00
-.md  00;00
-.ppt 00;00
-#+end_src
-
-* Local variables
-:PROPERTIES:
-:header-args+: :export none :tangle no
-:END:
-Use =add-file-local-variable= or =add-file-local-variable-prop-line= instead of adding these manually
-
-[[https://www.reddit.com/r/emacs/comments/372nxd/how_to_move_init_to_orgbabel/crjicdv/][Auto-tangle on save]] - Not using it because it was too aggressive for at least this file considering how often I tinker with it
-# eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
-
-# Local Variables:
-# End:
+# alias completion:2 ends here

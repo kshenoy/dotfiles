@@ -4,16 +4,6 @@
 .nfs*
 *sync.ffs_db
 
-# emacs
-emacs/doom/config*.el
-emacs/vanilla/init.el
-emacs/*/bookmarks
-emacs/*/elpa
-emacs/*/recentf
-emacs/*/snippets
-emacs/*/straight
-emacs/*/tmp
-
 # vim
 vim/autoload/plug*
 vim/bundles
@@ -22,11 +12,6 @@ vim/pack/bundles/opt/UltiSnips/pythonx/UltiSnips_globals.pyc
 vim/pack/bundles/opt/UltiSnips/pythonx/vimsnippets.pyc
 vim/pack/bundles/opt/UltiSnips/pythonx/__pycache__
 vim/tmp
-nvim/autoload/plug*
-nvim/bundles
-wallpapers/
-zsh/history
-zsh/oh-my-zsh/
 
-# generated files
-generated/
+# neovim
+nvim/plugin/

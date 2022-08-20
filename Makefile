@@ -4,9 +4,10 @@ TANGLE := emacs --batch --no-init-file --load emacs/tangle.el --funcall literate
 XDG_CONFIG_HOME ?= ${HOME}/.config
 XDG_DATA_HOME ?= ${HOME}/.local/share
 MKLINK := ln -svTf
+CWD := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 
-all: dotfiles-priv base16-fzf base16-shell bash emacs fish git tmux vim links
+all: dotfiles-priv base16-fzf base16-shell bash emacs fish git nvim tmux vim links
 # Rules not included in all: xmonad
 
 
@@ -23,12 +24,14 @@ ${XDG_CONFIG_HOME}/dotfiles-priv:
 # However, this approach doesn't work on files which have machine-specific configuration as everytime I tangle it,
 # the saved version of the file gets updated, thereby affecting the link
 # Hence, a workaround at the moment is to tangle to the location and copy it over to the repo
-bash: generated/bash/bashrc generated/dircolors generated/ripgreprc
+bash: bash/bashrc bash/dircolors.rc ripgrep/config ${HOME}/.bashrc
 # Using grouped targets here to run tangle only once. Supported only for make versions >= 4.3
-generated/bash/bashrc generated/dircolors generated/ripgreprc &: bashrc.org
+bash/bashrc bash/dircolors.rc ripgrep/config &: bashrc.org
 	${TANGLE} $<
 	@mkdir -p ${XDG_DATA_HOME}/bash_history
 	@if [ -f ${HOME}/.bash_history ]; then rm ${HOME}/.bash_history; fi
+${HOME}/.bashrc:
+	@${MKLINK} ${CWD}/bash/bashrc $@
 
 
 #== base16-fzf =========================================================================================================
@@ -44,113 +47,86 @@ ${XDG_CONFIG_HOME}/base16-shell:
 
 
 #== emacs ==============================================================================================================
-emacs: chemacs emacs-doom emacs-vanilla ${HOME}/bin/emacs_daemon
+emacs: chemacs doom
 
-chemacs: ${XDG_CONFIG_HOME}/emacs ${XDG_CONFIG_HOME}/chemacs/profiles.el
+chemacs: ${XDG_CONFIG_HOME}/emacs ${XDG_CONFIG_HOME}/chemacs
 ${XDG_CONFIG_HOME}/emacs:
 	if [ ! -d $@ ]; then git clone https://github.com/plexus/chemacs2 $@; fi
-${XDG_CONFIG_HOME}/chemacs/profiles.el:
-	@mkdir -p $(dir $@)
-	@${MKLINK} ${PWD}/emacs/chemacs-profiles.el $@
+${XDG_CONFIG_HOME}/chemacs:
+	@${MKLINK} ${CWD}/chemacs $@
 
-emacs-doom: ${XDG_CONFIG_HOME}/emacs-doom ${XDG_CONFIG_HOME}/doom emacs/doom/config.el emacs/doom/init.el emacs/doom/packages.el emacs/doom/bookmarks
+emacs-doom: ${XDG_CONFIG_HOME}/emacs-doom ${XDG_CONFIG_HOME}/doom
 ${XDG_CONFIG_HOME}/emacs-doom:
 	if [ ! -d $@ ]; then \
 	  git clone https://github.com/hlissner/doom-emacs $@; \
 	  $@/bin/doom install; \
 	fi
 ${XDG_CONFIG_HOME}/doom:
-	@${MKLINK} ${PWD}/emacs/doom $@
-emacs/doom/config.el: emacs/doom/config.org
-	${XDG_CONFIG_HOME}/emacs-doom/bin/doom sync
-emacs/doom/init.el emacs/doom/packages.el:
-	${XDG_CONFIG_HOME}/emacs-doom/bin/doom sync
-emacs/doom/bookmarks:
-	@${MKLINK} ${PWD}/emacs/bookmarks $@
-
-emacs-vanilla: emacs/vanilla/init.el emacs/vanilla/bookmarks emacs/vanilla/snippets
-emacs/vanilla/init.el: emacs/vanilla/config.org
-	emacs --batch --load emacs/tangle.el --funcall literate-dotfiles-tangle $<
-emacs/vanilla/bookmarks:
-	@${MKLINK} ${PWD}/emacs/bookmarks $@
-emacs/vanilla/snippets:
-	@${MKLINK} ${PWD}/emacs/snippets $@
-
-${HOME}/bin/emacs_daemon:
-	@${MKLINK} ${PWD}/scripts/emacs_daemon $@
+	@${MKLINK} ${CWD}/doom $@
 
 
 #== fish ===============================================================================================================
-fish: generated/fish/config.fish ${XDG_CONFIG_HOME}/fish/config.fish ${XDG_CONFIG_HOME}/fish/functions
-generated/fish/config.fish: fish.org
+fish: fish/config.fish ${XDG_CONFIG_HOME}/fish
+fish/config.fish: fish.org
 	${TANGLE} $<
-# Using grouped targets here to create links only once. Supported only for make versions >= 4.3
-${XDG_CONFIG_HOME}/fish/config.fish ${XDG_CONFIG_HOME}/fish/functions &:
-	make -f generated/Makefile fish
+${XDG_CONFIG_HOME}/fish:
+	@${MKLINK} ${CWD}/fish $@
 
 
 #== git ================================================================================================================
-git: generated/git/config generated/git/ignore ${XDG_CONFIG_HOME}/git/config ${XDG_CONFIG_HOME}/git/ignore
+git: git/config git/ignore ${XDG_CONFIG_HOME}/git
 # Using grouped targets here to run tangle only once. Supported only for make versions >= 4.3
-generated/git/config generated/git/ignore &: git.org
+git/config git/ignore &: git.org
 	${TANGLE} $<
-# Using grouped targets here to create links only once. Supported only for make versions >= 4.3
-${XDG_CONFIG_HOME}/git/config ${XDG_CONFIG_HOME}/git/ignore &:
-	make -f generated/Makefile git
+${XDG_CONFIG_HOME}/git &:
+	@${MKLINK} ${CWD}/git $@
+
+
+#== nvim =================================================================================================================
+nvim: ${XDG_CONFIG_HOME}/nvim/init.lua
+${XDG_CONFIG_HOME}/nvim/init.lua:
+	@mkdir -p $(dir $@)
+	@${MKLINK} ${CWD}/nvim/init.lua $@
 
 
 #== tmux ===============================================================================================================
-tmux: tmux/tmux.conf ${XDG_CONFIG_HOME}/tmux/tmux.conf
+tmux: tmux/tmux.conf ${XDG_CONFIG_HOME}/tmux
 tmux/tmux.conf: tmux/tmux.org
 	${TANGLE} $<
-${XDG_CONFIG_HOME}/tmux/tmux.conf:
-	@mkdir -p $(dir $@)
-	@${MKLINK} ${PWD}/tmux/tmux.conf $@
+${XDG_CONFIG_HOME}/tmux:
+	@${MKLINK} ${CWD}/tmux $@
 
 
 #== vim ================================================================================================================
-vim: ${HOME}/.vim ${HOME}/.config/nvim ${HOME}/bin/vile ${HOME}/bin/vim_merge vim/pack/rc_local
+vim: ${HOME}/.vim ${HOME}/bin/vile ${HOME}/bin/vim_merge vim/pack/rc_local
 ${HOME}/.vim:
-	@${MKLINK} ${PWD}/vim $@
-${HOME}/.config/nvim:
-	@${MKLINK} ${PWD}/vim $@
+	@${MKLINK} ${CWD}/vim $@
 ${HOME}/bin/vile:
-	@${MKLINK} ${PWD}/scripts/vile $@
+	@${MKLINK} ${CWD}/scripts/vile $@
 ${HOME}/bin/vim_merge:
-	@${MKLINK} ${PWD}/scripts/vim_merge $@
+	@${MKLINK} ${CWD}/scripts/vim_merge $@
 vim/pack/rc_local:
 	@${MKLINK} ${XDG_CONFIG_HOME}/dotfiles-priv/$@ $@
 
 
 #== links ===============================================================================================================
-links: ${XDG_CONFIG_HOME}/bat/config ${HOME}/.ssh/config ${HOME}/.Xresources ${HOME}/.ctags ${HOME}/bin/rgf ${HOME}/.unison/dotfiles.prf ${HOME}/pipe
-${XDG_CONFIG_HOME}/bat/config:
-	@mkdir -p $(dir $@)
-	@${MKLINK} ${PWD}/bat.cfg $@
+links: ${XDG_CONFIG_HOME}/bat ${HOME}/.ssh/config ${HOME}/.Xresources ${HOME}/.ctags ${HOME}/bin/rgf ${HOME}/.unison/dotfiles.prf ${HOME}/pipe
+${XDG_CONFIG_HOME}/bat:
+	@${MKLINK} ${CWD}/bat $@
 ${HOME}/.ssh/config:
 	@mkdir -p $(dir $@)
 	@${MKLINK} ${XDG_CONFIG_HOME}/dotfiles-priv/ssh/config $@
 ${HOME}/.Xresources:
-	@${MKLINK} ${PWD}/Xresources $@
+	@${MKLINK} ${CWD}/Xresources $@
 ${HOME}/.ctags:
-	@${MKLINK} ${PWD}/ctags $@
+	@${MKLINK} ${CWD}/ctags/config.ctags $@
 ${HOME}/bin/rgf:
-	@${MKLINK} ${PWD}/scripts/rgf $@
+	@${MKLINK} ${CWD}/scripts/rgf $@
 ${HOME}/.unison/dotfiles.prf:
 	@mkdir -p $(dir $@)
-	@${MKLINK} ${PWD}/unison/dotfiles.prf $@
+	@${MKLINK} ${CWD}/unison/dotfiles.prf $@
 ${HOME}/pipe:
 	if [ ! -p $@ ]; then mkfifo $@; fi
-
-
-#== xmonad et al. ======================================================================================================
-xmonad: ${XDG_CONFIG_HOME}/xmonad xmobar
-${XDG_CONFIG_HOME}/xmonad:
-	@${MKLINK} ${PWD}/xmonad $@
-
-xmobar: ${XDG_CONFIG_HOME}/xmobar
-${XDG_CONFIG_HOME}/xmobar:
-	@${MKLINK} ${PWD}/xmobar $@
 
 
 #=======================================================================================================================
