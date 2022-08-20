@@ -1,4 +1,4 @@
-# [[file:../../../fish.org::*aliases][aliases:6]]
+# [[file:~/.config/dotfiles/fish/fish.org::*aliases][aliases:6]]
 function cp
   command cp -vi $argv
 end

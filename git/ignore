@@ -6,7 +6,7 @@
 
 # For C
 
-# [[file:../../git.org::*ignore][ignore:1]]
+# [[file:~/.config/dotfiles/git/git.org::*ignore][ignore:1]]
 # Object files
 *.o
 *.ko
@@ -46,7 +46,7 @@
 
 # For C++
 
-# [[file:../../git.org::*ignore][ignore:2]]
+# [[file:~/.config/dotfiles/git/git.org::*ignore][ignore:2]]
 # Compiled Object files
 *.slo
 *.lo
@@ -81,7 +81,7 @@
 
 # For Dropbox
 
-# [[file:../../git.org::*ignore][ignore:3]]
+# [[file:~/.config/dotfiles/git/git.org::*ignore][ignore:3]]
 # Dropbox settings and caches
 .dropbox
 .dropbox.attr
@@ -92,7 +92,7 @@
 
 # For Emacs
 
-# [[file:../../git.org::*ignore][ignore:4]]
+# [[file:~/.config/dotfiles/git/git.org::*ignore][ignore:4]]
 # -*- mode: gitignore; -*-
 *~
 \#*\#
@@ -141,7 +141,7 @@ flycheck_*.el
 
 # For Vim
 
-# [[file:../../git.org::*ignore][ignore:5]]
+# [[file:~/.config/dotfiles/git/git.org::*ignore][ignore:5]]
 # swap
 [._]*.s[a-w][a-z]
 [._]s[a-w][a-z]
@@ -159,7 +159,7 @@ tags
 
 # For Tags
 
-# [[file:../../git.org::*ignore][ignore:6]]
+# [[file:~/.config/dotfiles/git/git.org::*ignore][ignore:6]]
 # Ignore tags created by etags, ctags, gtags (GNU global) and cscope
 TAGS
 .TAGS
@@ -181,6 +181,6 @@ cscope.po.out
 
 # For Git
 
-# [[file:../../git.org::*ignore][ignore:7]]
+# [[file:~/.config/dotfiles/git/git.org::*ignore][ignore:7]]
 *.orig
 # ignore:7 ends here

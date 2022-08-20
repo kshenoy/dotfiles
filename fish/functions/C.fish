@@ -1,4 +1,4 @@
-# [[file:../../../fish.org::*aliases][aliases:10]]
+# [[file:~/.config/dotfiles/fish/fish.org::*aliases][aliases:10]]
 function C --wraps=cat
   cat $argv
 end

@@ -1,4 +1,4 @@
-# [[file:../../../fish.org::*aliases][aliases:7]]
+# [[file:~/.config/dotfiles/fish/fish.org::*aliases][aliases:7]]
 function rm
   command rm -vi $argv
 end
