@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-setxkbmap -option 'ctrl:nocaps' -option 'shift:both_capslock' &
-
-trayer --edge top --align right --SetDockType true --SetPartialStrut true --expand true --width 15 --height 20
-
-xmonad
