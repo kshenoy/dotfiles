@@ -108,7 +108,7 @@ vim/pack/rc_local:
 
 
 #== links ===============================================================================================================
-links: ${XDG_CONFIG_HOME}/bat ${HOME}/.ssh/config ${HOME}/.Xresources ${HOME}/.ctags ${HOME}/bin/rgf ${HOME}/.unison/dotfiles.prf ${HOME}/pipe
+links: ${XDG_CONFIG_HOME}/bat ${HOME}/.ssh/config ${HOME}/.Xresources ${HOME}/.ctags ${HOME}/bin/rgf ${HOME}/.unison ${HOME}/pipe
 ${XDG_CONFIG_HOME}/bat:
 	@${MKLINK} ${CWD}/bat $@
 ${HOME}/.ssh/config:
@@ -120,9 +120,8 @@ ${HOME}/.ctags:
 	@${MKLINK} ${CWD}/ctags/config.ctags $@
 ${HOME}/bin/rgf:
 	@${MKLINK} ${CWD}/scripts/rgf $@
-${HOME}/.unison/dotfiles.prf:
-	@mkdir -p $(dir $@)
-	@${MKLINK} ${CWD}/unison/dotfiles.prf $@
+${HOME}/.unison:
+	@${MKLINK} ${CWD}/unison $@
 ${HOME}/pipe:
 	if [ ! -p $@ ]; then mkfifo $@; fi
 

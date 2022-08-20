@@ -68,5 +68,9 @@ vim.api.nvim_create_autocmd('ColorScheme', {
 })
 -- Make pretty:2 ends here
 
-require('work.settings')
-require('work.keybindings')
+if (vim.fn.filereadable("lua/work/settings.lua") == 1) then
+    require('work.settings')
+end
+if (vim.fn.filereadable("lua/work/keybindings.lua") == 1) then
+    require('work.keybindings')
+end
