@@ -303,7 +303,7 @@ vi-mode for copy-paste
 
 Set the default terminal mode to 256color mode
 #+begin_src conf
-  set -g default-terminal "xterm-256color"
+set -g default-terminal "xterm-256color"
 #+end_src
 
 Sane scrolling (http://superuser.com/a/314620)

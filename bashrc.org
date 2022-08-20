@@ -1237,7 +1237,7 @@ hdl:*.x
 
 *** vim
 #+begin_src bash
-alias v=vim
+alias v=nvim
 alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
 #+end_src
 

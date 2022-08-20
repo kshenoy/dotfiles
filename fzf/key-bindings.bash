@@ -1,6 +1,6 @@
 #=======================================================================================================================
 fzf::lsf::bjobs() {                                                                                                #{{{1
-  local selected=$(lsf_bjobs -w |
+  local selected=$(lsf_bjobs -o "id: user: stat: queue: submit_time: name" |
     FZF_DEFAULT_OPTS="--header-lines=1 $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
     cut -d' ' -f1 | while read -r item; do
       printf '%q ' "$item"
