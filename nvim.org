@@ -55,9 +55,7 @@ use 'nvim-lua/plenary.nvim'
 
 ** base16
 #+begin_src lua :noweb-ref package_spec :tangle no
-use {
-    'wincent/base16-nvim',
-}
+use 'wincent/base16-nvim'
 #+end_src
 
 ** [[https://github.com/numToStr/Comment.nvim][Comment.nvim]]
@@ -79,7 +77,7 @@ use {
 
 Out-of-the-box fzf-lua only supports sending selection quickfix list. This adds an action to send to LocationList.
 From https://github.com/ibhagwan/fzf-lua/issues/435
-#+begin_src lua :noweb-ref package_spec :tangle no
+#+begin_src lua
 _G.sel_to_ll = function(selected, opts)
     local loc_list = {}
     for i = 1, #selected do
@@ -112,7 +110,7 @@ require('fzf-lua').setup {
 require('fzf-lua').setup({
     winopts = {
         preview = {
-            -- hidden = 'hidden',  -- The previewer is a bit slower than fzf.vim so disabling it by default
+            hidden = 'hidden',  -- The previewer is a bit slower than fzf.vim so disabling it by default
         }
     }
 })
@@ -180,10 +178,7 @@ M.status = function(opts)
     opts.cwd = opts.cwd or M.get_root(opts)
     opts.prompt = opts.prompt or "P4Status> "
     opts.fn_transform = function(x)
-        local repo_path = utils.strsplit(x, ' ')[1]
-        -- local output, err = utils.io_systemlist("p4 where " .. repo_path)
-        -- return utils.strsplit(output, ' ')[3]
-        return repo_path
+        return utils.strsplit(x, ' ')[1]
     end
 
     -- Set other options from git and override as required
@@ -196,7 +191,6 @@ end
 #+end_src
 
 Diff the file
-Checkout the file
 
 #+begin_src lua
 return M
@@ -251,7 +245,7 @@ vim.keymap.set('n', '<Plug>(leader-vcs-map)f', function()
     elseif require('fzf-lua.perforce').is_p4_repo({}, true) then
         return require('fzf-lua.perforce').files()
     end
-end, {desc = "Find file"})
+end, {desc="Find file", unique=true})
 
 vim.keymap.set('n', '<Plug>(leader-vcs-map)F', function()
     if require('fzf-lua.path').is_git_repo({cwd='.'}, true) then
@@ -259,7 +253,7 @@ vim.keymap.set('n', '<Plug>(leader-vcs-map)F', function()
     elseif require('fzf-lua.perforce').is_p4_repo({cwd='.'}, true) then
         return require('fzf-lua.perforce').files({cwd='.'})
     end
-end, {desc = "Find file from here"})
+end, {desc="Find file from here", unique=true})
 #+end_src
 
 Use VCS-appropriate status command if in a VCS repo
@@ -270,7 +264,7 @@ vim.keymap.set('n', '<Plug>(leader-vcs-map)s', function()
     elseif require('fzf-lua.perforce').is_p4_repo({}, true) then
         return require('fzf-lua.perforce').status()
     end
-end, {desc = "Repo status"})
+end, {desc="Repo status", unique=true})
 #+end_src
 
 Generic map to use the VCS-appropriate files command if in a VCS repo and default to the =files= command if not
@@ -283,7 +277,7 @@ vim.keymap.set('n', '<Plug>(leader-project-map)f', function()
     else
         return require('fzf-lua').files()
     end
-end, {desc = "Find file"})
+end, {desc="Find file", unique=true})
 
 vim.keymap.set('n', '<Plug>(leader-project-map)F', function()
     if require('fzf-lua.path').is_git_repo({cwd='.'}, true) then
@@ -293,22 +287,13 @@ vim.keymap.set('n', '<Plug>(leader-project-map)F', function()
     else
         return require('fzf-lua').files({cwd='.'})
     end
-end, {desc = "Find file from here"})
+end, {desc="Find file from here", unique=true})
 #+end_src
 
 *** END
 #+begin_src lua :noweb-ref package_spec :tangle no
     end,
 }
-#+end_src
-
-** COMMENT [[https://github.com/b0o/mapx.nvim][mapx]]
-#+begin_src lua :noweb-ref package_spec :tangle no
-use 'b0o/mapx.nvim'
-#+end_src
-
-#+begin_src lua
-require('mapx').setup{ global = true }
 #+end_src
 
 ** [[https://github.com/jakemason/ouroboros.nvim][ouroboros.nvim]] - switch between header and implementation files
@@ -330,6 +315,65 @@ use {
 ** COMMENT [[https://github.com/machakann/vim-sandwich][vim-sandwich]] - surround text-objects
 #+begin_src lua :noweb-ref package_spec :tangle no
 use 'machakann/vim-sandwich'
+#+end_src
+
+** treesitter
+#+begin_src lua :noweb-ref package_spec :tangle no
+use {
+    'nvim-treesitter/nvim-treesitter',
+    run = function()
+        require('nvim-treesitter.install').update({ with_sync = true })
+    end,
+    config = function()
+        require('nvim-treesitter.configs').setup{
+            -- A list of parser names, or "all"
+            ensure_installed = {"cpp", "lua"},
+
+            -- Automatically install missing parsers when entering buffer
+            auto_install = true,
+
+            highlight = {
+                enable = true,
+            },
+            indent = {
+                enable = true,
+            }
+        }
+
+        -- Better folding
+        vim.opt.foldmethod = "expr"
+        vim.opt.foldexpr   = "nvim_treesitter#foldexpr()"
+    end,
+}
+#+end_src
+
+** lspconfig
+#+begin_src lua :noweb-ref package_spec :tangle no
+use 'neovim/nvim-lspconfig'
+
+use {
+    'williamboman/nvim-lsp-installer',
+    run = function()
+        require('nvim-treesitter.install').update({ with_sync = true })
+    end,
+    config = function()
+        require('nvim-lsp-installer').on_server_ready(function(server)
+            local opts = {}
+            if server.name == "sumneko_lua" then
+                opts = {
+                    settings = {
+                        Lua = {
+                            diagnostics = {
+                                globals = { 'vim', 'use' }
+                            },
+                        }
+                    }
+                }
+            end
+            server:setup(opts)
+        end)
+    end,
+}
 #+end_src
 
 * Settings
@@ -466,6 +510,27 @@ map.set('n', '<Plug>(leader-open-map)m', '<Cmd>marks<CR>')
 map.set('n', '<Plug>(leader-open-map)r', '<Cmd>reg<CR>')
 #+end_src
 
+Toggle quickfix and location list
+#+begin_src lua
+map.set('n', '<Plug>(leader-toggle-map)l', function()
+  if ((vim.fn.getloclist(0, { winid = 0 }).winid or 0) == 0) then
+    vim.cmd "lopen"
+  else
+    vim.cmd "lclose"
+  end
+end, {desc = "Toggle LocationList"})
+
+map.set('n', '<Plug>(leader-toggle-map)q', function()
+    for _, win in pairs(vim.fn.getwininfo()) do
+        if ((win.quickfix == 1) and (win.loclist == 0)) then
+            vim.cmd('cclose')
+            return
+        end
+    end
+    vim.cmd('copen')
+end, {desc = "Toggle QuickFix"})
+#+end_src
+
 ** Remapping for convenience
 Remap 'w' to behave as 'w' should in all cases ~:h cw~. Use =ce= to do what =cw= used to
 #+begin_src lua
@@ -555,6 +620,15 @@ map.set('n', ']b', '<Cmd>bnext<CR>')
 #+begin_src lua
 map.set('n', '<Leader>f', '<Plug>(leader-file-map)', {remap=true})
 map.set('n', '<Leader>F', '<Plug>(leader-file-map)', {remap=true})
+#+end_src
+
+Checkout the file if in a VCS
+#+begin_src lua
+vim.keymap.set('n', '<Plug>(leader-vcs-map)e', function()
+    if require('fzf-lua.perforce').is_p4_repo({}, true) then
+        vim.cmd "!p4 edit %"
+    end
+end, {desc = "Checkout file"})
 #+end_src
 
 * Make pretty
