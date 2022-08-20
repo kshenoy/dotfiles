@@ -14,6 +14,7 @@ map.set('n', '<Leader>h', '<Plug>(leader-help-map)',    {remap=true, silent=true
 map.set('n', '<Leader>o', '<Plug>(leader-open-map)',    {remap=true, silent=true})
 map.set('n', '<Leader>p', '<Plug>(leader-project-map)', {remap=true, silent=true})
 map.set('n', '<Leader>s', '<Plug>(leader-search-map)',  {remap=true, silent=true})
+map.set('n', '<Leader>t', '<Plug>(leader-toggle-map)',  {remap=true, silent=true})
 map.set('n', '<Leader>v', '<Plug>(leader-vcs-map)',     {remap=true, silent=true})
 -- Keybindings:3 ends here
 
@@ -106,3 +107,33 @@ map.set('n', ']b', '<Cmd>bnext<CR>')
 map.set('n', '<Leader>f', '<Plug>(leader-file-map)', {remap=true})
 map.set('n', '<Leader>F', '<Plug>(leader-file-map)', {remap=true})
 -- files:1 ends here
+
+
+
+-- Checkout the file if in a VCS
+
+-- [[file:../../dotfiles/nvim.org::*files][files:2]]
+map.set('n', '<Plug>(leader-vcs-map)e', function()
+    if require('fzf-lua.perforce').is_p4_repo({}, true) then
+        vim.cmd "!p4 edit %"
+    end
+end, {desc = "Checkout file"})
+-- files:2 ends here
+
+map.set('n', '<Plug>(leader-toggle-map)l', function()
+  if ((vim.fn.getloclist(0, { winid = 0 }).winid or 0) == 0) then
+    vim.cmd "lopen"
+  else
+    vim.cmd "lclose"
+  end
+end, {desc = "Toggle LocationList"})
+
+map.set('n', '<Plug>(leader-toggle-map)q', function()
+    for _, win in pairs(vim.fn.getwininfo()) do
+        if ((win.quickfix == 1) and (win.loclist == 0)) then
+            vim.cmd('cclose')
+            return
+        end
+    end
+    vim.cmd('copen')
+end, {desc = "Toggle QuickFix"})

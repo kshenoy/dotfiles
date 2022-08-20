@@ -4,7 +4,7 @@
 # :END:
 
 
-# [[file:~/.config/dotfiles/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:1]]
+# [[file:../bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:1]]
 # This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
 # Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
 # If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
@@ -19,7 +19,7 @@
 # - ~all~ adds color characters to all output
 # - ~none~ shuts colorization off.
 
-# [[file:~/.config/dotfiles/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:2]]
+# [[file:../bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:2]]
 COLOR tty
 # LS_COLORS/dircolors:2 ends here
 
@@ -27,7 +27,7 @@ COLOR tty
 
 # There should be one TERM entry for each termtype that is colorizable
 
-# [[file:~/.config/dotfiles/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:4]]
+# [[file:../bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:4]]
 TERM Eterm
 TERM ansi
 TERM color_xterm
@@ -78,7 +78,7 @@ TERM xterm-debian
 # | white   |     37     |     47     |
 
 
-# [[file:~/.config/dotfiles/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:5]]
+# [[file:../bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:5]]
 BLK     40;33;01    # block device driver
 CHR     40;33;01    # character device driver
 DIR     00;34       # directory
@@ -100,7 +100,7 @@ SOCK    01;35       # socket
 
 # Executables
 
-# [[file:~/.config/dotfiles/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:6]]
+# [[file:../bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:6]]
 .cmd 00;32
 .exe 00;32
 .com 00;32
@@ -114,7 +114,7 @@ SOCK    01;35       # socket
 
 # Archives or compressed files
 
-# [[file:~/.config/dotfiles/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:7]]
+# [[file:../bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:7]]
 .tar  00;31
 .tgz  00;31
 .arj  00;31
@@ -137,7 +137,7 @@ SOCK    01;35       # socket
 
 # Image formats
 
-# [[file:~/.config/dotfiles/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:8]]
+# [[file:../bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:8]]
 .jpg  00;35
 .jpeg 00;35
 .gif  00;35
@@ -165,7 +165,7 @@ SOCK    01;35       # socket
 
 # Audio formats
 
-# [[file:~/.config/dotfiles/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:9]]
+# [[file:../bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:9]]
 .ogg 00;35
 .mp3 00;35
 .wav 00;35

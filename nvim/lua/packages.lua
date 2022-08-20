@@ -31,7 +31,7 @@ require('packer').startup(function(use)
     require('fzf-lua').setup({
         winopts = {
             preview = {
-                -- hidden = 'hidden',  -- The previewer is a bit slower than fzf.vim so disabling it by default
+                hidden = 'hidden',  -- The previewer is a bit slower than fzf.vim so disabling it by default
             }
         }
     })
@@ -54,7 +54,7 @@ require('packer').startup(function(use)
         elseif require('fzf-lua.perforce').is_p4_repo({}, true) then
             return require('fzf-lua.perforce').files()
         end
-    end, {desc = "Find file"})
+    end, {desc="Find file", unique=true})
     
     vim.keymap.set('n', '<Plug>(leader-vcs-map)F', function()
         if require('fzf-lua.path').is_git_repo({cwd='.'}, true) then
@@ -62,14 +62,14 @@ require('packer').startup(function(use)
         elseif require('fzf-lua.perforce').is_p4_repo({cwd='.'}, true) then
             return require('fzf-lua.perforce').files({cwd='.'})
         end
-    end, {desc = "Find file from here"})
+    end, {desc="Find file from here", unique=true})
     vim.keymap.set('n', '<Plug>(leader-vcs-map)s', function()
         if require('fzf-lua.path').is_git_repo({}, true) then
             return require('fzf-lua').git_status()
         elseif require('fzf-lua.perforce').is_p4_repo({}, true) then
             return require('fzf-lua.perforce').status()
         end
-    end, {desc = "Repo status"})
+    end, {desc="Repo status", unique=true})
     vim.keymap.set('n', '<Plug>(leader-project-map)f', function()
         if require('fzf-lua.path').is_git_repo({}, true) then
             return require('fzf-lua').git_files()
@@ -78,7 +78,7 @@ require('packer').startup(function(use)
         else
             return require('fzf-lua').files()
         end
-    end, {desc = "Find file"})
+    end, {desc="Find file", unique=true})
     
     vim.keymap.set('n', '<Plug>(leader-project-map)F', function()
         if require('fzf-lua.path').is_git_repo({cwd='.'}, true) then
@@ -88,7 +88,7 @@ require('packer').startup(function(use)
         else
             return require('fzf-lua').files({cwd='.'})
         end
-    end, {desc = "Find file from here"})
+    end, {desc="Find file from here", unique=true})
         end,
     }
     use {

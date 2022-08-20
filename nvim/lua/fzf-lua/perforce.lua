@@ -88,7 +88,6 @@ end
 
 
 -- Diff the file
--- Checkout the file
 
 
 -- [[file:../../../dotfiles/nvim.org::*perforce support][perforce support:6]]

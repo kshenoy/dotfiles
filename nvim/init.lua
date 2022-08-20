@@ -67,3 +67,6 @@ vim.api.nvim_create_autocmd('ColorScheme', {
   end
 })
 -- Make pretty:2 ends here
+
+require('work.settings')
+require('work.keybindings')
