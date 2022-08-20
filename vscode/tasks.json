@@ -1,0 +1,12 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558 for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Display variables",
+      "type": "shell",
+      "command": "echo \"workspaceFolder         = ${workspaceFolder}\nuserHome                = ${userHome}\nworkspaceFolder         = ${workspaceFolder}\nworkspaceFolderBasename = ${workspaceFolderBasename}\nfile                    = ${file}\nfileWorkspaceFolder     = ${fileWorkspaceFolder}\nrelativeFile            = ${relativeFile}\nrelativeFileDirname     = ${relativeFileDirname}\nfileBasename            = ${fileBasename}\nfileBasenameNoExtension = ${fileBasenameNoExtension}\nfileDirname             = ${fileDirname}\nfileExtname             = ${fileExtname}\nlineNumber              = ${lineNumber}\nexecPath                = ${execPath}\npathSeparator           = ${pathSeparator}\"",
+      "problemMatcher": []
+    }
+  ]
+}
