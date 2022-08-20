@@ -22,7 +22,7 @@ endglobal
 #
 snippet inc "#include <>" b
 #include ${2/>/</}$1`!p
-opts = ['boost/optional.hpp', 'boost/range/adaptors.hpp',
+opts = ['boost/optional.hpp', 'boost/range/adaptors.hpp', 'boost/range/algorithm.hpp',
         'algorithm', 'array', 'cassert', 'cstdint', 'experimental/optional', 'fstream', 'iostream', 'iterator', 'list',
         'map', 'memory', 'set', 'sstream', 'string', 'tuple', 'unordered_map', 'unordered_set', 'utility', 'vector']
 opts.sort()
@@ -30,6 +30,34 @@ if snip.basename:
   opts.insert(0, snip.basename + '.h')
 snip.rv = complete(t[1], opts)
 `${2:`!p snip.rv = '"' if (t[1][-2:] == '.h') else ">" `}$0
+endsnippet
+
+
+snippet Irad "#include <boost/range/adaptors/*>" b
+#include <boost/range/`!p snip.rv = "adaptors" if (t[1] == ".") else "adaptor"`${1:/}`!p
+
+opts = [ '/adjacent_filtered', '/copied', '/filtered', '/formatted', '/indexed', '/indirected', '/map', '/replaced',
+'/replaced_if', '/reversed', '/sliced', '/strided', '/tokenized', '/transformed', '/uniqued' ]
+
+opts.sort()
+snip.rv = complete(t[1], opts)
+``!p snip.rv = "hpp" if (t[1][-1] == ".") else ".hpp"`>$0
+endsnippet
+
+snippet Iral "#include <boost/range/algorithm/*>" b
+#include <boost/range/algorithm${1:/}`!p
+
+opts = [ '/adjacent_find', '/count', '/count_if', '/equal', '/for_each', '/find', '/find_end', '/find_first_of',
+'/find_if', '/lexicographical_compare', '/mismatch', '/search', '/search_n', '/copy', '/copy_backward', '/fill',
+'/fill_n', '/generate', '/inplace_merge', '/merge', '/nth_element', '/partial_sort', '/partial_sort_copy', '/partition',
+'/random_shuffle', '/remove', '/remove_copy', '/remove_copy_if', '/remove_if', '/replace', '/replace_copy',
+'/replace_copy_if', '/replace_if', '/reverse', '/reverse_copy', '/rotate', '/rotate_copy', '/sort', '/stable_partition',
+'/stable_sort', '/transform', '/unique', '/unique_copy', '/binary_search', '/equal_range', '/lower_bound',
+'/upper_bound', '/set_algorithm', '/heap_algorithm', '/max_element', '/min_element', '/permutation' ]
+
+opts.sort()
+snip.rv = complete(t[1], opts)
+``!p snip.rv = "hpp" if (t[1][-1] == ".") else ".hpp"`>$0
 endsnippet
 
 
@@ -237,7 +265,7 @@ auto count = std::count_if(begin(${1:${VISUAL:container}}), end($1), [](auto con
 });
 endsnippet
 
-snippet fnd "std::find"
+snippet fnd "{boost::range/std}::find"
 auto const k_searchIt = std::find(begin(${1:${VISUAL:container}}), end($1), ${2:<value>});
 if (k_searchIt != end($1)) {
   $0
@@ -278,6 +306,10 @@ snippet cpi "std::copy_if"
 std::copy_if(begin(${1:${VISUAL:src}}), end($1), back_inserter(${2:dest}), [](auto const & ${3:i}) {
   $0
 });
+endsnippet
+
+snippet cpn "std::copy_n"
+std::copy_n(begin(${1:${VISUAL:src}}), ${2:count}, back_inserter(${3:dest}));
 endsnippet
 
 snippet fil "std::fill"

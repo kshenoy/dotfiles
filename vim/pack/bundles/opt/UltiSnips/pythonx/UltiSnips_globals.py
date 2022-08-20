@@ -11,5 +11,5 @@ def complete(t, opts):
   elif len(opts) == 1:
     return opts[0][len(t):]
 
-  # return os.path.commonprefix(opts) + "  (" + " | ".join(opts) + ")"
-  return "  ...(" + " | ".join(opts) + ")"
+  # return os.path.commonprefix(opts) + "...(" + " | ".join(opts) + ")"
+  return " ...(" + " | ".join(opts) + ")"
