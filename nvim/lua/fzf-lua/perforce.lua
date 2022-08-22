@@ -1,33 +1,20 @@
--- perforce support
--- :PROPERTIES:
--- :header-args+: :tangle (concat (or (getenv "XDG_CONFIG_HOME") (concat (getenv "HOME") "/.config")) "/nvim/lua/fzf-lua/perforce.lua")
--- :END:
-
-
--- [[file:../../../dotfiles/nvim.org::*perforce support][perforce support:1]]
+------------------------------------------------------------------------------------------------------------------------
+-- Perforce extension for fzf-lua
+------------------------------------------------------------------------------------------------------------------------
 local core  = require "fzf-lua.core"
 local utils = require "fzf-lua.utils"
 local config = require "fzf-lua.config"
 
 local M = {}
--- perforce support:1 ends here
 
-
-
--- Check if currently in a Perforce repo
-
--- [[file:../../../dotfiles/nvim.org::*perforce support][perforce support:2]]
+-- Check if currently in a Perforce repo -------------------------------------------------------------------------------
 M.is_p4_repo = function(opts, noerr)
     local _, err = utils.io_systemlist("p4 info")
     return not (err ~= 0)
 end
--- perforce support:2 ends here
 
 
-
--- Get the root of the repo
-
--- [[file:../../../dotfiles/nvim.org::*perforce support][perforce support:3]]
+-- Get the root of the repo --------------------------------------------------------------------------------------------
 M.get_root = function(opts, noerr)
     local output, err = utils.io_systemlist("p4 info")
     if err ~= 0 then
@@ -36,13 +23,9 @@ M.get_root = function(opts, noerr)
     end
     return utils.strsplit(output[4], ' ')[3]
 end
--- perforce support:3 ends here
 
 
-
--- Get the files in the repo
-
--- [[file:../../../dotfiles/nvim.org::*perforce support][perforce support:4]]
+-- Get the files in the repo -------------------------------------------------------------------------------------------
 M.files = function(opts)
     if not opts then opts = {} end
     opts.cwd = opts.cwd or M.get_root(opts)
@@ -60,13 +43,9 @@ M.files = function(opts)
     opts = core.set_header(opts, opts.headers or {"cwd"})
     return core.fzf_exec(contents, opts)
 end
--- perforce support:4 ends here
 
 
-
--- Get the status
-
--- [[file:../../../dotfiles/nvim.org::*perforce support][perforce support:5]]
+-- Get the status ------------------------------------------------------------------------------------------------------
 M.status = function(opts)
     if not opts then opts = {} end
     opts.cmd = opts.cmd or "p4 opened -s | cut -d ' ' -f1 | xargs p4 where | cut -d ' ' -f3"
@@ -83,13 +62,9 @@ M.status = function(opts)
     opts = core.set_header(opts, opts.headers or {"cwd"})
     return core.fzf_exec(contents, opts)
 end
--- perforce support:5 ends here
 
 
+-- TODO: Diff the file -------------------------------------------------------------------------------------------------
 
--- Diff the file
 
-
--- [[file:../../../dotfiles/nvim.org::*perforce support][perforce support:6]]
 return M
--- perforce support:6 ends here
