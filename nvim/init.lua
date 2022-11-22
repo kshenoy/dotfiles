@@ -4,11 +4,18 @@ if vim.g.vscode then
     return nil
 end
 
+-- Leader and LocalLeader. The leader is used for global maps and localleader for buffer/filetype specific maps
+-- These keybindings need to be defined before the first map is called so placing them here before everything else
+vim.g.mapleader = ' '
+vim.g.maplocalleader = '\\'
+
+
 require('packages')
 require('settings')
 require('keybindings')
 
---[[ Make pretty ]]-----------------------------------------------------------------------------------------------------
+
+-- Make pretty ---------------------------------------------------------------------------------------------------------
 -- Automatically load the same base16 theme as the shell
 vim.api.nvim_create_autocmd({"VimEnter", "FocusGained"}, {
   desc = "Automatically load the same base16 theme as the shell",
@@ -29,7 +36,7 @@ vim.api.nvim_create_autocmd('ColorScheme', {
 })
 
 
----[[ Local config -----------------------------------------------------------------------------------------------------
+-- Local config --------------------------------------------------------------------------------------------------------
 local _cwd = vim.fn.expand('<sfile>:p:h')
 if (vim.fn.filereadable(_cwd .. "/lua/work/settings.lua") == 1) then
     require('work.settings')
@@ -37,4 +44,3 @@ end
 if (vim.fn.filereadable(_cwd .. "/lua/work/keybindings.lua") == 1) then
    require('work.keybindings')
 end
---]]

@@ -1,4 +1,6 @@
 " Vim Functions file
+
+"=======================================================================================================================
 function! utils#MethodJump(arg)                                                                                    "{{{1
   " Description: Small modification to ]m, [m, ]M, [M to skip over the end of class when using ]m and [m and the start
   "              of the class when using ]M and [M
@@ -19,6 +21,7 @@ function! utils#MethodJump(arg)                                                 
 endfunction
 
 
+"=======================================================================================================================
 function! utils#SectionJump(dir, pos)                                                                              "{{{1
   " Description: Jump to next/previous start/end of method
   "              Assumes that the end of the function can be identified by a "}" in the first column
@@ -66,18 +69,17 @@ function! utils#SectionJump(dir, pos)                                           
 endfunction
 
 
+"=======================================================================================================================
 function! utils#FillTW(...)                                                                                        "{{{1
   " Description: Insert spaces to make the current line as wide as specified by textwidth or the supplied width
-  " Arguments:  If argument is supplied use the provided value instead of textwidth to fill
-  let l:filler    = nr2char(getchar())
-  let l:textwidth = (a:0 > 0 ? a:1 : &textwidth)
-  let l:line      = getline('.')
-  let l:padding   = repeat(l:filler, l:textwidth - len(l:line))
-  execute "normal! i" . l:padding
-  call repeat#set(":FTW " . l:textwidth . "\<CR>" . l:filler)
+  " Arguments: When provided an argument, use that character as the fill char
+  let l:filler = (a:0 > 0 ? a:1 : nr2char(getchar()))
+  execute "normal! i" . repeat(l:filler, &textwidth - len(getline('.')))
+  silent! call repeat#set(":call utils#FillTW('" . l:filler . "')\<CR>", -1)
 endfunction
 
 
+"=======================================================================================================================
 function! utils#SetFileTypesInDiff()                                                                               "{{{1
   let g:filetype=''
   Bufdo if (g:filetype == '' && &filetype != 'conf')|let g:filetype=&filetype|endif
@@ -86,6 +88,7 @@ function! utils#SetFileTypesInDiff()                                            
 endfunction
 
 
+"=======================================================================================================================
 function! utils#WindowToggleZoom ()                                                                                "{{{1
   " Description: Zoom/unzoom similar to TMUX
 

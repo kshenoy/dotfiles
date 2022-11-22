@@ -6,7 +6,6 @@ if fn.empty(fn.glob(install_path)) > 0 then
     vim.cmd "packadd packer.nvim"
 end
 
-
 -- Initialize packer
 require('packer').startup(function(use)
     use 'wbthomason/packer.nvim'  -- let packer manage itself
@@ -61,14 +60,14 @@ require('packer').startup(function(use)
             vim.api.nvim_create_autocmd({"Filetype"}, {
                 desc = "Switch between header and implementation",
                 callback = function()
-                    vim.keymap.set('n', "<Leader>ma", "<Cmd>Ouroboros<CR>", {desc="Switch between header and implementation", buffer=true, silent=true})
+                    vim.keymap.set('n', "<LocalLeader>a", "<Cmd>Ouroboros<CR>", {desc="Switch between header and implementation", buffer=true, silent=true})
                 end,
             })
         end,
     }
     --]]
 
-    ---[[ Treesitter ---------------------------------------------------------------------------------------------------
+    --[[ Treesitter ---------------------------------------------------------------------------------------------------
     use {
         'nvim-treesitter/nvim-treesitter',
         run = function()
@@ -84,9 +83,11 @@ require('packer').startup(function(use)
 
                 highlight = {
                     enable = true,
+                    disable = { "verilog", "systemverilog" },
                 },
                 indent = {
                     enable = true,
+                    disable = { "cpp" },
                 }
             }
 
@@ -95,7 +96,7 @@ require('packer').startup(function(use)
             vim.opt.foldexpr   = "nvim_treesitter#foldexpr()"
         end,
     }
-    --]]
+    ]]
 
     --[[
     use {
