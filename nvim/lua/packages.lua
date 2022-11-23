@@ -4,13 +4,33 @@ local fn = vim.fn
 
 plug.begin(vim.fn.stdpath('data')..'/plugged')
 
+
+-- Some TPope plugins that really should be bundled vim *vim
+plug('tpope/vim-abolish')
+plug('tpope/vim-endwise')
 plug('tpope/vim-repeat')
+plug('tpope/vim-surround')
+plug('tpope/vim-unimpaired')
+
 
 if not vim.g.vscode then
   plug('nvim-lua/plenary.nvim')
-  plug('wincent/base16-nvim')
+  plug('RRethy/nvim-base16')
+  plug('kyazdani42/nvim-web-devicons')
 
-  ---[[ Comment ------------------------------------------------------------------------------------------------------
+  ---[[ Lualine --------------------------------------------------------------------------------------------------------
+  plug('nvim-lualine/lualine.nvim', {
+    config = function()
+      require('lualine').setup({
+        options = {
+          icons_enabled = true,
+        },
+      })
+    end,
+  })
+  --]]
+
+  ---[[ Comment --------------------------------------------------------------------------------------------------------
   plug('numToStr/Comment.nvim', {
     config = function()
       require('Comment').setup()
@@ -18,7 +38,7 @@ if not vim.g.vscode then
   })
   --]]
 
-  ---[[ FZF ----------------------------------------------------------------------------------------------------------
+  ---[[ FZF ------------------------------------------------------------------------------------------------------------
   plug('ibhagwan/fzf-lua', {
     config = function()
       require('fzf-lua').setup({
@@ -46,7 +66,7 @@ if not vim.g.vscode then
   })
   --]]
 
-  ---[[ Ouroboros ----------------------------------------------------------------------------------------------------
+  ---[[ Ouroboros ------------------------------------------------------------------------------------------------------
   plug('jakemason/ouroboros', {
     requires = { 'nvim-lua/plenary.nvim' },
     config = function()
@@ -59,7 +79,6 @@ if not vim.g.vscode then
     end,
   })
   --]]
-
 end
 
 plug.ends()

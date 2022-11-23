@@ -41,6 +41,10 @@ opt.splitright = true
 opt.mouse = "ar"                                                                               -- use mouse in all modes
 
 
+--[[ Messages and Info ]]-----------------------------------------------------------------------------------------------
+opt.showmode = false
+
+
 --[[ Editing text ]]----------------------------------------------------------------------------------------------------
 opt.undofile  = true
 opt.textwidth = 120
