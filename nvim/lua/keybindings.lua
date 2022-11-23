@@ -32,8 +32,8 @@ map.set('n', '<C-R>', 'U', {silent=true})
 map.set('n', 'U',     '<C-R>', {silent=true})
 
 -- Remap 'w' to behave as 'w' should in all cases (:h cw). Use `ce` to do what `cw` used to
-map.set('o', 'w', 'v:count > 1 ? "<Cmd>normal! " . v:count . "w<CR>" : "<Cmd>normal! w<CR>"', {expr=true})
-map.set('o', 'W', 'v:count > 1 ? "<Cmd>normal! " . v:count . "W<CR>" : "<Cmd>normal! W<CR>"', {expr=true})
+map.set('n', 'cw', 'dwi')
+map.set('n', 'cW', 'dWi')
 
 
 --[[ Indentation and styling ]]-----------------------------------------------------------------------------------------
@@ -69,6 +69,8 @@ map.set('n', ']b', '<Cmd>bnext<CR>')
 -- Fill Text Width
 map.set('n', '<Leader>mf', "<Cmd>call utils#FillTW()<CR>", {silent=true})
 
-if not vim.g.vscode then
+if vim.g.vscode then
+  require('vscode-only.keybindings')
+else
   require('neovim-only.keybindings')
 end
