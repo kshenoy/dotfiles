@@ -18,18 +18,6 @@ if not vim.g.vscode then
   plug('RRethy/nvim-base16')
   plug('kyazdani42/nvim-web-devicons')
 
-  ---[[ Lualine --------------------------------------------------------------------------------------------------------
-  plug('nvim-lualine/lualine.nvim', {
-    config = function()
-      require('lualine').setup({
-        options = {
-          icons_enabled = true,
-        },
-      })
-    end,
-  })
-  --]]
-
   ---[[ Comment --------------------------------------------------------------------------------------------------------
   plug('numToStr/Comment.nvim', {
     config = function()
@@ -62,6 +50,18 @@ if not vim.g.vscode then
       map.set('n', '<Plug>(leader-open-map)q',   "<Cmd>lua require('fzf-lua').quickfix()<CR>", {desc="Open QuickFix", silent=true})
       map.set('n', '<Plug>(leader-search-map)b', "<Cmd>lua require('fzf-lua').blines()<CR>", {desc="Search current buffer", silent=true})
       map.set('n', '<Plug>(leader-search-map)B', "<Cmd>lua require('fzf-lua').lines()<CR>", {desc="Search all buffers", silent=true})
+    end,
+  })
+  --]]
+
+  ---[[ Lualine --------------------------------------------------------------------------------------------------------
+  plug('nvim-lualine/lualine.nvim', {
+    config = function()
+      require('lualine').setup({
+        options = {
+          icons_enabled = true,
+        },
+      })
     end,
   })
   --]]
