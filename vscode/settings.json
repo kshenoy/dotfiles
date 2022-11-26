@@ -29,6 +29,25 @@
     "workbench.colorTheme": "Catppuccin Frappé",
     "workbench.editor.highlightModifiedTabs": true,
     "workbench.editor.showTabs": false,
+    "workbench.iconTheme": "vscode-icons",
     "workbench.sideBar.location": "right",
+    "workbench.statusBar.visible": false,
     "zenMode.fullScreen": false,
+    "settings.cycle": [
+        {
+            "id": "lineNumbers", // must be unique
+            "overrideWorkspaceSettings": true,
+            "values": [
+                {
+                    "editor.lineNumbers": "off",
+                },
+                {
+                    "editor.lineNumbers": "on",
+                },
+                {
+                    "editor.lineNumbers": "relative",
+                },
+            ]
+        },
+    ],
 }

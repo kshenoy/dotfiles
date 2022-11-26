@@ -3,7 +3,6 @@ local map = vim.keymap
 -- TODO: Change leader from 'Space' to 'Ctrl+Space' to allow using it in Insert mode
 -- TODO: Change localleader from '\' to 'Ctrl+\' to allow using it in Insert mode
 -- TODO: Use settings.cycler to replace multiple commands with a single toggle eg. pin/unpin etc.
--- TODO: Create binding to cycle through line numbering settings using settings cycler
 
 
 -- map.set('n', 'z=', '<Cmd>call VSCodeNotify("workbench.action.toggleSidebarVisibility")<CR>', {remap=true})
@@ -42,29 +41,29 @@ local mapb = function(key, cmd)
 end
 
 -- mapb('a', 'workbench.action.showAllEditorsByMostRecentlyUsed')
-mapb('b', 'workbench.action.showEditorsInActiveGroup')
-mapb('B', 'workbench.action.showAllEditors')
-mapb('c', 'workbench.action.closeActiveEditor')
-mapb('C', 'workbench.action.closeEditorInAllGroups')
-mapb('d', 'workbench.action.closeEditorsInGroup')                                                    --  (except pinned)
-mapb('D', 'workbench.action.closeAllEditors')
-mapb('H', 'workbench.action.moveEditorLeftInGroup')
-mapb('J', 'workbench.action.moveEditorToLastGroup')
-mapb('K', 'workbench.action.moveEditorToFirstGroup')
-mapb('L', 'workbench.action.moveEditorRightInGroup')
-mapb('n', 'workbench.action.nextEditorInGroup')
-mapb('N', 'workbench.action.moveEditorToNextGroup')
-mapb('o', 'workbench.action.closeOtherEditors')
-mapb('p', 'workbench.action.previousEditorInGroup')
-mapb('P', 'workbench.action.moveEditorToPreviousGroup')
-mapb('r', 'workbench.action.closeUnmodifiedEditors')
-mapb('R', 'workbench.action.files.revert')
-mapb('s', 'workbench.action.toggleSplitEditorInGroup')
-mapb('S', 'workbench.action.toggleSplitEditorInGroupLayout')
-mapb('u', 'workbench.action.reopenClosedEditor')                                                        --  (u)ndo close
-mapb('x', 'workbench.action.pinEditor')
-mapb('X', 'workbench.action.unpinEditor')
-mapb('y', 'copyFilePath')                                                        -- (y)ank file-path. doom also uses 'y'
+mapb('b',       'workbench.action.showEditorsInActiveGroup')
+mapb('B',       'workbench.action.showAllEditors')
+mapb('c',       'workbench.action.closeActiveEditor')
+mapb('C',       'workbench.action.closeEditorInAllGroups')
+mapb('<M-c>',   'workbench.action.closeEditorsInGroup')                                              --  (except pinned)
+mapb('<M-S-C>', 'workbench.action.closeAllEditors')
+mapb('d',       'workbench.action.closeUnmodifiedEditors')
+mapb('H',       'workbench.action.moveEditorLeftInGroup')
+mapb('J',       'workbench.action.moveEditorToLastGroup')
+mapb('K',       'workbench.action.moveEditorToFirstGroup')
+mapb('L',       'workbench.action.moveEditorRightInGroup')
+mapb('n',       'workbench.action.nextEditorInGroup')
+mapb('N',       'workbench.action.moveEditorToNextGroup')
+mapb('o',       'workbench.action.closeOtherEditors')
+mapb('p',       'workbench.action.previousEditorInGroup')
+mapb('P',       'workbench.action.moveEditorToPreviousGroup')
+mapb('r',       'workbench.action.files.revert')
+mapb('s',       'workbench.action.toggleSplitEditorInGroup')
+mapb('S',       'workbench.action.toggleSplitEditorInGroupLayout')
+mapb('u',       'workbench.action.reopenClosedEditor')                                                  --  (u)ndo close
+mapb('x',       'workbench.action.pinEditor')
+mapb('X',       'workbench.action.unpinEditor')
+mapb('y',       'copyFilePath')                                                  -- (y)ank file-path. doom also uses 'y'
 -- mapb('`', 'workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup')
 
 
@@ -163,6 +162,7 @@ mapk('l', 'workbench.action.customizeLayout')
 mapk('o', 'outline.focus')
 mapk('t', 'workbench.action.selectTheme')
 mapk('v', 'workbench.action.quickOpenView')
+mapk('x', 'workbench.view.extensions')
 mapk(',', 'workbench.action.openSettings')
 
 map.set('n', '<Plug>(leader-kustom-map)nN', '<Cmd>call VSCodeCall("editor.lineNumbers", "off")<CR>', {remap=true})
@@ -194,7 +194,7 @@ end
 mapt('b',     'workbench.action.toggleSidebarVisibility')
 mapt('B',     'workbench.action.toggleAuxiliaryBar')
 mapt('e',     'workbench.action.toggleCenteredLayout')                                   --  Ctrl+E to center in MS Word
--- mapt('n', 'settings.cycle.lineNumbers')
+mapt('n',     'settings.cycle.lineNumbers')
 mapt('p',     'workbench.action.togglePanel')
 mapt('P',     'workbench.action.toggleMaximizedPanel')
 mapt('s',     'workbench.action.toggleStatusbarVisibility')
