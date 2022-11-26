@@ -1,23 +1,18 @@
 // Place your key bindings in this file to override the defaults
 [
   {
-    "key": "ctrl+space",
-    "command": "-toggleSuggestionDetails",
-    "when": "suggestWidgetVisible && textInputFocus"
+    "key": "ctrl+q",
+    "command": "-workbench.action.quit"
   },
-  {
-    "key": "ctrl+space",
-    "command": "-editor.action.triggerSuggest",
-    "when": "editorHasCompletionItemProvider && textInputFocus && !editorReadonly"
-  },
-  {
-    "key": "ctrl+space",
-    "command": "vscode-neovim.send",
-    "args": "<C-Space>"
-  }
   {
     "key": "ctrl+alt+enter",
     "command": "workbench.action.focusActiveEditorGroup",
     "when": "!editorTextFocus"
-  }
+  },
+  {
+    "key": "ctrl+space",
+    "command": "vscode-neovim.send",
+    "when": "editorTextFocus && neovim.mode == 'normal'",
+    "args": "<C-Space>"
+  },
 ]
