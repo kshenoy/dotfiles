@@ -1,19 +1,50 @@
 --  Lua interface to vim-plug by https://dev.to/vonheikemen/neovim-using-vim-plug-in-lua-3oom
 local plug = require('plug')
 local fn = vim.fn
+local map = vim.keymap
+
 
 plug.begin(vim.fn.stdpath('data')..'/plugged')
 
-
--- Some TPope plugins that really should be bundled vim *vim
-plug('tpope/vim-abolish')
-plug('tpope/vim-endwise')
 plug('tpope/vim-repeat')
-plug('tpope/vim-surround')
-plug('tpope/vim-unimpaired')
+
+
+plug('kylechui/nvim-surround', {
+  config = function()
+    require('nvim-surround').setup({
+      keymaps = {
+        normal = "gs",
+        normal_cur = "gss",
+        normal_line = "gS",
+        normal_cur_line = "gSS",
+        visual = "gs",
+        visual_line = "gS",
+      }
+    })
+  end,
+})
+
+
+plug('ggandor/leap.nvim', {
+  config = function()
+    map.set({'n', 'x', 'o'}, 's', '<Plug>(leap-forward-to)', {remap=true})
+    map.set({'n', 'x', 'o'}, 'S', '<Plug>(leap-backward-to)', {remap=true})
+    if not vim.g.vscode then
+      map.set('n', 'ys', '<Plug>(leap-cross-window)', {remap=true})
+    end
+  end,
+})
+plug('ggandor/flit.nvim', {
+  config = function()
+    require('flit').setup()
+  end
+})
 
 
 if not vim.g.vscode then
+  plug('tpope/vim-abolish')
+  plug('tpope/vim-endwise')
+  plug('tpope/vim-unimpaired')
   plug('nvim-lua/plenary.nvim')
   plug('RRethy/nvim-base16')
   plug('kyazdani42/nvim-web-devicons')
@@ -37,7 +68,6 @@ if not vim.g.vscode then
         }
       })
 
-      local map = vim.keymap
       map.set('n', '<Plug>(leader-buffer-map)b', "<Cmd>lua require('fzf-lua').buffers({ winopts = { preview = { hidden='hidden' }}})<CR>", {desc="Switch buffer", silent=true})
       map.set('n', '<Plug>(leader-file-map)f',   "<Cmd>lua require('fzf-lua').files()<CR>", {desc="Find file", silent=true})
       map.set('n', '<Plug>(leader-file-map)F',   "<Cmd>lua require('fzf-lua').files({cwd='.'})<CR>", {desc="Find file from here", silent=true})
@@ -73,7 +103,7 @@ if not vim.g.vscode then
       vim.api.nvim_create_autocmd({"Filetype"}, {
         desc = "Switch between header and implementation",
         callback = function()
-          vim.keymap.set('n', "<LocalLeader>a", "<Cmd>Ouroboros<CR>", {desc="Switch between header and implementation", buffer=true, silent=true})
+          map.set('n', "<LocalLeader>a", "<Cmd>Ouroboros<CR>", {desc="Switch between header and implementation", buffer=true, silent=true})
         end,
       })
     end,

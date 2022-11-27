@@ -8,7 +8,7 @@
     "editor.guides.indentation": false,
     "editor.inlayHints.enabled": "off",
     "editor.lineHeight": 1.5,
-    "editor.lineNumbers": "relative",
+    "editor.lineNumbers": "off",
     "editor.minimap.enabled": false,
     "editor.scrollBeyondLastLine": false,
     "editor.scrollbar.horizontal": "hidden",
