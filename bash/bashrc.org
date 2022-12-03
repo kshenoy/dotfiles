@@ -257,7 +257,7 @@ Thus, I've moved this to =PROMPT_COMMAND= instead to keep the HISTFILE current.
 *** misc
 
 #+begin_src bash
-export EDITOR=vim
+export EDITOR=nvim
 export VISUAL=gvim
 #+end_src
 
@@ -1235,10 +1235,14 @@ hdl:*.x
 --smart-case
 #+end_src
 
-*** vim
+*** vim/neovim
 #+begin_src bash
-alias v=nvim
-alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
+alias v=$EDITOR
+if [[ $EDITOR == "nvim" ]]; then
+  alias vi='nvim --clean'
+else
+  alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
+fi
 #+end_src
 
 Open results of the last shell command in vim quickfix.

@@ -341,7 +341,7 @@ export HISTCONTROL=ignoreboth
 
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*misc][misc:1]]
-export EDITOR=vim
+export EDITOR=nvim
 export VISUAL=gvim
 # misc:1 ends here
 
@@ -1314,11 +1314,15 @@ export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgrep/co
 alias g='command rg'
 # [[https://github.com/BurntSushi/ripgrep][ripgrep]]:1 ends here
 
-# vim
+# vim/neovim
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*vim][vim:1]]
-alias v=nvim
-alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
+alias v=$EDITOR
+if [[ $EDITOR == "nvim" ]]; then
+  alias vi='nvim --clean'
+else
+  alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
+fi
 # vim:1 ends here
 
 
