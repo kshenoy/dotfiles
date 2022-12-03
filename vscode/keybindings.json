@@ -10,9 +10,18 @@
     "when": "!editorTextFocus"
   },
   {
-    "key": "ctrl+space",
-    "command": "vscode-neovim.send",
-    "when": "editorTextFocus && neovim.mode == 'normal'",
-    "args": "<C-Space>"
+    "key": "ctrl+x ctrl+y",
+    "command": "editor.action.insertSnippet",
+    "when": "editorTextFocus && neovim.mode == 'insert'",
   },
+  {
+    "key": "ctrl+n",
+    "command": "-workbench.action.files.newUntitledFile"
+  },
+  // {
+  //   "key": "ctrl+space",
+  //   "command": "vscode-neovim.send",
+  //   "when": "editorTextFocus && neovim.mode == 'normal'",
+  //   "args": "<C-Space>"
+  // },
 ]

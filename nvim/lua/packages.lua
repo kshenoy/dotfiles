@@ -34,11 +34,11 @@ plug('ggandor/leap.nvim', {
     end
   end,
 })
-plug('ggandor/flit.nvim', {
-  config = function()
-    require('flit').setup()
-  end
-})
+-- plug('ggandor/flit.nvim', {
+--   config = function()
+--     require('flit').setup()
+--   end
+-- })
 
 
 if not vim.g.vscode then

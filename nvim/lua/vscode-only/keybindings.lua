@@ -158,15 +158,14 @@ end
 
 mapk('b', 'workbench.files.action.focusOpenEditorsView')
 mapk('f', 'workbench.explorer.fileView.focus')
-mapk('l', 'workbench.action.customizeLayout')
 mapk('o', 'outline.focus')
 mapk('t', 'workbench.action.selectTheme')
-mapk('v', 'workbench.action.quickOpenView')
 mapk('x', 'workbench.view.extensions')
 mapk(',', 'workbench.action.openSettings')
 
-map.set('n', '<Plug>(leader-kustom-map)nN', '<Cmd>call VSCodeCall("editor.lineNumbers", "off")<CR>', {remap=true})
-map.set('n', '<Plug>(leader-kustom-map)nr', '<Cmd>call VSCodeCall("editor.lineNumbers", "relative")<CR>', {remap=true})
+-- Menu-like behavior use M- maps
+mapk('<C-v>', 'workbench.action.quickOpenView')
+mapk('<C-l>', 'workbench.action.customizeLayout')
 
 
 --[[ PROJECTS/FOLDERS/WORKSPACES ]]-------------------------------------------------------------------------------------

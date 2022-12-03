@@ -13,6 +13,8 @@
     "editor.scrollBeyondLastLine": false,
     "editor.scrollbar.horizontal": "hidden",
     "editor.scrollbar.vertical": "hidden",
+    "editor.snippetSuggestions": "top",
+    "editor.tabCompletion": "onlySnippets",
     "editor.wordWrapColumn": 120,
     "perforce.editOnFileSave": true,
     "perforce.enableP4ConfigScanOnStartup": false,
@@ -34,20 +36,23 @@
     "workbench.statusBar.visible": false,
     "zenMode.fullScreen": false,
     "settings.cycle": [
-        {
-            "id": "lineNumbers", // must be unique
-            "overrideWorkspaceSettings": true,
-            "values": [
-                {
-                    "editor.lineNumbers": "off",
-                },
-                {
-                    "editor.lineNumbers": "on",
-                },
-                {
-                    "editor.lineNumbers": "relative",
-                },
-            ]
-        },
+    {
+        "id": "lineNumbers", // must be unique
+        "overrideWorkspaceSettings": true,
+        "values": [
+            {
+                "editor.lineNumbers": "off",
+            },
+            {
+                "editor.lineNumbers": "on",
+            },
+            {
+                "editor.lineNumbers": "relative",
+            },
+        ]
+    },
     ],
+    "C_Cpp.clang_format_fallbackStyle": "LLVM",
+    "C_Cpp.codeAnalysis.clangTidy.enabled": true,
+    "cppref.searchEngine": "DuckDuckGo",
 }
