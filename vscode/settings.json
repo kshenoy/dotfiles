@@ -16,6 +16,7 @@
     "editor.snippetSuggestions": "top",
     "editor.tabCompletion": "onlySnippets",
     "editor.wordWrapColumn": 120,
+    "files.trimTrailingWhitespace": true,
     "perforce.editOnFileSave": true,
     "perforce.enableP4ConfigScanOnStartup": false,
     "perforce.hideEmptyChangelists": true,
@@ -55,4 +56,9 @@
     "C_Cpp.clang_format_fallbackStyle": "LLVM",
     "C_Cpp.codeAnalysis.clangTidy.enabled": true,
     "cppref.searchEngine": "DuckDuckGo",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true
+    },
+    "python.formatting.provider": "none",
 }
