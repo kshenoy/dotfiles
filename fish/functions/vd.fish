@@ -1,5 +1,3 @@
-# [[file:~/.config/dotfiles/fish/fish.org::*vim][vim:2]]
-function vd --wraps=vim
-  vim -d $argv
+function vd --wraps=nvim
+  nvim -d $argv
 end
-# vim:2 ends here
