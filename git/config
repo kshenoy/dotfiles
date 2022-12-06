@@ -21,7 +21,7 @@ email = theresmorethanoneway@gmail.com
 
 # [[file:~/.config/dotfiles/git/git.org::*core][core:1]]
 [core]
-editor   = gvim --nofork
+editor   = nvim --nofork
 fileMode = false
 # core:1 ends here
 
@@ -63,13 +63,13 @@ untracked = cyan
 
 # [[file:~/.config/dotfiles/git/git.org::*diff][diff:1]]
 [diff]
-tool = gvim
+tool = nvim
 
 [difftool]
 prompt = false
 
-[difftool "gvim"]
-cmd = gvim -df -c 'set columns=260|set lines=62|wincmd =' $LOCAL $REMOTE 2> /dev/null
+[difftool "nvim"]
+cmd = nvim -d $LOCAL $REMOTE
 trustExitCode = true
 
 [difftool "vim"]
@@ -84,13 +84,13 @@ cmd = meld --diff $LOCAL $REMOTE
 
 # [[file:~/.config/dotfiles/git/git.org::*merge][merge:1]]
 [merge]
-tool = gvim
+tool = nvim
 conflictstyle = diff3
 
 [mergetool "meld"]
 cmd = meld --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $MERGED $REMOTE
 
-[mergetool "gvim"]
+[mergetool "nvim"]
 cmd = vim_merge -g -geometry 420x70 $BASE $REMOTE $LOCAL $MERGED
 trustExitCode = true
 

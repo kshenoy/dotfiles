@@ -1,7 +1,7 @@
 {
     "editor.cursorSurroundingLines": 3,
     "editor.find.addExtraSpaceOnTop": false,
-    "editor.fontFamily": "'Iosevka'",
+    "editor.fontFamily": "Iosevka",
     "editor.fontSize": 13,
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
@@ -21,6 +21,7 @@
     "perforce.enableP4ConfigScanOnStartup": false,
     "perforce.hideEmptyChangelists": true,
     "security.workspace.trust.untrustedFiles": "open",
+    "telemetry.telemetryLevel": "off",
     "vscode-neovim.logOutputToConsole": true,
     "vscode-neovim.mouseSelectionStartVisualMode": true,
     "window.commandCenter": true,
@@ -37,21 +38,21 @@
     "workbench.statusBar.visible": false,
     "zenMode.fullScreen": false,
     "settings.cycle": [
-    {
-        "id": "lineNumbers", // must be unique
-        "overrideWorkspaceSettings": true,
-        "values": [
-            {
-                "editor.lineNumbers": "off",
-            },
-            {
-                "editor.lineNumbers": "on",
-            },
-            {
-                "editor.lineNumbers": "relative",
-            },
-        ]
-    },
+        {
+            "id": "lineNumbers", // must be unique
+            "overrideWorkspaceSettings": true,
+            "values": [
+                {
+                    "editor.lineNumbers": "off",
+                },
+                {
+                    "editor.lineNumbers": "on",
+                },
+                {
+                    "editor.lineNumbers": "relative",
+                },
+            ]
+        },
     ],
     "C_Cpp.clang_format_fallbackStyle": "LLVM",
     "C_Cpp.codeAnalysis.clangTidy.enabled": true,

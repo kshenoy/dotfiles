@@ -77,3 +77,7 @@ if (vim.fn.executable('rg')) then
   opt.grepformat = "%f:%l:%m"
   opt.grepprg    = "rg --vimgrep --smart-case"
 end
+
+
+--[[ Misc ]]------------------------------------------------------------------------------------------------------------
+opt.clipboard:append('unnamedplus')

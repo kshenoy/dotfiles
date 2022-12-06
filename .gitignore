@@ -17,3 +17,7 @@
 /nvim/autoload/plug.vim
 /nvim/plugin/packer_compiled.lua
 /nvim/lua/work
+
+# fish
+/fish/functions/base16.fish
+/fish/functions/fisher.fish
