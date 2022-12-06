@@ -193,6 +193,8 @@ end
 mapt('b',     'workbench.action.toggleSidebarVisibility')
 mapt('B',     'workbench.action.toggleAuxiliaryBar')
 mapt('e',     'workbench.action.toggleCenteredLayout')                                   --  Ctrl+E to center in MS Word
+mapt('gi',    'settings.cycle.indentGuides')
+mapt('gb',    'settings.cycle.bracketPairs')
 mapt('n',     'settings.cycle.lineNumbers')
 mapt('p',     'workbench.action.togglePanel')
 mapt('P',     'workbench.action.toggleMaximizedPanel')

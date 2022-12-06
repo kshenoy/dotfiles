@@ -53,6 +53,33 @@
                 },
             ]
         },
+        {
+            "id": "indentGuides", // must be unique
+            "overrideWorkspaceSettings": true,
+            "values": [
+                {
+                    "editor.guides.indentation": true,
+                },
+                {
+                    "editor.guides.indentation": false,
+                },
+            ]
+        },
+        {
+            "id": "bracketPairs", // must be unique
+            "overrideWorkspaceSettings": true,
+            "values": [
+                {
+                    "editor.guides.bracketPairs": "active",
+                },
+                {
+                    "editor.guides.bracketPairs": true,
+                },
+                {
+                    "editor.guides.bracketPairs": false,
+                },
+            ]
+        },
     ],
     "C_Cpp.clang_format_fallbackStyle": "LLVM",
     "C_Cpp.codeAnalysis.clangTidy.enabled": true,
@@ -62,4 +89,5 @@
         "editor.formatOnSave": true
     },
     "python.formatting.provider": "none",
+    "window.zoomLevel": 1,
 }
