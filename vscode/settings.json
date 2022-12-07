@@ -2,7 +2,7 @@
     "editor.cursorSurroundingLines": 3,
     "editor.find.addExtraSpaceOnTop": false,
     "editor.fontFamily": "Iosevka",
-    "editor.fontSize": 13,
+    "editor.fontSize": 11,
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
     "editor.guides.indentation": false,

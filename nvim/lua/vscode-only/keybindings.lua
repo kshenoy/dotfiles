@@ -16,7 +16,7 @@ local mapL = function(key, cmd)
   map.set('n', '<Leader>' .. key, '<Cmd>call VSCodeNotify("' .. cmd .. '")<CR>', {remap=true})
 end
 
-mapL('<Leader>', 'workbench.action.quickOpenWithModes')                                         -- Ctrl+P with more info
+mapL('<Leader>', 'workbench.action.quickOpen')                                                                 -- Ctrl+P
 mapL(':', 'workbench.action.showCommands')                                                               -- Ctrl+Shift+P
 -- mapL('`', 'workbench.action.quickOpenPreviousRecentlyUsedEditor')
 -- mapL(',', 'workbench.action.showAllEditorsByMostRecentlyUsed')
@@ -74,6 +74,7 @@ local mapw = function(key, cmd)
   map.set('n', '<Plug>(leader-editor-group-map)' .. key, '<Cmd>call VSCodeNotify("' .. cmd .. '")<CR>', {remap=true})
 end
 
+mapw('a',  'workbench.action.joinAllGroups')                                                      --  (u)nite all groups
 mapw('c',  'workbench.action.closeGroup')
 mapw('C',  'workbench.action.closeAllGroups')
 mapw('h',  'workbench.action.focusLeftGroup')
@@ -89,7 +90,6 @@ mapw('nh', 'workbench.action.newGroupLeft')
 mapw('nj', 'workbench.action.newGroupDown')
 mapw('nk', 'workbench.action.newGroupUp')
 mapw('nl', 'workbench.action.newGroupRight')
-mapw('u',  'workbench.action.joinAllGroups')                                                      --  (u)nite all groups
 mapw('w',  'workbench.action.navigateEditorGroups')
 mapw('z',  'workbench.action.toggleEditorWidths')                                        --  (z)oom in/out or maximi(z)e
 mapw('Z',  'workbench.action.maximizeEditor')                                  --  like zoom but gets rid of Primary Bar
@@ -108,34 +108,41 @@ mapc('r', 'editor.action.rename')
 
 --[[ GO TO ]]-----------------------------------------------------------------------------------------------------------
 map.set('n', '<Leader>g', '<Plug>(leader-goto-map)', {remap=true, silent=true})
-local maps = function(key, cmd)
+local mapg = function(key, cmd)
   map.set('n', '<Plug>(leader-goto-map)' .. key, '<Cmd>call VSCodeNotify("' .. cmd .. '")<CR>', {remap=true})
 end
 
 -- General pattern followed in defining these bindings
---   (d)efinitions, (h)ierarchy, (i)mplementation, symb(o)l, (r)eferences, (t)ypes
+--   (d)efinitions, (h)ierarchy, de(k)larations, (i)mplementation, symb(o)l, (r)eferences, (t)ypes
 -- These are then combined with modifiers to specify how it should be shown
 --   Ctrl   : Peek at something. Control what's shown
 --   Alt    : Show all of something
 --   Ctrl+W : Open on the side
 
-maps('d',      'editor.action.revealDefinition')
-maps('<C-W>d', 'editor.action.revealDefinitionAside')
-maps('<C-D>',  'editor.action.peekDefinition')
+mapg('d',      'editor.action.revealDefinition')
+mapg('<C-d>',  'editor.action.peekDefinition')
+mapg('<C-w>d', 'editor.action.revealDefinitionAside')
 
-maps('h',      'references-view.showCallHierarchy')
+mapg('k',       'editor.action.revealDeclaration')
+mapg('<C-k>', 'editor.action.peekDeclaration')
+map.set('n', '<Plug>(leader-goto-map)<C-w>k', function()
+  VSCodeNotify("editor.action.openDeclarationToTheSide")
+  VSCodeNotify("editor.action.revealDeclaration")
+end, {remap=true})
 
-maps('o',      'workbench.action.gotoSymbol')
-maps('O',      'workbench.action.showAllSymbols')
+mapg('h',      'references-view.showCallHierarchy')
 
-maps('r',      'editor.action.goToReferences')
-maps('<C-R>',  'editor.action.referenceSearch.trigger')
-maps('<M-r>',  'references-view.findReferences')
-maps('<C-W>r', 'openReferenceToSide')
+mapg('o',      'workbench.action.gotoSymbol')
+mapg('O',      'workbench.action.showAllSymbols')
 
--- maps('q', 'editor.action.revealDeclaration')
--- maps('<C->', 'editor.action.peekDeclaration')
--- maps('<C-W>', 'editor.action.openDeclarationToTheSide')
+mapg('r',      'editor.action.goToReferences')
+mapg('<C-r>',  'editor.action.referenceSearch.trigger')
+mapg('<M-r>',  'references-view.findReferences')
+mapg('<C-w>r', 'openReferenceToSide')
+
+-- mapg('q', 'editor.action.revealDeclaration')
+-- mapg('<C->', 'editor.action.peekDeclaration')
+-- mapg('<C-W>', 'editor.action.openDeclarationToTheSide')
 -- editor.action.previewDeclaration
 
 
