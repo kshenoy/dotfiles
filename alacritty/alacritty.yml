@@ -1,5 +1,53 @@
+# Configuration for Alacritty, the GPU enhanced terminal emulator.
+
+# Import additional configuration files
+#
+# Imports are loaded in order, skipping all missing files, with the importing file being loaded last.
+# If a field is already present in a previous import, it will be replaced.
+#
+# All imports must either be absolute paths starting with `/`, or paths relative
+# to the user's home directory starting with `~/`.
 import:
  # - ~/.config/alacritty/themes/catppuccin/catppuccin-mocha.yml
- - ~/.config/alacritty/themes/catppuccin/catppuccin-macchiato.yml
- # - ~/.config/alacritty/themes/catppuccin/catppuccin-frappe.yml
+ # - ~/.config/alacritty/themes/catppuccin/catppuccin-macchiato.yml
+ - ~/.config/alacritty/themes/catppuccin/catppuccin-frappe.yml
  # - ~/.config/alacritty/themes/catppuccin/catppuccin-latte.yml
+
+# Any items in the `env` entry below will be added as environment variables. Some entries may override variables set by
+# alacritty itself.
+env:
+  # TERM variable
+  #
+  # This value is used to set the `$TERM` environment variable for
+  # each instance of Alacritty. If it is not present, alacritty will
+  # check the local terminfo database and use `alacritty` if it is
+  # available, otherwise `xterm-256color` is used.
+  TERM: xterm-256color
+
+# Font configuration
+font:
+  # Normal (roman) font face
+  normal:
+    # Font family
+    #
+    # Default:
+    #   - (macOS) Menlo
+    #   - (Linux/BSD) monospace
+    #   - (Windows) Consolas
+    family: "FiraCode Nerd Font Mono"
+
+    # The `style` can be specified to pick a specific face.
+    #style: Regular
+
+# Shell
+# You can set `shell.program` to the path of your favorite shell, e.g. `/bin/fish`.
+# Entries in `shell.args` are passed unmodified as arguments to the shell.
+#
+# Default:
+#   - (macOS) /bin/bash --login
+#   - (Linux/BSD) user login shell
+#   - (Windows) powershell
+shell:
+  program: /usr/bin/tmux
+#  args:
+#    - --login
