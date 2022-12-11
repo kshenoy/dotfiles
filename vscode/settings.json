@@ -1,10 +1,12 @@
 {
     "editor.cursorSurroundingLines": 3,
     "editor.find.addExtraSpaceOnTop": false,
-    "editor.fontFamily": "Iosevka",
-    "editor.fontSize": 11,
+    "editor.fontFamily": "Iosevka Term",
+    "editor.fontLigatures": true,
+    "editor.fontSize": 15,
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
+    "editor.guides.bracketPairs": false,
     "editor.guides.indentation": false,
     "editor.inlayHints.enabled": "off",
     "editor.lineHeight": 1.5,
@@ -22,6 +24,7 @@
     "perforce.hideEmptyChangelists": true,
     "security.workspace.trust.untrustedFiles": "open",
     "telemetry.telemetryLevel": "off",
+    "terminal.integrated.fontFamily": "FiraCode Nerd Font Mono",
     "vscode-neovim.logOutputToConsole": true,
     "vscode-neovim.mouseSelectionStartVisualMode": true,
     "window.commandCenter": true,
@@ -34,7 +37,6 @@
     "workbench.editor.highlightModifiedTabs": true,
     "workbench.editor.showTabs": false,
     "workbench.iconTheme": "vscode-icons",
-    "workbench.sideBar.location": "right",
     "workbench.statusBar.visible": false,
     "zenMode.fullScreen": false,
     "settings.cycle": [
@@ -89,5 +91,4 @@
         "editor.formatOnSave": true
     },
     "python.formatting.provider": "none",
-    "window.zoomLevel": 1,
 }

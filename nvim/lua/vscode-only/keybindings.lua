@@ -163,6 +163,7 @@ local mapk = function(key, cmd)
   map.set('n', '<Plug>(leader-kustom-map)' .. key, '<Cmd>call VSCodeNotify("' .. cmd .. '")<CR>', {remap=true})
 end
 
+mapk('a', 'workbench.action.toggleActivityBarVisibility')
 mapk('b', 'workbench.files.action.focusOpenEditorsView')
 mapk('f', 'workbench.explorer.fileView.focus')
 mapk('o', 'outline.focus')
