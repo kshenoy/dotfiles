@@ -49,6 +49,24 @@ if not vim.g.vscode then
   plug('RRethy/nvim-base16')
   plug('kyazdani42/nvim-web-devicons')
 
+  ---[[ Catpuccin ------------------------------------------------------------------------------------------------------
+  plug('catppuccin/nvim', {
+    config = function()
+      require("catppuccin").setup({
+        flavour = "frappe", -- latte, frappe, macchiato, mocha
+        background = { -- :h background
+          light = "latte",
+          dark = "frappe",
+        },
+        transparent_background = false,
+        dim_inactive = {
+          enabled = true,
+        },
+      })
+    end,
+  })
+  ---]]
+
   ---[[ Comment --------------------------------------------------------------------------------------------------------
   plug('numToStr/Comment.nvim', {
     config = function()
