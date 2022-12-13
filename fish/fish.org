@@ -31,7 +31,7 @@ end
 #+end_src
 
 #+begin_src sh
-fish_add_path ~/bin
+fish_add_path ~/.local/bin
 #+end_src
 
 * aliases

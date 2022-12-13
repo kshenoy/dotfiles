@@ -96,19 +96,19 @@ ${XDG_CONFIG_HOME}/tmux:
 
 
 #== vim ================================================================================================================
-vim: ${HOME}/.vim ${HOME}/bin/vile ${HOME}/bin/vim_merge vim/pack/rc_local
+vim: ${HOME}/.vim ${HOME}/.local/bin/vile ${HOME}/.local/bin/vim_merge vim/pack/rc_local
 ${HOME}/.vim:
 	@${MKLINK} ${CWD}/vim $@
-${HOME}/bin/vile:
+${HOME}/.local/bin/vile:
 	@${MKLINK} ${CWD}/scripts/vile $@
-${HOME}/bin/vim_merge:
+${HOME}/.local/bin/vim_merge:
 	@${MKLINK} ${CWD}/scripts/vim_merge $@
 vim/pack/rc_local:
 	@${MKLINK} ${XDG_CONFIG_HOME}/dotfiles-priv/$@ $@
 
 
 #== links ===============================================================================================================
-links: ${XDG_CONFIG_HOME}/bat ${HOME}/.ssh/config ${HOME}/.Xresources ${HOME}/.ctags ${HOME}/bin/rgf ${HOME}/.unison ${HOME}/pipe
+links: ${XDG_CONFIG_HOME}/bat ${HOME}/.ssh/config ${HOME}/.Xresources ${HOME}/.ctags ${HOME}/.local/bin/rgf ${HOME}/.unison ${HOME}/pipe
 ${XDG_CONFIG_HOME}/bat:
 	@${MKLINK} ${CWD}/bat $@
 ${HOME}/.ssh/config:
@@ -118,7 +118,7 @@ ${HOME}/.Xresources:
 	@${MKLINK} ${CWD}/Xresources $@
 ${HOME}/.ctags:
 	@${MKLINK} ${CWD}/ctags/config.ctags $@
-${HOME}/bin/rgf:
+${HOME}/.local/bin/rgf:
 	@${MKLINK} ${CWD}/scripts/rgf $@
 ${HOME}/.unison:
 	@${MKLINK} ${CWD}/unison $@

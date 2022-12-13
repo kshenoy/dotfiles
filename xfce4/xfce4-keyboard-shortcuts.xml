@@ -43,7 +43,7 @@
       <property name="&lt;Super&gt;Return" type="string" value="xfce4-appfinder">
         <property name="startup-notify" type="bool" value="true"/>
       </property>
-      <property name="&lt;Super&gt;t" type="string" value="/home/kshenoy/bin/xterm_launcher.sh"/>
+      <property name="&lt;Super&gt;t" type="string" value="/home/kshenoy/.local/bin/xterm_launcher.sh"/>
       <property name="&lt;Super&gt;space" type="empty">
         <property name="startup-notify" type="bool" value="true"/>
       </property>
