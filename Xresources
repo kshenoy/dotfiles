@@ -20,67 +20,36 @@
 !! More comprehensive list of options: https://www.computerhope.com/unix/uxterm.htm
 
 !! To allow the terminal itself to set the TERM variable correctly; instead of forcing in .bashrc etc.
-*XTerm*termName: xterm-256color
+XTerm*termName: xterm-256color
 
 !! Interpret all incoming data as UTF-8
-*XTerm*locale: true
+XTerm*locale: true
 
-*XTerm*saveLines: 10000
-*XTerm*cursorBlink: true
+XTerm*saveLines: 10000
+XTerm*cursorBlink: true
 
 !! From https://unix.stackexchange.com/a/332367/111534
-*XTerm*faceName: Iosevka
-*XTerm*fontdefault*Label: Size 10 (Default)
-*XTerm*faceSize: 10
-*XTerm*font1*Label: Size 9
-*XTerm*faceSize1: 9
-*XTerm*font2*Label: Size 10
-*XTerm*faceSize2: 10
-*XTerm*font3*Label: Size 11
-*XTerm*faceSize3: 11
-*XTerm*font4*Label: Size 12
-*XTerm*faceSize4: 12
-*XTerm*font5*Label: Size 14
-*XTerm*faceSize5: 14
-*XTerm*font6*Label: Size 16
-*XTerm*faceSize6: 16
-*XTerm*ForceBoxChars: true
-*XTerm*internalBorder: 3
-*XTerm*scaleHeight: 1.1
+XTerm*faceName: Iosevka Term
+XTerm*fontdefault*Label: Size 10 (Default)
+XTerm*faceSize: 10
+XTerm*font1*Label: Size 9
+XTerm*faceSize1: 9
+XTerm*font2*Label: Size 10
+XTerm*faceSize2: 10
+XTerm*font3*Label: Size 11
+XTerm*faceSize3: 11
+XTerm*font4*Label: Size 12
+XTerm*faceSize4: 12
+XTerm*font5*Label: Size 14
+XTerm*faceSize5: 14
+XTerm*font6*Label: Size 16
+XTerm*faceSize6: 16
+XTerm*ForceBoxChars: true
+XTerm*internalBorder: 10
+XTerm*scaleHeight: 1.1
+XTerm*VT100.backarrowKey: false
+XTerm*ttyModes: erase ^?
 
-*XTerm*on3Clicks: regex ([[:alpha:]]+://)?([[:alnum:]!#+,./=?@_~-]|(%[[:xdigit:]][[:xdigit:]]))+
-*XTerm*rightScrollBar: false
-*XTerm*scrollBar: false
-
-
-!=======================================================================================================================
-! Xft settings                                                                                                      {{{1
-!=======================================================================================================================
-! From https://wiki.archlinux.org/index.php/font_configuration#Applications_without_fontconfig_support
-Xft.dpi:        94
-Xft.lcdfilter:  lcddefault
-Xft.antialias:  true
-Xft.rgba:       rgb
-Xft.hinting:    true
-Xft.hintstyle:  hintslight
-
-!=======================================================================================================================
-! Emacs settings                                                                                                    {{{1
-!=======================================================================================================================
-Emacs.fontBackend: xft
-Emacs.font: Iosevka-10:style=Regular
-Emacs.menuBar: off
-Emacs.toolBar: off
-Emacs.verticalScrollBars: off
-
-!=======================================================================================================================
-! Colors                                                                                                            {{{1
-!=======================================================================================================================
-!! Color 0/8:   Black
-!! Color 1/9:   Red
-!! Color 2/10:  Green
-!! Color 3/11:  Yellow
-!! Color 4/12:  Blue
-!! Color 5/13:  Magenta
-!! Color 6/14:  Cyan
-!! Color 7/15:  White
+XTerm*on3Clicks: regex ([[:alpha:]]+://)?([[:alnum:]!#+,./=?@_~-]|(%[[:xdigit:]][[:xdigit:]]))+
+XTerm*rightScrollBar: false
+XTerm*scrollBar: false
