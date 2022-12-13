@@ -84,11 +84,12 @@ cmd = meld --diff $LOCAL $REMOTE
 
 # [[file:~/.config/dotfiles/git/git.org::*merge][merge:1]]
 [merge]
-tool = nvim
+tool = meld
 conflictstyle = diff3
 
 [mergetool "meld"]
-cmd = meld --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $MERGED $REMOTE
+cmd = meld $LOCAL $MERGED $REMOTE --output $MERGED --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $REMOTE --diff $LOCAL $MERGED --diff $REMOTE $MERGED
+trustExitCode = false
 
 [mergetool "nvim"]
 cmd = vim_merge -g -geometry 420x70 $BASE $REMOTE $LOCAL $MERGED
