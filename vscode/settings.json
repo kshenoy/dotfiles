@@ -19,9 +19,6 @@
     "editor.tabCompletion": "onlySnippets",
     "editor.wordWrapColumn": 120,
     "files.trimTrailingWhitespace": true,
-    "perforce.editOnFileSave": true,
-    "perforce.enableP4ConfigScanOnStartup": false,
-    "perforce.hideEmptyChangelists": true,
     "security.workspace.trust.untrustedFiles": "open",
     "telemetry.telemetryLevel": "off",
     "terminal.integrated.fontFamily": "FiraCode Nerd Font Mono",
@@ -91,4 +88,5 @@
         "editor.formatOnSave": true
     },
     "python.formatting.provider": "none",
+    "vsicons.dontShowNewVersionMessage": true,
 }
