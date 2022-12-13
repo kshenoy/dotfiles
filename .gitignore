@@ -21,3 +21,6 @@
 # fish
 /fish/functions/base16.fish
 /fish/functions/fisher.fish
+
+# tmux
+/tmux/plugins
