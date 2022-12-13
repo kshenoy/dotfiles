@@ -34,12 +34,14 @@ else
 fi
 
 # Clear out old env vars
-export FZF_DEFAULT_OPTS="--ansi --select-1 --exit-0 --inline-info --reverse --tiebreak=length,end --bind=btab:select-all,ctrl-n:down,ctrl-p:up"
+export FZF_DEFAULT_OPTS="--ansi --select-1 --exit-0 --inline-info --reverse --tiebreak=length,end --bind=shift-tab:toggle-all,ctrl-n:down,ctrl-p:up"
 unset FZF_ALT_C_OPTS
 unset FZF_CTRL_T_OPTS
 # export FZF_CTRL_T_OPTS='--expect=alt-v,alt-e,alt-c'
 
-# base16 fzf colorscheme is applied by appending to the FZF_DEFAULT_OPTS env var
-# Thus, I "set" it first before sourcing the base16 file which appends to it
-export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
-[[ -n "$BASE16_THEME" ]] && source "${BASE16_FZF}/bash/base16-${BASE16_THEME}.config"
+# FZF colorschemes are applied by appending to the FZF_DEFAULT_OPTS env var
+# Thus, I "set" FZF_DEFAULT_OPTS first before sourcing the colorscheme file which appends to it
+# export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
+# [[ -n "$BASE16_THEME" ]] && source "${BASE16_FZF}/bash/base16-${BASE16_THEME}.config"
+source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/themes/catppuccin-frappe.sh
+

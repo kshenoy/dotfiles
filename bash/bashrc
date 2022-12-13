@@ -373,13 +373,13 @@ fi
 # base16 themes
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*base16 themes][base16 themes:1]]
-export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
-[[ -n "$PS1" ]] && [[ -s $BASE16_SHELL/profile_helper.sh ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
-if [[ -f ~/.base16_theme ]]; then
-  . ~/.base16_theme
-else
-  base16_solarized-light &> /dev/null
-fi
+# export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
+# [[ -n "$PS1" ]] && [[ -s $BASE16_SHELL/profile_helper.sh ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
+# if [[ -f ~/.base16_theme ]]; then
+#   . ~/.base16_theme
+# else
+#   base16_solarized-light &> /dev/null
+# fi
 # base16 themes:1 ends here
 
 # colored man pages with less
