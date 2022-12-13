@@ -21,7 +21,7 @@ email = theresmorethanoneway@gmail.com
 
 # [[file:~/.config/dotfiles/git/git.org::*core][core:1]]
 [core]
-editor   = nvim --nofork
+editor   = nvim
 fileMode = false
 # core:1 ends here
 
