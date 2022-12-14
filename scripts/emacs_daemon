@@ -24,7 +24,7 @@ done
 
 # Defaults
 _emacs_path=""
-[[ -d /home/kshenoy/bin/emacs_path ]] && _emacs_path="/home/kshenoy/bin/emacs_path/"
+[[ -d /home/kshenoy/.local/bin/emacs_path ]] && _emacs_path="/home/kshenoy/.local/bin/emacs_path/"
 
 # By default, on a *nix-like platform, the sockets are located in a directory called /tmp/emacs1234 where
 # /tmp is the value of the environment variable TMPDIR (defaulting to /tmp) and 1234 is the user ID

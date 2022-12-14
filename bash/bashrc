@@ -373,13 +373,13 @@ fi
 # base16 themes
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*base16 themes][base16 themes:1]]
-export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
-[[ -n "$PS1" ]] && [[ -s $BASE16_SHELL/profile_helper.sh ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
-if [[ -f ~/.base16_theme ]]; then
-  . ~/.base16_theme
-else
-  base16_solarized-light &> /dev/null
-fi
+# export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
+# [[ -n "$PS1" ]] && [[ -s $BASE16_SHELL/profile_helper.sh ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
+# if [[ -f ~/.base16_theme ]]; then
+#   . ~/.base16_theme
+# else
+#   base16_solarized-light &> /dev/null
+# fi
 # base16 themes:1 ends here
 
 # colored man pages with less
@@ -726,38 +726,18 @@ alias ..='cd ..'
 # [[file:~/.config/dotfiles/bash/bashrc.org::*[[https://github.com/junegunn/fzf\][fzf]\]][[[https://github.com/junegunn/fzf][fzf]]:1]]
 if [[ -d /opt/fzf ]]; then
     export FZF_PATH=/opt/fzf
-# elif [[ -z "$FZF_PATH" ]]; then
-#     echo "$(tput setaf 1)ERROR$(tput sgr0): FZF_PATH is not set"
 fi
-
-if [[ -n "$FZF_PATH" ]]; then
-    [[ ! "$PATH" == *$FZF_PATH/bin* ]] && export PATH="$PATH:$FZF_PATH/bin"
-
-    # Key bindings
-    # Note the order is important because some functions get overridden
-    source $FZF_PATH/shell/key-bindings.bash
-    source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf_vcs.bash
-    source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/key-bindings.bash
-
-    # Customisations
-    if hash fd 2> /dev/null; then
-        export FZF_DEFAULT_COMMAND="fd --color=never --hidden --exclude .git --type f"
-        export FZF_ALT_C_COMMAND="fd --color=never --hidden --exclude .git --type d"
-        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-    fi
-
-    # Clear out old env vars
-    export FZF_DEFAULT_OPTS="--ansi --select-1 --exit-0 --inline-info --reverse --tiebreak=length,end --bind=shift-tab:toggle-all,ctrl-n:down,ctrl-p:up"
-    unset FZF_ALT_C_OPTS
-    unset FZF_CTRL_T_OPTS
-    # export FZF_CTRL_T_OPTS='--expect=alt-v,alt-e,alt-c'
-
-    # base16 fzf colorscheme is applied by appending to the FZF_DEFAULT_OPTS env var
-    # Thus, I "set" it first before sourcing the base16 file which appends to it
-    export BASE16_FZF=${XDG_CONFIG_HOME:-$HOME/.config}/base16-fzf
-    [[ -n "$BASE16_THEME" ]] && source "$BASE16_FZF/bash/base16-${BASE16_THEME}.config"
-fi
+source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf.bash
 # [[https://github.com/junegunn/fzf][fzf]]:1 ends here
+
+
+#=======================================================================================================================
+# zoxide (https://github.com/ajeetdsouza/zoxide)
+if hash zoxide 2> /dev/null; then
+  eval "$(zoxide init --cmd j bash)"
+fi
+
+
 
 # query
 # :LOGBOOK:
@@ -1177,8 +1157,6 @@ alias C=cat
 alias P=$PAGER
 alias hh='history | tail'
 alias x=exit
-alias k9='kill -9'
-alias j='jobs -l'
 alias pls='sudo $(history -p !!)'
 duh() { du -h "$@" | sort -rh; }
 
@@ -1665,7 +1643,7 @@ history -a
 if ((which ruby &> /dev/null) && (which gem &> /dev/null)); then
   export PATH="$(ruby -rubygems -e 'puts Gem.user_dir')/bin:$PATH"
 fi
-export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 clnpath
 # PATH:1 ends here
 

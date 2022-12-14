@@ -63,6 +63,7 @@ if not vim.g.vscode then
           enabled = true,
         },
       })
+      vim.cmd('colorscheme catppuccin')
     end,
   })
   ---]]
