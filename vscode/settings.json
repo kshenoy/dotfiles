@@ -87,4 +87,7 @@
     },
     "python.formatting.provider": "none",
     "vsicons.dontShowNewVersionMessage": true,
+    "perforce.editOnFileSave": true,
+    "perforce.enableP4ConfigScanOnStartup": false,
+    "perforce.hideEmptyChangelists": true,
 }
