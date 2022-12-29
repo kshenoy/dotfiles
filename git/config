@@ -63,7 +63,7 @@ untracked = cyan
 
 # [[file:~/.config/dotfiles/git/git.org::*diff][diff:1]]
 [diff]
-tool = vim
+tool = nvim
 
 [difftool]
 prompt = false
