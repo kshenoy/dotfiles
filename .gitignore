@@ -14,7 +14,7 @@
 /vim/tmp
 
 # neovim
-/nvim/plugin/packer_compiled.lua
+/nvim/lua/packages/packer_compiled.lua
 /nvim/lua/work
 
 # fish
