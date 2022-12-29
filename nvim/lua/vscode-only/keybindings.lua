@@ -217,14 +217,14 @@ mapt('<Tab>', 'workbench.action.toggleTabsVisibility')
 
 --[[ SOURCE-CONTROL ]]--------------------------------------------------------------------------------------------------
 map.set('n', '<Leader>v', '<Plug>(leader-vcs-map)', {remap=true, silent=true})
-local maps = function(key, cmd)
+local mapv = function(key, cmd)
   map.set('n', '<Plug>(leader-vcs-map)' .. key, '<Cmd>call VSCodeNotify("' .. cmd .. '")<CR>', {remap=true})
 end
 
-maps('a', 'perforce.annotate')
-maps('d', 'perforce.diff')
-maps('e', 'perforce.edit')
-maps('s', 'perforce.opened')                                                                                 -- (s)tatus
+mapv('a', 'perforce.annotate')
+mapv('d', 'perforce.diff')
+mapv('e', 'perforce.edit')
+mapv('s', 'perforce.opened')                                                                                 -- (s)tatus
 
 
 --[[ EXTENSIONS ]]------------------------------------------------------------------------------------------------------

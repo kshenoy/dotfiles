@@ -1,5 +1,6 @@
 -- Neovim already has a lot of sane defaults. Here's some more.
 -- The options are arranged according to how they're specified in 'options.txt'
+-- See `:help opt`
 local opt = vim.opt
 
 
@@ -15,7 +16,8 @@ opt.tags = "./tags;,./.tags;"
 
 --[[ Displaying text ]]-------------------------------------------------------------------------------------------------
 opt.scrolloff     = 3                                              -- no. of lines to show around the cursor for context
-opt.showbreak     = "↪"                                                 -- string to put at the start of wrapped lines
+opt.breakindent   = true                                                         -- preserve indentation in wrapped text
+opt.showbreak     = "↪"                                                   -- string to put at the start of wrapped lines
 opt.sidescroll    = 3                                                -- minimal number of columns to scroll horizontally
 opt.sidescrolloff = 10                                           -- no. of columns to show around the cursor for context
 opt.cmdheight     = 2          -- number of screen lines to use for the command-line. Helps avoiding 'hit-enter' prompts
@@ -48,6 +50,7 @@ opt.showmode = false
 --[[ Editing text ]]----------------------------------------------------------------------------------------------------
 opt.undofile  = true
 opt.textwidth = 120
+opt.completeopt:append('menuone')                                -- use the popup menu also when there is only one match
 opt.completeopt:append('noinsert')                               -- do not insert any text for a match until I select it
 opt.completeopt:append('noselect')                                    -- do not select a match in the menu automatically
 opt.showmatch  = true                                                                          -- show matching brackets
@@ -64,6 +67,7 @@ opt.shiftround  = true
 opt.backup   = true
 opt.backupdir:remove(".")
 opt.swapfile = false
+opt.updatetime = 250
 
 
 --[[ Command line editing ]]--------------------------------------------------------------------------------------------
