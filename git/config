@@ -21,7 +21,7 @@ email = theresmorethanoneway@gmail.com
 
 # [[file:~/.config/dotfiles/git/git.org::*core][core:1]]
 [core]
-editor   = nvim
+editor   = vim
 fileMode = false
 # core:1 ends here
 
@@ -63,7 +63,7 @@ untracked = cyan
 
 # [[file:~/.config/dotfiles/git/git.org::*diff][diff:1]]
 [diff]
-tool = nvim
+tool = vim
 
 [difftool]
 prompt = false
