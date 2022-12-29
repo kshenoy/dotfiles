@@ -1,133 +1,79 @@
---  Lua interface to vim-plug by https://dev.to/vonheikemen/neovim-using-vim-plug-in-lua-3oom
-local plug = require('plug')
-local fn = vim.fn
-local map = vim.keymap
-
-
-plug.begin(vim.fn.stdpath('data')..'/plugged')
-
-plug('tpope/vim-repeat')
-
-
-plug('kylechui/nvim-surround', {
-  config = function()
-    require('nvim-surround').setup({
-      keymaps = {
-        normal = "gs",
-        normal_cur = "gss",
-        normal_line = "gS",
-        normal_cur_line = "gSS",
-        visual = "gs",
-        visual_line = "gS",
-      }
-    })
-  end,
-})
-
-
-plug('ggandor/leap.nvim', {
-  config = function()
-    map.set({'n', 'x', 'o'}, 's', '<Plug>(leap-forward-to)', {remap=true})
-    map.set({'n', 'x', 'o'}, 'S', '<Plug>(leap-backward-to)', {remap=true})
-    if not vim.g.vscode then
-      map.set('n', 'ys', '<Plug>(leap-cross-window)', {remap=true})
-    end
-  end,
-})
--- plug('ggandor/flit.nvim', {
---   config = function()
---     require('flit').setup()
---   end
--- })
-
-
-if not vim.g.vscode then
-  plug('tpope/vim-abolish')
-  plug('tpope/vim-endwise')
-  plug('tpope/vim-unimpaired')
-  plug('nvim-lua/plenary.nvim')
-  plug('RRethy/nvim-base16')
-  plug('kyazdani42/nvim-web-devicons')
-
-  ---[[ Catpuccin ------------------------------------------------------------------------------------------------------
-  plug('catppuccin/nvim', {
-    config = function()
-      require("catppuccin").setup({
-        flavour = "frappe", -- latte, frappe, macchiato, mocha
-        background = { -- :h background
-          light = "latte",
-          dark = "frappe",
-        },
-        transparent_background = false,
-        dim_inactive = {
-          enabled = true,
-        },
-      })
-      vim.cmd('colorscheme catppuccin')
-    end,
-  })
-  ---]]
-
-  ---[[ Comment --------------------------------------------------------------------------------------------------------
-  plug('numToStr/Comment.nvim', {
-    config = function()
-      require('Comment').setup()
-    end,
-  })
-  --]]
-
-  ---[[ FZF ------------------------------------------------------------------------------------------------------------
-  plug('ibhagwan/fzf-lua', {
-    config = function()
-      require('fzf-lua').setup({
-        winopts = {
-          preview = {
-            hidden = 'hidden',  -- The previewer is a bit slower than fzf.vim so disabling it by default
-          }
-        }
-      })
-
-      map.set('n', '<Plug>(leader-buffer-map)b', "<Cmd>lua require('fzf-lua').buffers({ winopts = { preview = { hidden='hidden' }}})<CR>", {desc="Switch buffer", silent=true})
-      map.set('n', '<Plug>(leader-file-map)f',   "<Cmd>lua require('fzf-lua').files()<CR>", {desc="Find file", silent=true})
-      map.set('n', '<Plug>(leader-file-map)F',   "<Cmd>lua require('fzf-lua').files({cwd='.'})<CR>", {desc="Find file from here", silent=true})
-      map.set('n', '<Plug>(leader-file-map)r',   "<Cmd>lua require('fzf-lua').oldfiles()<CR>", {desc="Recent files", silent=true})
-      map.set('n', "<Leader>'",                  "<Cmd>lua require('fzf-lua').resume()<CR>",  {desc="Resume last Fzf op", silent=true})
-      map.set('n', '<Plug>(leader-help-map)b',   "<Cmd>lua require('fzf-lua').keymaps()<CR>", {desc="Describe bindings", silent=true})
-      map.set('n', '<Plug>(leader-open-map)l',   "<Cmd>lua require('fzf-lua').loclist()<CR>",  {desc="Open Location List", silent=true})
-      map.set('n', '<Plug>(leader-open-map)q',   "<Cmd>lua require('fzf-lua').quickfix()<CR>", {desc="Open QuickFix", silent=true})
-      map.set('n', '<Plug>(leader-open-map)l',   "<Cmd>lua require('fzf-lua').loclist()<CR>",  {desc="Open Location List", silent=true})
-      map.set('n', '<Plug>(leader-open-map)q',   "<Cmd>lua require('fzf-lua').quickfix()<CR>", {desc="Open QuickFix", silent=true})
-      map.set('n', '<Plug>(leader-search-map)b', "<Cmd>lua require('fzf-lua').blines()<CR>", {desc="Search current buffer", silent=true})
-      map.set('n', '<Plug>(leader-search-map)B', "<Cmd>lua require('fzf-lua').lines()<CR>", {desc="Search all buffers", silent=true})
-    end,
-  })
-  --]]
-
-  ---[[ Lualine --------------------------------------------------------------------------------------------------------
-  plug('nvim-lualine/lualine.nvim', {
-    config = function()
-      require('lualine').setup({
-        options = {
-          icons_enabled = true,
-        },
-      })
-    end,
-  })
-  --]]
-
-  ---[[ Ouroboros ------------------------------------------------------------------------------------------------------
-  plug('jakemason/ouroboros', {
-    requires = { 'nvim-lua/plenary.nvim' },
-    config = function()
-      vim.api.nvim_create_autocmd({"Filetype"}, {
-        desc = "Switch between header and implementation",
-        callback = function()
-          map.set('n', "<LocalLeader>a", "<Cmd>Ouroboros<CR>", {desc="Switch between header and implementation", buffer=true, silent=true})
-        end,
-      })
-    end,
-  })
-  --]]
+-- Install packer
+local install_path = vim.fn.stdpath 'data' .. '/site/pack/packer/start/packer.nvim'
+local is_bootstrap = false
+if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
+  is_bootstrap = true
+  vim.fn.execute('!git clone https://github.com/wbthomason/packer.nvim ' .. install_path)
+  vim.cmd [[packadd packer.nvim]]
 end
 
-plug.ends()
+local packer = require('packer')
+local packer_compile_path = vim.fn.stdpath('config') .. '/lua/packages/' .. 'packer_compiled.lua'
+
+-- Easiest way to use packer is to use the 'startup' function which can take a table of plugin specifications for each
+-- plugin. It'll do everything - install, configure etc. The downside is, everything is in one place, in one file
+-- Here, instead of packer.startup, I use separate calls to packer.init and packer.use. This allows me to have
+-- everything related to a plugin in its own separate file and I keep only 'packer' related stuff in this file
+packer.init({
+    display = {
+        open_fn = function()
+            return require("packer.util").float({ border = 'single' })
+        end,
+    },
+    compile_path = packer_compile_path,
+})
+
+packer.use 'wbthomason/packer.nvim' -- Let the package manager bootstrap itself
+
+require('packages.Comment')  -- "gc" to comment visual regions/lines
+require('packages.nvim-surround')
+require('packages.leap')
+require('packages.catppuccin')  -- colorscheme
+require('packages.vim-repeat')
+require('packages.vim-unimpaired')  -- complementary pairs of mappings
+require('packages.vim-abolish')  -- smarter abbrev, substitutes and case-coercions
+require('packages.vim-endwise')  -- add 'end' structures automatically
+require('packages.nvim-web-devicons')
+require('packages.lualine')
+require('packages.indent-blankline')  -- add indentation guides even on blank lines
+require('packages.lsp')  -- LSP Configuration & Plugins
+require('packages.autocomplete')  -- Autocompletion
+require('packages.treesitter')  -- Highlight, edit, and navigate code
+require('packages.telescope')
+
+
+-- Add custom plugins to packer from /nvim/lua/custom/plugins.lua
+local has_plugins, plugins = pcall(require, 'custom.plugins')
+if has_plugins then
+  plugins(packer.use)
+end
+
+if is_bootstrap then
+  require('packer').sync()
+elseif vim.fn.empty(vim.fn.glob(packer_compile_path)) == 0 then
+  require('packages.packer_compiled')
+end
+
+
+-- When we are bootstrapping a configuration, it doesn't make sense to execute the rest of the init.lua.
+-- You'll need to restart nvim, and then it will work.
+if is_bootstrap then
+  print '==================================================================================='
+  print '    Plugins are being installed. Wait until Packer completes, then restart nvim'
+  print '==================================================================================='
+  return
+end
+
+-- Automatically source and re-compile packer whenever you save this init.lua
+local packer_group = vim.api.nvim_create_augroup('Packer', { clear = true })
+vim.api.nvim_create_autocmd('BufWritePost', {
+  command = 'source <afile> | PackerCompile',
+  group = packer_group,
+  pattern = vim.fn.expand '$MYVIMRC',
+})
+
+-- Diagnostic keymaps
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
