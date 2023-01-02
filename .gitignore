@@ -14,6 +14,7 @@
 /vim/tmp
 
 # neovim
+/nvim/lua/.luarc.json
 /nvim/lua/packages/packer_compiled.lua
 /nvim/lua/work
 

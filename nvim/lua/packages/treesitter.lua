@@ -72,8 +72,8 @@ require('packer').use {
 }
 
 -- Additional text objects via treesitter
--- require('packer').use {
---   'nvim-treesitter/nvim-treesitter-textobjects',
---   cond = 'vim.fn.empty(vim.g.vscode) == 1',
---   after = 'nvim-treesitter',
--- }
+require('packer').use {
+  'nvim-treesitter/nvim-treesitter-textobjects',
+  opt = true,
+  after = 'nvim-treesitter',
+}

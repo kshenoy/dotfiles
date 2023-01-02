@@ -78,5 +78,5 @@ require('packer').use {
 
 require('packer').use {
   'nvim-lua/plenary.nvim',
-  opt = true,
+  cond = 'vim.fn.empty(vim.g.vscode) == 1',
 }

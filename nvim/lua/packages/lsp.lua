@@ -1,20 +1,4 @@
 -- LSP Configuration & Plugins
-
-require('packer').use {
-  'williamboman/mason.nvim',
-  opt = true,
-}
-
-require('packer').use {
-  'williamboman/mason-lspconfig.nvim',
-  opt = true,
-}
-
-require('packer').use {
-  'j-hui/fidget.nvim',
-  opt = true,
-}
-
 require('packer').use {
   'neovim/nvim-lspconfig',
   cond = 'vim.fn.empty(vim.g.vscode) == 1',
@@ -131,4 +115,19 @@ require('packer').use {
       },
     }
   end,
+}
+
+require('packer').use {
+  'williamboman/mason.nvim',
+  opt = true,
+}
+
+require('packer').use {
+  'williamboman/mason-lspconfig.nvim',
+  opt = true,
+}
+
+require('packer').use {
+  'j-hui/fidget.nvim',
+  opt = true,
 }

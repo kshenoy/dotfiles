@@ -36,9 +36,9 @@ require('packages.vim-endwise')  -- add 'end' structures automatically
 require('packages.nvim-web-devicons')
 require('packages.lualine')
 require('packages.indent-blankline')  -- add indentation guides even on blank lines
-require('packages.lsp')  -- LSP Configuration & Plugins
-require('packages.autocomplete')  -- Autocompletion
-require('packages.treesitter')  -- Highlight, edit, and navigate code
+-- require('packages.lsp')  -- LSP Configuration & Plugins
+-- require('packages.cmp')  -- Autocompletion
+-- require('packages.treesitter')  -- Highlight, edit, and navigate code
 require('packages.telescope')
 
 
