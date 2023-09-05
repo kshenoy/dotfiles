@@ -1422,8 +1422,8 @@ local _columns=$(tput cols)
 local _pwd="$(prompt::get_compact_pwd)"
 local _pwd_sep=" in "
 
-# Force time to US Mountain Time. I don't want to export TZ as it messes up some other scripts
-local _time="$(TZ=US/Mountain date +%I:%M%P) "
+# Set time dynamically. I don't want to export TZ as it messes up some other scripts
+local _time="$(date +%I:%M%P) "
 local _user="$(whoami)"
 # prompt:2 ends here
 
