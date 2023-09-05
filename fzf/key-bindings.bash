@@ -1,4 +1,26 @@
 #=======================================================================================================================
+fzf::cd() {
+  local cmd="${FZF_ALT_C_COMMAND:-"command find -L . -mindepth 1 \\( -path '*/\\.*' -o -fstype 'sysfs' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
+    -o -type d -print 2> /dev/null | cut -b3-"}"
+  local out=($(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse --bind=ctrl-z:ignore $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m --expect=alt-g))
+
+  local expected=${out[0]}
+  if [[ -z "$expected" ]]; then
+    return
+  fi
+
+  local selected
+  if [[ ${expected} == "alt-g" ]]; then
+    selected=$(printf 'cd -- %q' "${out[1]}")
+  else
+    selected=$(printf '%q ' "$expected")
+  fi
+  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}${selected}${READLINE_LINE:$READLINE_POINT}"
+  READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
+}
+
+
+#=======================================================================================================================
 fzf::lsf::bjobs() {                                                                                                #{{{1
   local selected=$(lsf_bjobs -o "id: user: stat: queue: submit_time: name" |
     FZF_DEFAULT_OPTS="--header-lines=1 $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
@@ -140,7 +162,8 @@ if [[ -o emacs ]]; then                                                         
 
   # cd into the selected directory
   # Unbind the default one first and then create new bindings
-  bind '"\ec": nop'
+  # bind '"\ec": nop'
+  bind -x '"\C-f\C-g": "fzf::cd"'
 
   bind -x '"\C-f\C-l": "fzf::lsf::bjobs"'
 
