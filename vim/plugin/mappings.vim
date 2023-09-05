@@ -2,57 +2,24 @@
 " LEADER COMMANDS                                                                                                   {{{1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-""" S
-nnoremap <silent> <leader>so :so $MYVIMRC<BAR>so $MYGVIMRC<CR>
-nnoremap <silent> <leader>sr :reg<CR>
-nnoremap <silent> <leader>sm :marks<CR>
-" Set size
-nnoremap <silent> <leader>ss :set columns=319<BAR>call system("wmctrl -i -b add,maximized_vert -r " . v:windowid)<CR>
-" nnoremap <silent> <leader>ss :set columns=273<BAR>call system("wmctrl -i -b add,maximized_vert -r " . v:windowid)<CR>
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" GOTO commands                                                                                                     {{{1
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-execute 'nnoremap <silent> govv :e ' . g:dotvim . '/vimrc<CR>'
-execute 'nnoremap <silent> govf :e ' . g:dotvim . '/pack/utils/start/utils/plugin/utils.vim<CR>'
-execute 'nnoremap <silent> govm :e ' . g:dotvim . '/plugin/mappings.vim<CR>'
-execute 'nnoremap <silent> govb :e ' . g:dotvim . '/bundles.vim<CR>'
-
-nnoremap <silent> gosa :e ~/.config/dotfiles/bash/aliases<CR>
-nnoremap <silent> gosc :e ~/.bashrc<CR>
-nnoremap <silent> gosf :e ~/.config/dotfiles/bash/bashrc-func<CR>
-nnoremap <silent> gosl :e ~/.bashrc_local<CR>
-nnoremap <silent> gosp :e ~/.config/dotfiles/bash/bashrc-prompt<CR>
-nnoremap <silent> gost :e ~/.config/dotfiles/tmux/tmux.conf<CR>
-nnoremap <silent> gosx :e ~/.Xresources<CR>
-
-""" Redirect F1 to list of all commands which is more useful than the default help page
-noremap <F1> :vert bo h index<CR>
-
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " RE-MAPPING FOR CONVENIENCE                                                                                        {{{1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-""" Netrw
-"nnoremap - :Ex<CR>
-"autocmd FileType netrw nnoremap qq :Rex<CR>
-
-""" Remap <CR> to accept the selected entry from the popup menu - Messes up endwise
-" inoremap <expr> <silent> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+""" Redirect F1 to list of all commands which is more useful than the default help page
+noremap <F1> :vert bo h index<CR>
 
 """ Remap w to behave as 'w' should in all cases (:h cw). Use ce to do what 'cw' used to
-onoremap <silent> <expr> w (v:count > 1 ? ":normal! " . v:count . "w<CR>" : ":normal! w<CR>")
-onoremap <silent> <expr> W (v:count > 1 ? ":normal! " . v:count . "W<CR>" : ":normal! W<CR>")
+nnoremap cw dwi
+nnoremap cW dWi
 
 """ Show full file path while opening file
-cabbrev %%p <C-R>=fnameescape(expand('%:p'))<CR>
-cabbrev %%h <C-R>=fnameescape(expand('%:p:h'))<CR>
-cabbrev %%t <C-R>=fnameescape(expand('%:p:t'))<CR>
-cabbrev %%r <C-R>=fnameescape(expand('%:p:r'))<CR>
+cabbrev %p%  <C-R>=fnameescape(expand('%:p'))<CR>
+cabbrev %ph% <C-R>=fnameescape(expand('%:p:h'))<CR>
+cabbrev %pt% <C-R>=fnameescape(expand('%:p:t'))<CR>
+cabbrev %pr% <C-R>=fnameescape(expand('%:p:r'))<CR>
 
-nnoremap <leader>s% :silent! source <C-R>=fnameescape(expand('%:p'))<CR><CR>
 cnoreabbrev <expr> E ((getcmdtype() == ':' && getcmdline() ==# 'E') ? 'e <C-R>=fnameescape(expand("%:p:h"))."/"<CR><C-R>=utils#EatChar("\\s")<CR>' : 'E')
 
 """ Display full path and filename
@@ -65,28 +32,8 @@ nnoremap <expr> y<C-G> ':let @' . (has('win_32') ? '+' : '*') . '="' . expand("%
 " From https://stackoverflow.com/a/3879737/734153
 cnoreabbrev <expr> h ((getcmdtype() == ':' && getcmdline() ==# 'h') ? 'vert bo h' : 'h')
 
-""" Persistent paste in visual mode
-" By default, p/P in visual mode pastes the contents of the default register and replaces it with the visual selection.
-" This will preserve the original contents of the default register. For the default behavior, P can be used
-" For named registers, it will behave like default
-xnoremap <expr> p v:register=='"'?'pgvy':'p'
-
-""" Jumping to next/previous start/end of Methods
-noremap <silent> ][ :call utils#SectionJump('next', 'start')<CR>
-noremap <silent> ]] :call utils#SectionJump('next', 'end')<CR>
-noremap <silent> [[ :call utils#SectionJump('prev', 'start')<CR>
-noremap <silent> [] :call utils#SectionJump('prev', 'end')<CR>
-
-noremap <silent> ]m :call utils#MethodJump(']m')<CR>
-noremap <silent> ]M :call utils#MethodJump(']M')<CR>
-noremap <silent> [m :call utils#MethodJump('[m')<CR>
-noremap <silent> [M :call utils#MethodJump('[M')<CR>
-
 """ Make Y consistent with C and D
 nnoremap Y y$
-
-""" Split line (sister to [J]oin lines)
-nnoremap <M-j> i<CR><ESC>:call utils#Preserve('-2s/\s\+$//')<CR>
 
 """ Break undo-sequence before deleting till start of line
 inoremap <C-U> <C-G>u<C-U>
@@ -94,20 +41,12 @@ inoremap <C-U> <C-G>u<C-U>
 """ Remap ZQ to quit everything. I can always use :bd to delete a single buffer
 nnoremap ZQ :qall!<CR>
 
-""" Make the repeat operator accept a count (repeat.vim does this too)
-" nnoremap . :<C-U>execute 'normal! ' . repeat('.', v:count1)<CR>
-
 """ Easily quit help pages
 augroup Help
   autocmd!
   autocmd FileType help nnoremap <buffer> q :q<CR>
   autocmd BufEnter option-window nnoremap <buffer> q :q<CR>
 augroup END
-
-""" g; goes to older position in change list. 
-""" Hence it makes sense to use `; to jump to position of last change instead of `.
-nnoremap `; `.
-nnoremap '; '.
 
 
 
@@ -125,20 +64,17 @@ vnoremap <C-X> <C-X>gv
 """ Briefly show CursorLine and CursorColumn
 nnoremap <silent> <F5> :call utils#CursorBlind()<cr>
 
-""" Panic Mode (rot13)
-nnoremap <silent> <F9> :call utils#Preserve('normal! ggg?G')<CR>
-
-""" Change font-size, line-spacing, window-size (May be set by vim-submode, hence the maparg() check)
-nnoremap <silent> >l  :<C-U>execute 'let &lines     += ' . v:count1<CR>
-nnoremap <silent> <l  :<C-U>execute 'let &lines     -= ' . v:count1<CR>
-nnoremap <silent> >c  :<C-U>execute 'let &columns   += ' . v:count1<CR>
-nnoremap <silent> <c  :<C-U>execute 'let &columns   -= ' . v:count1<CR>
-nnoremap <silent> >s  :<C-U>execute 'let &linespace += ' . v:count1<CR>
-nnoremap <silent> <s  :<C-U>execute 'let &linespace  = ' . (&linespace - v:count1)<CR>
-nnoremap <silent> >f  :<C-U>IncFontSize<CR>
-nnoremap <silent> <f  :<C-U>DecFontSize<CR>
-" Note: This overrides the default functionality of =fx. However, the same thing can be done by =_ or ==
-nnoremap =f :set guifont=*<CR>
+""" Change font-size, line-spacing, window-size
+if has('gui_running')
+  nnoremap <silent> >l  :<C-U>execute 'let &lines     += ' . v:count1<CR>
+  nnoremap <silent> <l  :<C-U>execute 'let &lines     -= ' . v:count1<CR>
+  nnoremap <silent> >c  :<C-U>execute 'let &columns   += ' . v:count1<CR>
+  nnoremap <silent> <c  :<C-U>execute 'let &columns   -= ' . v:count1<CR>
+  nnoremap <silent> >s  :<C-U>execute 'let &linespace += ' . v:count1<CR>
+  nnoremap <silent> <s  :<C-U>execute 'let &linespace  = ' . (&linespace - v:count1)<CR>
+  nnoremap <silent> >f  :<C-U>'let &guifont=' . join(map(split(&guifont, ','), {key, val -> substitute(val, '\d\+$', '\=submatch(0)+1', '')}), ',')<CR>
+  nnoremap <silent> <f  :<C-U>'let &guifont=' . join(map(split(&guifont, ','), {key, val -> substitute(val, '\d\+$', '\=submatch(0)-1', '')}), ',')<CR>
+endif
 
 """ Fill Text Width
 command! -nargs=? FTW call utils#FillTW(<args>)
@@ -167,9 +103,6 @@ noremap <silent> gk k
 
 nnoremap gm :call cursor(0, virtcol('$')/2)<CR>
 
-"imap <C-Left>  <C-O>B
-"imap <C-Right> <C-O>W
-
 """ View/scrolling
 nnoremap <silent> zh    3zh
 nnoremap <silent> zl    3zl
@@ -181,9 +114,6 @@ nnoremap <silent> <leader>zz :let &scrolloff=999-&scrolloff<CR>
 
 nnoremap <expr> <CR> foldlevel('.') ? 'za' : '<CR>'
 
-""" Cycle between absolute/relative numbering
-noremap <silent> <F2> :call utils#CycleNumbering()<CR>
-
 """ Visually select the text that was last edited/pasted
 nnoremap gV `[v`]
 
@@ -192,13 +122,6 @@ nnoremap gV `[v`]
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " BUFFERS, WINDOWS, TABS                                                                                            {{{1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-""" Buffers
-"nnoremap gb :<C-U>exec (v:count ? 'b '.v:count : 'bn')<cr>
-nnoremap <S-Del>  :bd<CR>
-nnoremap <S-BS>   :bp<BAR>bd#<CR>
-nnoremap <Space>b :ls<CR>:b<Space>
-
 
 """ Windows
 " Swap Windows
@@ -217,44 +140,9 @@ nnoremap <silent> <C-W><S-C>l <C-W><C-L><C-W>c
 " Toggle Zoom
 nnoremap + :<C-U>call utils#WindowToggleZoom()<CR>
 
+" Toggle between all buffers and all tabs
+nnoremap <silent> <expr> <F8> (tabpagenr('$') == 1 ? ':tab ball<Bar>tabn' : ':tabo') . '<CR>'
 
-""" Tab operations
-if v:version >= 700
-  " Open file in new tab next to current tab
-  "nnoremap <silent> gt :let tabnum=tabpagenr()<CR><C-W>gf:execute 'silent! tabmove '.tabnum<CR>
-
-  " Move to
-  nnoremap <C-Home>  :tabfirst<CR>
-  nnoremap <C-End>   :tablast<CR>
-  "nnoremap <C-Tab>   :tabnext<CR>
-  "nnoremap <C-S-Tab> :tabprev<CR>
-
-  " Move current tab to first position
-  nnoremap <C-S-Home> :tabmove 0<CR>
-  " Move current tab to last position
-  nnoremap <C-S-End> :tabmove<CR>
-  " Move current tab to the left
-  nnoremap <silent> <C-S-PageUp> :execute 'silent! tabmove ' . (tabpagenr()-2)<CR>
-  " Move current tab to the right
-  nnoremap <silent> <C-S-PageDown> :execute 'silent! tabmove ' . tabpagenr()<CR>
-
-  " Toggle between all buffers and all tabs
-  nnoremap <silent> <expr> <F8> (tabpagenr('$') == 1 ? ':tab ball<Bar>tabn' : ':tabo') . '<CR>'
-endif
-
-
-""" Command-line Window (:h c_CTRL-F)
-" Make Vim start in Insert mode in the command-line window.
-"autocmd CmdwinEnter [/?] startinsert
-" Make closing cmdline-window easier
-autocmd CmdwinEnter * noremap <buffer> <ESC> <C-C><C-C>
-" Persistent command-line window
-autocmd CmdwinEnter * noremap <buffer> <S-CR> <CR>q:
-
-
-""" To make traversing up the directory tree easier in cmd-mode
-" FIXME: Make this silent
-cnoremap <C-W> <C-R>=utils#CmdIsk(1)<CR><C-W><C-R>=utils#CmdIsk(0)<CR>
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -353,23 +241,16 @@ nnoremap cg* g*<C-O>cgn
 " MISC                                                                                                              {{{1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-""" Show help on the word below cursor (Note: :h has been remapped to 'vert bo h')
-nnoremap <silent> <S-F1> :h <C-R><C-W><CR>
-imap     <S-F1> <C-\><C-O><S-F1>
-
 """ Ctrl+S functionality for save
 nnoremap <silent> <C-S> :execute ':silent :wall!'<CR>
 imap     <silent> <C-S> <C-\><C-O><C-S>
-
-""" Execute selection as vimscript
-vnoremap g: <Esc>:@*<CR>
 
 """ Run perforce diff on current file
 nnoremap <silent> <leader>pd :call perforce#DiffCurrentFile()<CR>
 nnoremap <silent> <leader>pe :call perforce#Checkout()<CR>
 
 """ Convert the base of the number below the cursor
-nnoremap <silent> gAb :echo utils#BaseConverter(expand('<cword>'), 2)<CR>
-nnoremap <silent> gAo :echo utils#BaseConverter(expand('<cword>'), 8)<CR>
-nnoremap <silent> gAd :echo utils#BaseConverter(expand('<cword>'), 10)<CR>
-nnoremap <silent> gAx :echo utils#BaseConverter(expand('<cword>'), 16)<CR>
+nnoremap <silent> g=b :echo utils#BaseConverter(expand('<cword>'), 2)<CR>
+nnoremap <silent> g=o :echo utils#BaseConverter(expand('<cword>'), 8)<CR>
+nnoremap <silent> g=d :echo utils#BaseConverter(expand('<cword>'), 10)<CR>
+nnoremap <silent> g=x :echo utils#BaseConverter(expand('<cword>'), 16)<CR>
