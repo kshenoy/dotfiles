@@ -41,29 +41,28 @@ local mapb = function(key, cmd)
 end
 
 -- mapb('a', 'workbench.action.showAllEditorsByMostRecentlyUsed')
-mapb('b',       'workbench.action.showEditorsInActiveGroup')
-mapb('B',       'workbench.action.showAllEditors')
-mapb('c',       'workbench.action.closeActiveEditor')
-mapb('C',       'workbench.action.closeEditorInAllGroups')
-mapb('<M-c>',   'workbench.action.closeEditorsInGroup')                                              --  (except pinned)
-mapb('<M-S-C>', 'workbench.action.closeAllEditors')
-mapb('d',       'workbench.action.closeUnmodifiedEditors')
-mapb('H',       'workbench.action.moveEditorLeftInGroup')
-mapb('J',       'workbench.action.moveEditorToLastGroup')
-mapb('K',       'workbench.action.moveEditorToFirstGroup')
-mapb('L',       'workbench.action.moveEditorRightInGroup')
-mapb('n',       'workbench.action.nextEditorInGroup')
-mapb('N',       'workbench.action.moveEditorToNextGroup')
-mapb('o',       'workbench.action.closeOtherEditors')
-mapb('p',       'workbench.action.previousEditorInGroup')
-mapb('P',       'workbench.action.moveEditorToPreviousGroup')
-mapb('r',       'workbench.action.files.revert')
-mapb('s',       'workbench.action.toggleSplitEditorInGroup')
-mapb('S',       'workbench.action.toggleSplitEditorInGroupLayout')
-mapb('u',       'workbench.action.reopenClosedEditor')                                                  --  (u)ndo close
-mapb('x',       'workbench.action.pinEditor')
-mapb('X',       'workbench.action.unpinEditor')
-mapb('y',       'copyFilePath')                                                  -- (y)ank file-path. doom also uses 'y'
+mapb('b', 'workbench.action.showEditorsInActiveGroup')
+mapb('B', 'workbench.action.showAllEditors')
+mapb('c', 'workbench.action.closeActiveEditor')
+mapb('C', 'workbench.action.closeEditorInAllGroups')
+mapb('d', 'workbench.action.closeUnmodifiedEditors')
+mapb('D', 'workbench.action.closeEditorsInGroup')                                              --  (except pinned)
+mapb('H', 'workbench.action.moveEditorLeftInGroup')
+mapb('J', 'workbench.action.moveEditorToLastGroup')
+mapb('K', 'workbench.action.moveEditorToFirstGroup')
+mapb('L', 'workbench.action.moveEditorRightInGroup')
+mapb('n', 'workbench.action.nextEditorInGroup')
+mapb('N', 'workbench.action.moveEditorToNextGroup')
+mapb('o', 'workbench.action.closeOtherEditors')
+mapb('p', 'workbench.action.previousEditorInGroup')
+mapb('P', 'workbench.action.moveEditorToPreviousGroup')
+mapb('r', 'workbench.action.files.revert')
+mapb('s', 'workbench.action.toggleSplitEditorInGroup')
+mapb('S', 'workbench.action.toggleSplitEditorInGroupLayout')
+mapb('u', 'workbench.action.reopenClosedEditor')                                                  --  (u)ndo close
+mapb('x', 'workbench.action.pinEditor')
+mapb('X', 'workbench.action.unpinEditor')
+mapb('y', 'copyFilePath')                                                  -- (y)ank file-path. doom also uses 'y'
 -- mapb('`', 'workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup')
 
 
@@ -103,7 +102,13 @@ local mapc = function(key, cmd)
   map.set('n', '<Plug>(leader-code-map)' .. key, '<Cmd>call VSCodeNotify("' .. cmd .. '")<CR>', {remap=true})
 end
 
-mapc('r', 'editor.action.rename')
+mapc('r',  'editor.action.rename')
+mapc('cc', 'editor.action.transformToCamelcase')
+mapc('ck', 'editor.action.transformToKebabcase')
+mapc('cl', 'editor.action.transformToLowercase')
+mapc('cs', 'editor.action.transformToSnakecase')
+mapc('ct', 'editor.action.transformToTitlecase')
+mapc('cu', 'editor.action.transformToUppercase')
 
 
 --[[ GO TO ]]-----------------------------------------------------------------------------------------------------------

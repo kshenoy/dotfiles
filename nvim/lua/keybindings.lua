@@ -13,6 +13,10 @@ map({'n', 'v', 'o', 's', 'x'}, 'gj', 'j')
 map({'n', 'v', 'o', 's', 'x'}, 'k', "v:count == 0 ? 'gk' : 'k'", {expr=true})
 map({'n', 'v', 'o', 's', 'x'}, 'gk', 'k')
 
+-- 'n' always searches forward and 'N' always searches backward
+map({'n', 'v', 'o', 's', 'x'}, 'n', "v:searchforward == 1 ? 'n' : 'N'", {expr=true, desc="'n' always searches forward"})
+map({'n', 'v', 'o', 's', 'x'}, 'N', "v:searchforward == 1 ? 'N' : 'n'", {expr=true, desc="'N' always searches back"})
+
 -- Swap 'U' and 'C-R'
 map('n', '<C-R>', 'U', {silent=true})
 map('n', 'U',     '<C-R>', {silent=true})
