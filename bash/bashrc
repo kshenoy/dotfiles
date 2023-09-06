@@ -1041,52 +1041,28 @@ vcs::is_in_git_repo() {
 }
 
 vcs::is_in_perforce_repo() {
-    local _cwd=$PWD
-    if (( $# > 0 )); then
-        command cd $1
-    fi
-
-    p4 info &> /dev/null
-    local _ret=$?
-
-    if (( $# > 0 )); then
-        command cd $_cwd
-    fi
-
-    return $_ret
+    [[ -n "$STEM" ]] && [[ ${1-$PWD} =~ $STEM ]];
 }
 
 vcs::is_in_repo() {
     vcs::is_in_git_repo "$@" || vcs::is_in_perforce_repo "$@"
 }
 
-vcs::get_type() {
-    # Description: Check if specified directory is under a Version-controlled system
-    # Arguments: 1 - Variable to return VCS type
-    #            2 - Directory to check. If skipped, defaults to PWD
-
-    if vcs::is_in_git_repo "$@"; then
-        echo "git"
-    elif vcs::is_in_perforce_repo "$@"; then
-        echo "p4"
-    else
-        # No VCS. Return empty string
-        echo ""
-    fi
+vcs::get_p4_branch() {
+  local top=${REPO_PATH-$PWD}
+  if [[ -f "$top/configuration_id" ]]; then
+    echo "$(sed 's/@.*//' "$top/configuration_id" 2> /dev/null)"
+  fi
 }
-
 vcs::get_branch() {
     # Description: If PWD is under a VCS, return the branch. If not, return an empty string
-    # Arguments:
-    # - $1 (optional): Use that as the VCS type instead of calculating it
 
-    local _vcs_type=${1-$(vcs::get_type)}
-    #echo "DEBUG: VCS Type=$_vcs_type (vcs::get_branch)"
-
-    if [[ $_vcs_type == "git" ]]; then
+    if vcs::is_in_git_repo; then
+        # echo "DEBUG: VCS Type=$_vcs_type (vcs::get_branch)"
         git symbolic-ref --short HEAD 2> /dev/null
-    elif [[ $_vcs_type == "p4" ]] && [[ -n "$REPO_PATH" ]] && [[ -f "$REPO_PATH/configuration_id" ]]; then
-        echo "$(sed 's/@.*//' "$REPO_PATH/configuration_id" 2> /dev/null)"
+    elif vcs::is_in_perforce_repo; then
+        # echo "DEBUG: VCS Type=$_vcs_type (vcs::get_branch)"
+        vcs::get_p4_branch
     else
         echo ""
     fi
@@ -1094,14 +1070,9 @@ vcs::get_branch() {
 
 vcs::get_status() {
     # Description: Get the status of the VCS - works only for git at the moment
-    # Arguments:
-    # - $1 (optional): Use as the VCS type instead of calculating it
-    # - $2 (optional): Use as the VCS branch instead of calculating it
 
-    local _vcs_type=${1-$(vcs::get_type)}
-    local _vcs_branch=${2-$(vcs::get_branch $_vcs_type)}
-
-    if [[ "$_vcs_type" == "git" ]]; then
+    if vcs::is_in_git_repo; then
+        local _vcs_branch=$(vcs::get_branch)
         if $(echo "$(git log origin/$_vcs_branch..HEAD 2> /dev/null)" | grep '^commit' &> /dev/null); then
             echo "staged"
         elif [[ -n $(git status -s --ignore-submodules=dirty  2> /dev/null) ]]; then

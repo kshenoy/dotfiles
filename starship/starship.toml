@@ -9,6 +9,7 @@ $git_branch\
 $git_commit\
 $git_state\
 $git_status\
+${custom.p4_repo}\
 $env_var\
 $custom\
 $fill \
@@ -56,7 +57,17 @@ disabled = false
 
 [time]
 disabled = false
-time_format = "%I:%M%P"
+time_format = '%I:%M%P'
 
 [vcsh]
 disabled = true
+
+[custom.p4_repo]
+description = 'The active branch of the Perforce repository'
+detect_files = ['P4CONFIG']
+style = 'bold purple'
+symbol = 'ℙ'
+format = "on [$symbol $output]($style) "
+command = "cut -d@ -f1 configuration_id"
+# This will run it in a new shell and since we can't bootenv in that shell, it doesn't work as desired
+# when = 'vcs::is_in_perforce_repo'
