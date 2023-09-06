@@ -1,0 +1,37 @@
+format = """
+[┌](bold black) \
+$username\
+$hostname\
+$shlvl\
+$directory\
+$vcsh\
+$git_branch\
+$git_commit\
+$git_state\
+$git_status\
+$env_var\
+$custom\
+$sudo\
+$fill \
+$jobs\
+$time\
+$line_break\
+[└](bold black) \
+$character"""
+
+[character]
+success_symbol = "[❮^_^❯](bold green)"
+error_symbol   = "[❮@_@❯](bold red)"
+
+[fill]
+symbol = '─'
+
+[hostname]
+ssh_only = false
+ssh_symbol = ''
+
+[sudo]
+disabled = false
+
+[time]
+disabled = false
