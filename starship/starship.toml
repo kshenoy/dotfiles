@@ -11,17 +11,32 @@ $git_state\
 $git_status\
 $env_var\
 $custom\
-$sudo\
 $fill \
 $jobs\
 $time\
 $line_break\
 [└](bold black) \
+$sudo\
 $character"""
 
 [character]
 success_symbol = "[❮^_^❯](bold green)"
 error_symbol   = "[❮@_@❯](bold red)"
+
+# [custom]
+# disabled = true
+
+[directory]
+truncation_length = 9
+[directory.substitutions]
+'/proj/ch_func_gen_scratch' = '~SCRATCH'
+'/proj/ch_func_dev0/CH/kshenoy/ch' = '~CH'
+'/proj/ch_func_dev1/CH/kshenoy/ch' = '~CH'
+'/proj/ch_func_dev0/CH' = '~CH0'
+'/proj/ch_func_dev1/CH' = '~CH1'
+
+[env_var]
+disabled = true
 
 [fill]
 symbol = '─'
@@ -30,8 +45,18 @@ symbol = '─'
 ssh_only = false
 ssh_symbol = ''
 
+[jobs]
+symbol = '✦ '
+
+[shlvl]
+disabled = true
+
 [sudo]
 disabled = false
 
 [time]
 disabled = false
+time_format = "%I:%M%P"
+
+[vcsh]
+disabled = true
