@@ -343,6 +343,11 @@ For Git
 ,*.orig
 #+end_src
 
+For MacOS
+#+begin_src conf
+.DS_Store
+#+end_src
+
 * Local variables
 :PROPERTIES:
 :header-args: :export none :tangle no
