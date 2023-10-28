@@ -2,21 +2,22 @@
 [
   {
     "key": "ctrl+q",
-    "command": "-workbench.action.quit"
+    "command": "-workbench.action.quit",
   },
   {
     "key": "ctrl+alt+enter",
     "command": "workbench.action.focusActiveEditorGroup",
-    "when": "!editorTextFocus"
+    "when": "!editorTextFocus && !isMac"
+  },
+  {
+    "key": "ctrl+command+enter",
+    "command": "workbench.action.focusActiveEditorGroup",
+    "when": "!editorTextFocus && isMac"
   },
   {
     "key": "ctrl+x ctrl+y",
     "command": "editor.action.insertSnippet",
     "when": "editorTextFocus && neovim.mode == 'insert'",
-  },
-  {
-    "key": "ctrl+n",
-    "command": "-workbench.action.files.newUntitledFile"
   },
   // {
   //   "key": "ctrl+space",

@@ -30,7 +30,7 @@
     "workbench.colorTheme": "Catppuccin Frappé",
     "workbench.editor.highlightModifiedTabs": true,
     "workbench.editor.showTabs": false,
-    "workbench.iconTheme": "vscode-icons",
+    "workbench.iconTheme": "catppuccin-frappe",
     "workbench.statusBar.visible": false,
     "zenMode.fullScreen": false,
     "settings.cycle": [
@@ -89,4 +89,7 @@
     "perforce.editOnFileSave": true,
     "perforce.enableP4ConfigScanOnStartup": false,
     "perforce.hideEmptyChangelists": true,
+    "extensions.experimental.affinity": {
+        "asvetliakov.vscode-neovim": 1
+    },
 }
