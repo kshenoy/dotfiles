@@ -8,7 +8,10 @@
     },
     "C_Cpp.clang_format_fallbackStyle": "LLVM",
     "C_Cpp.codeAnalysis.clangTidy.enabled": true,
+    "C_Cpp.hover": "disabled",
+    "cmake.configureOnOpen": false,
     "cppref.searchEngine": "DuckDuckGo",
+    "cSpell.enabled": true,
     "diffEditor.ignoreTrimWhitespace": false,
     "editor.cursorSurroundingLines": 3,
     "editor.find.addExtraSpaceOnTop": false,
@@ -33,14 +36,10 @@
         "asvetliakov.vscode-neovim": 1
     },
     "files.trimTrailingWhitespace": true,
-    "perforce.addOnFileCreate": true,
-    "perforce.deleteOnFileDelete": true,
-    "perforce.editOnFileSave": true,
-    "perforce.enableP4ConfigScanOnStartup": false,
-    "perforce.hideEmptyChangelists": true,
     "prettier.tabWidth": 4,
     "python.formatting.provider": "none",
     "security.workspace.trust.untrustedFiles": "open",
+    "settings._comment": "The ID should be unique for each setting",
     "settings.cycle": [
         {
             "id": "editor-guides-bracketPairs",
@@ -94,6 +93,7 @@
             ]
         }
     ],
+    "task.allowAutomaticTasks": "on",
     "telemetry.telemetryLevel": "off",
     "terminal.integrated.fontFamily": "Iosevka Term Slab",
     "terminal.integrated.lineHeight": 1.1,
