@@ -1,4 +1,15 @@
 {
+    "[jsonc]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[python]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "C_Cpp.clang_format_fallbackStyle": "LLVM",
+    "C_Cpp.codeAnalysis.clangTidy.enabled": true,
+    "cppref.searchEngine": "DuckDuckGo",
+    "diffEditor.ignoreTrimWhitespace": false,
     "editor.cursorSurroundingLines": 3,
     "editor.find.addExtraSpaceOnTop": false,
     "editor.fontFamily": "Iosevka Term",
@@ -6,87 +17,99 @@
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
     "editor.guides.bracketPairs": false,
-    "editor.guides.indentation": true,
+    "editor.guides.indentation": false,
     "editor.inlayHints.enabled": "off",
+    "editor.largeFileOptimizations": true,
     "editor.lineNumbers": "off",
     "editor.minimap.enabled": false,
-    "editor.scrollBeyondLastLine": false,
+    "editor.occurrencesHighlight": "singleFile",
     "editor.scrollbar.horizontal": "hidden",
     "editor.scrollbar.vertical": "hidden",
+    "editor.scrollBeyondLastLine": false,
     "editor.snippetSuggestions": "top",
     "editor.tabCompletion": "onlySnippets",
     "editor.wordWrapColumn": 120,
+    "extensions.experimental.affinity": {
+        "asvetliakov.vscode-neovim": 1
+    },
     "files.trimTrailingWhitespace": true,
+    "perforce.addOnFileCreate": true,
+    "perforce.deleteOnFileDelete": true,
+    "perforce.editOnFileSave": true,
+    "perforce.enableP4ConfigScanOnStartup": false,
+    "perforce.hideEmptyChangelists": true,
+    "prettier.tabWidth": 4,
+    "python.formatting.provider": "none",
     "security.workspace.trust.untrustedFiles": "open",
+    "settings.cycle": [
+        {
+            "id": "editor-guides-bracketPairs",
+            "overrideWorkspaceSettings": true,
+            "values": [
+                {
+                    "editor.guides.bracketPairs": "active"
+                },
+                {
+                    "editor.guides.bracketPairs": false
+                }
+            ]
+        },
+        {
+            "id": "editor-guides-indentation",
+            "overrideWorkspaceSettings": true,
+            "values": [
+                {
+                    "editor.guides.indentation": true
+                },
+                {
+                    "editor.guides.indentation": false
+                }
+            ]
+        },
+        {
+            "id": "editor-lineNumbers",
+            "overrideWorkspaceSettings": true,
+            "values": [
+                {
+                    "editor.lineNumbers": "relative"
+                },
+                {
+                    "editor.lineNumbers": "off"
+                },
+                {
+                    "editor.lineNumbers": "on"
+                }
+            ]
+        },
+        {
+            "id": "editor-occurencesHighlight",
+            "overrideWorkspaceSettings": true,
+            "values": [
+                {
+                    "editor.occurrencesHighlight": "singleFile"
+                },
+                {
+                    "editor.occurrencesHighlight": "off"
+                }
+            ]
+        }
+    ],
     "telemetry.telemetryLevel": "off",
     "terminal.integrated.fontFamily": "Iosevka Term Slab",
+    "terminal.integrated.lineHeight": 1.1,
     "vscode-neovim.logOutputToConsole": true,
     "vscode-neovim.mouseSelectionStartVisualMode": true,
+    "vsicons.dontShowNewVersionMessage": true,
     "window.commandCenter": true,
     "window.customMenuBarAltFocus": false,
     "window.enableMenuBarMnemonics": false,
     "window.titleBarStyle": "custom",
-    "workbench.activityBar.visible": false,
+    "workbench.activityBar.location": "hidden",
     "workbench.colorTheme": "Catppuccin Frappé",
     "workbench.editor.highlightModifiedTabs": true,
-    "workbench.editor.showTabs": false,
+    "workbench.editor.showTabs": "none",
     "workbench.iconTheme": "vscode-icons",
+    "workbench.startupEditor": "none",
     "workbench.statusBar.visible": false,
-    "zenMode.fullScreen": false,
-    "settings.cycle": [
-        {
-            "id": "lineNumbers", // must be unique
-            "overrideWorkspaceSettings": true,
-            "values": [
-                {
-                    "editor.lineNumbers": "off",
-                },
-                {
-                    "editor.lineNumbers": "on",
-                },
-                {
-                    "editor.lineNumbers": "relative",
-                },
-            ]
-        },
-        {
-            "id": "indentGuides", // must be unique
-            "overrideWorkspaceSettings": true,
-            "values": [
-                {
-                    "editor.guides.indentation": true,
-                },
-                {
-                    "editor.guides.indentation": false,
-                },
-            ]
-        },
-        {
-            "id": "bracketPairs", // must be unique
-            "overrideWorkspaceSettings": true,
-            "values": [
-                {
-                    "editor.guides.bracketPairs": "active",
-                },
-                {
-                    "editor.guides.bracketPairs": true,
-                },
-                {
-                    "editor.guides.bracketPairs": false,
-                },
-            ]
-        },
-    ],
-    "C_Cpp.clang_format_fallbackStyle": "LLVM",
-    "C_Cpp.codeAnalysis.clangTidy.enabled": true,
-    "cppref.searchEngine": "DuckDuckGo",
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter",
-        "editor.formatOnSave": true
-    },
-    "python.formatting.provider": "none",
-    "vsicons.dontShowNewVersionMessage": true,
-    "perforce.editOnFileSave": true,
-    "perforce.enableP4ConfigScanOnStartup": false,
-    "perforce.hideEmptyChangelists": true,
+    "zenMode.fullScreen": false
 }

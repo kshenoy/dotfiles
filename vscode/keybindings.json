@@ -1,27 +1,26 @@
 // Place your key bindings in this file to override the defaults
 [
-  {
-    "key": "ctrl+q",
-    "command": "-workbench.action.quit"
-  },
-  {
-    "key": "ctrl+alt+enter",
-    "command": "workbench.action.focusActiveEditorGroup",
-    "when": "!editorTextFocus"
-  },
-  {
-    "key": "ctrl+x ctrl+y",
-    "command": "editor.action.insertSnippet",
-    "when": "editorTextFocus && neovim.mode == 'insert'",
-  },
-  {
-    "key": "ctrl+n",
-    "command": "-workbench.action.files.newUntitledFile"
-  },
   // {
   //   "key": "ctrl+space",
   //   "command": "vscode-neovim.send",
   //   "when": "editorTextFocus && neovim.mode == 'normal'",
   //   "args": "<C-Space>"
   // },
+  {
+    "command": "-workbench.action.quit",
+    "key": "ctrl+q"
+  },
+  {
+    "command": "workbench.action.focusActiveEditorGroup",
+    "key": "ctrl+alt+enter",
+    "when": "!editorTextFocus"
+  },
+  {
+    "command": "editor.action.insertSnippet",
+    "key": "ctrl+x ctrl+y",
+    "when": "editorTextFocus && neovim.mode == 'insert'"{
+      "command": "-workbench.action.files.newUntitledFile",
+      "key": "ctrl+n"
+    }
+  }
 ]
