@@ -79,18 +79,20 @@ TERM xterm-debian
 
 
 # [[file:~/.config/dotfiles/bash/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:5]]
-BLK     40;33;01    # block device driver
-CHR     40;33;01    # character device driver
-DIR     00;34       # directory
-DOOR    01;35       # door
-EXEC    00;32       # files with execute permissions
-FIFO    40;33       # pipe
-FILE    00          # normal file
-LINK    00;36       # symbolic link. (If this is set to 'target' instead of a numerical value, the color is as for the file pointed to.)
-MISSING 05;37;41    # ... and the files they point to
-NORMAL  00          # global default, although everything should be something.
-ORPHAN  01;37;41    # orphaned syminks
-SOCK    01;35       # socket
+BLK                      40;33;01  # block device driver
+CHR                      40;33;01  # character device driver
+DIR                      00;34     # directory
+# STICKY_OTHER_WRITABLE  30;42     # dir that is sticky and other-writable (+t,o+w)
+OTHER_WRITABLE           04;34     # dir that is other-writable (o+w) and not sticky
+DOOR                     01;35     # door
+EXEC                     00;32     # files with execute permissions
+FIFO                     40;33     # pipe
+FILE                     00        # normal file
+LINK                     00;36     # symbolic link. (If this is set to 'target' instead of a numerical value, the color is as for the file pointed to.)
+MISSING                  05;37;41  # ... and the files they point to
+NORMAL                   00        # global default, although everything should be something.
+ORPHAN                   01;37;41  # orphaned syminks
+SOCK                     01;35     # socket
 # LS_COLORS/dircolors:5 ends here
 
 

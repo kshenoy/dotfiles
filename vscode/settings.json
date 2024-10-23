@@ -108,7 +108,7 @@
     "workbench.colorTheme": "Catppuccin Frappé",
     "workbench.editor.highlightModifiedTabs": true,
     "workbench.editor.showTabs": "none",
-    "workbench.iconTheme": "vscode-icons",
+    "workbench.iconTheme": "catppuccin-frappe",
     "workbench.startupEditor": "none",
     "workbench.statusBar.visible": false,
     "zenMode.fullScreen": false
