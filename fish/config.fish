@@ -5,6 +5,8 @@ end
 fish_add_path ~/.local/bin
 fish_add_path ~/.cargo/bin
 
+set -gx EDITOR nvim
+
 # fish_config theme save "Catppuccin Frappe"
 
 # Use starship prompt (https://starship.rs/)

@@ -184,3 +184,6 @@ cscope.po.out
 # [[file:~/.config/dotfiles/git/git.org::*ignore][ignore:7]]
 *.orig
 # ignore:7 ends here
+
+# For OS
+.DS_Store

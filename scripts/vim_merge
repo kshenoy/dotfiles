@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # SetupMergeLayout() requires the files to be in the following order:
 # 1 : base
@@ -6,4 +6,4 @@
 # 3 : local/yours
 # 4 : merged
 
-gvim -f -c "call perforce#MergeInit()" -c "set nobackup" "$@"
+${VISUAL:-${EDITOR:-vim}} -f -c "call perforce#MergeInit()" -c "set nobackup" "$@"
