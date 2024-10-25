@@ -6,4 +6,4 @@
 # 3 : local/yours
 # 4 : merged
 
-vim -f -c "call perforce#MergeInit()" -c "set nobackup" "$@"
+gvim -f -c "call perforce#MergeInit()" -c "set nobackup" "$@"

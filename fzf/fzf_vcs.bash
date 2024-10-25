@@ -154,10 +154,8 @@ fzf::vcs::commits() {                                                           
       --preview 'grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git show --color=always' |
       command grep -o "[a-f0-9]\{7,\}" | head -n 1)
   elif vcs::is_in_perforce_repo; then
-    if [[ ! "$*" =~ -m\ \[0-9]+ ]]; then
-      local _limit="-m 1000"
-    fi
-    local _selected=$(p4 changes $_limit "$@" $STEM/... | cut -d ' ' -f2- | sed -r 's/@.*//' |
+    local _cmd=${FZF_P4_COMMITS_COMMAND-"p4 changes -m 1000 \$STEM/..."}
+    local _selected=$(eval "${_cmd}" | cut -d ' ' -f2- | sed -r 's/@.*//' |
       fzf --ansi --multi --no-sort --preview 'p4 describe -s {1}' --preview-window right:70% |
       cut -d' ' -f1)
   fi

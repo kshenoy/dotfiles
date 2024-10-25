@@ -185,3 +185,5 @@ sync = !git pull --rebase --prune && git submodule update --init --recursive
 # [[file:~/.config/dotfiles/git/git.org::*aliases][aliases:8]]
 wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
 # aliases:8 ends here
+[safe]
+	directory = /proj/cores_dft_publish/cores_common_verif/repos/design/ch_shared_ip_2023/ch_shared_ip/.git

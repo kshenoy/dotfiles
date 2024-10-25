@@ -138,6 +138,11 @@ end, {remap=true})
 mapg('h',      'references-view.showCallHierarchy')
 
 mapg('o',      'workbench.action.gotoSymbol')
+map.set('n',   '<Plug>(leader-goto-map)<M-o>', function()
+  require('vscode-neovim').action(
+    'workbench.action.gotoSymbol',
+    { args = { query = vim.fn.expand('<cword>') } })
+end, {remap=true})
 mapg('O',      'workbench.action.showAllSymbols')
 
 mapg('r',      'editor.action.goToReferences')
@@ -168,17 +173,39 @@ local mapk = function(key, cmd)
   map.set('n', '<Plug>(leader-kustom-map)' .. key, '<Cmd>call VSCodeNotify("' .. cmd .. '")<CR>', {remap=true})
 end
 
-mapk('a', 'workbench.action.toggleActivityBarVisibility')
-mapk('b', 'workbench.files.action.focusOpenEditorsView')
-mapk('f', 'workbench.explorer.fileView.focus')
-mapk('o', 'outline.focus')
-mapk('t', 'workbench.action.selectTheme')
-mapk('x', 'workbench.view.extensions')
-mapk(',', 'workbench.action.openSettings')
+mapk('a',  'workbench.action.toggleActivityBarVisibility')
+mapk('b',  'workbench.action.toggleSidebarVisibility')
+mapk('B',  'workbench.action.toggleAuxiliaryBar')
+mapk('e',  'workbench.action.toggleCenteredLayout')                                      --  Ctrl+E to center in MS Word
+mapk('f',  'workbench.explorer.fileView.focus')
+mapk('o',  'outline.focus')
+mapk('p',  'workbench.action.togglePanel')
+mapk('P',  'workbench.action.toggleMaximizedPanel')
+mapk('s',  'workbench.action.toggleStatusbarVisibility')
+mapk('t',  'workbench.action.selectTheme')
+mapk('xb', 'workbench.files.action.focusOpenEditorsView')                               -- These are all in the Explorer
+mapk('xe', 'workbench.files.action.focusOpenEditorsView')
+mapk('xx', 'workbench.view.extensions')
+mapk('z',  'workbench.action.toggleZenMode')
+mapk(',',  'workbench.action.openSettings')
+mapk('_',  'workbench.action.toggleMenuBar')                                    --  Menus have underscores for selection
+mapk('>',  'breadcrumbs.toggle')                                                  --  breadcrumbs use '>' for separators
 
 -- Menu-like behavior use M- maps
 mapk('<C-v>', 'workbench.action.quickOpenView')
 mapk('<C-l>', 'workbench.action.customizeLayout')
+
+
+--[[ LSP ]]-------------------------------------------------------------------------------------------------------------
+map.set('n', '<Leader>l', '<Plug>(leader-lsp-map)', {remap=true, silent=true})
+local mapl = function(key, cmd)
+  map.set('n', '<Plug>(leader-lsp-map)' .. key, '<Cmd>call VSCodeNotify("' .. cmd .. '")<CR>', {remap=true})
+end
+
+
+mapl('p',  'workbench.actions.view.problems')
+mapl('[p', 'editor.action.marker.prev')
+mapl(']p', 'editor.action.marker.next')
 
 
 --[[ PROJECTS/FOLDERS/WORKSPACES ]]-------------------------------------------------------------------------------------
@@ -203,20 +230,11 @@ local mapt = function(key, cmd)
   map.set('n', '<Plug>(leader-toggle-map)' .. key, '<Cmd>call VSCodeNotify("' .. cmd .. '")<CR>', {remap=true})
 end
 
-mapt('b',     'workbench.action.toggleSidebarVisibility')
-mapt('B',     'workbench.action.toggleAuxiliaryBar')
-mapt('e',     'workbench.action.toggleCenteredLayout')                                   --  Ctrl+E to center in MS Word
-mapt('gi',    'settings.cycle.indentGuides')
-mapt('gb',    'settings.cycle.bracketPairs')
+mapt('i',     'settings.cycle.indentGuides')
+mapt('b',     'settings.cycle.bracketPairs')
 mapt('n',     'settings.cycle.lineNumbers')
-mapt('p',     'workbench.action.togglePanel')
-mapt('P',     'workbench.action.toggleMaximizedPanel')
-mapt('s',     'workbench.action.toggleStatusbarVisibility')
 mapt('t',     'workbench.action.toggleLightDarkThemes')
 mapt('w',     'editor.action.toggleWordWrap')
-mapt('z',     'workbench.action.toggleZenMode')
-mapt('_',     'workbench.action.toggleMenuBar')                                 --  Menus have underscores for selection
-mapt('>',     'breadcrumbs.toggle')                                               --  breadcrumbs use '>' for separators
 mapt('<Tab>', 'workbench.action.toggleTabsVisibility')
 
 

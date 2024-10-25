@@ -485,7 +485,7 @@ unset -f =
         _input="($_input).to_s($_base)"
     fi
 
-    local _result=$(echo "$_input" | irb -m --noverbose | command sed 's/"//g')
+    local _result=$(echo "$_input" | irb --noverbose | command sed 's/"//g')
 
     # Pretty-print formatted output
     if [[ $_input =~ 'to_s(16)' ]]; then

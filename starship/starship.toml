@@ -68,6 +68,6 @@ detect_files = ['P4CONFIG']
 style = 'bold purple'
 symbol = 'ℙ'
 format = "on [$symbol $output]($style) "
-command = "cut -d@ -f1 configuration_id"
+# command = "cut -d@ -f1 configuration_id"
 # This will run it in a new shell and since we can't bootenv in that shell, it doesn't work as desired
 # when = 'vcs::is_in_perforce_repo'

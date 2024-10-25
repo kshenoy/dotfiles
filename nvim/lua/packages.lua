@@ -28,6 +28,8 @@ packer.use 'wbthomason/packer.nvim' -- Let the package manager bootstrap itself
 require('packages.Comment')  -- "gc" to comment visual regions/lines
 require('packages.nvim-surround')
 require('packages.leap')
+require('packages.mini')
+require('packages.vim_p4_files')
 require('packages.catppuccin')  -- colorscheme
 require('packages.vim-repeat')
 require('packages.vim-unimpaired')  -- complementary pairs of mappings
