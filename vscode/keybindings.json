@@ -1,24 +1,25 @@
 [
-  {
-    "command": "-workbench.action.quit",
-    "key": "ctrl+q"
-  },
-  {
-    "command": "workbench.action.focusActiveEditorGroup",
-    "key": "ctrl+alt+enter",
-    "when": "!editorTextFocus && !isMac"
-  },
-  {
-    "key": "ctrl+command+enter",
-    "command": "workbench.action.focusActiveEditorGroup",
-    "when": "!editorTextFocus && isMac"
-  },
-  {
-    "command": "editor.action.insertSnippet",
-    "key": "ctrl+x ctrl+y",
-    "when": "editorTextFocus && neovim.mode == 'insert'"{
-      "command": "-workbench.action.files.newUntitledFile",
-      "key": "ctrl+n"
+    {
+        "command": "-workbench.action.quit",
+        "key": "ctrl+q"
+    },
+    {
+        "command": "workbench.action.focusActiveEditorGroup",
+        "key": "ctrl+alt+enter",
+        "when": "!editorTextFocus && !isMac"
+    },
+    {
+        "command": "workbench.action.focusActiveEditorGroup",
+        "key": "ctrl+command+enter",
+        "when": "!editorTextFocus && isMac"
+    },
+    {
+        "command": "editor.action.insertSnippet",
+        "key": "ctrl+x ctrl+y",
+        "when": "editorTextFocus && neovim.mode == 'insert'"
+    },
+    {
+        "command": "-workbench.action.files.newUntitledFile",
+        "key": "ctrl+n"
     }
-  }
 ]
