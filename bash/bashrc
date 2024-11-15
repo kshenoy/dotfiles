@@ -1124,7 +1124,11 @@ alias df='df -h'
 alias pppath='tr ":" "\n" <<< $PATH'
 alias clnpath='export PATH=$(tr ":" "\n" <<< $PATH | perl -ne "print unless \$seen{\$_}++" | paste -s -d":")'
 
-alias C=cat
+if command -v bat >/dev/null 2>&1; then
+  alias C=bat
+else
+  alias C=cat
+fi
 alias P=$PAGER
 alias hh='history | tail'
 alias x=exit
@@ -1455,7 +1459,7 @@ _compl_alias() {
 # [[file:~/.config/dotfiles/bash/bashrc.org::*alias completion][alias completion:2]]
 _compl_alias e    emacs
 _compl_alias g    grep
-_compl_alias v    vim
+_compl_alias v    nvim
 _compl_alias vd   diff
 _compl_alias vile less
 for _alias in C P gi gv l la ll lla doomacs; do

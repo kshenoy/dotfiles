@@ -10,7 +10,7 @@
     "diffEditor.ignoreTrimWhitespace": false,
     "editor.cursorSurroundingLines": 3,
     "editor.find.addExtraSpaceOnTop": false,
-    "editor.fontFamily": "Iosevka Term",
+    "editor.fontFamily": "'IosevkaTerm Nerd Font Mono', 'Droid Sans Mono', 'monospace', monospace",
     "editor.fontLigatures": true,
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
@@ -104,5 +104,6 @@
     "workbench.editor.showTabs": "single",
     "workbench.startupEditor": "none",
     "workbench.statusBar.visible": false,
-    "zenMode.fullScreen": false
+    "zenMode.fullScreen": false,
+    "workbench.iconTheme": "vscode-icons"
 }

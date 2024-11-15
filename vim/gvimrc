@@ -41,15 +41,12 @@ set mouse=a                                                                     
   if g:env ==? 'linux'
     " Note that this doesn't include Cygwin or Mingw
     set guifont=
-    " set guifont+=Fira\ Code\ Medium\ 9
-    set guifont+=Iosevka\ 10
-    " set guifont+=Hack\ 9
+    set guifont+=IosevkaTerm\ Nerd\ Font\ Mono\ 10
     set guifont+=Monospace\ 10
     set linespace=2
   elseif g:env ==? 'windows'
     set guifont=
     set guifont+=Iosevka:h9:cANSI:qDRAFT
-    set guifont+=Hack:h9:cANSI:qDRAFT
     set guifont+=Consolas:h9:cANSI
     set linespace=2
   endif

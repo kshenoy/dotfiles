@@ -1,7 +1,7 @@
 # Config file for bat ()
 
 # Set the theme to base16. This will use the colors from the base16 theme in-use
---theme="Catppuccin-frappe"
+--theme="Catppuccin Frappe"
 
 # Show line numbers, git modifications and file header (but no grid)
 # --style="numbers,changes,header"
