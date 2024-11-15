@@ -95,15 +95,17 @@
     "vsicons.dontShowNewVersionMessage": true,
     "window.commandCenter": true,
     "window.customMenuBarAltFocus": false,
+    "window.customTitleBarVisibility": "auto",
     "window.enableMenuBarMnemonics": false,
     "window.menuBarVisibility": "toggle",
     "window.titleBarStyle": "custom",
-    "workbench.activityBar.location": "hidden",
+    "workbench.activityBar.location": "bottom",
     "workbench.colorTheme": "Catppuccin Frappé",
+    "workbench.editor.editorActionsLocation": "titleBar",
     "workbench.editor.highlightModifiedTabs": true,
     "workbench.editor.showTabs": "single",
+    "workbench.iconTheme": "vscode-icons",
     "workbench.startupEditor": "none",
     "workbench.statusBar.visible": false,
-    "zenMode.fullScreen": false,
-    "workbench.iconTheme": "vscode-icons"
+    "zenMode.fullScreen": false
 }
