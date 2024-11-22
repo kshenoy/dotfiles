@@ -1125,7 +1125,7 @@ alias pppath='tr ":" "\n" <<< $PATH'
 alias clnpath='export PATH=$(tr ":" "\n" <<< $PATH | perl -ne "print unless \$seen{\$_}++" | paste -s -d":")'
 
 if command -v bat >/dev/null 2>&1; then
-  alias C=bat
+  alias C="bat --paging=never"
 else
   alias C=cat
 fi
@@ -1462,7 +1462,9 @@ _compl_alias g    grep
 _compl_alias v    nvim
 _compl_alias vd   diff
 _compl_alias vile less
-for _alias in C P gi gv l la ll lla doomacs; do
+_compl_alias C    cat
+_compl_alias bat  cat
+for _alias in P gi gv l la ll lla doomacs; do
     _compl_alias "$_alias"
 done
 # alias completion:2 ends here
