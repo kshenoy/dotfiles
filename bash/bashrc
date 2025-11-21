@@ -1,390 +1,102 @@
-# bashrc
-# :PROPERTIES:
-# :header-args+: :tangle bashrc
-# :END:
-
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*bashrc][bashrc:1]]
-# This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
-# Use =org-babel-tangle-jump-to-org= to jump back to it from any code block.
-# If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
-# bashrc:1 ends here
-
-
+# NOTE: exporting a variable makes it available for child processes via the environment
 
 # Proceed only if its an interactive shell
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*bashrc][bashrc:3]]
 [[ $- == *i* ]] || return
-# bashrc:3 ends here
 
-# local init
-# Any local settings that need to be set initially go here
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*local init][local init:1]]
+# local init. Any local settings that need to be set initially go here
 [[ -f ~/.bashrc_local_init ]] && . ~/.bashrc_local_init
-# local init:1 ends here
 
 # interactive, login shell settings
 # Turn off TTY "start" and "stop" commands in all interactive shells.
 # They default to ~C-q~ and ~C-s~. I want to use ~C-s~ to do forward history search.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*interactive, login shell settings][interactive, login shell settings:1]]
 stty start ''
 stty stop  ''
 stty -ixon # disable XON/XOFF flow control
 stty ixoff # enable sending (to app) of start/stop characters
 stty ixany # let any character restart output, not only start character
-# interactive, login shell settings:1 ends here
 
-# configuration
 # default permissions
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:1]]
 umask 002
-# configuration:1 ends here
-
-
 
 # [[https://unix.stackexchange.com/questions/32409/set-and-shopt-why-two][shopt v/s set]]
-
 # Using [[https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html][shopt]]:
 # ~-s~ : set
 # ~-u~ : unset
 # ~-q~ : query whether set/unset
-
 # [[http://wiki.bash-hackers.org/internals/shell_options][List of shell options]]
 
-# If set, a command name that is the name of a directory is executed as if it were the argument to the cd command.
+# Directory and completion options
+shopt -s cdable_vars  # Allow cd to variable names containing directory paths
+shopt -s cdspell      # Auto-correct minor typos in directory names
+shopt -s checkhash    # Check if hashed commands still exist before executing
+shopt -s checkjobs    # List stopped/running jobs before exiting shell
+shopt -s checkwinsize # Update LINES and COLUMNS after each command
+shopt -s direxpand    # Expand directory names (prevents escaping $ in $dir_variable)
+shopt -s dirspell     # Auto-correct directory names during completion
+shopt -s dotglob      # Include hidden files in filename expansion
+
+# Optional shopt options (currently disabled)
+# shopt -s expand_aliases        # Expand aliases
+# shopt -s extglob               # Extended pattern matching
+# shopt -s failglob              # Error on failed glob expansion
+# shopt -s globstar              # ** matches files and directories (too slow, using @ function instead)
+# shopt -s gnu_errfmt            # GNU error message format
+# shopt -s no_empty_cmd_completion  # Don't search PATH for completions on empty line
+# shopt -s nocaseglob            # Case-insensitive filename expansion
+# shopt -s nocasematch           # Case-insensitive pattern matching
+# shopt -s nullglob              # Non-matching patterns expand to null
+
+shopt -s huponexit     # Send SIGHUP to jobs when interactive login shell exits
+shopt -s lastpipe      # Run last command of pipeline in current shell
+shopt -s lithist       # Save multi-line commands with embedded newlines
+shopt -s mailwarn      # Warn if mail file has been accessed
+shopt -s shift_verbose # Print error when shift count exceeds parameters
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:2]]
-shopt -u autocd
-# configuration:2 ends here
-
-
-
-# If this is set, an argument to the cd builtin command that is not a directory is assumed to be the name of a variable whose value is the directory to change to.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:3]]
-shopt -s cdable_vars
-# configuration:3 ends here
-
-
-
-# If set, minor errors in the spelling of a directory component in a cd command will be corrected.
-# The errors checked for are transposed characters, a missing character, and a character too many.
-# If a correction is found, the corrected path is printed, and the command proceeds.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:4]]
-shopt -s cdspell
-# configuration:4 ends here
-
-
-
-# If this is set, Bash checks that a command found in the hash table exists before trying to execute it.
-# If a hashed command no longer exists, a normal path search is performed.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:5]]
-shopt -s checkhash
-# configuration:5 ends here
-
-
-
-# If set, Bash lists the status of any stopped and running jobs before exiting an interactive shell.
-# If any jobs are running, this causes the exit to be deferred until a second exit is attempted without an intervening command (see Job Control).
-# The shell always postpones exiting if any jobs are stopped.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:6]]
-shopt -s checkjobs
-# configuration:6 ends here
-
-
-
-# If set, Bash checks the window size after each command and, if necessary, updates the values of LINES and COLUMNS.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:7]]
-shopt -s checkwinsize
-# configuration:7 ends here
-
-
-
-# If set, Bash attempts to save all lines of a multiple-line command in the same history entry.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:8]]
-shopt -s cmdhist
-# configuration:8 ends here
-
-
-
-# If set, Bash quotes all shell metacharacters in filenames and directory names when performing completion.
-# If not set, Bash removes metacharacters such as the dollar sign from the set of characters that will be quoted in completed filenames when these metacharacters appear in shell variable references in words to be completed.
-# This means that dollar signs in variable names that expand to directories will not be quoted; however, any dollar signs appearing in filenames will not be quoted, either.
-# This is active only when bash is using backslashes to quote completed filenames.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:9]]
-shopt -s complete_fullquote
-# configuration:9 ends here
-
-
-
-# If set, Bash replaces directory names with the results of word expansion when performing filename completion.
-# This changes the contents of the readline editing buffer. If not set, Bash attempts to preserve what the user typed.
-# I use it mainly to prevent bash from escaping $ in $dir_variable
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:10]]
-shopt -s direxpand
-# configuration:10 ends here
-
-
-
-# If set, Bash attempts spelling correction on directory names during word completion if the directory name initially supplied does not exist.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:11]]
-shopt -s dirspell
-# configuration:11 ends here
-
-
-
-# If set, Bash includes filenames beginning with a ‘.’ in the results of filename expansion.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:12]]
-shopt -s dotglob
-# configuration:12 ends here
-
-
-
-# If set, aliases are expanded as described below under Aliases, Aliases.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:13]]
-# shopt -s expand_aliases
-# configuration:13 ends here
-
-
-
-# If set, the extended pattern matching features (see [[https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html#Pattern-Matching][Pattern Matching]]) are enabled.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:14]]
-# shopt -s extglob
-# configuration:14 ends here
-
-
-
-# If set, patterns which fail to match filenames during filename expansion result in an expansion error.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:15]]
-# shopt -s failglob
-# configuration:15 ends here
-
-
-
-# If set, the pattern ‘**’ used in a filename expansion context will match all files and zero or more directories and subdirectories.
-# If the pattern is followed by a ‘/’, only directories and subdirectories match.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:16]]
-# shopt -s globstar
-# configuration:16 ends here
-
-
-# Not using this as it's too slow! - Use [[id:2870e3ab-aa92-4006-9899-372135ae00c4][home-brewed @]] instead
-
-# If set, shell error messages are written in the standard GNU error message format.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:17]]
-# shopt -s gnu_errfmt
-# configuration:17 ends here
-
-
-
-# If set, the history list is appended to the file named by the value of the HISTFILE variable when the shell exits, rather than overwriting the file.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:18]]
-shopt -s histappend
-# configuration:18 ends here
-
-
-
-# If set, and Readline is being used, a user is given the opportunity to re-edit a failed history substitution.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:19]]
-shopt -s histreedit
-# configuration:19 ends here
-
-
-
-# If set, and Readline is being used, the results of history substitution are not immediately passed to the shell parser.
-# Instead, the resulting line is loaded into the Readline editing buffer, allowing further modification.
-# eg. commands using (!, !!, etc.) will print to shell first for confirmation and not auto-execute
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:20]]
-shopt -s histverify
-# configuration:20 ends here
-
-
-
-# If set, Bash will send SIGHUP to all jobs when an interactive login shell exits (see [[https://www.gnu.org/software/bash/manual/html_node/Signals.html][Signals]]).
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:21]]
-shopt -s huponexit
-# configuration:21 ends here
-
-
-
-# If set, and job control is not active, the shell runs the last command of a pipeline not executed in the background
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:22]]
-shopt -s lastpipe
-# configuration:22 ends here
-
-
-
-# If enabled, and the cmdhist option is enabled, multi-line commands are saved to the history with embedded newlines rather than using semicolon separators where possible.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:23]]
-shopt -s lithist
-# configuration:23 ends here
-
-
-
-# If set, and a file that Bash is checking for mail has been accessed since the last time it was checked, the message "The mail in mailfile has been read" is displayed.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:24]]
-shopt -s mailwarn
-# configuration:24 ends here
-
-
-
-# If set, and Readline is being used, Bash will not attempt to search the PATH for possible completions when completion is attempted on an empty line.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:25]]
-# shopt -s no_empty_cmd_completion
-# configuration:25 ends here
-
-
-
-# If set, Bash matches filenames in a case-insensitive fashion when performing filename expansion.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:26]]
-# shopt -s nocaseglob
-# configuration:26 ends here
-
-
-
-# If set, Bash matches patterns in a case-insensitive fashion when performing matching while executing case or =[[= conditional commands,
-# when performing pattern substitution word expansions, or when filtering possible completions as part of programmable completion.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:27]]
-# shopt -s nocasematch
-# configuration:27 ends here
-
-
-
-# If set, Bash allows filename patterns which match no files to expand to a null string, rather than themselves.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:28]]
-# shopt -s nullglob
-# configuration:28 ends here
-
-
-
-# If this is set, the shift builtin prints an error message when the shift count exceeds the number of parameters.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:29]]
-shopt -s shift_verbose
-# configuration:29 ends here
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*configuration][configuration:30]]
 set -o noclobber
 #set -o vi
 set bell-style none
 # Otherwise some completions will fail
 set +o nounset
-# configuration:30 ends here
 
-# history
-# NOTE: exporting a variable makes it available for child processes via the environment
+# History
+shopt -s histappend    # Append to history file instead of overwriting
+shopt -s histreedit    # Allow re-editing failed history substitutions
+shopt -s histverify    # Load history substitutions into readline buffer for confirmation
 
 # Increase size of history in the terminal. Default is a measly 512 lines
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*history][history:1]]
 export HISTSIZE=65535
 export HISTFILESIZE=65535
-# history:1 ends here
-
-
 
 # Add timestamps to history
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*history][history:2]]
 export HISTTIMEFORMAT="%F %T  "
-# history:2 ends here
-
-
 
 # Ignore duplicates and trivial one/two char commands as I've a bad habit of doing =cl= all the time.
-# Furthermore, I can add all the commands I want to ignore to it as well.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*history][history:3]]
 export HISTIGNORE='?:??:history*:sosc:que*:ll*'
-# history:3 ends here
 
-
-
-# =ignoredups= allows me to ignore the same command type multiple times consecutively
-# =ignorespace= does not add commands that start with a space to the history just in case I don't want to log something
-# =ignoreboth= does both
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*history][history:4]]
+# `ignoredups` allows me to ignore the same command type multiple times consecutively
+# `ignorespace` does not add commands that start with a space to the history just in case I don't want to log something
+# `ignoreboth` does both
 export HISTCONTROL=ignoreboth
-# history:4 ends here
 
-# misc
-
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*misc][misc:1]]
+# Misc
 export EDITOR=nvim
 export VISUAL=gvim
-# misc:1 ends here
-
-
 
 # Make less more friendly for non-text input files, see lesspipe(1)
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*misc][misc:2]]
 export MANPAGER=less
 export PAGER=less
 [[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
-# misc:2 ends here
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*misc][misc:3]]
 export HOSTNAME="$(hostname)"
 export LANG=en_US.UTF-8
-# misc:3 ends here
 
 # ls colors
-# See [[id:2823d31a-572c-44ec-80e1-84acbbb6412e][dircolors]]
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*ls colors][ls colors:1]]
 if [[ -x /usr/bin/dircolors ]]; then
     _dircolors=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/dircolors.rc
     [[ -r $_dircolors ]] && eval "$(/usr/bin/dircolors -b $_dircolors)" || eval "$(/usr/bin/dircolors -b)"
 fi
-# ls colors:1 ends here
-
-# base16 themes
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*base16 themes][base16 themes:1]]
-# export BASE16_SHELL=${XDG_CONFIG_HOME:-$HOME/.config}/base16-shell
-# [[ -n "$PS1" ]] && [[ -s $BASE16_SHELL/profile_helper.sh ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
-# if [[ -f ~/.base16_theme ]]; then
-#   . ~/.base16_theme
-# else
-#   base16_solarized-light &> /dev/null
-# fi
-# base16 themes:1 ends here
 
 # colored man pages with less
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*colored man pages with less][colored man pages with less:1]]
 man() {
     env \
         LESS_TERMCAP_mb=$(printf "\e[1;31m") \
@@ -396,47 +108,13 @@ man() {
         LESS_TERMCAP_us=$(printf "\e[1;32m") \
         man "$@"
 }
-# colored man pages with less:1 ends here
-
-# @: a simpler and faster alternative to globstar
-# :LOGBOOK:
-# - Refiled on [2021-03-08 Mon 06:33]
-# :END:
-# =@ ls /some/long/path/**/that/I/dont/want/to/type= is converted to =ls $(find /some/long/path/ -path '*/that/I/dont/want/to/type')=
-
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*@: a simpler and faster alternative to globstar][@: a simpler and faster alternative to globstar:1]]
-unset -f @
-function @ {
-    # Description:
-    # @ ls /some/long/path/**/that/I/dont/want/to/type is converted to
-    #   ls $(find /some/long/path/ -path '*/that/I/dont/want/to/type')
-
-    local _cmd=()
-    for i in "$@"; do
-        if [[ $i =~ '**' ]]; then
-            _cmd+=('$(find'    $(command awk 'BEGIN {FS="**"} {print $1}' <<< "$i"))
-            _cmd+=('-path' "'*"$(command awk 'BEGIN {FS="**"} {print $2}' <<< "$i")"')")
-        else
-            _cmd+=("$i")
-        fi
-    done
-    # echo "${_cmd[@]}"
-    # echo
-    eval "${_cmd[@]}"
-}
-# @: a simpler and faster alternative to globstar:1 ends here
 
 # alert
-# :LOGBOOK:
-# - Refiled on [2021-03-08 Mon 06:33]
-# :END:
 # Simply function to "alert" when a command completes.
 # NOTE: This must be used as a function to have access to the history via the fc command
 
-# Use like this: =sleep 10 && alert=
+# Use like this: `sleep 10 && alert`
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*alert][alert:1]]
 unset -f alert
 alert() {
     # Pick up display message if provided as argument. If not show the last command that was run
@@ -454,17 +132,11 @@ alert() {
 
     notify-send --urgency=low -i $_icon "$_msg"
 }
-# alert:1 ends here
 
-# calc
-# :LOGBOOK:
-# - Refiled on [2021-03-08 Mon 06:33]
-# :END:
-# Simple wrapper around =irb= to make it more natural to use. eg. ~= 4 + 5~
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*calc][calc:1]]
+#=======================================================================================================================
+# calc: Simple wrapper around `irb` to make it more natural to use. eg. `= 4 + 5`
 unset -f =
-=() {                                                                                                             # {{{1
+=() {
     local _input="${@:-$(</dev/stdin)}"
     # echo $_input
 
@@ -496,16 +168,11 @@ unset -f =
 
     echo $_result
 }
-# calc:1 ends here
-
-
 
 # Simple base-converter
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*calc][calc:2]]
 unset -f =base
-=base() (                                                                                                         # {{{1
-    _help () { #{{{
+=base() (
+    _help () {
         echo 'SYNTAX:'
         echo '  =base NUM TO [FROM=10]'
         echo '  echo NUM | =base TO [FROM=10]'
@@ -545,9 +212,7 @@ unset -f =base
 =bin() { =base $1  2 ${2:-10}; }  # Convert to binary, by default from decimal
 =dec() { =base $1 10 ${2:-16}; }  # Convert to decimal, by default from hexadecimal
 =hex() { =base $1 16 ${2:-10}; }  # Convert to hexadecimal, by default from decimal
-# calc:2 ends here
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*calc][calc:3]]
 unset -f =slice
 =slice() (
     _help() {
@@ -585,14 +250,8 @@ unset -f =slice
     # echo "in=$_num, msb=$_msb, lsb=$_lsb"
     = "($_num >> $_lsb) & ((1 << ($_msb - $_lsb + 1)) - 1)"
 )
-# calc:3 ends here
 
 # dir related
-# :LOGBOOK:
-# - Refiled on [2021-03-08 Mon 06:33]
-# :END:
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*dir related][dir related:1]]
 alias md='mkdir -p'
 
 # Create new dir(s) and enter it (last directory if multiple arguments are given)
@@ -601,13 +260,10 @@ mcd() {
     command mkdir -p "$@" || return
     cd -- "${@: -1}"
 }
-# dir related:1 ends here
 
-
-
-# NOTE: The use of $* is deliberate here as it produces all the scripts arguments separated by the first character of $IFS which, by default, is a space. This allows me to match all arguments against a regex in one go instead of looping over them
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*dir related][dir related:2]]
+# NOTE: The use of $* is deliberate here as it produces all the scripts arguments separated by the first character of
+# $IFS which, by default, is a space. This allows me to match all arguments against a regex in one go instead of looping
+# over them
 dirs() {
     if (( $# == 0 )); then
         builtin dirs -v
@@ -619,13 +275,10 @@ dirs() {
         builtin dirs "$@"
     fi
 }
-# dir related:2 ends here
 
-
-
+#=======================================================================================================================
 # Silent pushd and uniquifies while pushing
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*dir related][dir related:3]]
+# Note that `pushd` calls `cd` under the hood. So `cdable_vars` and `cdspell` apply to `pushd` as well
 pushd() {
     builtin pushd "$@" > /dev/null;
 
@@ -633,19 +286,12 @@ pushd() {
     local _dir_pos=$(dirs -l -v | tail -n+2 | grep "$PWD$" | sed 's/^\s*//' | cut -d ' ' -f1 | paste -s)
     command popd -n +$_dir_pos &> /dev/null
 }
-# dir related:3 ends here
 
-
-
-# Better dirstack. Adds the following to the usual =cd= behavior:
-# - =cd ==           Lists the contents of the stack and use fzf to select from it
-# - =cd=             (with no args) Goes to $REPO_PATH if it's set. If not, or if already on $REPO_PATH, goes to $HOME
-# - =cd ... [TARG]=  Jump to a directory in the path that starts with TARG.
+# Better dirstack. Adds the following to the usual `cd` behavior:
+# - `cd =`           Lists the contents of the stack and use fzf to select from it
+# - `cd`             (with no args) Goes to $REPO_PATH if it's set. If not, or if already on $REPO_PATH, goes to $HOME
+# - `cd ... [TARG]`  Jump to a directory in the path that starts with TARG.
 #                  If TARG is not given, show all directories in the filepath and use fzf to select
-
-# Note that =pushd= calls =cd= under the hood. So =cdable_vars= and =cdspell= apply to =pushd= as well
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*dir related][dir related:4]]
 cd() {
     if (( "$#" == 0 )); then
         if vcs::is_in_repo > /dev/null; then
@@ -715,21 +361,13 @@ cd() {
 }
 
 alias ..='cd ..'
-# dir related:4 ends here
 
+#=======================================================================================================================
 # [[https://github.com/junegunn/fzf][fzf]]
-# :LOGBOOK:
-# - Refiled on [2021-03-08 Mon 06:33]
-# :END:
-
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*[[https://github.com/junegunn/fzf\][fzf]\]][[[https://github.com/junegunn/fzf][fzf]]:1]]
 if [[ -d /opt/fzf ]]; then
     export FZF_PATH=/opt/fzf
 fi
 source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf.bash
-# [[https://github.com/junegunn/fzf][fzf]]:1 ends here
-
 
 #=======================================================================================================================
 # zoxide (https://github.com/ajeetdsouza/zoxide)
@@ -738,20 +376,15 @@ if hash zoxide 2> /dev/null; then
 fi
 
 
-
 # query
-# :LOGBOOK:
-# - Refiled on [2020-12-15 Tue 06:18]
-# :END:
 # =which= on steroids. Shows aliases and function definitions recursively.
 # Since this function deals with aliases, it cannot be made into a stand-alone script since aliases are not accessible inside subshells.
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*query][query:1]]
 query() (
 # Yep, parentheses is correct. It makes this a subshell function allowing the definition to be inaccessible from outside
 # Thus, no more polluting of shell space with helper functions
 
-__help() {                                                                                                  # {{{1
+__help() {                                                                                                    # {{{1
   echo "Usage:"
   echo "    query [OPTION]... INPUT..."
   echo
@@ -766,8 +399,7 @@ __help() {                                                                      
   echo "        --nodefine         Don't print the function definition"
 }
 
-
-__parse_args() {                                                                                            # {{{1
+__parse_args() {                                                                                              # {{{1
   #echo "DEBUG: Parse:'$@'"
 
   # Default values of options
@@ -869,8 +501,7 @@ __parse_args() {                                                                
   fi
 }
 
-
-__query_alias() {                                                                                                 # {{{1
+__query_alias() {                                                                                                   # {{{1
   echo "${_query_pp[sep]}${_query_pp[input]} (${_query_pp[type]})"
   while read; do
     echo "${_query_pp[spc]}${REPLY}";
@@ -900,16 +531,14 @@ __query_alias() {                                                               
   fi
 }
 
-
-__query_file() {                                                                                                  # {{{1
+__query_file() {                                                                                                    # {{{1
   echo "${_query_pp[sep]}${_query_pp[input]} (${_query_pp[type]})"
   while read; do
     echo "${_query_pp[spc]}${REPLY}";
   done < <(command type -a -- "${_opts[input]}" | command head -n1)
 }
 
-
-__query_function() {                                                                                              # {{{1
+__query_function() {                                                                                                # {{{1
   echo "${_query_pp[sep]}${_query_pp[input]} (${_query_pp[type]})"
   shopt -s extdebug
   IFS=" " read -a _arr <<< $(command declare -F -- "${_opts[input]}")
@@ -924,8 +553,7 @@ __query_function() {                                                            
   fi
 }
 
-
-__query_pp() {                                                                                                    # {{{1
+__query_pp() {                                                                                                      # {{{1
 
   _query_pp[spc]=""
   _query_pp[sep]=""
@@ -1013,17 +641,11 @@ __query_pp() {                                                                  
       ;;
   esac
 )
-# query:1 ends here
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*query][query:2]]
 alias que=query
-# query:2 ends here
 
-# vcs
+#=======================================================================================================================
 # Collection of utilities to deal with all VCS related stuff
-
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*vcs][vcs:1]]
 vcs::is_in_git_repo() {
     local _cwd=$PWD
     if (( $# > 0 )); then
@@ -1092,24 +714,18 @@ vcs::get_root() {
         echo ""
     fi
 }
-# vcs:1 ends here
-
 
 # Now, if I run =g SOMETHING= followed by =vq= then =vq= doesn't run as expected because ~!!~ expands to 'g SOMETHING'.
 # However, in the expanded form, 'g' doesn't get replaced with grep because of the afore-mentioned limitation.
 
 # To avoid this, I use functions for my most commonly used aliases so that they work everywhere and, aliases only if I'm sure that they won't be used in the middle of a command.
 
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*aliases][aliases:2]]
 alias ls='ls -FLH --color=always'
 alias l=ls
 alias la='ls -A'
 alias ll='ls -lh'
 alias lla='ll -A'
-# aliases:2 ends here
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*aliases][aliases:3]]
 alias c=clear
 alias cl="c;l"
 
@@ -1138,69 +754,50 @@ duh() { du -h "$@" | sort -rh; }
 ec() { emacsclient --alternate-editor="" --no-wait --create-frame --quiet "$@" & }
 alias e=ec
 alias evan='emacs --with-profile vanilla'
-# aliases:3 ends here
-
-
 
 # From https://askubuntu.com/a/185746/38952
 # Using ww twice ensures that the output is not truncated to the width of the terminal
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*aliases][aliases:4]]
 psgrep() { ps wwup $(command pgrep -f "$@"); }
-# aliases:4 ends here
-
-
 
 # bookmarks for commonly used config files
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*aliases][aliases:5]]
 alias gosc='$VISUAL ~/.bashrc'
 alias gost='$VISUAL ~/.dotfiles/tmux/tmux.conf'
 alias gosx='$VISUAL ~/.Xresources'
 alias sosc='. ~/.bashrc && clnpath'
-# aliases:5 ends here
+
 
 # grep
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*grep][grep:1]]
 export GREP_COLORS='1;32'
 alias grep='grep -sP --color=always'
-# grep:1 ends here
-
-
 
 # I use ~g~ as a generic alias for grep and all its replacements. Hence create a generic alias
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*grep][grep:2]]
 alias g=grep
 alias gi='g -i'
 alias gv='g -v'
-# grep:2 ends here
+
 
 # git
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*git][git:1]]
 alias ga='git add'
 alias gA='git add -A .'
 alias gh='git help'
 alias gs='git status'
-# git:1 ends here
+
 
 # perforce
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*perforce][perforce:1]]
 alias pf='p4'
 alias pfd='pf diff'
 alias pfdg='P4DIFF= pf diff -du | grepdiff --output-matching=hunk --remove-timestamps'
 alias pfe='pf edit'
 alias pflog='pf filelog -stl -m 5'
-# perforce:1 ends here
-
-
 
 # Make opened files prettier by aligning the columns
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*perforce][perforce:2]]
 pfo() {
     pf opened "$@" | command column -s# -o ' #' -t | command column -o ' ' -t | command sed 's/#/   #/'
 }
@@ -1218,13 +815,9 @@ pfrel() {
 pfor() {
     pfo "$@" | pfrel
 }
-# perforce:2 ends here
-
-
 
 # Show top N (default=10) changes
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*perforce][perforce:3]]
 pftop() {
     local num=10
     if (( $# > 0 )) && [[ "$1" =~ ^[0-9]+$ ]]; then
@@ -1233,12 +826,11 @@ pftop() {
     fi
     pf changes -m $num "$@" $STEM/...
 }
-# perforce:3 ends here
+
 
 # rm
 # Delete in background
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*rm][rm:1]]
 unset -f rm_rf
 rm_rf_silent() {
     # FIXME: Doesn't work if there are spaces in the filename
@@ -1254,46 +846,32 @@ rm_rf_silent() {
     done
 }
 alias rdj='rm_rf_silent'
-# rm:1 ends here
 
 # [[https://github.com/BurntSushi/ripgrep][ripgrep]]
-# :PROPERTIES:
-# :header-args+: :tangle (if (executable-find "rg") "bashrc" "no")
-# :END:
 # These will be tangled only if =rg= exists
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*[[https://github.com/BurntSushi/ripgrep\][ripgrep]\]][[[https://github.com/BurntSushi/ripgrep][ripgrep]]:1]]
 export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgrep/config
 alias g='command rg'
-# [[https://github.com/BurntSushi/ripgrep][ripgrep]]:1 ends here
+
 
 # vim/neovim
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*vim][vim:1]]
 alias v=$EDITOR
 if [[ $EDITOR == "nvim" ]]; then
   alias vi='nvim --clean'
 else
   alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
 fi
-# vim:1 ends here
-
-
 
 # Open results of the last shell command in vim quickfix.
 # Very useful for searching something using =rg= etc. and iterating through the results in vim
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*vim][vim:2]]
 vq() { v -q <(eval "$(fc -nl -1) $@"); }
 vqg() { v -q <(g --vimgrep "$@"); }
-# vim:2 ends here
-
-
 
 # Opening up vimdiff takes noticeable amount of time. This will run it only if required.
 # Using -f keeps the window in the foreground and prevents a whole bunch of diffs opening at the same time
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*vim][vim:3]]
 gvim_diff() {
     # Check to see if all files are present. If not, return.
     for i in "$@"; do
@@ -1307,25 +885,22 @@ gvim_diff() {
     gvim -df -c 'set nobackup' "$@"
 }
 alias vd=gvim_diff
-# vim:3 ends here
 
 # [[https://github.com/tmux/tmux][tmux]]
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*[[https://github.com/tmux/tmux\][tmux]\]][[[https://github.com/tmux/tmux][tmux]]:1]]
 source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/tmux/tmuxw.bash
 alias tmux='tmuxw'
 alias tm='tmux'
-# [[https://github.com/tmux/tmux][tmux]]:1 ends here
+
 
 # PATH
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*PATH][PATH:1]]
 if ((which ruby &> /dev/null) && (which gem &> /dev/null)); then
   export PATH="$(ruby -rubygems -e 'puts Gem.user_dir')/bin:$PATH"
 fi
 export PATH="$HOME/.local/bin:$PATH"
 clnpath
-# PATH:1 ends here
+
 
 ## prompt
 # 'PROMPT_COMMAND' is evaluated right before the prompt is displayed. I use it to update history more regularly
@@ -1344,10 +919,10 @@ __setprompt() {
 # Use the starship prompt
 eval "$(starship init bash)"
 
+
 # local override
 # Update permissions of the history when exiting as root
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*local override][local override:1]]
 __histfile_perm_update__() {
     if [[ -f $HISTFILE ]]; then
         echo "Changing permissions of HISTFILE..."
@@ -1362,18 +937,16 @@ trap __histfile_perm_update__ EXIT
 if [[ "$SHLVL" = 1 ]]; then
     [[ -x /usr/bin/clear_console ]] && /usr/bin/clear_console -q
 fi
-# local override:1 ends here
+
 
 # bashrc_local
 # And finally, check for a .bashrc_local and load it
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*bashrc_local][bashrc_local:1]]
 [[ -f ~/.bashrc_local_override ]] && . ~/.bashrc_local_override
-# bashrc_local:1 ends here
+
 
 # command completion
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*command completion][command completion:1]]
 if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
@@ -1421,22 +994,18 @@ complete -f -o default -X '!*.gif'  kview
 #complete -f -o default -X '!*.+(jp*g|gif|xpm|png|bmp)' xv gimp
 #complete -f -o default -X '!*.+(mp3|MP3)' mpg123 mpg321
 #complete -f -o default -X '!*.+(ogg|OGG)' ogg123
-# command completion:1 ends here
+
 
 # fzf completion
 # Rest of fzf configuration defined above: [[*\[\[https://github.com/junegunn/fzf\]\[fzf\]\]][fzf]]
 
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*fzf completion][fzf completion:1]]
 [[ $- == *i* ]] && source "$FZF_PATH/shell/completion.bash" 2> /dev/null
-# fzf completion:1 ends here
+
 
 # alias completion
 # Automatically add completion for all aliases to commands having completion functions
 # This must be called only at the very end
 
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*alias completion][alias completion:1]]
 _compl_alias() {
     [[ -z "$1" ]] && return
     local _alias="$1"
@@ -1450,13 +1019,9 @@ _compl_alias() {
 
     eval "$(complete -p $_cmd | sed "s/$_cmd$/$_alias/")"
 }
-# alias completion:1 ends here
-
-
 
 # Note the order of application is important
 
-# [[file:~/.config/dotfiles/bash/bashrc.org::*alias completion][alias completion:2]]
 _compl_alias e    emacs
 _compl_alias g    grep
 _compl_alias v    nvim
@@ -1467,4 +1032,5 @@ _compl_alias bat  cat
 for _alias in P gi gv l la ll lla doomacs; do
     _compl_alias "$_alias"
 done
-# alias completion:2 ends here
+
+. ~/.bash_ai
