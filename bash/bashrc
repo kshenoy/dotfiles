@@ -111,44 +111,8 @@ man() {
 }
 
 #========================================================================================================================
-# UTILITY FUNCTIONS
-#========================================================================================================================
-
-# Function: alert
-# Description: Notify when a command completes
-# Usage: sleep 10 && alert ["custom message"]
-unset -f alert
-alert() {
-    # Pick up display message if provided as argument. If not show the last command that was run
-    local _msg=${1:-"'$(fc -nl -1 | sed -e 's/^\s*//' -e 's/\s*[;&|]\+\s*alert$//')' has completed"}
-
-    # Add TMUX information if available
-    if [[ -n $TMUX ]]; then
-        _msg="$(tmux display-message -p "[#S:#I.#P]") $_msg"
-    else
-        _msg="[$$] $_msg"
-    fi
-
-    # Indicate normal completion or error
-    local _icon=$( (($? == 0)) && echo terminal || echo error)
-
-    notify-send --urgency=low -i $_icon "$_msg"
-}
-
-#========================================================================================================================
 # DIRECTORY NAVIGATION
 #========================================================================================================================
-
-# Function: mcd
-# Description: Create new directory(ies) and enter the last one
-# Usage: mcd dir1 [dir2 ...]
-alias md='mkdir -p'
-
-unset -f mcd
-mcd() {
-    command mkdir -p "$@" || return
-    cd -- "${@: -1}"
-}
 
 # Function: dirs
 # Description: Enhanced directory stack viewer
@@ -259,10 +223,6 @@ alias ..='cd ..'
 # EXTERNAL TOOL INTEGRATIONS
 #========================================================================================================================
 
-# Load utility functions
-[[ -f utils/calc.sh ]] && . utils/calc.sh
-[[ -f utils/query.sh ]] && . utils/query.sh
-
 # fzf: https://github.com/junegunn/fzf
 if [[ -d /opt/fzf ]]; then
     export FZF_PATH=/opt/fzf
@@ -275,221 +235,13 @@ if hash zoxide 2> /dev/null; then
 fi
 
 #========================================================================================================================
-# VERSION CONTROL SYSTEM HELPERS
+# MODULAR CONFIGURATION
 #========================================================================================================================
-vcs::is_in_git_repo() {
-    local _cwd=$PWD
-    if (( $# > 0 )); then
-        command cd $1
-    fi
-
-    git rev-parse HEAD &> /dev/null
-    local _ret=$?
-
-    if (( $# > 0 )); then
-        command cd $_cwd
-    fi
-
-    return $_ret
-}
-
-vcs::is_in_perforce_repo() {
-    [[ -n "$STEM" ]] && [[ ${1-$PWD} =~ $STEM ]];
-}
-
-vcs::is_in_repo() {
-    vcs::is_in_git_repo "$@" || vcs::is_in_perforce_repo "$@"
-}
-
-vcs::get_p4_branch() {
-  local top=${REPO_PATH-$PWD}
-  if [[ -f "$top/configuration_id" ]]; then
-    echo "$(sed 's/@.*//' "$top/configuration_id" 2> /dev/null)"
-  fi
-}
-vcs::get_branch() {
-    # Description: If PWD is under a VCS, return the branch. If not, return an empty string
-
-    if vcs::is_in_git_repo; then
-        # echo "DEBUG: VCS Type=$_vcs_type (vcs::get_branch)"
-        git symbolic-ref --short HEAD 2> /dev/null
-    elif vcs::is_in_perforce_repo; then
-        # echo "DEBUG: VCS Type=$_vcs_type (vcs::get_branch)"
-        vcs::get_p4_branch
-    else
-        echo ""
-    fi
-}
-
-vcs::get_status() {
-    # Description: Get the status of the VCS - works only for git at the moment
-
-    if vcs::is_in_git_repo; then
-        local _vcs_branch=$(vcs::get_branch)
-        if $(echo "$(git log origin/$_vcs_branch..HEAD 2> /dev/null)" | grep '^commit' &> /dev/null); then
-            echo "staged"
-        elif [[ -n $(git status -s --ignore-submodules=dirty  2> /dev/null) ]]; then
-            echo "modified"
-        else
-            echo "committed"
-        fi
-    fi
-}
-
-vcs::get_root() {
-    if vcs::is_in_git_repo "$@"; then
-        echo "$(git rev-parse --show-toplevel)"
-    elif vcs::is_in_perforce_repo "$@"; then
-        echo "$REPO_PATH"
-    else
-        echo ""
-    fi
-}
-
-#========================================================================================================================
-# ALIASES
-#========================================================================================================================
-
-# File Operations
-alias ls='ls -FLH --color=auto'
-alias l=ls
-alias la='ls -A'
-alias ll='ls -lh'
-alias lla='ll -A'
-
-alias c=clear
-alias cl="c;l"
-alias mv='mv -vi'
-alias cp='cp -vi'
-alias rm='rm -vi'
-alias rd='rm -rvf'
-alias ln='ln -svi'
-alias df='df -h'
-alias pppath='tr ":" "\n" <<< $PATH'
-alias clnpath='export PATH=$(tr ":" "\n" <<< $PATH | perl -ne "print unless \$seen{\$_}++" | paste -s -d":")'
-
-# File Viewers
-if command -v bat >/dev/null 2>&1; then
-  alias C="bat --paging=never"
-else
-  alias C=cat
-fi
-alias P=$PAGER
-
-# Misc
-alias hh='history | tail'
-alias x=exit
-alias pls='sudo $(history -p !!)'
-duh() { du -h "$@" | sort -rh; }
-
-# Editors
-ec() { emacsclient --alternate-editor="" --no-wait --create-frame --quiet "$@" & }
-alias e=ec
-alias evan='emacs --with-profile vanilla'
-
-# Process Management
-psgrep() { ps wwup $(command pgrep -f "$@"); }  # Using ww prevents output truncation
-
-# Config File Shortcuts
-alias sosc='. ~/.bashrc && clnpath'
-
-# grep
-export GREP_COLORS='1;32'
-alias grep='grep -sP --color=auto'
-alias g=grep
-alias gi='g -i'
-alias gv='g -v'
-
-# git
-alias ga='git add'
-alias gA='git add -A .'
-alias gh='git help'
-alias gs='git status'
-
-# perforce
-alias pf='p4'
-alias pfd='pf diff'
-alias pfdg='P4DIFF= pf diff -du | grepdiff --output-matching=hunk --remove-timestamps'
-alias pfe='pf edit'
-alias pflog='pf filelog -stl -m 5'
-
-pfo() {
-    pf opened "$@" | command column -s# -o ' #' -t | command column -o ' ' -t | command sed 's/#/   #/'
-}
-
-pfrel() {
-    if [[ ! -t 0 ]]; then
-        pf where $(command sed -e 's/#.*//' < /dev/stdin)
-    elif [[ -n "$1" ]]; then
-        pf where $(command sed -e 's/#.*//' "$@")
-    else
-        return
-    fi |  awk "{ if (\$3 != \"$REPO_PATH/...\") { print \$3; } }" | sed -e "s:$REPO_PATH/::"
-}
-
-pfor() {
-    pfo "$@" | pfrel
-}
-
-# Show top N (default=10) changes
-pftop() {
-    local num=10
-    if (( $# > 0 )) && [[ "$1" =~ ^[0-9]+$ ]]; then
-        num=$1
-        shift
-    fi
-    pf changes -m $num "$@" $STEM/...
-}
-
-# rm - Delete in background
-unset -f rm_rf
-rm_rf_silent() {
-    # FIXME: Doesn't work if there are spaces in the filename
-    for i in "$@"; do
-        # Remove trailing slash and move to hidden
-        ni=${i/%\//}
-        bi=$(basename $ni)
-        ni=${ni/%$bi/.$bi}
-
-        #echo $ni.$$
-        command mv $i $ni.$$
-        command rm -rf $ni.$$ &
-    done
-}
-alias rdj='rm_rf_silent'
-
-# ripgrep
-if hash rg 2> /dev/null; then
-  export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgrep/config
-  alias g='command rg'
-fi
-
-# vim/neovim
-alias v=$EDITOR
-if [[ $EDITOR == "nvim" ]]; then
-  alias vi='nvim --clean'
-else
-  alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
-fi
-
-gvim_diff() {
-    # Check to see if all files are present. If not, return.
-    for i in "$@"; do
-        [[ ! -f "$i" ]] && return
-    done
-
-    # If there are no differences, print that files are identical and return
-    command diff -qs "$@" && return
-
-    # Run vimdiff only if there are differences and all files are present
-    gvim -df -c 'set nobackup' "$@"
-}
-alias vd=gvim_diff
-
-# tmux
-source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/tmux/tmuxw.bash
-alias tmux='tmuxw'
-alias tm='tmux'
+# Load modular configuration files
+[[ -f utils/calc.sh ]] && . utils/calc.sh
+[[ -f utils/query.sh ]] && . utils/query.sh
+[[ -f vcs.sh ]] && . vcs.sh
+[[ -f aliases.sh ]] && . aliases.sh
 
 #========================================================================================================================
 # PATH MANAGEMENT
@@ -501,130 +253,14 @@ export PATH="$HOME/.local/bin:$PATH"
 clnpath
 
 #========================================================================================================================
-# PROMPT CONFIGURATION
+# PROMPT & COMPLETION
 #========================================================================================================================
-# 'PROMPT_COMMAND' is evaluated right before the prompt is displayed. I use it to update history more regularly
-PROMPT_COMMAND=__setprompt
+# Load prompt configuration and completions
+[[ -f prompt.sh ]] && . prompt.sh
+[[ -f completions.sh ]] && . completions.sh
 
-__setprompt() {
-  # Set HISTFILE here to keep it current when sessions span multiple days
-  # FIXME: Find a better way to do this i.e. do it once a day instead of everytime the prompt is refreshed
-  HISTFILE="${XDG_DATA_HOME:-$HOME/.local/share}/bash_history/$(date +%Y/%m/%d)_${HOSTNAME%%.*}_${USER}_$$"
-  [[ -d $(dirname ${HISTFILE}) ]] || mkdir -p $(dirname ${HISTFILE})
-
-  # Write to the history file immediately instead of waiting till the end of the session
-  history -a
-}
-
-# Use the starship prompt
-eval "$(starship init bash)"
-
-# Update permissions of the history when exiting as root
-__histfile_perm_update__() {
-    if [[ -f $HISTFILE ]]; then
-        echo "Changing permissions of HISTFILE..."
-        chown kshenoy $HISTFILE
-        chgrp kshenoy $HISTFILE
-        chmod 640 $HISTFILE
-    fi
-}
-trap __histfile_perm_update__ EXIT
-
-#========================================================================================================================
-# SHELL CLEANUP & LOCAL OVERRIDES
-#========================================================================================================================
-# When leaving the console, clear the screen to increase privacy
-if [[ "$SHLVL" = 1 ]]; then
-    [[ -x /usr/bin/clear_console ]] && /usr/bin/clear_console -q
-fi
-
+# Local overrides (loaded last)
 [[ -f ~/.bashrc_local_override ]] && . ~/.bashrc_local_override
 
-#========================================================================================================================
-# COMMAND COMPLETION
-#========================================================================================================================
-if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
-    . /etc/bash_completion
-fi
-
-complete -A hostname   rsh rcp telnet rlogin r ftp ping disk
-complete -A export     printenv
-complete -A variable   export local readonly unset
-complete -A enabled    builtin
-complete -A alias      alias unalias
-complete -A function   function
-complete -A user       su mail finger
-
-complete -A helptopic  help     # currently same as builtins
-complete -A shopt      shopt
-complete -A stopped -P '%' bg
-complete -A job -P '%' fg jobs disown
-
-complete -A directory  mkdir rmdir
-complete -A directory  -o default cd
-
-# Compression
-complete -f -o default -X '*.+(zip|ZIP)'  zip
-complete -f -o default -X '!*.+(zip|ZIP)' unzip
-complete -f -o default -X '*.+(z|Z)'      compress
-complete -f -o default -X '!*.+(z|Z)'     uncompress
-complete -f -o default -X '*.+(gz|GZ)'    gzip
-complete -f -o default -X '!*.+(gz|GZ)'   gunzip
-complete -f -o default -X '*.+(bz2|BZ2)'  bzip2
-complete -f -o default -X '!*.+(bz2|BZ2)' bunzip2
-
-# Misc filetypes
-complete -f -o default -X '!*.ps'  gs ghostview ps2pdf ps2ascii
-complete -f -o default -X '!*.dvi' dvips dvipdf xdvi dviselect dvitype
-complete -f -o default -X '!*.pdf' acroread pdf2ps
-complete -f -o default -X '!*.+(pdf|ps)' gv
-complete -f -o default -X '!*.texi*' makeinfo texi2dvi texi2html texi2pdf
-complete -f -o default -X '!*.tex' tex latex slitex
-complete -f -o default -X '!*.lyx' lyx
-complete -f -o default -X '!*.+(htm*|HTM*)' lynx html2ps
-complete -f -o default -X '!*.pl'  perl perl5
-complete -f -o default -X '!*.gv'   dot
-complete -f -o default -X '!*.gif'  kview
-
-# Multimedia
-#complete -f -o default -X '!*.+(jp*g|gif|xpm|png|bmp)' xv gimp
-#complete -f -o default -X '!*.+(mp3|MP3)' mpg123 mpg321
-#complete -f -o default -X '!*.+(ogg|OGG)' ogg123
-
-# fzf completion
-# Rest of fzf configuration defined in fzf section above
-
-[[ $- == *i* ]] && source "$FZF_PATH/shell/completion.bash" 2> /dev/null
-
-# alias completion
-# Automatically add completion for all aliases to commands having completion functions
-# This must be called only at the very end
-
-_compl_alias() {
-    [[ -z "$1" ]] && return
-    local _alias="$1"
-
-    if (( $# >= 2 )); then
-        local _cmd="$2"
-    else
-        local _cmd="$(alias $_alias 2> /dev/null | sed -e 's/^.*=//' -e 's/ .*$//' | tr -d "'")"
-    fi
-    [[ -z "$_cmd" ]] && return
-
-    eval "$(complete -p $_cmd | sed "s/$_cmd$/$_alias/")"
-}
-
-# Note the order of application is important
-
-_compl_alias e    emacs
-_compl_alias g    grep
-_compl_alias v    nvim
-_compl_alias vd   diff
-_compl_alias vile less
-_compl_alias C    cat
-_compl_alias bat  cat
-for _alias in P gi gv l la ll lla doomacs; do
-    _compl_alias "$_alias"
-done
-
+# AI integration
 [[ -f ~/.bash_ai ]] && . ~/.bash_ai
