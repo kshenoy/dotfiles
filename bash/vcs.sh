@@ -9,19 +9,7 @@
 
 # Git Detection
 vcs::is_in_git_repo() {
-    local _cwd=$PWD
-    if (( $# > 0 )); then
-        command cd $1
-    fi
-
-    git rev-parse HEAD &> /dev/null
-    local _ret=$?
-
-    if (( $# > 0 )); then
-        command cd $_cwd
-    fi
-
-    return $_ret
+    git -C "${1:-.}" rev-parse HEAD &> /dev/null
 }
 
 # Perforce Detection
@@ -58,9 +46,9 @@ vcs::get_status() {
 
     if vcs::is_in_git_repo; then
         local _vcs_branch=$(vcs::get_branch)
-        if $(echo "$(git log origin/$_vcs_branch..HEAD 2> /dev/null)" | grep '^commit' &> /dev/null); then
+        if git rev-list --count origin/$_vcs_branch..HEAD 2> /dev/null | grep -q '^[1-9]'; then
             echo "staged"
-        elif [[ -n $(git status -s --ignore-submodules=dirty  2> /dev/null) ]]; then
+        elif [[ -n $(git status -s --ignore-submodules=dirty 2> /dev/null) ]]; then
             echo "modified"
         else
             echo "committed"

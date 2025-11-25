@@ -20,7 +20,7 @@ query() (
 # Yep, parentheses is correct. It makes this a subshell function allowing the definition to be inaccessible from outside
 # Thus, no more polluting of shell space with helper functions
 
-__help() {                                                                                                    # {{{1
+__help() {
   echo "Usage:"
   echo "    query [OPTION]... INPUT..."
   echo
@@ -35,9 +35,7 @@ __help() {                                                                      
   echo "        --nodefine         Don't print the function definition"
 }
 
-__parse_args() {                                                                                              # {{{1
-  #echo "DEBUG: Parse:'$@'"
-
+__parse_args() {
   # Default values of options
   _opts[ascii]=0
   _opts[color]=1
@@ -137,7 +135,7 @@ __parse_args() {                                                                
   fi
 }
 
-__query_alias() {                                                                                                   # {{{1
+__query_alias() {
   echo "${_query_pp[sep]}${_query_pp[input]} (${_query_pp[type]})"
   while read; do
     echo "${_query_pp[spc]}${REPLY}";
@@ -167,14 +165,14 @@ __query_alias() {                                                               
   fi
 }
 
-__query_file() {                                                                                                    # {{{1
+__query_file() {
   echo "${_query_pp[sep]}${_query_pp[input]} (${_query_pp[type]})"
   while read; do
     echo "${_query_pp[spc]}${REPLY}";
   done < <(command type -a -- "${_opts[input]}" | command head -n1)
 }
 
-__query_function() {                                                                                                # {{{1
+__query_function() {
   echo "${_query_pp[sep]}${_query_pp[input]} (${_query_pp[type]})"
   shopt -s extdebug
   IFS=" " read -a _arr <<< $(command declare -F -- "${_opts[input]}")
@@ -189,8 +187,7 @@ __query_function() {                                                            
   fi
 }
 
-__query_pp() {                                                                                                      # {{{1
-
+__query_pp() {
   _query_pp[spc]=""
   _query_pp[sep]=""
 
@@ -239,9 +236,7 @@ __query_pp() {                                                                  
   _query_pp[type]="${_c_type}${_type}${_c_reset}"
   _query_pp[input]="${_c_input}${_opts[input]}${_c_reset}"
 }
-# }}}1
 
-  #echo "DEBUG: Cmd='$@'"
   # Default values for options
   local -A _opts=()
   local -a _cmd_recurse=()
@@ -252,7 +247,6 @@ __query_pp() {                                                                  
   fi
 
   local _type=$(command type -t -- "${_opts[input]}")
-  #echo "DEBUG: Input='${_opts[input]}', Type='$_type'"
 
   # Pretty-print the tree structure for recursive lookups
   local -A _query_pp=()

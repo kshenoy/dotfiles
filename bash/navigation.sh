@@ -24,11 +24,11 @@ dirs() {
 # Description: Silent pushd that removes duplicate entries from directory stack
 # Note: pushd calls cd under the hood, so cdable_vars and cdspell apply here too
 pushd() {
-    builtin pushd "$@" > /dev/null;
+    builtin pushd "$@" > /dev/null
 
     # Remove any duplicate entries. The 1st entry will be the PWD so skip it
-    local _dir_pos=$(dirs -l -v | tail -n+2 | grep "$PWD$" | sed 's/^\s*//' | cut -d ' ' -f1 | paste -s)
-    command popd -n +$_dir_pos &> /dev/null
+    local _dir_pos=$(dirs -l -v | tail -n+2 | grep -F "$PWD" | awk '{print $1}')
+    [[ -n "$_dir_pos" ]] && command popd -n +$_dir_pos &> /dev/null
 }
 
 # Function: cd
