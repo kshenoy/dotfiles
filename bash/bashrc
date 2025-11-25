@@ -89,26 +89,13 @@ export HOSTNAME="$(hostname)"
 export LANG=en_US.UTF-8
 
 #=======================================================================================================================
-# COLORS & PAGER CONFIGURATION
+# COLORS CONFIGURATION
 #=======================================================================================================================
 # ls colors
 if [[ -x /usr/bin/dircolors ]]; then
     _dircolors=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/dircolors.rc
     [[ -r $_dircolors ]] && eval "$(/usr/bin/dircolors -b $_dircolors)" || eval "$(/usr/bin/dircolors -b)"
 fi
-
-# colored man pages with less
-man() {
-    env \
-        LESS_TERMCAP_mb=$(printf "\e[1;31m") \
-        LESS_TERMCAP_md=$(printf "\e[1;31m") \
-        LESS_TERMCAP_me=$(printf "\e[0m") \
-        LESS_TERMCAP_se=$(printf "\e[0m") \
-        LESS_TERMCAP_so=$(printf "\e[0;43;30m") \
-        LESS_TERMCAP_ue=$(printf "\e[0m") \
-        LESS_TERMCAP_us=$(printf "\e[1;32m") \
-        man "$@"
-}
 
 #=======================================================================================================================
 # EXTERNAL TOOL INTEGRATIONS
@@ -130,7 +117,7 @@ fi
 #=======================================================================================================================
 # Load modular configuration files
 # Note: utils/query.sh and navigation.sh is available but not auto-loaded (source manually if needed)
-for f in aliases.sh completions.sh utils/alert.sh utils/calc.sh vcs.sh; do
+for f in aliases.sh completions.sh utils/alert.sh utils/calc.sh utils/man.sh utils/path.sh vcs.sh; do
     [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/$f ]] &&
         . ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/$f
 done
@@ -138,7 +125,7 @@ done
 #=======================================================================================================================
 # PATH MANAGEMENT
 #=======================================================================================================================
-if ((which ruby &> /dev/null) && (which gem &> /dev/null)); then
+if hash ruby 2>/dev/null && hash gem 2>/dev/null; then
   export PATH="$(ruby -rubygems -e 'puts Gem.user_dir')/bin:$PATH"
 fi
 export PATH="$HOME/.local/bin:$PATH"

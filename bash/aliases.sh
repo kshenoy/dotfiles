@@ -17,8 +17,6 @@ alias cp='cp -vi'
 alias rm='rm -vi'
 alias ln='ln -svi'
 alias df='df -h'
-alias pppath='tr ":" "\n" <<< $PATH'
-alias clnpath='export PATH=$(tr ":" "\n" <<< $PATH | perl -ne "print unless \$seen{\$_}++" | paste -s -d":")'
 
 # Directory operations
 alias md='mkdir -p'
