@@ -1,41 +1,50 @@
 #=======================================================================================================================
-# calc: Simple wrapper around `irb` to make it more natural to use. eg. `= 4 + 5`
+# calc: Calculator using Python. Supports hex (0x) and binary (0b) literals.
+# Usage: = 4 + 5
+#        = 0xFF + 0b1010
+#        = 2**8
+#        echo "16 * 32" | =
 #=======================================================================================================================
+
+# Check dependencies
+if ! command -v python3 &>/dev/null; then
+    echo "Error: python3 not found." >&2
+    return 1
+fi
+
 unset -f =
 =() {
     local _input="${@:-$(</dev/stdin)}"
-    # echo $_input
 
-    # if [[ $_input =~ [:xdigit:]+\[[:digit:]+:[:digit:]+\] ]]; then
-    #   _input=${_input#.*[}
-    #   echo $_input
-    #   return
-    # fi
-    # = "($_input >> $_lsb) & ($_msb - $_lsb)"
+    # Use Python for evaluation with smart output formatting
+    python3 << EOF
+try:
+    result = ${_input}
+    # Auto-detect output format based on input
+    input_str = """${_input}"""
 
-    # If there's no explicit output formatting, try to infer from the input
-    if [[ ! $_input =~ to_s ]]; then
-        if [[ $_input =~ 0x ]] || [[ $_input =~ [a-fA-F] ]]; then
-            local _base=16
-        elif [[ $_input =~ 0b ]]; then
-            local _base=2
-        fi
-        _input="($_input).to_s($_base)"
-    fi
+    # Check if input contains hex or binary literals
+    has_hex = '0x' in input_str.lower() or any(c in input_str for c in 'abcdefABCDEF')
+    has_bin = '0b' in input_str.lower()
 
-    local _result=$(echo "$_input" | irb --noverbose | command sed 's/"//g')
-
-    # Pretty-print formatted output
-    if [[ $_input =~ 'to_s(16)' ]]; then
-        _result="0x${_result}"
-    elif [[ $_input =~ 'to_s(2)' ]]; then
-        _result="0b${_result}"
-    fi
-
-    echo $_result
+    # Format output accordingly
+    if has_hex and not has_bin:
+        print(hex(int(result)))
+    elif has_bin and not has_hex:
+        print(bin(int(result)))
+    elif has_hex and has_bin:
+        # If both present, prefer hex output
+        print(hex(int(result)))
+    else:
+        print(result)
+except Exception as e:
+    import sys
+    print(f"Error: {e}", file=sys.stderr)
+    sys.exit(1)
+EOF
 }
 
-# Simple base-converter
+# Base converter using Python
 unset -f =base
 =base() (
     _help () {
@@ -43,15 +52,20 @@ unset -f =base
         echo '  =base NUM TO [FROM=10]'
         echo '  echo NUM | =base TO [FROM=10]'
         echo '  =base TO [FROM=10] <<< "NUM"'
-    } # }}}
+        echo ''
+        echo 'EXAMPLES:'
+        echo '  =base 255 16          # Convert 255 to hex → 0xff'
+        echo '  =base 0xFF 2          # Convert hex to binary → 0b11111111'
+        echo '  =base 0b1010 10       # Convert binary to decimal → 10'
+    }
 
     if (( $# <= 1 )); then
-        echo -e "ERROR: Insufficient arguments. At least two required\n"; _help
+        echo "ERROR: Insufficient arguments. At least two required" >&2
+        _help
         return 1
     fi
 
     if [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
-        # From pipe or from redirection respectively
         local _num=$(</dev/stdin)
     else
         local _num=$1
@@ -61,58 +75,115 @@ unset -f =base
     local _obase=$1
     local _ibase=${2:-10}
 
-    case $_ibase in
-        2)  _num=${_num#0[bB]} ;;
-        16) _num=$(tr '[a-f]' '[A-F]' <<< "${_num#0[xX]}") ;;
-    esac
+    # Use Python for base conversion
+    python3 << EOF
+try:
+    # Parse input number
+    num_str = "${_num}".strip()
+    if num_str.startswith(('0x', '0X')):
+        num = int(num_str, 16)
+    elif num_str.startswith(('0b', '0B')):
+        num = int(num_str, 2)
+    else:
+        num = int(num_str, ${_ibase})
 
-    local _result=$(echo "obase=$_obase; ibase=$_ibase; $_num" | bc)
-    case $_obase in
-        2)  _result="0b${_result}" ;;
-        16) _result="0x${_result}" ;;
-    esac
-
-    echo $_result
+    # Convert to target base
+    if ${_obase} == 2:
+        print(bin(num))
+    elif ${_obase} == 16:
+        print(hex(num))
+    else:
+        print(num)
+except ValueError as e:
+    import sys
+    print(f"Error: Invalid number format - {e}", file=sys.stderr)
+    sys.exit(1)
+EOF
 )
 
-=bin() { =base $1  2 ${2:-10}; }  # Convert to binary, by default from decimal
-=dec() { =base $1 10 ${2:-16}; }  # Convert to decimal, by default from hexadecimal
-=hex() { =base $1 16 ${2:-10}; }  # Convert to hexadecimal, by default from decimal
+# Base conversion shortcuts
+=bin() { =base "$1" 2 "${2:-10}"; }   # Convert to binary, default from decimal
+=dec() { =base "$1" 10 "${2:-16}"; }  # Convert to decimal, default from hexadecimal
+=hex() { =base "$1" 16 "${2:-10}"; }  # Convert to hexadecimal, default from decimal
 
 unset -f =slice
 =slice() (
     _help() {
         echo 'SYNTAX:'
-        echo '  =slice NUM MSB LSB'
-        echo '  =slice NUM BIT'
+        echo '  =slice NUM MSB LSB    # Extract bits MSB:LSB from NUM'
+        echo '  =slice NUM BIT        # Extract single bit BIT from NUM'
         echo '  echo NUM | =slice MSB LSB'
-        echo '  =slice MSB LSB <<< "NUM"'
-        echo
-        echo "NOTE: MSB >= LSB"
+        echo ''
+        echo 'EXAMPLES:'
+        echo '  =slice 0xFF 7 4       # Extract bits 7:4 from 0xFF → 0xf'
+        echo '  =slice 0b11110000 6   # Extract bit 6 → 0b1'
+        echo '  =slice 255 3 0        # Extract bits 3:0 from 255 → 15'
     }
 
+    # Parse arguments
     if (( $# >= 3 )); then
         local _num=$1
-        shift
-    elif [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
-        # From pipe or from redirection respectively
-        local _num=$(</dev/stdin)
-    elif (( $# < 1 )); then
-        echo -e "ERROR: Insufficient arguments. At least one more required\n"; _help
-        return 1
+        local _msb=$2
+        local _lsb=${3:-$2}
+    elif (( $# == 2 )); then
+        if [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
+            local _num=$(</dev/stdin)
+            local _msb=$1
+            local _lsb=${2:-$1}
+        else
+            local _num=$1
+            local _msb=$2
+            local _lsb=$2
+        fi
+    elif (( $# == 1 )); then
+        if [[ -p /dev/stdin ]] || [[ -s /dev/stdin ]]; then
+            local _num=$(</dev/stdin)
+            local _msb=$1
+            local _lsb=$1
+        else
+            echo "ERROR: Insufficient arguments" >&2
+            _help
+            return 1
+        fi
     else
-        local _num=$1
-        shift
-    fi
-
-    local _msb=$1
-    local _lsb=${2:-$_msb}
-
-    if (( $_lsb > $_msb )); then
-        echo -e "ERROR: MSB must be greater than or equal to LSB when slicing\n"; _help
+        echo "ERROR: Insufficient arguments" >&2
+        _help
         return 1
     fi
 
-    # echo "in=$_num, msb=$_msb, lsb=$_lsb"
-    = "($_num >> $_lsb) & ((1 << ($_msb - $_lsb + 1)) - 1)"
+    # Validate MSB >= LSB
+    if (( _lsb > _msb )); then
+        echo "ERROR: MSB must be >= LSB when slicing" >&2
+        _help
+        return 1
+    fi
+
+    # Use Python for bit slicing
+    python3 << EOF
+try:
+    # Parse number
+    num_str = "${_num}".strip()
+    if num_str.startswith(('0x', '0X')):
+        num = int(num_str, 16)
+        output_hex = True
+    elif num_str.startswith(('0b', '0B')):
+        num = int(num_str, 2)
+        output_hex = False
+    else:
+        num = int(num_str)
+        output_hex = False
+
+    # Perform bit slicing: (num >> lsb) & ((1 << (msb - lsb + 1)) - 1)
+    result = (num >> ${_lsb}) & ((1 << (${_msb} - ${_lsb} + 1)) - 1)
+
+    # Output in appropriate format
+    if output_hex:
+        print(hex(result))
+    else:
+        print(result)
+except Exception as e:
+    import sys
+    print(f"Error: {e}", file=sys.stderr)
+    sys.exit(1)
+EOF
 )
