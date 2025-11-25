@@ -7,17 +7,14 @@
 # File Operations
 #=======================================================================================================================
 alias ls='ls -FLH --color=auto'
-alias l=ls
 alias la='ls -A'
 alias ll='ls -lh'
 alias lla='ll -A'
 
-alias c=clear
-alias cl="c;l"
+alias cl="clear;ls"
 alias mv='mv -vi'
 alias cp='cp -vi'
 alias rm='rm -vi'
-alias rd='rm -rvf'
 alias ln='ln -svi'
 alias df='df -h'
 alias pppath='tr ":" "\n" <<< $PATH'
@@ -33,22 +30,6 @@ mcd() {
     command mkdir -p "$@" || return
     cd -- "${@: -1}"
 }
-
-# Background file deletion
-unset -f rm_rf
-rm_rf_silent() {
-    # FIXME: Doesn't work if there are spaces in the filename
-    for i in "$@"; do
-        # Remove trailing slash and move to hidden
-        ni=${i/%\//}
-        bi=$(basename $ni)
-        ni=${ni/%$bi/.$bi}
-
-        command mv $i $ni.$$
-        command rm -rf $ni.$$ &
-    done
-}
-alias rdj='rm_rf_silent'
 
 #=======================================================================================================================
 # File Viewers & Pagers
@@ -88,18 +69,8 @@ alias vd=gvim_diff
 #=======================================================================================================================
 # Miscellaneous Utilities
 #=======================================================================================================================
-alias hh='history | tail'
-alias x=exit
-
-# Sorted disk usage
-duh() { du -h "$@" | sort -rh; }
-
-# Process search with full output
-psgrep() { ps wwup $(command pgrep -f "$@"); }
-
-# Function: alert
-# Description: Notify when a command completes
-# Usage: sleep 10 && alert ["custom message"]
+# Notify when a command completes
+# eg. sleep 10 && alert ["custom message"]
 unset -f alert
 alert() {
     # Pick up display message if provided as argument. If not show the last command that was run
