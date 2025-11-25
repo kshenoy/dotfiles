@@ -130,7 +130,7 @@ fi
 #=======================================================================================================================
 # Load modular configuration files
 # Note: utils/query.sh and navigation.sh is available but not auto-loaded (source manually if needed)
-for f in utils/calc.sh vcs.sh aliases.sh; do
+for f in aliases.sh completions.sh utils/alert.sh utils/calc.sh vcs.sh; do
     [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/$f ]] &&
         . ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/$f
 done
@@ -164,12 +164,8 @@ __setprompt() {
 eval "$(starship init bash)"
 
 #=======================================================================================================================
-# COMPLETION
+# LOCAL OVERRIDES (load last)
 #=======================================================================================================================
-[[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/completions.sh ]] &&
-    . ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/completions.sh
-
-# Local overrides (loaded last)
 [[ -f ~/.bashrc_local_override ]] && . ~/.bashrc_local_override
 
 # AI integration
