@@ -35,9 +35,9 @@ mcd() {
 # File Viewers & Pagers
 #=======================================================================================================================
 if command -v bat >/dev/null 2>&1; then
-  alias C="bat --paging=never"
+    alias C="bat --paging=never"
 else
-  alias C=cat
+    alias C=cat
 fi
 alias P=$PAGER
 
@@ -46,9 +46,9 @@ alias P=$PAGER
 #=======================================================================================================================
 alias v=$EDITOR
 if [[ $EDITOR == "nvim" ]]; then
-  alias vi='nvim --clean'
+    alias vi='nvim --clean'
 else
-  alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
+    alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
 fi
 
 # Conditional vimdiff - only runs if files exist and differ
@@ -99,19 +99,21 @@ alias sosc='. ~/.bashrc && clnpath'
 #=======================================================================================================================
 export GREP_COLORS='1;32'
 alias grep='grep -sP --color=auto'
-alias g=grep
-alias gi='g -i'
 
 # ripgrep integration
 if hash rg 2> /dev/null; then
-  export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgrep/config
-  alias g='command rg'
+    export RIPGREP_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/ripgrep/config
+    alias g='command rg'
+else
+    alias g=grep
 fi
+alias gi='g -i'
 
 #=======================================================================================================================
 # tmux
 #=======================================================================================================================
 [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/tmux/tmuxw.bash ]] &&
     . ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/tmux/tmuxw.bash
+
 alias tmux='tmuxw'
 alias tm='tmux'

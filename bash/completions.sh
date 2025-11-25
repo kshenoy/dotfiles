@@ -1,7 +1,6 @@
 #=======================================================================================================================
 # COMMAND COMPLETION
 #=======================================================================================================================
-# Tab completion configuration for bash
 
 # Load system bash completion
 if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
@@ -9,64 +8,36 @@ if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
 fi
 
 #=======================================================================================================================
-# System Completions
+# Essential Completions Only
 #=======================================================================================================================
-complete -A variable   export local readonly unset
-complete -A enabled    builtin
-complete -A alias      alias unalias
-complete -A function   function
-complete -A user       su mail finger
-
-complete -A helptopic      help     # currently same as builtins
-complete -A shopt          shopt
-complete -A stopped -P '%' bg
-complete -A job -P '%'     fg jobs disown
-
-complete -A directory  mkdir rmdir
-complete -A directory  -o default cd
+# Only keep completions that aren't handled by bash-completion or need special handling
+complete -A directory -o default cd
 
 #=======================================================================================================================
-# File Type Completions
+# Alias Completion Helper
 #=======================================================================================================================
-complete -f -o default -X '*.+(zip|ZIP)' zip unzip
-complete -f -o default -X '!*.pdf'       acroread pdf2ps
-complete -f -o default -X '!*.pl'        perl perl5
-complete -f -o default -X '!*.gv'        dot
-complete -f -o default -X '!*.gif'       kview
-
-#=======================================================================================================================
-# FZF Completion
-#=======================================================================================================================
-# Rest of fzf configuration defined in EXTERNAL TOOL INTEGRATIONS section of bashrc
-[[ $- == *i* ]] && source "$FZF_PATH/shell/completion.bash" 2> /dev/null
-
-#=======================================================================================================================
-# Alias Completion
-#=======================================================================================================================
-# Automatically add completion for all aliases to commands having completion functions
-# This must be called only at the very end
-
+# Copy completion behavior from a command to one or more aliases
+# Usage: _compl_alias <command> <alias1> [alias2 ...]
+# Example: _compl_alias nvim v vi  # Makes 'v' and 'vi' use nvim's completion
 _compl_alias() {
-    [[ -z "$1" ]] && return
-    local _alias="$1"
-
-    if (( $# >= 2 )); then
-        local _cmd="$2"
-    else
-        local _cmd="$(alias $_alias 2> /dev/null | sed -e 's/^.*=//' -e 's/ .*$//' | tr -d "'")"
-    fi
-    [[ -z "$_cmd" ]] && return
-
-    eval "$(complete -p $_cmd | sed "s/$_cmd$/$_alias/")"
+    local cmd="$1"; shift
+    local spec="$(complete -p "$cmd" 2>/dev/null)" || return
+    for alias_name in "$@"; do
+        eval "${spec//$cmd/$alias_name}"
+    done
 }
 
-# Note the order of application is important
-_compl_alias g    grep
-_compl_alias v    nvim
-_compl_alias vd   diff
-_compl_alias vile less
-_compl_alias C    cat
-_compl_alias bat  cat
-for _alias in P gi gv l la ll lla doomacs; do
-    _compl_alias "$_alias"
-done
+# Apply completions to active aliases only
+_compl_alias grep  g gi
+if hash rg 2> /dev/null; then
+    _compl_alias grep  rg
+fi
+if hash nvim 2> /dev/null; then
+    _compl_alias nvim  v vi
+else
+    _compl_alias vim   v vi
+fi
+_compl_alias diff  vd
+_compl_alias cat   C
+_compl_alias less  P
+_compl_alias tmux  tm
