@@ -129,7 +129,8 @@ fi
 # MODULAR CONFIGURATION
 #========================================================================================================================
 # Load modular configuration files
-for f in utils/calc.sh utils/query.sh vcs.sh navigation.sh aliases.sh; do
+# Note: utils/query.sh is available but not auto-loaded (source manually if needed)
+for f in utils/calc.sh vcs.sh navigation.sh aliases.sh; do
     [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/$f ]] &&
         . ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/$f
 done
