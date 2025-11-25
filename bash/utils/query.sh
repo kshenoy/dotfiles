@@ -1,6 +1,6 @@
-#========================================================================================================================
+#=======================================================================================================================
 # query - Enhanced command introspection tool
-#========================================================================================================================
+#=======================================================================================================================
 # Description: which on steroids. Shows aliases and function definitions recursively.
 # Since this function deals with aliases, it cannot be made into a stand-alone script
 # since aliases are not accessible inside subshells.
