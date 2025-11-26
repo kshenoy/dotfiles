@@ -1,0 +1,275 @@
+#!/usr/bin/env python3
+"""
+calc - A command-line calculator with support for different bases and bit operations.
+
+Supports hex (0x), binary (0b), and decimal literals.
+Smart output formatting based on input format.
+"""
+
+import argparse
+import sys
+import re
+
+
+def parse_number(num_str, default_base=10):
+    """Parse a number string that may contain hex (0x), binary (0b), or decimal."""
+    num_str = num_str.strip()
+
+    if num_str.startswith(('0x', '0X')):
+        return int(num_str, 16), 16
+    elif num_str.startswith(('0b', '0B')):
+        return int(num_str, 2), 2
+    else:
+        return int(num_str, default_base), default_base
+
+
+def format_number(num, base=10):
+    """Format a number in the specified base."""
+    num = int(num)
+    if base == 2:
+        return bin(num)
+    elif base == 16:
+        return hex(num)
+    else:
+        return str(num)
+
+
+def cmd_eval(args):
+    """Evaluate a mathematical expression."""
+    # Get expression from args or stdin
+    if args.expression:
+        expr = ' '.join(args.expression)
+    else:
+        expr = sys.stdin.read().strip()
+
+    if not expr:
+        print("Error: No expression provided", file=sys.stderr)
+        return 1
+
+    try:
+        # Evaluate the expression
+        result = eval(expr)
+
+        # Auto-detect output format based on input
+        has_hex = '0x' in expr.lower() or bool(re.search(r'[a-fA-F]', expr))
+        has_bin = '0b' in expr.lower()
+
+        # Format output accordingly
+        if has_hex and not has_bin:
+            print(hex(int(result)))
+        elif has_bin and not has_hex:
+            print(bin(int(result)))
+        elif has_hex and has_bin:
+            # If both present, prefer hex output
+            print(hex(int(result)))
+        else:
+            print(result)
+
+        return 0
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
+
+
+def cmd_base(args):
+    """Convert a number between different bases."""
+    # Get number from args or stdin
+    if args.number is not None:
+        num_str = args.number
+    else:
+        num_str = sys.stdin.read().strip()
+
+    if not num_str:
+        print("Error: No number provided", file=sys.stderr)
+        return 1
+
+    try:
+        # Parse the input number
+        num, detected_base = parse_number(num_str, args.from_base)
+
+        # Convert to target base
+        print(format_number(num, args.to_base))
+        return 0
+    except ValueError as e:
+        print(f"Error: Invalid number format - {e}", file=sys.stderr)
+        return 1
+
+
+def cmd_bin(args):
+    """Convert a number to binary."""
+    return cmd_base(argparse.Namespace(
+        number=args.number,
+        to_base=2,
+        from_base=args.from_base
+    ))
+
+
+def cmd_dec(args):
+    """Convert a number to decimal."""
+    return cmd_base(argparse.Namespace(
+        number=args.number,
+        to_base=10,
+        from_base=args.from_base
+    ))
+
+
+def cmd_hex(args):
+    """Convert a number to hexadecimal."""
+    return cmd_base(argparse.Namespace(
+        number=args.number,
+        to_base=16,
+        from_base=args.from_base
+    ))
+
+
+def cmd_slice(args):
+    """Extract bits from a number using hardware-style syntax: NUMBER[MSB:LSB]."""
+    # Get input from args or stdin
+    if args.input is not None:
+        input_str = args.input
+    else:
+        input_str = sys.stdin.read().strip()
+
+    if not input_str:
+        print("Error: No input provided", file=sys.stderr)
+        return 1
+
+    # Parse hardware-style syntax: NUMBER[MSB:LSB] or NUMBER[BIT]
+    # Pattern: (number)[msb:lsb] or (number)[bit]
+    bracket_pattern = r'^(.+?)\[(\d+)(?::(\d+))?\]$'
+    match = re.match(bracket_pattern, input_str)
+
+    if not match:
+        print("Error: Invalid slice syntax. Use 'NUMBER[MSB:LSB]' or 'NUMBER[BIT]'", file=sys.stderr)
+        print("Examples: '0xFF[7:4]' or '255[5]'", file=sys.stderr)
+        return 1
+
+    # Parse the components
+    num_str = match.group(1)
+    msb = int(match.group(2))
+    lsb = int(match.group(3)) if match.group(3) else msb
+
+    # Validate MSB >= LSB
+    if lsb > msb:
+        print("Error: MSB must be >= LSB when slicing", file=sys.stderr)
+        return 1
+
+    try:
+        # Parse number and determine output format
+        num, detected_base = parse_number(num_str)
+        output_hex = detected_base == 16
+
+        # Perform bit slicing: (num >> lsb) & ((1 << (msb - lsb + 1)) - 1)
+        result = (num >> lsb) & ((1 << (msb - lsb + 1)) - 1)
+
+        # Output in appropriate format
+        if output_hex:
+            print(hex(result))
+        else:
+            print(result)
+
+        return 0
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
+
+
+def main():
+    """Main entry point for the calc CLI."""
+    parser = argparse.ArgumentParser(
+        description='Calculator with support for hex, binary, and bit operations',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+Examples:
+  calc eval "4 + 5"              # Basic math
+  calc eval "0xFF + 0b1010"      # Hex and binary
+  echo "16 * 32" | calc eval     # Pipe input
+  calc base 255 16               # Convert 255 to hex
+  calc base 0xFF 2               # Convert hex to binary
+  calc hex 255                   # Convert to hex (shortcut)
+  calc slice "0xFF[7:4]"         # Extract bits 7:4 from 0xFF
+  calc slice "255[5]"            # Extract bit 5 from 255
+        '''
+    )
+
+    subparsers = parser.add_subparsers(dest='command', help='Command to execute')
+
+    # eval command
+    eval_parser = subparsers.add_parser(
+        'eval',
+        help='Evaluate a mathematical expression',
+        description='Evaluate a mathematical expression with auto-detected output format'
+    )
+    eval_parser.add_argument(
+        'expression',
+        nargs='*',
+        help='Expression to evaluate (or read from stdin)'
+    )
+
+    # base command
+    base_parser = subparsers.add_parser(
+        'base',
+        help='Convert number between bases',
+        description='Convert a number from one base to another'
+    )
+    base_parser.add_argument('number', nargs='?', help='Number to convert (or read from stdin)')
+    base_parser.add_argument('to_base', type=int, help='Target base (2, 10, 16)')
+    base_parser.add_argument('from_base', type=int, nargs='?', default=10, help='Source base (default: 10)')
+
+    # bin command
+    bin_parser = subparsers.add_parser(
+        'bin',
+        help='Convert number to binary',
+        description='Convert a number to binary representation'
+    )
+    bin_parser.add_argument('number', nargs='?', help='Number to convert (or read from stdin)')
+    bin_parser.add_argument('from_base', type=int, nargs='?', default=10, help='Source base (default: 10)')
+
+    # dec command
+    dec_parser = subparsers.add_parser(
+        'dec',
+        help='Convert number to decimal',
+        description='Convert a number to decimal representation'
+    )
+    dec_parser.add_argument('number', nargs='?', help='Number to convert (or read from stdin)')
+    dec_parser.add_argument('from_base', type=int, nargs='?', default=16, help='Source base (default: 16)')
+
+    # hex command
+    hex_parser = subparsers.add_parser(
+        'hex',
+        help='Convert number to hexadecimal',
+        description='Convert a number to hexadecimal representation'
+    )
+    hex_parser.add_argument('number', nargs='?', help='Number to convert (or read from stdin)')
+    hex_parser.add_argument('from_base', type=int, nargs='?', default=10, help='Source base (default: 10)')
+
+    # slice command
+    slice_parser = subparsers.add_parser(
+        'slice',
+        help='Extract bits from a number',
+        description='Extract a range of bits from a number using hardware-style syntax: NUMBER[MSB:LSB]'
+    )
+    slice_parser.add_argument('input', nargs='?', help='Slice expression: "0xFF[7:4]" or "255[5]" (or read from stdin)')
+
+    args = parser.parse_args()
+
+    # If no command specified, show help
+    if not args.command:
+        parser.print_help()
+        return 1
+
+    # Dispatch to appropriate command handler
+    commands = {
+        'eval': cmd_eval,
+        'base': cmd_base,
+        'bin': cmd_bin,
+        'dec': cmd_dec,
+        'hex': cmd_hex,
+        'slice': cmd_slice,
+    }
+
+    return commands[args.command](args)
+
+
+if __name__ == '__main__':
+    sys.exit(main())

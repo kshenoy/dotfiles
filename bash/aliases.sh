@@ -65,6 +65,30 @@ gvim_diff() {
 alias vd=gvim_diff
 
 #=======================================================================================================================
+# Calculator Functions (wrappers for ~/.local/bin/calc)
+#=======================================================================================================================
+# Check if calc is available
+if command -v calc &>/dev/null; then
+    # Calculator with smart base detection
+    # Usage: = 4 + 5
+    #        = 0xFF + 0b1010
+    #        echo "16 * 32" | =
+    =() { calc eval "$@"; }
+
+    # Base converter
+    # Usage: =bin 10 --> 0b1010
+    #        =dec 0xFF --> 255
+    =bin() { calc bin "$@"; }   # Convert to binary
+    =dec() { calc dec "$@"; }   # Convert to decimal
+    =hex() { calc hex "$@"; }   # Convert to hexadecimal
+
+    # Bit slicing (hardware-style syntax)
+    # Usage: =slice '0xFF[7:4]'  # Extract bits 7:4
+    #        =slice '255[5]'     # Extract bit 5
+    =slice() { calc slice "$@"; }
+fi
+
+#=======================================================================================================================
 # Config File Shortcuts
 #=======================================================================================================================
 alias sosc='. ~/.bashrc && clnpath'
