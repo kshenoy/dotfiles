@@ -1,17 +1,13 @@
-# ignore
-# :PROPERTIES:
-# :header-args+: :tangle ignore
-# :END:
+# Global gitignore file
 # Created by https://www.gitignore.io/api/c,c++,dropbox,emacs,vim,tags
 
-# For C
-
-# [[file:~/.config/dotfiles/git/git.org::*ignore][ignore:1]]
+### C/C++ ###
 # Object files
 *.o
 *.ko
 *.obj
 *.elf
+*.slo
 
 # Precompiled Headers
 *.gch
@@ -22,6 +18,7 @@
 *.a
 *.la
 *.lo
+*.lai
 
 # Shared objects (inc. Windows DLLs)
 *.dll
@@ -40,59 +37,16 @@
 # Debug files
 *.dSYM/
 *.su
-# ignore:1 ends here
-
-
-
-# For C++
-
-# [[file:~/.config/dotfiles/git/git.org::*ignore][ignore:2]]
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
 
 # Fortran module files
 *.mod
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-# ignore:2 ends here
-
-
-
-# For Dropbox
-
-# [[file:~/.config/dotfiles/git/git.org::*ignore][ignore:3]]
-# Dropbox settings and caches
+### Dropbox ###
 .dropbox
 .dropbox.attr
 .dropbox.cache
-# ignore:3 ends here
 
-
-
-# For Emacs
-
-# [[file:~/.config/dotfiles/git/git.org::*ignore][ignore:4]]
+### Emacs ###
 # -*- mode: gitignore; -*-
 *~
 \#*\#
@@ -135,13 +89,8 @@ flycheck_*.el
 
 # projectiles files
 .projectile
-# ignore:4 ends here
 
-
-
-# For Vim
-
-# [[file:~/.config/dotfiles/git/git.org::*ignore][ignore:5]]
+### Vim ###
 # swap
 [._]*.s[a-w][a-z]
 [._]s[a-w][a-z]
@@ -150,16 +99,8 @@ Session.vim
 # temporary
 .netrwhist
 NetrwTreeListing*
-*~
-# auto-generated tag files
-tags
-# ignore:5 ends here
 
-
-
-# For Tags
-
-# [[file:~/.config/dotfiles/git/git.org::*ignore][ignore:6]]
+### Tags ###
 # Ignore tags created by etags, ctags, gtags (GNU global) and cscope
 TAGS
 .TAGS
@@ -175,15 +116,12 @@ cscope.files
 cscope.out
 cscope.in.out
 cscope.po.out
-# ignore:6 ends here
 
-
-
-# For Git
-
-# [[file:~/.config/dotfiles/git/git.org::*ignore][ignore:7]]
+### Git ###
 *.orig
-# ignore:7 ends here
 
-# For OS
+### OS ###
 .DS_Store
+
+### Claude Code ###
+**/.claude
