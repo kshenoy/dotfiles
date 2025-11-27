@@ -3,6 +3,26 @@
 #=======================================================================================================================
 # Enhanced directory navigation with fuzzy finding and directory stack management
 
+# Function: ...
+# Description: Interactively navigate up the directory tree with fzf
+# Usage:
+#   ...          - Select parent directory with fzf
+#   ... pattern  - Filter parent directories by pattern
+...() {
+    if ! hash fzf 2> /dev/null; then
+        echo "Error: fzf is required for this function" >&2
+        return 1
+    fi
+
+    local _selected=$(_dir=$PWD
+                      while [[ -n "$_dir" ]]; do
+                          _dir="${_dir%/[^/]*}"
+                          echo ${_dir:-/}
+                      done | fzf::_down --select-1 --delimiter='/' --nth=-1 ${1+ --query=$1})
+
+    [[ -n "$_selected" ]] && pushd "$_selected"
+}
+
 # Function: dirs
 # Description: Enhanced directory stack viewer
 # Usage:
@@ -34,11 +54,10 @@ pushd() {
 # Function: cd
 # Description: Enhanced cd with fuzzy directory navigation
 # Usage:
-#   cd              - Go to repository root (if in repo) or $HOME
-#   cd -            - Go to previous directory
-#   cd =            - Select from directory stack with fzf
-#   cd ... [TARG]   - Navigate up directory tree with fzf, optionally filtered by TARG
-#   cd path**glob   - Fuzzy search subdirectories matching glob pattern
+#   cd         - Go to repository root (if in repo) or $HOME
+#   cd -       - Go to previous directory
+#   cd =       - Select from directory stack with fzf
+#   cd <path>  - Navigate to path
 cd() {
     if (( "$#" == 0 )); then
         if vcs::is_in_repo > /dev/null; then
@@ -61,44 +80,6 @@ cd() {
             else
                 dirs
             fi
-            return
-            ;;
-
-        ...)
-            if hash fzf 2> /dev/null; then
-                local _selected=$(_dir=$PWD;
-                                  while [[ -n "$_dir" ]]; do
-                                      _dir="${_dir%/[^/]*}";
-                                      echo ${_dir:-/};
-                                  done | fzf::_down --select-1 --delimiter='/' --nth=-1 ${2+ --query=$2})
-                pushd $_selected
-            fi
-            return
-            ;;
-
-        *\*\**)
-            # Split $1 about the first ** into '_path' and '_pattern' and replace all '**' in _pattern with '*'
-            local _path=${1%%\*\**}; _path=${_path:-.}
-            local _pattern="*$(tr -s '*' <<< ${1#*\*\*})"
-
-            local _selected
-            if hash fzf 2> /dev/null; then
-                # Find '_path' for all dirs that match the glob expr '_pattern' and select with FZF from the results
-                _selected=$(if hash fd 2> /dev/null; then
-                                ${FZF_ALT_C_COMMAND} --full-path --glob "${_pattern}" "${_path}"
-                            else
-                                find "${_path}" -type d -path "${_pattern}"
-                            fi | fzf::_down --select-1)
-            else
-                # Select only the first match since without FZF we don't have a good way of handling multiple matches
-                if hash fd 2> /dev/null; then
-                    _selected=$(fd --color=never --hidden --exclude .git --type d --glob "${_pattern}" ${_path} | head -n 1)
-                else
-                    _selected=$(find $_path -type d -path "${_pattern}" -print -quit)
-                fi
-            fi
-
-            pushd "$_selected"
             return
             ;;
     esac
