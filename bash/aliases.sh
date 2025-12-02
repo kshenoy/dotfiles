@@ -14,7 +14,6 @@ alias lla='ll -A'
 alias cl="clear;ls"
 alias mv='mv -vi'
 alias cp='cp -vi'
-alias rm='rm -vi'
 alias ln='ln -svi'
 alias df='df -h'
 
@@ -28,6 +27,24 @@ mcd() {
     command mkdir -p "$@" || return
     cd -- "${@: -1}"
 }
+
+alias rm='rm -vi'
+alias rd='rm -rf'
+# Renames files/dirs and deletes in the background. Pretty nifty as I can create another file/dir with the same name
+# before the original one has been deleted
+unset -f rm_rf_bg
+rm_rf_bg() {
+    for i in "$@"; do
+        # Remove trailing slash and move to hidden
+        ni=${i/%\//}
+        bi=$(basename "$ni")
+        ni=${ni/%$bi/.$bi}
+
+        command mv "$i" "$ni.$$"
+        command rm -rf "$ni.$$" &
+    done
+}
+alias rdj='rm_rf_bg'
 
 #=======================================================================================================================
 # File Viewers & Pagers
