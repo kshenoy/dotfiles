@@ -149,6 +149,7 @@ __setprompt() {
 
 # Use the starship prompt
 eval "$(starship init bash)"
+command cp ${XDG_CONFIG_HOME:-$HOME/.config}/{dotfiles/starship/,}starship.toml
 
 #=======================================================================================================================
 # LOCAL OVERRIDES (load last)

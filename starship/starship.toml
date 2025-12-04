@@ -29,12 +29,6 @@ error_symbol   = "[❮@_@❯](bold red)"
 
 [directory]
 truncation_length = 9
-[directory.substitutions]
-'/proj/ch_func_gen_scratch' = '~SCRATCH'
-'/proj/ch_func_dev0/CH/kshenoy/ch' = '~CH'
-'/proj/ch_func_dev1/CH/kshenoy/ch' = '~CH'
-'/proj/ch_func_dev0/CH' = '~CH0'
-'/proj/ch_func_dev1/CH' = '~CH1'
 
 [env_var]
 disabled = true
