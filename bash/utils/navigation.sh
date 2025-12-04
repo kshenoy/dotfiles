@@ -40,16 +40,6 @@ dirs() {
     fi
 }
 
-# Function: pushd
-# Description: Silent pushd that removes duplicate entries from directory stack
-# Note: pushd calls cd under the hood, so cdable_vars and cdspell apply here too
-pushd() {
-    builtin pushd "$@" > /dev/null
-
-    # Remove any duplicate entries. The 1st entry will be the PWD so skip it
-    local _dir_pos=$(dirs -l -v | tail -n+2 | grep -F "$PWD" | awk '{print $1}')
-    [[ -n "$_dir_pos" ]] && command popd -n +$_dir_pos &> /dev/null
-}
 
 # Function: cd
 # Description: Enhanced cd with fuzzy directory navigation
@@ -58,25 +48,26 @@ pushd() {
 #   cd -       - Go to previous directory
 #   cd =       - Select from directory stack with fzf
 #   cd <path>  - Navigate to path
+unset -f cd
 cd() {
     if (( "$#" == 0 )); then
         if vcs::is_in_repo > /dev/null; then
-            pushd "$(vcs::get_root)"
+            pushd "$(vcs::get_root)" > /dev/null
         else
-            pushd "$HOME"
+            pushd "$HOME" > /dev/null
         fi
         return
     fi
 
     case "$1" in
         -)
-            pushd
+            pushd > /dev/null
             return
             ;;
 
         =)
             if hash fzf 2> /dev/null; then
-                $(FZF_ALT_C_COMMAND='command dirs -l -p' __fzf_cd__)
+                $(FZF_ALT_C_COMMAND='builtin dirs -l -p' __fzf_cd__)
             else
                 dirs
             fi
@@ -85,7 +76,7 @@ cd() {
     esac
 
     # Fall-through to the default command
-    pushd "$@"
+    pushd "$@" > /dev/null
 }
 
 alias ..='cd ..'
