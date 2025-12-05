@@ -1,14 +1,4 @@
 # LS_COLORS/dircolors
-# :PROPERTIES:
-# :header-args+: :tangle dircolors.rc
-# :END:
-
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:1]]
-# This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
-# Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
-# If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
-# LS_COLORS/dircolors:1 ends here
 
 
 

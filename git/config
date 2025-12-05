@@ -1,41 +1,19 @@
-# config
-# :PROPERTIES:
-# :header-args+: :tangle config
-# :END:
-
-# [[file:~/.config/dotfiles/git/git.org::*config][config:1]]
-# This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
-# Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
-# If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
-# config:1 ends here
+# Git configuration
 
 # user
-
-# [[file:~/.config/dotfiles/git/git.org::*user][user:1]]
 [user]
 name  = Kartik Shenoy
 email = theresmorethanoneway@gmail.com
-# user:1 ends here
 
 # core
-
-# [[file:~/.config/dotfiles/git/git.org::*core][core:1]]
 [core]
 editor   = vim
 fileMode = false
-# core:1 ends here
-
-
 
 # Centralize all hooks instead of configuring them on a per-repository basis
-
-# [[file:~/.config/dotfiles/git/git.org::*core][core:3]]
 hooksPath = ~/.config/git/hooks/
-# core:3 ends here
 
 # color
-
-# [[file:~/.config/dotfiles/git/git.org::*color][color:1]]
 [color]
 ui     = auto
 branch = auto
@@ -57,11 +35,8 @@ plain = white
 added = yellow
 changed = red
 untracked = cyan
-# color:1 ends here
 
 # diff
-
-# [[file:~/.config/dotfiles/git/git.org::*diff][diff:1]]
 [diff]
 tool = nvim
 
@@ -78,11 +53,8 @@ trustExitCode = true
 
 [difftool "meld"]
 cmd = meld --diff $LOCAL $REMOTE
-# diff:1 ends here
 
 # merge
-
-# [[file:~/.config/dotfiles/git/git.org::*merge][merge:1]]
 [merge]
 tool = meld
 conflictstyle = diff3
@@ -102,11 +74,8 @@ trustExitCode = true
 [mergetool "nvim"]
 cmd = nvim $BASE $REMOTE $LOCAL $MERGED
 trustExitCode = true
-# merge:1 ends here
 
 # misc
-
-# [[file:~/.config/dotfiles/git/git.org::*misc][misc:1]]
 [credential]
 helper = cache --timeout=3600
 
@@ -115,10 +84,8 @@ default = matching
 
 [pull]
 rebase = false
-# misc:1 ends here
 
 # aliases
-# - https://gitlab.com/to1ne/literate-dotfiles/blob/master/git.org
 # - https://haacked.com/archive/2014/07/28/github-flow-aliases/
 
 # Using =!= as prefix allows running any command in the shell and it doesn't have to be a git command.

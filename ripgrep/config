@@ -1,7 +1,4 @@
-# [[file:~/.config/dotfiles/bash/bashrc.org::*[[https://github.com/BurntSushi/ripgrep\][ripgrep]\]][[[https://github.com/BurntSushi/ripgrep][ripgrep]]:2]]
-# This is a tangled file. Do not make any changes here. All changes should preferably be made in the original Org file.
-# Use =org-babel-tangle-jump-back-to-org= to jump back to it from any code block.
-# If any changes are made here, use =org-babel-detangle= to add it back to the original Org mode file.
+# ripgrep configuration
 
 # Redefine the cpp extension to make it easier to parse and use it with fd. Start by first clearing it
 --type-clear
@@ -32,4 +29,4 @@ hdl:*.x
 
 # Because who cares about case!?
 --smart-case
-# [[https://github.com/BurntSushi/ripgrep][ripgrep]]:2 ends here
+# https://github.com/BurntSushi/ripgrep

@@ -1,13 +1,7 @@
 # tmux++
-# :PROPERTIES:
-# :header-args+: :tangle tmuxw.bash
-# :END:
-
 # Wrapper around tmux to add more functionality. This file must be sourced
 
-# [[file:tmux.org::*tmux++][tmux++:1]]
 #!/usr/bin/env bash
-# tmux++:1 ends here
 
 
 
