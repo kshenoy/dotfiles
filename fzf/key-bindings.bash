@@ -76,24 +76,6 @@ fzf::cmd_opts() {                                                               
 
 
 #=======================================================================================================================
-fzf::tmux::select_session() {                                                                                      #{{{1
-  # Create new tmux session, or switch to existing one. Works from within tmux too
-  if [[ -n "$TMUX" ]]; then
-    local cmd="switch-client"
-  else
-    local cmd="attach-session"
-  fi
-
-  local session=$(tmux list-sessions 2>/dev/null |
-                  sed -e 's/ (created[^)]*)//' -e 's/:/ :/' | column -t -o ' ' |
-                  fzf --nth=1 |
-                  awk '{print $1}')
-  if [[ -n "$session" ]]; then
-    tmux $cmd -t "$session"
-  fi
-}
-
-
 #=======================================================================================================================
 # fzf::bookmarks() {                                                                                               #{{{1
   
@@ -172,9 +154,6 @@ if [[ -o emacs ]]; then                                                         
 
   # CTRL-X: Experimental
   # bind -x '"\C-f\C-x": "fzf::_expt"'
-
-  # Tmux related bindings: CTRL-F CTRL-T
-  bind -x '"\C-f\C-t\C-s": "fzf::tmux::select_session"'
 
   # Version-control related bindings: CTRL-F CTRL-V
   bind -x '"\C-f\C-v\C-b": "fzf::git::branches"'
