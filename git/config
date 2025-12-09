@@ -43,17 +43,6 @@ tool = nvim
 [difftool]
 prompt = false
 
-[difftool "nvim"]
-cmd = nvim -d $LOCAL $REMOTE
-trustExitCode = true
-
-[difftool "vim"]
-cmd = vim -df -c 'set columns=260|set lines=62|wincmd =' $LOCAL $REMOTE 2> /dev/null
-trustExitCode = true
-
-[difftool "meld"]
-cmd = meld --diff $LOCAL $REMOTE
-
 # merge
 [merge]
 tool = meld
@@ -62,10 +51,6 @@ conflictstyle = diff3
 [mergetool "meld"]
 cmd = meld $LOCAL $MERGED $REMOTE --output $MERGED --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $REMOTE --diff $LOCAL $MERGED --diff $REMOTE $MERGED
 trustExitCode = false
-
-[mergetool "gvim"]
-cmd = vim_merge -g -geometry 420x70 $BASE $REMOTE $LOCAL $MERGED
-trustExitCode = true
 
 [mergetool "vim"]
 cmd = vim_merge $BASE $REMOTE $LOCAL $MERGED
@@ -82,9 +67,6 @@ helper = cache --timeout=3600
 [push]
 default = matching
 
-[pull]
-rebase = false
-
 # aliases
 # - https://haacked.com/archive/2014/07/28/github-flow-aliases/
 
@@ -100,7 +82,7 @@ dt = difftool
 mt = mergetool
 ci = commit
 co = checkout
-br = branch -a
+br = branch
 lg = log --color --graph --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(red)%d%C(reset)' --abbrev-commit --all
 
 # Safer wipes. Using =git reset HEAD --hard= leaves no room for undoing anything.
@@ -109,7 +91,3 @@ lg = log --color --graph --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%c
 # there. I can run the =git reflog= command and find the SHA of the commit if I realize later that I made a mistake with
 # the reset. The commit message will be “WIPE SAVEPOINT” in this case.
 wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
-
-
-[safe]
-	directory = /proj/cores_dft_publish/cores_common_verif/repos/design/ch_shared_ip_2023/ch_shared_ip/.git
