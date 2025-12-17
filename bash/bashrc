@@ -98,21 +98,6 @@ if [[ -x /usr/bin/dircolors ]]; then
 fi
 
 #=======================================================================================================================
-# EXTERNAL TOOL INTEGRATIONS
-#=======================================================================================================================
-
-# fzf: https://github.com/junegunn/fzf
-if [[ -d /opt/fzf ]]; then
-    export FZF_PATH=/opt/fzf
-fi
-source ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf.bash
-
-# zoxide (https://github.com/ajeetdsouza/zoxide)
-if hash zoxide 2> /dev/null; then
-  eval "$(zoxide init --cmd j bash)"
-fi
-
-#=======================================================================================================================
 # MODULAR CONFIGURATION
 #=======================================================================================================================
 # Load modular configuration files
@@ -147,6 +132,18 @@ __setprompt() {
   history -a
 }
 
+#=======================================================================================================================
+# EXTERNAL TOOL INTEGRATIONS
+#=======================================================================================================================
+
+# fzf: https://github.com/junegunn/fzf
+. ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf.bash
+
+# zoxide (https://github.com/ajeetdsouza/zoxide)
+if hash zoxide 2> /dev/null; then
+  eval "$(zoxide init --cmd j bash)"
+fi
+
 # Use the starship prompt
 eval "$(starship init bash)"
 command cp ${XDG_CONFIG_HOME:-$HOME/.config}/{dotfiles/starship/,}starship.toml
@@ -155,6 +152,3 @@ command cp ${XDG_CONFIG_HOME:-$HOME/.config}/{dotfiles/starship/,}starship.toml
 # LOCAL OVERRIDES (load last)
 #=======================================================================================================================
 [[ -f ~/.bashrc_local_override ]] && . ~/.bashrc_local_override
-
-# AI integration
-[[ -f ~/.bash_ai ]] && . ~/.bash_ai

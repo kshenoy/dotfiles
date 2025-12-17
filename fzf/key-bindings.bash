@@ -1,27 +1,5 @@
 #=======================================================================================================================
-fzf::cd() {
-  local cmd="${FZF_ALT_C_COMMAND:-"command find -L . -mindepth 1 \\( -path '*/\\.*' -o -fstype 'sysfs' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
-    -o -type d -print 2> /dev/null | cut -b3-"}"
-  local out=($(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse --bind=ctrl-z:ignore $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m --expect=alt-g))
-
-  local expected=${out[0]}
-  if [[ -z "$expected" ]]; then
-    return
-  fi
-
-  local selected
-  if [[ ${expected} == "alt-g" ]]; then
-    selected=$(printf 'cd -- %q' "${out[1]}")
-  else
-    selected=$(printf '%q ' "$expected")
-  fi
-  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}${selected}${READLINE_LINE:$READLINE_POINT}"
-  READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
-}
-
-
-#=======================================================================================================================
-fzf::lsf::bjobs() {                                                                                                #{{{1
+fzf::lsf::bjobs() {
   local selected=$(lsf_bjobs -o "id: user: stat: queue: submit_time: name" |
     FZF_DEFAULT_OPTS="--header-lines=1 $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
     cut -d' ' -f1 | while read -r item; do
@@ -35,7 +13,7 @@ fzf::lsf::bjobs() {                                                             
 
 
 #=======================================================================================================================
-fzf::cmd_opts() {                                                                                                  #{{{1
+fzf::cmd_opts() {
   # echo "DEBUG: '${READLINE_LINE}' Point=${READLINE_POINT}, Char='${READLINE_LINE:$READLINE_POINT:1}'"
   local pos=$READLINE_POINT
 
@@ -76,100 +54,61 @@ fzf::cmd_opts() {                                                               
 
 
 #=======================================================================================================================
-#=======================================================================================================================
-# fzf::bookmarks() {                                                                                               #{{{1
-  
-#   local _cmd='grep filename ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/emacs/bookmarks | cut -d " " -f4 | tr -d \'")\' | sed -e "s,/ssh:\w\+:,," -e "s,~,\$HOME," | sort -u' | while
-# read -r item; do
-# [[ -d "$item" ]] && printf '%q\n' "$item"
-# done
-#   local _cmd="cat <(command find -L ~/Notes -type f -name '*.org' 2> /dev/null) ~/bookmarks"
-
-#   local _out=($(eval "$_cmd | sed "s:${HOME}:~:g" | fzf -m --expect=alt-v,alt-e"))
-#   local _key=$(head -n1 <<< "$_out")
-
-#   case ${_key} in
-#     "alt-v")
-#       _out[0]="gvim 2> /dev/null"
-#       eval "$(paste -s -d' ' <<< ${_out[@]})"
-#       ;;
-#     "alt-e")
-#       _out[0]="emacs"
-#       eval "$(paste -s -d' ' <<< ${_out[@]})"
-#       ;;
-#     *)
-#       local _selected=$(paste -s -d' ' <<< ${_out[@]})
-#       READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}${_selected}${READLINE_LINE:$READLINE_POINT}"
-#       READLINE_POINT=$(( READLINE_POINT + ${#_selected} ))
-#     ;;
-#   esac
-# }
-# }}}1
-
-
-#=======================================================================================================================
 # Info on bind usage: https://stackoverflow.com/a/47878915/734153
 # bind -X : List all key sequences bound to shell commands (using -x)
 #      -S : Display readline key sequences bound to macros and the strings they output
-#
-# Unbind C-t as I want to sue C-f instead
-bind '"\C-t": nop'
-
 
 #=======================================================================================================================
-if [[ -o vi ]]; then                                                                                               #{{{
-  # CTRL-F - Paste the selected file path into the command line (changed from default CTRL-T)
-  # - FIXME: Selected items are attached to the end regardless of cursor position
-  if (( $BASH_VERSINFO > 3 )); then
-    bind -x '"\C-f\C-f": "fzf-file-widget"'
-  elif __fzf_use_tmux__; then
-    bind '"\C-f\C-f": "\C-x\C-a$a \C-x\C-addi`__fzf_select_tmux__`\C-x\C-e\C-x\C-a0P$xa"'
-  else
-    bind '"\C-f\C-f": "\C-x\C-a$a \C-x\C-addi`__fzf_select__`\C-x\C-e\C-x\C-a0Px$a \C-x\C-r\C-x\C-axa "'
+# CTRL-F CTRL-F instead of CTRL-T : Paste the selected file path into the command line
+# These were obtained directly from FZF's key-bindings.bash file and modified
+bind -m emacs-standard '"\C-t": nop'
+bind -m vi-command '"\C-t": nop'
+bind -m vi-insert '"\C-t": nop'
+if ((BASH_VERSINFO[0] < 4)); then
+  # CTRL-T - Paste the selected file path into the command line
+  if [[ ${FZF_CTRL_T_COMMAND-x} != "" ]]; then
+    bind -m emacs-standard '"\C-f\C-f": " \C-b\C-k \C-u`__fzf_select__`\e\C-e\er\C-a\C-y\C-h\C-e\e \C-y\ey\C-x\C-x\C-f\C-y\ey\C-_"'
   fi
-  bind -m vi-command '"\C-f\C-f": "i\C-f\C-f"'
-fi # }}}
-
+else
+  # CTRL-T - Paste the selected file path into the command line
+  if [[ ${FZF_CTRL_T_COMMAND-x} != "" ]]; then
+    bind -m emacs-standard -x '"\C-f\C-f": fzf-file-widget'
+  fi
+fi
 
 #=======================================================================================================================
-if [[ -o emacs ]]; then                                                                                            #{{{
-  # CTRL-F - Paste the selected file path into the command line (changed from default CTRL-T)
-  if (( $BASH_VERSINFO > 3 )); then
-    bind -x '"\C-f\C-f": "fzf-file-widget"'
-  elif __fzf_use_tmux__; then
-    bind '"\C-f\C-f": " \C-u \C-a\C-k`__fzf_select_tmux__`\e\C-e\C-y\C-a\C-d\C-y\ey\C-h"'
-  else
-    bind '"\C-f\C-f": " \C-u \C-a\C-k`__fzf_select__`\e\C-e\C-y\C-a\C-y\ey\C-h\C-e\er \C-h"'
-  fi
+# CTRL-F CTRL-J instead of ALT-C : cd into the selected directory
+# These were obtained directly from FZF's key-bindings.bash file and modified
+bind -m emacs-standard '"\ec": nop'
+bind -m vi-command '"\ec": nop'
+bind -m vi-insert '"\ec": nop'
+if [[ ${FZF_ALT_C_COMMAND-x} != "" ]]; then
+  bind -m emacs-standard '"\C-f\C-j": " \C-b\C-k \C-u`__fzf_cd__`\e\C-e\er\C-m\C-y\C-h\e \C-y\ey\C-x\C-x\C-d\C-y\ey\C-_"'
+fi
 
-  # cd into the selected directory
-  # Unbind the default one first and then create new bindings
-  # bind '"\ec": nop'
-  bind -x '"\C-f\C-g": "fzf::cd"'
+#=======================================================================================================================
+bind -m emacs-standard -x '"\C-f\C-l": "fzf::lsf::bjobs"'
 
-  bind -x '"\C-f\C-l": "fzf::lsf::bjobs"'
+# CTRL-O: Show list of options of the command before the cursor using '<cmd> -h'
+bind -m emacs-standard -x '"\C-f\C-o": "fzf::cmd_opts"'
 
-  # CTRL-O: Show list of options of the command before the cursor using '<cmd> -h'
-  bind -x '"\C-f\C-o": "fzf::cmd_opts"'
+# CTRL-X: Experimental
+# bind -x '"\C-f\C-x": "fzf::_expt"'
 
-  # CTRL-X: Experimental
-  # bind -x '"\C-f\C-x": "fzf::_expt"'
+# Version-control related bindings: CTRL-G
+bind -m emacs-standard -x '"\C-f\C-g\C-b": "fzf::git::branches"'
+bind -m emacs-standard -x '"\C-f\C-g\C-d": "fzf::git::diffs"'
+bind -m emacs-standard -x '"\C-f\C-g\C-e": "fzf::vcs::files"'
+bind -m emacs-standard -x '"\C-f\C-g\C-f": "fzf::vcs::all_files"'
+# bind    '"\C-f\C-g\C-g": " \C-e\C-u`fzf::vcs::cd`\e\C-e\er\C-m"'
+bind -m emacs-standard -x '"\C-f\C-g\C-k": "fzf::vcs::commits"'
+bind -m emacs-standard -x '"\C-f\C-g\C-l": "fzf::vcs::filelog"'
+bind -m emacs-standard -x '"\C-f\C-g\C-r": "fzf::git::remotes"'
+bind -m emacs-standard -x '"\C-f\C-g\C-s": "fzf::vcs::status"'
+bind -m emacs-standard -x '"\C-f\C-g\C-t": "fzf::git::tags"'
 
-  # Version-control related bindings: CTRL-F CTRL-V
-  bind -x '"\C-f\C-v\C-b": "fzf::git::branches"'
-  bind -x '"\C-f\C-v\C-d": "fzf::git::diffs"'
-  bind -x '"\C-f\C-v\C-e": "fzf::vcs::files"'
-  bind -x '"\C-f\C-v\C-f": "fzf::vcs::all_files"'
-  bind    '"\C-f\C-v\C-g": " \C-e\C-u`fzf::vcs::cd`\e\C-e\er\C-m"'
-  bind -x '"\C-f\C-v\C-k": "fzf::vcs::commits"'
-  bind -x '"\C-f\C-v\C-l": "fzf::vcs::filelog"'
-  bind -x '"\C-f\C-v\C-r": "fzf::git::remotes"'
-  bind -x '"\C-f\C-v\C-s": "fzf::vcs::status"'
-  bind -x '"\C-f\C-v\C-t": "fzf::git::tags"'
+bind -m emacs-standard '"\er": redraw-current-line'
 
-  bind '"\er": redraw-current-line'
-
-  # Alt-/: Repeat last command and pipe result to FZF
-  # From http://brettterpstra.com/2015/07/09/shell-tricks-inputrc-binding-fun/
-  bind '"\C-f\e/": "!! | fzf -m\C-m\C-m"'
-fi #}}}
+# Alt-/: Repeat last command and pipe result to FZF
+# From http://brettterpstra.com/2015/07/09/shell-tricks-inputrc-binding-fun/
+bind -m emacs-standard -x '"\C-f\e/": "!! | fzf -m\C-m\C-m"'
