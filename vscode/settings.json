@@ -35,33 +35,33 @@
             "id": "editor-guides-bracketPairs",
             "overrideWorkspaceSettings": true,
             "values": [
-                {"editor.guides.bracketPairs": "active"},
-                {"editor.guides.bracketPairs": false}
+                { "editor.guides.bracketPairs": "active" },
+                { "editor.guides.bracketPairs": false }
             ]
         },
         {
             "id": "editor-guides-indentation",
             "overrideWorkspaceSettings": true,
             "values": [
-                {"editor.guides.indentation": true},
-                {"editor.guides.indentation": false}
+                { "editor.guides.indentation": true },
+                { "editor.guides.indentation": false }
             ]
         },
         {
             "id": "editor-lineNumbers",
             "overrideWorkspaceSettings": true,
             "values": [
-                {"editor.lineNumbers": "relative"},
-                {"editor.lineNumbers": "off"},
-                {"editor.lineNumbers": "on"}
+                { "editor.lineNumbers": "relative" },
+                { "editor.lineNumbers": "off" },
+                { "editor.lineNumbers": "on" }
             ]
         },
         {
             "id": "editor-occurrencesHighlight",
             "overrideWorkspaceSettings": true,
             "values": [
-                {"editor.occurrencesHighlight": "singleFile"},
-                {"editor.occurrencesHighlight": "off"}
+                { "editor.occurrencesHighlight": "singleFile" },
+                { "editor.occurrencesHighlight": "off" }
             ]
         }
     ],
@@ -84,5 +84,6 @@
     "workbench.startupEditor": "none",
     "workbench.statusBar.visible": false,
     "workbench.activityBar.location": "top",
-    "workbench.secondarySideBar.defaultVisibility": "hidden"
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
+    "workbench.externalBrowser": "/tool/pandora64/.package/firefox-117.0.1/bin/firefox"
 }
