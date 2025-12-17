@@ -54,6 +54,43 @@ fzf::cmd_opts() {
 
 
 #=======================================================================================================================
+# Enhanced history search across all archived history files
+# Usage: fzf::prehistory [months]
+#   months: number of months to search (default: 6, -1 for all history)
+fzf::prehistory() {
+  local output
+  local months="${1:-6}"  # Default to 6 months if no argument provided
+
+  # Search through all archived history files in the bash_history directory
+  local hist_dir="${HOME}/.local/share/bash_history"
+
+  # Set up the date filter for find command
+  local newermt_filter=""
+  if [[ "$months" -ne -1 ]]; then
+    local cutoff_date=$(date -d "$months months ago" +%s 2>/dev/null || date -v-${months}m +%s 2>/dev/null)
+    newermt_filter="-newermt @$cutoff_date"
+  fi
+
+  output=$(
+    if [[ -d "$hist_dir" ]]; then
+      find "$hist_dir" -type f $newermt_filter -exec cat {} \; 2>/dev/null | \
+        grep -v '^#' | \
+        awk '!seen[$0]++' | \
+        FZF_DEFAULT_OPTS="--reverse --scheme=history --bind=ctrl-r:toggle-sort ${FZF_CTRL_R_OPTS-} +m" \
+        FZF_DEFAULT_OPTS_FILE='' fzf --query "$READLINE_LINE"
+    fi
+  ) || return
+
+  READLINE_LINE="$output"
+  if [[ -z $READLINE_POINT ]]; then
+    echo "$READLINE_LINE"
+  else
+    READLINE_POINT=${#READLINE_LINE}
+  fi
+}
+
+
+#=======================================================================================================================
 # Info on bind usage: https://stackoverflow.com/a/47878915/734153
 # bind -X : List all key sequences bound to shell commands (using -x)
 #      -S : Display readline key sequences bound to macros and the strings they output
@@ -87,15 +124,19 @@ if [[ ${FZF_ALT_C_COMMAND-x} != "" ]]; then
 fi
 
 #=======================================================================================================================
+# CTRL-F CTRL-L: Search all running LSF jobs
 bind -m emacs-standard -x '"\C-f\C-l": "fzf::lsf::bjobs"'
 
-# CTRL-O: Show list of options of the command before the cursor using '<cmd> -h'
+# CTRL-F CTRL-O: Show list of options of the command before the cursor using '<cmd> -h'
 bind -m emacs-standard -x '"\C-f\C-o": "fzf::cmd_opts"'
 
-# CTRL-X: Experimental
+# CTRL-F CTRL-R: Search through all archived history files
+bind -m emacs-standard -x '"\C-f\C-r": "fzf::prehistory"'
+
+# CTRL-F CTRL-X: Experimental
 # bind -x '"\C-f\C-x": "fzf::_expt"'
 
-# Version-control related bindings: CTRL-G
+# Version-control related bindings: CTRL-F CTRL-G
 bind -m emacs-standard -x '"\C-f\C-g\C-b": "fzf::git::branches"'
 bind -m emacs-standard -x '"\C-f\C-g\C-d": "fzf::git::diffs"'
 bind -m emacs-standard -x '"\C-f\C-g\C-e": "fzf::vcs::files"'
@@ -109,6 +150,6 @@ bind -m emacs-standard -x '"\C-f\C-g\C-t": "fzf::git::tags"'
 
 bind -m emacs-standard '"\er": redraw-current-line'
 
-# Alt-/: Repeat last command and pipe result to FZF
+# CTRL-F ALT-/: Repeat last command and pipe result to FZF
 # From http://brettterpstra.com/2015/07/09/shell-tricks-inputrc-binding-fun/
 bind -m emacs-standard -x '"\C-f\e/": "!! | fzf -m\C-m\C-m"'
