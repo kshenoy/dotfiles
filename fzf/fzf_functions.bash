@@ -1,15 +1,23 @@
 #!/usr/bin/env bash
 
 #=======================================================================================================================
-fzf::_down() {                                                                                                     #{{{1
+fzf::_down() {                                                                                                     #
   fzf "$@" --height 50% --border
 }
-# }}}1
+
+
+#=======================================================================================================================
+fzf::_insert_at_cursor() {                                                                                         #
+  local selected="$1"
+  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
+  READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
+}
+
 
 #=======================================================================================================================
 # fzf::git
 #=======================================================================================================================
-fzf::git::diffs() {                                                                                                #{{{1
+fzf::git::diffs() {                                                                                                #
   vcs::is_in_git_repo || return
   git -c color.status=always status --short |
   fzf::_down -m --ansi --nth 2..,.. \
@@ -19,7 +27,7 @@ fzf::git::diffs() {                                                             
 
 
 #=======================================================================================================================
-fzf::git::branches() {                                                                                             #{{{1
+fzf::git::branches() {                                                                                             #
   vcs::is_in_git_repo || return
 
   local _selected=$(
@@ -28,13 +36,12 @@ fzf::git::branches() {                                                          
     --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1) | head -'$LINES |
   sed -e 's/^..//' -e 's#^remotes/##' | cut -d' ' -f1 | paste -s -d ' ')
 
-  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$_selected${READLINE_LINE:$READLINE_POINT}"
-  READLINE_POINT=$(( READLINE_POINT + ${#_selected} ))
+  fzf::_insert_at_cursor "$_selected"
 }
 
 
 #=======================================================================================================================
-fzf::git::tags() {                                                                                                 #{{{1
+fzf::git::tags() {                                                                                                 #
   vcs::is_in_git_repo || return
   git tag --sort -version:refname |
   fzf::_down --multi --preview-window right:70% \
@@ -43,19 +50,19 @@ fzf::git::tags() {                                                              
 
 
 #=======================================================================================================================
-fzf::git::remotes() {                                                                                              #{{{1
+fzf::git::remotes() {                                                                                              #
   vcs::is_in_git_repo || return
   git remote -v | awk '{print $1 "\t" $2}' | uniq |
   fzf::_down --tac \
     --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" {1} | head -200' |
   cut -d$'\t' -f1
 }
-# }}}1
+
 
 #=======================================================================================================================
 # fzf::p4
 #=======================================================================================================================
-fzf::p4::strip_common_ancestors() {                                                                                #{{{1
+fzf::p4::strip_common_ancestors() {                                                                                #
   for item in "$@"; do
     [[ -z "$item" ]] && continue
 
@@ -71,7 +78,7 @@ fzf::p4::strip_common_ancestors() {                                             
 }
 
 #=======================================================================================================================
-fzf::p4::cd() {                                                                                                    #{{{1
+fzf::p4::cd() {                                                                                                    #
   local cmd='command find $STEM -mindepth 1 \
     -type d \( -path $STEM/_env -o -path $STEM/emu -o -path $STEM/env_squash -o -path $STEM/import -o \
       -path $STEM/powerPro -o -path $STEM/sdpx \) -prune \
@@ -86,19 +93,19 @@ fzf::p4::cd() {                                                                 
 }
 
 #=======================================================================================================================
-fzf::p4::all_files() {                                                                                             #{{{1
+fzf::p4::all_files() {                                                                                             #
   FZF_CTRL_T_COMMAND='cat \
     <(command p4 have ${STEM:+$STEM/}...) \
     <(p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" | command xargs -I{} -n1 command p4 where {}) \
     | command awk "{print \$3}"' \
   fzf-file-widget
 }
-# }}}1
+
 
 #=======================================================================================================================
 # fzf::vcs (generic wrapper to cover all vcs types)
 #=======================================================================================================================
-fzf::vcs::cd() {                                                                                                   #{{{1
+fzf::vcs::cd() {                                                                                                   #
   if vcs::is_in_perforce_repo; then
     fzf::p4::cd
   else
@@ -107,7 +114,7 @@ fzf::vcs::cd() {                                                                
 }
 
 #=======================================================================================================================
-fzf::vcs::all_files() {                                                                                            #{{{1
+fzf::vcs::all_files() {                                                                                            #
   if vcs::is_in_git_repo; then
     local _top=$(git rev-parse --show-toplevel)
     local _selected=$(git ls-tree --full-tree -r --name-only HEAD |
@@ -118,8 +125,7 @@ fzf::vcs::all_files() {                                                         
       done
     )
 
-    READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$_selected${READLINE_LINE:$READLINE_POINT}"
-    READLINE_POINT=$(( READLINE_POINT + ${#_selected} ))
+    fzf::_insert_at_cursor "$_selected"
   elif vcs::is_in_perforce_repo; then
     fzf::p4::all_files
   else
@@ -128,7 +134,7 @@ fzf::vcs::all_files() {                                                         
 }
 
 #=======================================================================================================================
-fzf::vcs::files() {                                                                                                #{{{1
+fzf::vcs::files() {                                                                                                #
   if vcs::is_in_git_repo; then
     FZF_CTRL_T_COMMAND='{ git ls-tree -r --name-only HEAD || \
       find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//; } 2> /dev/null' \
@@ -146,7 +152,7 @@ fzf::vcs::files() {                                                             
 }
 
 #=======================================================================================================================
-fzf::vcs::commits() {                                                                                              #{{{1
+fzf::vcs::commits() {                                                                                              #
   if vcs::is_in_git_repo; then
     local _selected=$(git log --graph --color --all --date=short --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cd) %C(red)%d%C(reset)' |
     fzf::_down --ansi --no-sort --multi --bind 'ctrl-s:toggle-sort' \
@@ -160,12 +166,11 @@ fzf::vcs::commits() {                                                           
       cut -d' ' -f1)
   fi
 
-  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$_selected${READLINE_LINE:$READLINE_POINT}"
-  READLINE_POINT=$(( READLINE_POINT + ${#_selected} ))
+  fzf::_insert_at_cursor "$_selected"
 }
 
 #=======================================================================================================================
-fzf::vcs::filelog() {                                                                                              #{{{1
+fzf::vcs::filelog() {                                                                                              #
   vcs::is_in_perforce_repo || return
 
   if [[ -n "$1" ]] && [[ $1 != -* ]] && [[ -f "$1" ]]; then
@@ -186,12 +191,11 @@ fzf::vcs::filelog() {                                                           
     --preview "p4 describe {3} | sed -n -e '1,/Differences .../p' -e \"/^====.*$(basename $_file)/,/^====/p\" | head -n -2" |
     cut -d' ' -f1 | while read -r item; do printf '%q ' "$_file$item"; done)
 
-  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$_selected${READLINE_LINE:$READLINE_POINT}"
-  READLINE_POINT=$(( READLINE_POINT + ${#_selected} ))
+  fzf::_insert_at_cursor "$_selected"
 }
 
 #=======================================================================================================================
-fzf::vcs::status() {                                                                                               #{{{1
+fzf::vcs::status() {                                                                                               #
   if vcs::is_in_git_repo; then
     local _selected=$(git -c color.status=always status --short |
       FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m --nth=2 | awk '{print $NF}' | paste -s -d ' ')
@@ -206,6 +210,100 @@ fzf::vcs::status() {                                                            
     )
   fi
 
-  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$_selected${READLINE_LINE:$READLINE_POINT}"
-  READLINE_POINT=$(( READLINE_POINT + ${#_selected} ))
+  fzf::_insert_at_cursor "$_selected"
+}
+
+#=======================================================================================================================
+# fzf::lsf
+#=======================================================================================================================
+fzf::lsf::bjobs() {                                                                                                #
+  local selected=$(lsf_bjobs -o "id: user: stat: queue: submit_time: name" |
+    FZF_DEFAULT_OPTS="--header-lines=1 $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
+    cut -d' ' -f1 | while read -r item; do
+      printf '%q ' "$item"
+    done
+  )
+
+  fzf::_insert_at_cursor "$selected"
+}
+
+
+#=======================================================================================================================
+# fzf::cmd_opts
+#=======================================================================================================================
+fzf::cmd_opts() {                                                                                                  #
+  # echo "DEBUG: '${READLINE_LINE}' Point=${READLINE_POINT}, Char='${READLINE_LINE:$READLINE_POINT:1}'"
+  local pos=$READLINE_POINT
+
+  # If cursor is on a non-whitespace char assume it's on the cmd that needs to be parsed and move pos to its end
+  while [[ ${READLINE_LINE:$pos:1} != " " ]] && [[ $pos != ${#READLINE_LINE} ]]; do
+    pos=$(( pos + 1 ))
+  done
+  local cmd=$(awk '{print $NF}' <<< "${READLINE_LINE:0:$pos}")
+
+  local selected=$(eval "${cmd} --help || ${cmd} -h || ${cmd} -help || ${cmd} help" | \
+    FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf +x -m "$@" | \
+    while read -r item; do
+      # Auto-split on whitespace
+      local words=($item)
+      for i in ${words[@]}; do
+        if [[ "$i" == -* ]]; then
+          local opt="$i"
+          break
+        fi
+      done
+      printf '%q ' $(awk '{print $1}' <<< "$opt" | sed 's/[,=].*$//')
+    done; echo)
+
+  if [[ "${READLINE_LINE:$(($pos-1)):1}" != " " ]]; then
+    # If cursor doesn't have a space before it, add one
+    selected=" ${selected}"
+  fi
+
+  if [[ "${READLINE_LINE:$pos:1}" == " " ]]; then
+    # If cursor has a space after it, remove last space from selected
+    # echo "Removing space after cursor"
+    selected="${selected% }"
+  fi
+
+  READLINE_LINE="${READLINE_LINE:0:pos}${selected}${READLINE_LINE:$pos}"
+  # Note that the READLINE_POINT has not moved; this makes it easier to launch this again
+}
+
+
+#=======================================================================================================================
+# fzf::prehistory - Enhanced history search across all archived history files
+# Usage: fzf::prehistory [months]
+#   months: number of months to search (default: 6, -1 for all history)
+#=======================================================================================================================
+fzf::prehistory() {                                                                                                #
+  local output
+  local months="${1:-6}"  # Default to 6 months if no argument provided
+
+  # Search through all archived history files in the bash_history directory
+  local hist_dir="${HOME}/.local/share/bash_history"
+
+  # Set up the date filter for find command
+  local newermt_filter=""
+  if [[ "$months" -ne -1 ]]; then
+    local cutoff_date=$(date -d "$months months ago" +%s 2>/dev/null || date -v-${months}m +%s 2>/dev/null)
+    newermt_filter="-newermt @$cutoff_date"
+  fi
+
+  output=$(
+    if [[ -d "$hist_dir" ]]; then
+      find "$hist_dir" -type f $newermt_filter -exec cat {} \; 2>/dev/null | \
+        grep -v '^#' | \
+        awk '!seen[$0]++' | \
+        FZF_DEFAULT_OPTS="--reverse --scheme=history --bind=ctrl-r:toggle-sort ${FZF_CTRL_R_OPTS-} +m" \
+        FZF_DEFAULT_OPTS_FILE='' fzf --query "$READLINE_LINE"
+    fi
+  ) || return
+
+  READLINE_LINE="$output"
+  if [[ -z $READLINE_POINT ]]; then
+    echo "$READLINE_LINE"
+  else
+    READLINE_POINT=${#READLINE_LINE}
+  fi
 }
