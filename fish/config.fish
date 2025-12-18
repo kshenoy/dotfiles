@@ -13,3 +13,5 @@ set -gx EDITOR nvim
 starship init fish | source
 
 # zoxide init --cmd j fish | source
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
