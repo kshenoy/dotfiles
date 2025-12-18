@@ -137,7 +137,9 @@ __setprompt() {
 #=======================================================================================================================
 
 # fzf: https://github.com/junegunn/fzf
-. ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf.bash
+if hash fzf 2> /dev/null; then
+  . ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf.bash
+fi
 
 # zoxide (https://github.com/ajeetdsouza/zoxide)
 if hash zoxide 2> /dev/null; then
@@ -145,8 +147,9 @@ if hash zoxide 2> /dev/null; then
 fi
 
 # Use the starship prompt
-eval "$(starship init bash)"
-command cp ${XDG_CONFIG_HOME:-$HOME/.config}/{dotfiles/starship/,}starship.toml
+if hash starship 2> /dev/null; then
+  eval "$(starship init bash)"
+fi
 
 #=======================================================================================================================
 # LOCAL OVERRIDES (load last)
