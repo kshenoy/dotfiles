@@ -1,90 +1,113 @@
 #!/usr/bin/env bash
 
 #=======================================================================================================================
-fzf::_down() {                                                                                                     #
-  fzf "$@" --height 50% --border
-}
-
-
+# Helper: Insert selected text at cursor position in readline buffer with smart spacing
+# Usage: __fzf::insert_at_cursor "text to insert"
+# Adds spaces before/after if needed based on context and selected text
 #=======================================================================================================================
-fzf::_insert_at_cursor() {                                                                                         #
+__fzf::insert_at_cursor() {                                                                                         #
   local selected="$1"
+  [[ -z "$selected" ]] && return
+
+  local char_before="${READLINE_LINE:$((READLINE_POINT-1)):1}"
+  local char_after="${READLINE_LINE:$READLINE_POINT:1}"
+
+  # Add space before if:
+  # - cursor is not at start AND
+  # - previous char is not whitespace AND
+  # - selected text doesn't start with space
+  if [[ $READLINE_POINT -gt 0 ]] && [[ "$char_before" != " " ]] && [[ "$selected" != " "* ]]; then
+    selected=" $selected"
+  fi
+
+  # Add space after if:
+  # - cursor is not at end AND
+  # - next char is not whitespace AND
+  # - selected text doesn't end with space
+  if [[ $READLINE_POINT -lt ${#READLINE_LINE} ]] && [[ "$char_after" != " " ]] && [[ "$selected" != *" " ]]; then
+    selected="$selected "
+  fi
+
   READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
   READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
 }
 
 
 #=======================================================================================================================
-# fzf::git
+# fzf::git - Git-specific FZF functions
 #=======================================================================================================================
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Select modified files from git status with diff preview
+# Returns: Modified file paths (output to stdout)
+#-----------------------------------------------------------------------------------------------------------------------
 fzf::git::diffs() {                                                                                                #
   vcs::is_in_git_repo || return
   git -c color.status=always status --short |
-  fzf::_down -m --ansi --nth 2..,.. \
+  fzf --nth 2..,.. \
     --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -500' |
   cut -c4- | sed 's/.* -> //'
 }
 
 
-#=======================================================================================================================
+#-----------------------------------------------------------------------------------------------------------------------
+# Select git branches (local and remote) with commit log preview
+# Inserts: Branch name(s) at cursor position
+#-----------------------------------------------------------------------------------------------------------------------
 fzf::git::branches() {                                                                                             #
   vcs::is_in_git_repo || return
 
   local _selected=$(
   git branch -a --color=always | grep -v '/HEAD\s' | sort |
-  fzf::_down --ansi --multi --tac --preview-window right:70% \
+  fzf --tac --preview-window right:70% \
     --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1) | head -'$LINES |
   sed -e 's/^..//' -e 's#^remotes/##' | cut -d' ' -f1 | paste -s -d ' ')
 
-  fzf::_insert_at_cursor "$_selected"
+  __fzf::insert_at_cursor "$_selected"
 }
 
 
-#=======================================================================================================================
+#-----------------------------------------------------------------------------------------------------------------------
+# Select git tags with show preview
+# Returns: Tag name(s) (output to stdout)
+#-----------------------------------------------------------------------------------------------------------------------
 fzf::git::tags() {                                                                                                 #
   vcs::is_in_git_repo || return
   git tag --sort -version:refname |
-  fzf::_down --multi --preview-window right:70% \
+  fzf --preview-window right:70% \
     --preview 'git show --color=always {} | head -'$LINES
 }
 
 
-#=======================================================================================================================
+#-----------------------------------------------------------------------------------------------------------------------
+# Select git remotes with commit log preview
+# Returns: Remote name (output to stdout)
+#-----------------------------------------------------------------------------------------------------------------------
 fzf::git::remotes() {                                                                                              #
   vcs::is_in_git_repo || return
   git remote -v | awk '{print $1 "\t" $2}' | uniq |
-  fzf::_down --tac \
+  fzf +m --tac \
     --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" {1} | head -200' |
   cut -d$'\t' -f1
 }
 
 
 #=======================================================================================================================
-# fzf::p4
+# fzf::p4 - Perforce-specific FZF functions
 #=======================================================================================================================
-fzf::p4::strip_common_ancestors() {                                                                                #
-  for item in "$@"; do
-    [[ -z "$item" ]] && continue
 
-    if [[ "$STEM/$item" =~ "$PWD" ]]; then
-      # Remove any common ancestors from filename
-      item="$STEM/$item"
-      item=${item##$PWD/}
-      echo "$item";
-    else
-      echo "$STEM/$item";
-    fi
-  done
-}
-
-#=======================================================================================================================
+#-----------------------------------------------------------------------------------------------------------------------
+# Select directory in Perforce workspace (excludes common build/cache directories)
+# Returns: Directory path (output to stdout)
+# Note: Currently unbound - planned for future use
+#-----------------------------------------------------------------------------------------------------------------------
 fzf::p4::cd() {                                                                                                    #
   local cmd='command find $STEM -mindepth 1 \
     -type d \( -path $STEM/_env -o -path $STEM/emu -o -path $STEM/env_squash -o -path $STEM/import -o \
       -path $STEM/powerPro -o -path $STEM/sdpx \) -prune \
     -o -type d -print 2> /dev/null | sed "s:$STEM/::"'
 
-  local dir=$(eval "$cmd" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m)
+  local dir=$(eval "$cmd" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd))
   if [[ -z "$dir" ]]; then
     return
   fi
@@ -92,7 +115,10 @@ fzf::p4::cd() {                                                                 
   printf '%q ' "$dir"
 }
 
-#=======================================================================================================================
+#-----------------------------------------------------------------------------------------------------------------------
+# Select files from Perforce workspace (includes synced files and locally opened files)
+# Calls: fzf-file-widget with custom FZF_CTRL_T_COMMAND
+#-----------------------------------------------------------------------------------------------------------------------
 fzf::p4::all_files() {                                                                                             #
   FZF_CTRL_T_COMMAND='cat \
     <(command p4 have ${STEM:+$STEM/}...) \
@@ -103,8 +129,14 @@ fzf::p4::all_files() {                                                          
 
 
 #=======================================================================================================================
-# fzf::vcs (generic wrapper to cover all vcs types)
+# fzf::vcs - VCS-agnostic wrapper functions (Git and Perforce support)
 #=======================================================================================================================
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Select directory in VCS workspace
+# Returns: Directory path (output to stdout)
+# Note: Currently unbound - planned for future use
+#-----------------------------------------------------------------------------------------------------------------------
 fzf::vcs::cd() {                                                                                                   #
   if vcs::is_in_perforce_repo; then
     fzf::p4::cd
@@ -113,19 +145,22 @@ fzf::vcs::cd() {                                                                
   fi
 }
 
-#=======================================================================================================================
+#-----------------------------------------------------------------------------------------------------------------------
+# Select files from VCS repository (all tracked files from repo root)
+# Inserts: File path(s) at cursor position
+#-----------------------------------------------------------------------------------------------------------------------
 fzf::vcs::all_files() {                                                                                            #
   if vcs::is_in_git_repo; then
     local _top=$(git rev-parse --show-toplevel)
     local _selected=$(git ls-tree --full-tree -r --name-only HEAD |
-      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m |
+      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf |
       while read -r item; do
         path=${_top}/$item
         printf '%q ' "${path#$(realpath $PWD)/}"
       done
     )
 
-    fzf::_insert_at_cursor "$_selected"
+    __fzf::insert_at_cursor "$_selected"
   elif vcs::is_in_perforce_repo; then
     fzf::p4::all_files
   else
@@ -133,7 +168,10 @@ fzf::vcs::all_files() {                                                         
   fi
 }
 
-#=======================================================================================================================
+#-----------------------------------------------------------------------------------------------------------------------
+# Select files from VCS repository (tracked files in current directory and below)
+# Calls: fzf-file-widget with custom FZF_CTRL_T_COMMAND
+#-----------------------------------------------------------------------------------------------------------------------
 fzf::vcs::files() {                                                                                                #
   if vcs::is_in_git_repo; then
     FZF_CTRL_T_COMMAND='{ git ls-tree -r --name-only HEAD || \
@@ -151,25 +189,33 @@ fzf::vcs::files() {                                                             
   fi
 }
 
-#=======================================================================================================================
+#-----------------------------------------------------------------------------------------------------------------------
+# Select commits with preview
+# Inserts: Commit hash at cursor position
+#-----------------------------------------------------------------------------------------------------------------------
 fzf::vcs::commits() {                                                                                              #
   if vcs::is_in_git_repo; then
     local _selected=$(git log --graph --color --all --date=short --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cd) %C(red)%d%C(reset)' |
-    fzf::_down --ansi --no-sort --multi --bind 'ctrl-s:toggle-sort' \
+    fzf +1 --no-sort --bind 'ctrl-s:toggle-sort' \
       --header 'Press CTRL-S to toggle sort' \
       --preview 'grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git show --color=always' |
       command grep -o "[a-f0-9]\{7,\}" | head -n 1)
   elif vcs::is_in_perforce_repo; then
     local _cmd=${FZF_P4_COMMITS_COMMAND-"p4 changes -m 1000 \$STEM/..."}
     local _selected=$(eval "${_cmd}" | cut -d ' ' -f2- | sed -r 's/@.*//' |
-      fzf --ansi --multi --no-sort --preview 'p4 describe -s {1}' --preview-window right:70% |
+      fzf +1 --no-sort --preview 'p4 describe -s {1}' --preview-window right:70% |
       cut -d' ' -f1)
   fi
 
-  fzf::_insert_at_cursor "$_selected"
+  __fzf::insert_at_cursor "$_selected"
 }
 
-#=======================================================================================================================
+#-----------------------------------------------------------------------------------------------------------------------
+# Select file revisions from Perforce filelog with change description preview
+# Usage: fzf::vcs::filelog [file] [p4-filelog-options]
+# Inserts: File revision(s) at cursor position (e.g., file#1, file#2)
+# Note: Perforce-only function
+#-----------------------------------------------------------------------------------------------------------------------
 fzf::vcs::filelog() {                                                                                              #
   vcs::is_in_perforce_repo || return
 
@@ -181,28 +227,31 @@ fzf::vcs::filelog() {                                                           
       <(p4 have $STEM/... | command awk "{print \$3}") \
       <(command p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" |
       command xargs -I{} -n1 command p4 where {} | command awk "{print \$3}") 2> /dev/null | command sed "s:$PWD/::" |
-      fzf +m)
+      fzf +1)
   fi
   [[ -z "$_file" ]] && return
 
   local _selected=$(p4 filelog -s "$@" $_file |
     grep '^\.\.\. *#' | sed -r 's/@\S*//' | cut -d ' ' -f 2-9 | tr -s ' ' | column -s' ' -o' ' -t |
-    fzf --ansi --header='filelog for '$(basename $_file) --multi --no-sort --preview-window right:70% \
+    fzf +1 --header='filelog for '$(basename $_file) --no-sort --preview-window right:70% \
     --preview "p4 describe {3} | sed -n -e '1,/Differences .../p' -e \"/^====.*$(basename $_file)/,/^====/p\" | head -n -2" |
     cut -d' ' -f1 | while read -r item; do printf '%q ' "$_file$item"; done)
 
-  fzf::_insert_at_cursor "$_selected"
+  __fzf::insert_at_cursor "$_selected"
 }
 
-#=======================================================================================================================
+#-----------------------------------------------------------------------------------------------------------------------
+# Select files from VCS status (modified/opened files)
+# Inserts: File path(s) at cursor position
+#-----------------------------------------------------------------------------------------------------------------------
 fzf::vcs::status() {                                                                                               #
   if vcs::is_in_git_repo; then
     local _selected=$(git -c color.status=always status --short |
-      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m --nth=2 | awk '{print $NF}' | paste -s -d ' ')
+      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf --nth=2 | awk '{print $NF}' | paste -s -d ' ')
   elif vcs::is_in_perforce_repo; then
     local _selected=$(p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" |
       column -s# -o "    #" -t | column -o" " -t |
-      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m --nth=1 | awk '{print $1}' |
+      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf --nth=1 | awk '{print $1}' |
       while read -r item; do
         path=${STEM}/$item
         printf '%q ' "${path#$(realpath $PWD)/}"
@@ -210,64 +259,64 @@ fzf::vcs::status() {                                                            
     )
   fi
 
-  fzf::_insert_at_cursor "$_selected"
+  __fzf::insert_at_cursor "$_selected"
 }
 
 #=======================================================================================================================
-# fzf::lsf
+# fzf::lsf - LSF (Load Sharing Facility) job management functions
 #=======================================================================================================================
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Select LSF jobs with interactive preview
+# Inserts: Job ID(s) at cursor position
+#-----------------------------------------------------------------------------------------------------------------------
 fzf::lsf::bjobs() {                                                                                                #
   local selected=$(lsf_bjobs -o "id: user: stat: queue: submit_time: name" |
-    FZF_DEFAULT_OPTS="--header-lines=1 $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf -m "$@" |
+    FZF_DEFAULT_OPTS="--header-lines=1 $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf "$@" |
     cut -d' ' -f1 | while read -r item; do
       printf '%q ' "$item"
     done
   )
 
-  fzf::_insert_at_cursor "$selected"
+  __fzf::insert_at_cursor "$selected"
 }
 
 
 #=======================================================================================================================
-# fzf::cmd_opts
+# fzf::cmd_opts - Parse and select command-line options from help output
 #=======================================================================================================================
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Extract and select command options from help output of command before cursor
+# Inserts: Selected option(s) at cursor position
+# Smart positioning: Handles spacing around cursor automatically
+#-----------------------------------------------------------------------------------------------------------------------
 fzf::cmd_opts() {                                                                                                  #
   # echo "DEBUG: '${READLINE_LINE}' Point=${READLINE_POINT}, Char='${READLINE_LINE:$READLINE_POINT:1}'"
-  local pos=$READLINE_POINT
+  local saved_point=$READLINE_POINT
 
-  # If cursor is on a non-whitespace char assume it's on the cmd that needs to be parsed and move pos to its end
-  while [[ ${READLINE_LINE:$pos:1} != " " ]] && [[ $pos != ${#READLINE_LINE} ]]; do
-    pos=$(( pos + 1 ))
-  done
-  local cmd=$(awk '{print $NF}' <<< "${READLINE_LINE:0:$pos}")
+  # If cursor is on a non-whitespace char, move to end of current word
+  if [[ "${READLINE_LINE:$READLINE_POINT}" =~ ^[^\ ]+ ]]; then
+    READLINE_POINT=$(( READLINE_POINT + ${#BASH_REMATCH[0]} ))
+  fi
+  local cmd=$(awk '{print $NF}' <<< "${READLINE_LINE:0:$READLINE_POINT}")
 
   local selected=$(eval "${cmd} --help || ${cmd} -h || ${cmd} -help || ${cmd} help" | \
-    FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf +x -m "$@" | \
+    FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf +x "$@" | \
     while read -r item; do
-      # Auto-split on whitespace
-      local words=($item)
-      for i in ${words[@]}; do
-        if [[ "$i" == -* ]]; then
-          local opt="$i"
+      # Extract first option flag (word starting with -)
+      for word in $item; do
+        if [[ "$word" == -* ]]; then
+          # Remove trailing comma or = and everything after
+          printf '%q ' "${word%%[,=]*}"
           break
         fi
       done
-      printf '%q ' $(awk '{print $1}' <<< "$opt" | sed 's/[,=].*$//')
-    done; echo)
+    done)
 
-  if [[ "${READLINE_LINE:$(($pos-1)):1}" != " " ]]; then
-    # If cursor doesn't have a space before it, add one
-    selected=" ${selected}"
-  fi
-
-  if [[ "${READLINE_LINE:$pos:1}" == " " ]]; then
-    # If cursor has a space after it, remove last space from selected
-    # echo "Removing space after cursor"
-    selected="${selected% }"
-  fi
-
-  READLINE_LINE="${READLINE_LINE:0:pos}${selected}${READLINE_LINE:$pos}"
-  # Note that the READLINE_POINT has not moved; this makes it easier to launch this again
+  __fzf::insert_at_cursor "$selected"
+  # Restore READLINE_POINT to make it easier to launch this again
+  READLINE_POINT=$saved_point
 }
 
 

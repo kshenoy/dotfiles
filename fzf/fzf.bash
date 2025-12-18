@@ -24,7 +24,7 @@ if hash fd 2> /dev/null; then
   export FZF_ALT_C_COMMAND="fd --strip-cwd-prefix --hidden --exclude .git --type d"
 fi
 
-export FZF_DEFAULT_OPTS="--ansi --exit-0 --inline-info --reverse --tiebreak=length,end \
+export FZF_DEFAULT_OPTS="--ansi --border --exit-0 --select-1 --multi --inline-info --reverse --tiebreak=length,end \
   --bind 'shift-tab:toggle-all,alt-p:change-preview-window(down|hidden|)' \
   --bind 'shift-page-down:preview-half-page-down,shift-page-up:preview-half-page-up'"
 export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"

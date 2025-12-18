@@ -17,14 +17,8 @@ bind -m vi-insert '"\ec": nop'
 #
 # CTRL-F CTRL-F instead of CTRL-T : Paste the selected file path into the command line
 # (obtained directly from FZF's key-bindings.bash file and modified)
-if ((BASH_VERSINFO[0] < 4)); then
-  if [[ ${FZF_CTRL_T_COMMAND-x} != "" ]]; then
-    bind -m emacs-standard '"\C-f\C-f": " \C-b\C-k \C-u`__fzf_select__`\e\C-e\er\C-a\C-y\C-h\C-e\e \C-y\ey\C-x\C-x\C-f\C-y\ey\C-_"'
-  fi
-else
-  if [[ ${FZF_CTRL_T_COMMAND-x} != "" ]]; then
-    bind -m emacs-standard -x '"\C-f\C-f": fzf-file-widget'
-  fi
+if [[ ${FZF_CTRL_T_COMMAND-x} != "" ]]; then
+  bind -m emacs-standard -x '"\C-f\C-f": fzf-file-widget'
 fi
 
 # CTRL-F CTRL-J instead of ALT-C : cd into the selected directory
