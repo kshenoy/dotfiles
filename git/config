@@ -1,19 +1,18 @@
 # Git configuration
 
-# user
 [user]
 name  = Kartik Shenoy
 email = theresmorethanoneway@gmail.com
 
-# core
 [core]
 editor   = vim
 fileMode = false
-
 # Centralize all hooks instead of configuring them on a per-repository basis
 hooksPath = ~/.config/git/hooks/
 
-# color
+[init]
+defaultBranch = main
+
 [color]
 ui     = auto
 branch = auto
@@ -36,17 +35,23 @@ added = yellow
 changed = red
 untracked = cyan
 
-# diff
 [diff]
 tool = nvim
+algorithm = histogram
+colorMoved = default
 
 [difftool]
 prompt = false
 
-# merge
+[difftool "nvim"]
+cmd = nvim -d $LOCAL $REMOTE
+
 [merge]
 tool = meld
 conflictstyle = diff3
+
+[mergetool]
+prompt = false
 
 [mergetool "meld"]
 cmd = meld $LOCAL $MERGED $REMOTE --output $MERGED --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $REMOTE --diff $LOCAL $MERGED --diff $REMOTE $MERGED
@@ -60,20 +65,22 @@ trustExitCode = true
 cmd = nvim $BASE $REMOTE $LOCAL $MERGED
 trustExitCode = true
 
-# misc
+[rerere]
+enabled = true
+
 [credential]
 helper = cache --timeout=3600
 
+[pull]
+rebase = false
+
 [push]
-default = matching
-
-# aliases
-# - https://haacked.com/archive/2014/07/28/github-flow-aliases/
-
-# Using =!= as prefix allows running any command in the shell and it doesn't have to be a git command.
-# Thus, if we want to create an alias to run multiple commands by chaining them together, we have to use =!=
+default = simple
 
 [alias]
+# https://haacked.com/archive/2014/07/28/github-flow-aliases/
+# Using =!= as prefix allows running any command in the shell and it doesn't have to be a git command.
+# Thus, if we want to create an alias to run multiple commands by chaining them together, we have to use =!=
 alias = !git config -l | grep alias | cut -c 7-
 st = status
 d  = diff
@@ -84,6 +91,9 @@ ci = commit
 co = checkout
 br = branch
 lg = log --color --graph --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(red)%d%C(reset)' --abbrev-commit --all
+unstage = reset HEAD --
+last = log -1 HEAD
+amend = commit --amend --no-edit
 
 # Safer wipes. Using =git reset HEAD --hard= leaves no room for undoing anything.
 # This commits everything and then does a hard reset to remove that commit. The nice thing is, the commit is still
