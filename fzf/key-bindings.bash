@@ -4,7 +4,7 @@
 #      -S : Display readline key sequences bound to macros and the strings they output
 
 #=======================================================================================================================
-# FZF uses C-t and M-c bindings. However, I want to prefix all FZF bindings with C-f so I'm unbind the defaults here
+# FZF uses C-t and M-c bindings. However, I want to prefix FZF bindings with C-f so I'm unbind the defaults here
 bind -m emacs-standard '"\C-t": nop'
 bind -m vi-command '"\C-t": nop'
 bind -m vi-insert '"\C-t": nop'
@@ -37,18 +37,22 @@ bind -m emacs-standard -x '"\C-f\C-o": "fzf::cmd_opts"'
 bind -m emacs-standard -x '"\C-f\C-r": "fzf::prehistory"'
 
 # CTRL-F CTRL-X: Experimental
+#  'k'
 # bind -x '"\C-f\C-x": "fzf::_expt"'
 
-# Version-control related bindings: CTRL-F CTRL-G
-bind -m emacs-standard -x '"\C-f\C-g\C-b": "fzf::git::branches"'
-bind -m emacs-standard -x '"\C-f\C-g\C-d": "fzf::git::diffs"'
-bind -m emacs-standard -x '"\C-f\C-g\C-e": "fzf::vcs::files"'
-bind -m emacs-standard -x '"\C-f\C-g\C-f": "fzf::vcs::all_files"'
-bind -m emacs-standard -x '"\C-f\C-g\C-k": "fzf::vcs::commits"'
-bind -m emacs-standard -x '"\C-f\C-g\C-l": "fzf::vcs::filelog"'
-bind -m emacs-standard -x '"\C-f\C-g\C-r": "fzf::git::remotes"'
-bind -m emacs-standard -x '"\C-f\C-g\C-s": "fzf::vcs::status"'
-bind -m emacs-standard -x '"\C-f\C-g\C-t": "fzf::git::tags"'
+# Version-control related bindings: CTRL-G
+# fzf-git.sh provides these git-specific bindings (sourced in fzf.bash):
+#   C-g C-f / C-g f → files           C-g C-h / C-g h → hashes (commits)
+#   C-g C-b / C-g b → branches        C-g C-s / C-g s → stashes
+#   C-g C-t / C-g t → tags            C-g C-w / C-g w → worktrees
+#   C-g C-r / C-g r → remotes         C-g C-l / C-g l → reflogs
+#   C-g C-e / C-g e → each-ref        C-g ?           → help
+# VCS-agnostic bindings below override fzf-git.sh defaults (git + Perforce support):
+bind -m emacs-standard -x '"\C-g\C-d": "fzf::vcs::cwd_files"'
+bind -m emacs-standard -x '"\C-g\C-f": "fzf::vcs::files"'
+bind -m emacs-standard -x '"\C-g\C-h": "fzf::vcs::commits"'
+bind -m emacs-standard -x '"\C-g\C-l": "fzf::vcs::filelog"'
+bind -m emacs-standard -x '"\C-g\C-s": "fzf::vcs::status"'
 
 # CTRL-F ALT-/ : Repeat last command and pipe result to FZF
 # From http://brettterpstra.com/2015/07/09/shell-tricks-inputrc-binding-fun/

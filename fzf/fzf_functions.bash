@@ -5,7 +5,7 @@
 # Usage: __fzf::insert_at_cursor "text to insert"
 # Adds spaces before/after if needed based on context and selected text
 #=======================================================================================================================
-__fzf::insert_at_cursor() {                                                                                         #
+__fzf::insert_at_cursor() {
   local selected="$1"
   [[ -z "$selected" ]] && return
 
@@ -34,65 +34,6 @@ __fzf::insert_at_cursor() {                                                     
 
 
 #=======================================================================================================================
-# fzf::git - Git-specific FZF functions
-#=======================================================================================================================
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Select modified files from git status with diff preview
-# Returns: Modified file paths (output to stdout)
-#-----------------------------------------------------------------------------------------------------------------------
-fzf::git::diffs() {                                                                                                #
-  vcs::is_in_git_repo || return
-  git -c color.status=always status --short |
-  fzf --nth 2..,.. \
-    --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -500' |
-  cut -c4- | sed 's/.* -> //'
-}
-
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Select git branches (local and remote) with commit log preview
-# Inserts: Branch name(s) at cursor position
-#-----------------------------------------------------------------------------------------------------------------------
-fzf::git::branches() {                                                                                             #
-  vcs::is_in_git_repo || return
-
-  local _selected=$(
-  git branch -a --color=always | grep -v '/HEAD\s' | sort |
-  fzf --tac --preview-window right:70% \
-    --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1) | head -'$LINES |
-  sed -e 's/^..//' -e 's#^remotes/##' | cut -d' ' -f1 | paste -s -d ' ')
-
-  __fzf::insert_at_cursor "$_selected"
-}
-
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Select git tags with show preview
-# Returns: Tag name(s) (output to stdout)
-#-----------------------------------------------------------------------------------------------------------------------
-fzf::git::tags() {                                                                                                 #
-  vcs::is_in_git_repo || return
-  git tag --sort -version:refname |
-  fzf --preview-window right:70% \
-    --preview 'git show --color=always {} | head -'$LINES
-}
-
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Select git remotes with commit log preview
-# Returns: Remote name (output to stdout)
-#-----------------------------------------------------------------------------------------------------------------------
-fzf::git::remotes() {                                                                                              #
-  vcs::is_in_git_repo || return
-  git remote -v | awk '{print $1 "\t" $2}' | uniq |
-  fzf +m --tac \
-    --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" {1} | head -200' |
-  cut -d$'\t' -f1
-}
-
-
-#=======================================================================================================================
 # fzf::p4 - Perforce-specific FZF functions
 #=======================================================================================================================
 
@@ -101,10 +42,10 @@ fzf::git::remotes() {                                                           
 # Returns: Directory path (output to stdout)
 # Note: Currently unbound - planned for future use
 #-----------------------------------------------------------------------------------------------------------------------
-fzf::p4::cd() {                                                                                                    #
+fzf::p4::cd() {
   local cmd='command find $STEM -mindepth 1 \
     -type d \( -path $STEM/_env -o -path $STEM/emu -o -path $STEM/env_squash -o -path $STEM/import -o \
-      -path $STEM/powerPro -o -path $STEM/sdpx \) -prune \
+    -path $STEM/powerPro -o -path $STEM/sdpx \) -prune \
     -o -type d -print 2> /dev/null | sed "s:$STEM/::"'
 
   local dir=$(eval "$cmd" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd))
@@ -115,19 +56,6 @@ fzf::p4::cd() {                                                                 
   printf '%q ' "$dir"
 }
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Select files from Perforce workspace (includes synced files and locally opened files)
-# Calls: fzf-file-widget with custom FZF_CTRL_T_COMMAND
-#-----------------------------------------------------------------------------------------------------------------------
-fzf::p4::all_files() {                                                                                             #
-  FZF_CTRL_T_COMMAND='cat \
-    <(command p4 have ${STEM:+$STEM/}...) \
-    <(p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" | command xargs -I{} -n1 command p4 where {}) \
-    | command awk "{print \$3}"' \
-  fzf-file-widget
-}
-
-
 #=======================================================================================================================
 # fzf::vcs - VCS-agnostic wrapper functions (Git and Perforce support)
 #=======================================================================================================================
@@ -137,7 +65,7 @@ fzf::p4::all_files() {                                                          
 # Returns: Directory path (output to stdout)
 # Note: Currently unbound - planned for future use
 #-----------------------------------------------------------------------------------------------------------------------
-fzf::vcs::cd() {                                                                                                   #
+fzf::vcs::cd() {
   if vcs::is_in_perforce_repo; then
     fzf::p4::cd
   else
@@ -149,20 +77,16 @@ fzf::vcs::cd() {                                                                
 # Select files from VCS repository (all tracked files from repo root)
 # Inserts: File path(s) at cursor position
 #-----------------------------------------------------------------------------------------------------------------------
-fzf::vcs::all_files() {                                                                                            #
+fzf::vcs::files() {
   if vcs::is_in_git_repo; then
-    local _top=$(git rev-parse --show-toplevel)
-    local _selected=$(git ls-tree --full-tree -r --name-only HEAD |
-      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf |
-      while read -r item; do
-        path=${_top}/$item
-        printf '%q ' "${path#$(realpath $PWD)/}"
-      done
-    )
-
+    local _selected=$(_fzf_git_files)
     __fzf::insert_at_cursor "$_selected"
   elif vcs::is_in_perforce_repo; then
-    fzf::p4::all_files
+    FZF_CTRL_T_COMMAND='cat \
+      <(command p4 have ${STEM:+$STEM/}...) \
+      <(command p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" | command xargs -I{} -n1 command p4 where {}) \
+      | command awk "{print \$3}"' \
+      fzf-file-widget
   else
     fzf-file-widget
   fi
@@ -172,18 +96,16 @@ fzf::vcs::all_files() {                                                         
 # Select files from VCS repository (tracked files in current directory and below)
 # Calls: fzf-file-widget with custom FZF_CTRL_T_COMMAND
 #-----------------------------------------------------------------------------------------------------------------------
-fzf::vcs::files() {                                                                                                #
+fzf::vcs::cwd_files() {
   if vcs::is_in_git_repo; then
-    FZF_CTRL_T_COMMAND='{ git ls-tree -r --name-only HEAD || \
-      find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//; } 2> /dev/null' \
-      fzf-file-widget
+    local _selected=$(_fzf_git_files)
+    __fzf::insert_at_cursor "$_selected"
   elif vcs::is_in_perforce_repo; then
     FZF_CTRL_T_COMMAND='cat \
-        <(p4 have ... | command awk "{print \$3}") \
-        <(command p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" | \
-          command xargs -I{} -n1 command p4 where {} | command awk "{print \$3}") 2> /dev/null | \
-      command sed "s:$PWD/::"' \
-    fzf-file-widget
+      <(command p4 have ...) \
+      <(command p4 opened 2> /dev/null | command grep add | command sed "s/#.*//" | command xargs -I{} -n1 command p4 where {}) \
+      | command awk "{print \$3}") 2> /dev/null | command sed "s:$PWD/::"' \
+      fzf-file-widget
   else
     fzf-file-widget
   fi
@@ -193,13 +115,10 @@ fzf::vcs::files() {                                                             
 # Select commits with preview
 # Inserts: Commit hash at cursor position
 #-----------------------------------------------------------------------------------------------------------------------
-fzf::vcs::commits() {                                                                                              #
+fzf::vcs::commits() {
   if vcs::is_in_git_repo; then
-    local _selected=$(git log --graph --color --all --date=short --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cd) %C(red)%d%C(reset)' |
-    fzf +1 --no-sort --bind 'ctrl-s:toggle-sort' \
-      --header 'Press CTRL-S to toggle sort' \
-      --preview 'grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git show --color=always' |
-      command grep -o "[a-f0-9]\{7,\}" | head -n 1)
+    local _selected=$(_fzf_git_hashes)
+    __fzf::insert_at_cursor "$_selected"
   elif vcs::is_in_perforce_repo; then
     local _cmd=${FZF_P4_COMMITS_COMMAND-"p4 changes -m 1000 \$STEM/..."}
     local _selected=$(eval "${_cmd}" | cut -d ' ' -f2- | sed -r 's/@.*//' |
@@ -216,7 +135,7 @@ fzf::vcs::commits() {                                                           
 # Inserts: File revision(s) at cursor position (e.g., file#1, file#2)
 # Note: Perforce-only function
 #-----------------------------------------------------------------------------------------------------------------------
-fzf::vcs::filelog() {                                                                                              #
+fzf::vcs::filelog() {
   vcs::is_in_perforce_repo || return
 
   if [[ -n "$1" ]] && [[ $1 != -* ]] && [[ -f "$1" ]]; then
@@ -244,10 +163,12 @@ fzf::vcs::filelog() {                                                           
 # Select files from VCS status (modified/opened files)
 # Inserts: File path(s) at cursor position
 #-----------------------------------------------------------------------------------------------------------------------
-fzf::vcs::status() {                                                                                               #
+fzf::vcs::status() {
   if vcs::is_in_git_repo; then
     local _selected=$(git -c color.status=always status --short |
-      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf --nth=2 | awk '{print $NF}' | paste -s -d ' ')
+      FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf --nth 2..,.. \
+      --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -500' |
+      cut -c4- | sed 's/.* -> //')
   elif vcs::is_in_perforce_repo; then
     local _selected=$(p4 opened 2> /dev/null | sed -r -e "s:^//depot/[^/]*/(trunk|branches/[^/]*)/::" |
       column -s# -o "    #" -t | column -o" " -t |
@@ -270,15 +191,15 @@ fzf::vcs::status() {                                                            
 # Select LSF jobs with interactive preview
 # Inserts: Job ID(s) at cursor position
 #-----------------------------------------------------------------------------------------------------------------------
-fzf::lsf::bjobs() {                                                                                                #
+fzf::lsf::bjobs() {
   local selected=$(lsf_bjobs -o "id: user: stat: queue: submit_time: name" |
     FZF_DEFAULT_OPTS="--header-lines=1 $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf "$@" |
     cut -d' ' -f1 | while read -r item; do
-      printf '%q ' "$item"
-    done
-  )
+  printf '%q ' "$item"
+done
+)
 
-  __fzf::insert_at_cursor "$selected"
+__fzf::insert_at_cursor "$selected"
 }
 
 
@@ -291,7 +212,7 @@ fzf::lsf::bjobs() {                                                             
 # Inserts: Selected option(s) at cursor position
 # Smart positioning: Handles spacing around cursor automatically
 #-----------------------------------------------------------------------------------------------------------------------
-fzf::cmd_opts() {                                                                                                  #
+fzf::cmd_opts() {
   # echo "DEBUG: '${READLINE_LINE}' Point=${READLINE_POINT}, Char='${READLINE_LINE:$READLINE_POINT:1}'"
   local saved_point=$READLINE_POINT
 
@@ -314,10 +235,10 @@ fzf::cmd_opts() {                                                               
       done
     done)
 
-  __fzf::insert_at_cursor "$selected"
-  # Restore READLINE_POINT to make it easier to launch this again
-  READLINE_POINT=$saved_point
-}
+    __fzf::insert_at_cursor "$selected"
+    # Restore READLINE_POINT to make it easier to launch this again
+    READLINE_POINT=$saved_point
+  }
 
 
 #=======================================================================================================================
@@ -325,7 +246,7 @@ fzf::cmd_opts() {                                                               
 # Usage: fzf::prehistory [months]
 #   months: number of months to search (default: 6, -1 for all history)
 #=======================================================================================================================
-fzf::prehistory() {                                                                                                #
+fzf::prehistory() {
   local output
   local months="${1:-6}"  # Default to 6 months if no argument provided
 
@@ -347,12 +268,12 @@ fzf::prehistory() {                                                             
         FZF_DEFAULT_OPTS="--reverse --scheme=history --bind=ctrl-r:toggle-sort ${FZF_CTRL_R_OPTS-} +m" \
         FZF_DEFAULT_OPTS_FILE='' fzf --query "$READLINE_LINE"
     fi
-  ) || return
+    ) || return
 
-  READLINE_LINE="$output"
-  if [[ -z $READLINE_POINT ]]; then
-    echo "$READLINE_LINE"
-  else
-    READLINE_POINT=${#READLINE_LINE}
-  fi
-}
+    READLINE_LINE="$output"
+    if [[ -z $READLINE_POINT ]]; then
+      echo "$READLINE_LINE"
+    else
+      READLINE_POINT=${#READLINE_LINE}
+    fi
+  }
