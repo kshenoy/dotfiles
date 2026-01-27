@@ -101,3 +101,6 @@ amend = commit --amend --no-edit
 # there. I can run the =git reflog= command and find the SHA of the commit if I realize later that I made a mistake with
 # the reset. The commit message will be “WIPE SAVEPOINT” in this case.
 wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
+
+[include]
+path = config.local
