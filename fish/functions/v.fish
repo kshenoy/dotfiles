@@ -1,3 +1,3 @@
 function v --wraps=nvim
-  nvim $argv
+  env NVIM_APPNAME=nvim-LazyVim nvim $argv
 end

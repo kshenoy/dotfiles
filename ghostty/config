@@ -44,3 +44,4 @@ font-family = "Iosevka Nerd Font Mono"
 font-size = 16
 adjust-cell-height = "5%"
 theme = "Catppuccin Frappe"
+# initial-command = "tmux new -AD -s Misc"

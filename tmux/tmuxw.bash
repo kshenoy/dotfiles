@@ -10,9 +10,9 @@ tmux::exe() {
 
 # Attach to existing session or else create a new one
 tmux::attach_or_new() {
-    if [[ ! -z "$TMUX" ]]; then return; fi
-
-    if [[ -z "$1" ]]; then
+    if [[ ! -z "$TMUX" ]]; then
+        tmux::exe -2 new-session
+    elif [[ -z "$1" ]]; then
         tmux::exe -2 attach-session || tmux::exe -2 new-session
     else
         # This doesn't work when the supplied argument is a subset of an already existing session name
@@ -84,6 +84,43 @@ tmux::_rename_pane() {
     fi
 }
 
+# Move current window to target index, inserting it and shifting intervening windows
+tmux::_move_window_to() {
+    local target=$1
+    local current
+    current=$(tmux display-message -p '#I')
+
+    [ "$target" = "$current" ] && return 0
+
+    # If target slot is empty, simple move
+    if ! tmux list-windows -F '#I' | grep -qx "$target"; then
+        tmux::exe move-window -t "$target"
+        return 0
+    fi
+
+    # Park current window out of the way
+    tmux::exe move-window -t 999
+
+    if [ "$current" -gt "$target" ]; then
+        # Moving left: shift windows [target .. current-1] right by 1 (iterate high→low)
+        for win in $(tmux list-windows -F '#I' | sort -rn); do
+            if [ "$win" -ge "$target" ] && [ "$win" -lt "$current" ]; then
+                tmux::exe move-window -s ":$win" -t "$((win + 1))"
+            fi
+        done
+    else
+        # Moving right: shift windows [current+1 .. target] left by 1 (iterate low→high)
+        for win in $(tmux list-windows -F '#I' | sort -n); do
+            if [ "$win" -gt "$current" ] && [ "$win" -le "$target" ]; then
+                tmux::exe move-window -s ":$win" -t "$((win - 1))"
+            fi
+        done
+    fi
+
+    # Place parked window at target
+    tmux::exe move-window -s ":999" -t "$target"
+}
+
 # Top-level wrapper function
 tmuxw() {
     if (( $# == 0 )); then
@@ -145,6 +182,10 @@ tmuxw() {
 
         sk)
             tmux::exe send-keys "$@"
+            ;;
+
+        move-window-to)
+            tmux::_move_window_to "$@"
             ;;
 
         *)
