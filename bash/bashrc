@@ -126,9 +126,6 @@ __setprompt() {
 #=======================================================================================================================
 # EXTERNAL TOOL INTEGRATIONS
 #=======================================================================================================================
-if hash ruby 2>/dev/null && hash gem 2>/dev/null; then
-  export PATH="$(ruby -rubygems -e 'puts Gem.user_dir')/bin:$PATH"
-fi
 
 # fzf: https://github.com/junegunn/fzf
 . ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf.bash
@@ -155,3 +152,5 @@ clnpath
 # LOCAL OVERRIDES (load last)
 #=======================================================================================================================
 [[ -f ~/.bashrc_local_override ]] && . ~/.bashrc_local_override
+
+eval $(thefuck --alias)
