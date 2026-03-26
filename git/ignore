@@ -125,3 +125,5 @@ cscope.po.out
 
 ### Claude Code ###
 **/.claude
+
+**/.claude/settings.local.json
