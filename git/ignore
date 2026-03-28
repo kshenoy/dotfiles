@@ -1,5 +1,7 @@
 # Global gitignore file
-# Created by https://www.gitignore.io/api/c,c++,dropbox,emacs,vim,tags
+
+# Generic editor backup files
+*~
 
 ### C/C++ ###
 # Object files
@@ -14,81 +16,28 @@
 *.pch
 
 # Libraries
-*.lib
 *.a
 *.la
 *.lo
 *.lai
 
-# Shared objects (inc. Windows DLLs)
-*.dll
+# Shared objects
 *.so
 *.so.*
-*.dylib
 
 # Executables
-*.exe
 *.out
-*.app
 *.i*86
 *.x86_64
 *.hex
 
 # Debug files
-*.dSYM/
 *.su
-
-# Fortran module files
-*.mod
 
 ### Dropbox ###
 .dropbox
 .dropbox.attr
 .dropbox.cache
-
-### Emacs ###
-# -*- mode: gitignore; -*-
-*~
-\#*\#
-/.emacs.desktop
-/.emacs.desktop.lock
-*.elc
-auto-save-list/
-tramp
-.\#*
-
-# Org-mode
-.org-id-locations
-*_archive
-
-# flymake-mode
-*_flymake.*
-
-# eshell files
-/eshell/history
-/eshell/lastdir
-
-# elpa packages
-/elpa/
-
-# reftex files
-*.rel
-
-# AUCTeX auto folder
-/auto/
-
-# cask packages
-.cask/
-dist/
-
-# Flycheck
-flycheck_*.el
-
-# server auth directory
-/server/
-
-# projectiles files
-.projectile
 
 ### Vim ###
 # swap
@@ -120,10 +69,5 @@ cscope.po.out
 ### Git ###
 *.orig
 
-### OS ###
-.DS_Store
-
 ### Claude Code ###
 **/.claude
-
-**/.claude/settings.local.json

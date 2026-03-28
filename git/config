@@ -1,44 +1,35 @@
 # Git configuration
-
 [user]
 name  = Kartik Shenoy
 email = theresmorethanoneway@gmail.com
 
 [core]
-editor   = vim
-fileMode = false
-# Centralize all hooks instead of configuring them on a per-repository basis
-hooksPath = ~/.config/git/hooks/
+editor = nvim
 
 [init]
 defaultBranch = main
 
-[color]
-ui     = auto
-branch = auto
-diff   = auto
-status = auto
-
 [color "branch"]
 current = green
-remote  = red
 
 [color "diff"]
 meta = yellow
 frag = magenta
 old = red bold
-new = green
 plain = white
 
 [color "status"]
 added = yellow
-changed = red
 untracked = cyan
 
 [diff]
 tool = nvim
+# Better handling of code moves than the default Myers algorithm
 algorithm = histogram
+# Highlight moved lines in a distinct color instead of showing them as add+delete
 colorMoved = default
+# Detect both renames and copies (default only detects renames)
+renames = copies
 
 [difftool]
 prompt = false
@@ -48,6 +39,7 @@ cmd = nvim -d $LOCAL $REMOTE
 
 [merge]
 tool = meld
+# Show the common ancestor in conflict markers (base|ours vs theirs) for more context
 conflictstyle = diff3
 
 [mergetool]
@@ -55,49 +47,56 @@ prompt = false
 
 [mergetool "meld"]
 cmd = meld $LOCAL $MERGED $REMOTE --output $MERGED --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $REMOTE --diff $LOCAL $MERGED --diff $REMOTE $MERGED
-trustExitCode = false
 
 [mergetool "vim"]
 cmd = vim_merge $BASE $REMOTE $LOCAL $MERGED
-trustExitCode = true
 
 [mergetool "nvim"]
 cmd = nvim $BASE $REMOTE $LOCAL $MERGED
-trustExitCode = true
+
+[fetch]
+# Remove stale remote-tracking branches when the remote branch is deleted
+prune = true
 
 [rerere]
+# Record conflict resolutions and replay them automatically if the same conflict recurs
 enabled = true
-
-[credential]
-helper = cache --timeout=3600
-
-[pull]
-rebase = false
-
-[push]
-default = simple
 
 [alias]
 # https://haacked.com/archive/2014/07/28/github-flow-aliases/
-# Using =!= as prefix allows running any command in the shell and it doesn't have to be a git command.
-# Thus, if we want to create an alias to run multiple commands by chaining them together, we have to use =!=
+# Using '!' as prefix allows running any command in the shell and it doesn't have to be a git command.
+# Thus, if we want to create an alias to run multiple commands by chaining them together, we have to use '!'
+# List all aliases
 alias = !git config -l | grep alias | cut -c 7-
+
+# Shorthands
 st = status
-d  = diff
 dw = diff --word-diff
 dt = difftool
 mt = mergetool
-ci = commit
-co = checkout
-br = branch
-lg = log --color --graph --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(red)%d%C(reset)' --abbrev-commit --all
-unstage = reset HEAD --
-last = log -1 HEAD
-amend = commit --amend --no-edit
 
-# Safer wipes. Using =git reset HEAD --hard= leaves no room for undoing anything.
-# This commits everything and then does a hard reset to remove that commit. The nice thing is, the commit is still
-# there, but it’s just unreachable. Unreachable commits are a bit inconvenient to restore, but at least they are still
-# there. I can run the =git reflog= command and find the SHA of the commit if I realize later that I made a mistake with
-# the reset. The commit message will be “WIPE SAVEPOINT” in this case.
-wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
+# Colorized graph log of all branches with author and relative date
+lg = log --color --graph --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(red)%d%C(reset)' --abbrev-commit --all
+# Same as above but for a single file
+flog = !git lg --follow
+
+# Show the most recent commit
+last = log -1 HEAD
+# Show the most recent commit, but for a single file
+flast = !git lg --follow -1
+
+# Print the repo root path
+root = rev-parse --show-toplevel
+
+# Unstage files without discarding changes
+unstage = restore --staged
+
+# Amend the last commit without changing its message
+recommit = commit --amend --no-edit
+
+# Stash everything including untracked files (default stash skips them)
+stsh = stash --include-untracked
+
+# Show commits on the remote not yet pulled / commits not yet pushed
+incoming = log HEAD..@{upstream}
+outgoing = log @{upstream}..HEAD
