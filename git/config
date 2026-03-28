@@ -78,12 +78,10 @@ mt = mergetool
 # Colorized graph log of all branches with author and relative date
 lg = log --color --graph --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(red)%d%C(reset)' --abbrev-commit --all
 # Same as above but for a single file
-flog = !git lg --follow
+flog = log --color --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(red)%d%C(reset)' --abbrev-commit --all --follow
 
 # Show the most recent commit
 last = log -1 HEAD
-# Show the most recent commit, but for a single file
-flast = !git lg --follow -1
 
 # Print the repo root path
 root = rev-parse --show-toplevel
