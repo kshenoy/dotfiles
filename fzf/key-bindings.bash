@@ -4,7 +4,7 @@
 #      -S : Display readline key sequences bound to macros and the strings they output
 
 #=======================================================================================================================
-# FZF uses C-t and M-c bindings. However, I want to prefix FZF bindings with C-f so I'm unbind the defaults here
+# FZF uses C-t and M-c bindings. However, I want to prefix FZF bindings with C-f so I'm unbinding the defaults here
 bind -m emacs-standard '"\C-t": nop'
 bind -m vi-command '"\C-t": nop'
 bind -m vi-insert '"\C-t": nop'
@@ -47,12 +47,8 @@ bind -m emacs-standard -x '"\C-f\C-r": "fzf::prehistory"'
 #   C-g C-t / C-g t → tags            C-g C-w / C-g w → worktrees
 #   C-g C-r / C-g r → remotes         C-g C-l / C-g l → reflogs
 #   C-g C-e / C-g e → each-ref        C-g ?           → help
-# VCS-agnostic bindings below override fzf-git.sh defaults (git + Perforce support):
-bind -m emacs-standard -x '"\C-g\C-d": "fzf::vcs::cwd_files"'
-bind -m emacs-standard -x '"\C-g\C-f": "fzf::vcs::files"'
-bind -m emacs-standard -x '"\C-g\C-h": "fzf::vcs::commits"'
-bind -m emacs-standard -x '"\C-g\C-l": "fzf::vcs::filelog"'
-bind -m emacs-standard -x '"\C-g\C-s": "fzf::vcs::status"'
+# C-g C-s: modified files picker (overrides fzf-git.sh's stashes)
+bind -m emacs-standard -x '"\C-g\C-s": "fzf::git::status"'
 
 # CTRL-F ALT-/ : Repeat last command and pipe result to FZF
 # From http://brettterpstra.com/2015/07/09/shell-tricks-inputrc-binding-fun/

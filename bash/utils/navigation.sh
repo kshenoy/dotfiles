@@ -45,8 +45,8 @@ dirs() {
 unset -f cd
 cd() {
     if (( "$#" == 0 )); then
-        if vcs::is_in_repo > /dev/null; then
-            pushd "$(vcs::get_root)" > /dev/null
+        if git rev-parse HEAD &> /dev/null; then
+            pushd "$(git rev-parse --show-toplevel)" > /dev/null
         else
             pushd "$HOME" > /dev/null
         fi
