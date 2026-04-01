@@ -3,8 +3,8 @@
 """ By: Kartik Shenoy
 """
 
-if ($FZF_PATH == "")
-  echoe "Not loading FZF as $FZF_PATH is not set"
+if ($FZF_HOME == "")
+  echoe "Not loading FZF as $FZF_HOME is not set"
   finish
 endif
 
@@ -38,7 +38,7 @@ inoremap <expr> <plug>(fzf-complete-file-fd) fzf#vim#complete#path('fd --color=n
 nnoremap <silent> <Plug>my(Finder)y :FzfSnippet<CR>
 inoremap <C-X><C-G><C-Y> <C-O>:FzfSnippet<CR>
 
-set rtp+=$FZF_PATH/fzf
+set rtp+=$FZF_HOME
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'tracyone/fzf-funky'

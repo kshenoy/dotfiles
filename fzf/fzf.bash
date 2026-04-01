@@ -1,24 +1,25 @@
 #!/usr/bin/env bash
 echo "$(tput setaf 2)Sourcing$(tput sgr0) ${BASH_SOURCE[0]} ..."
 
-if [[ -z "$FZF_PATH" ]]; then
+if [[ -z "$FZF_HOME" ]]; then
   _fg_red=$(tput setaf 1)
   _reset=$(tput sgr0)
-  echo "${_fg_red}ERROR${_reset}: FZF_PATH is not set"
+  echo "${_fg_red}ERROR${_reset}: FZF_HOME is not set"
   return
 fi
 
 # Setup fzf defaults - prepend to PATH to override system fzf
-if [[ ! "$PATH" == *$FZF_PATH/fzf/bin* ]]; then
-  export PATH="$FZF_PATH/fzf/bin${PATH:+:${PATH}}"
+if [[ ! "$PATH" == *$FZF_HOME/bin* ]]; then
+  export PATH="$FZF_HOME/bin${PATH:+:${PATH}}"
 fi
 
-eval "$($FZF_PATH/fzf/bin/fzf --bash)"
+eval "$($FZF_HOME/bin/fzf --bash)"
 
 # Source fzf-git.sh for enhanced git integration
 # (our custom VCS bindings in key-bindings.bash will override the default C-g bindings)
-if [[ -f $FZF_PATH/fzf-git.sh/fzf-git.sh ]]; then
-  . $FZF_PATH/fzf-git.sh/fzf-git.sh
+# Note that I'm using FZF_HOME here for fzf-git as well as I'm installing fzf-git in the same dir as fzf
+if [[ -f $FZF_HOME-git.sh/fzf-git.sh ]]; then
+  . $FZF_HOME-git.sh/fzf-git.sh
 fi
 
 # Customizations. Source these after the fzf invocation as it overrides the default
