@@ -43,7 +43,7 @@ __fzf::insert_at_cursor() {
 # Note: Currently unbound - planned for future use
 #-----------------------------------------------------------------------------------------------------------------------
 fzf::p4::cd() {
-  local cmd='command find $STEM -mindepth 1 \
+  local cmd='command find $STEM -mindepth 1 ! -type l \
     -type d \( -path $STEM/_env -o -path $STEM/emu -o -path $STEM/env_squash -o -path $STEM/import -o \
     -path $STEM/powerPro -o -path $STEM/sdpx \) -prune \
     -o -type d -print 2> /dev/null | sed "s:$STEM/::"'
@@ -115,13 +115,13 @@ fzf::vcs::cwd_files() {
 # Select commits with preview
 # Inserts: Commit hash at cursor position
 #-----------------------------------------------------------------------------------------------------------------------
+export FZF_P4_COMMITS_COMMAND="${FZF_P4_COMMITS_COMMAND-p4 changes -m 1000 \$STEM/...}"
 fzf::vcs::commits() {
+  local _selected
   if vcs::is_in_git_repo; then
-    local _selected=$(_fzf_git_hashes)
-    __fzf::insert_at_cursor "$_selected"
+    _selected=$(_fzf_git_hashes)
   elif vcs::is_in_perforce_repo; then
-    local _cmd=${FZF_P4_COMMITS_COMMAND-"p4 changes -m 1000 \$STEM/..."}
-    local _selected=$(eval "${_cmd}" | cut -d ' ' -f2- | sed -r 's/@.*//' |
+    _selected=$(eval "${FZF_P4_COMMITS_COMMAND}" | cut -d ' ' -f2- | sed -r 's/@.*//' |
       fzf +1 --no-sort --preview 'p4 describe -s {1}' --preview-window right:70% |
       cut -d' ' -f1)
   fi
