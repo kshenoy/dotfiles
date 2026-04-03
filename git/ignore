@@ -70,4 +70,4 @@ cscope.po.out
 *.orig
 
 ### Claude Code ###
-**/.claude
+**/.claude/*local*

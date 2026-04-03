@@ -1,3 +1,3 @@
-function tm --wraps=tmux
-  tmux $argv
+function tm --wraps=tmuxw
+    tmuxw $argv
 end
