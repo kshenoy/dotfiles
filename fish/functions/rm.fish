@@ -1,5 +1,3 @@
-# [[file:~/.config/dotfiles/fish/fish.org::*aliases][aliases:7]]
 function rm
-  command rm -vi $argv
+    command rm -vi $argv
 end
-# aliases:7 ends here

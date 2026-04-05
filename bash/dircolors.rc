@@ -1,23 +1,12 @@
 # LS_COLORS/dircolors
-
-
-
-# =ls= uses the value of the environment variable =LS_COLORS= to display. =dircolors= is a utility to set =LS_COLORS=
-
-# =COLOR= needs one of these arguments:
-# - ~tty~ colorizes output to ttys, but not pipes.
-# - ~all~ adds color characters to all output
-# - ~none~ shuts colorization off.
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:2]]
+# 'ls' uses the value of the environment variable LS_COLORS to display. 'dircolors' is a utility to set LS_COLORS
+# COLOR needs one of these arguments:
+# - 'tty' colorizes output to ttys, but not pipes.
+# - 'all' adds color characters to all output
+# - 'none' shuts colorization off.
 COLOR tty
-# LS_COLORS/dircolors:2 ends here
-
-
 
 # There should be one TERM entry for each termtype that is colorizable
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:4]]
 TERM Eterm
 TERM ansi
 TERM color_xterm
@@ -50,9 +39,6 @@ TERM vt100
 TERM xterm
 TERM xterm-256color
 TERM xterm-debian
-# LS_COLORS/dircolors:4 ends here
-
-
 
 # These are the color init strings for the basic file types. A color init string consists of one or more of the following numeric codes:
 # Attribute codes: 00:Normal, 01:Bold, 04:Underline, 05=Blink, 06:Outline, 07:Reverse, 08:Concealed
@@ -67,8 +53,6 @@ TERM xterm-debian
 # | cyan    |     36     |     46     |
 # | white   |     37     |     47     |
 
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:5]]
 BLK                      40;33;01  # block device driver
 CHR                      40;33;01  # character device driver
 DIR                      00;34     # directory
@@ -83,16 +67,11 @@ MISSING                  05;37;41  # ... and the files they point to
 NORMAL                   00        # global default, although everything should be something.
 ORPHAN                   01;37;41  # orphaned syminks
 SOCK                     01;35     # socket
-# LS_COLORS/dircolors:5 ends here
-
-
 
 # List any file extensions like '.gz' or '.tar' that you would like ls to colorize below. Put the extension, a space, and the color init string.
 # (and any comments you want to add after a '#')
 
 # Executables
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:6]]
 .cmd 00;32
 .exe 00;32
 .com 00;32
@@ -100,13 +79,8 @@ SOCK                     01;35     # socket
 .bat 00;32
 .sh  00;32
 .csh 00;32
-# LS_COLORS/dircolors:6 ends here
-
-
 
 # Archives or compressed files
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:7]]
 .tar  00;31
 .tgz  00;31
 .arj  00;31
@@ -123,13 +97,8 @@ SOCK                     01;35     # socket
 .bz   00;31
 .tz   00;31
 .cpio 00;31
-# LS_COLORS/dircolors:7 ends here
-
-
 
 # Image formats
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:8]]
 .jpg  00;35
 .jpeg 00;35
 .gif  00;35
@@ -151,14 +120,8 @@ SOCK                     01;35     # socket
 .dl   00;35
 .xcf  00;35
 .xwd  00;35
-# LS_COLORS/dircolors:8 ends here
-
-
 
 # Audio formats
-
-# [[file:~/.config/dotfiles/bash/bashrc.org::*LS_COLORS/dircolors][LS_COLORS/dircolors:9]]
 .ogg 00;35
 .mp3 00;35
 .wav 00;35
-# LS_COLORS/dircolors:9 ends here

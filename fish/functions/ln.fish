@@ -1,5 +1,3 @@
-# [[file:~/.config/dotfiles/fish/fish.org::*aliases][aliases:9]]
 function ln
-  command ln -svi $argv
+    command ln -svi $argv
 end
-# aliases:9 ends here

@@ -1,3 +1,3 @@
 function vv --wraps=nvim
-  nvim $argv
+    env NVIM_APPNAME=nvim-my nvim $argv
 end
