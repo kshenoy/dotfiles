@@ -64,6 +64,8 @@ alias P=$PAGER
 alias v=$EDITOR
 if [[ $EDITOR == "nvim" ]]; then
     alias vi='nvim --clean'
+    alias lv='NVIM_APPNAME=nvim-LazyVim nvim'
+    alias kv='NVIM_APPNAME=nvim-kickstart nvim'
 else
     alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
 fi

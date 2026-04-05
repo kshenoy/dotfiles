@@ -8,9 +8,8 @@ if [[ -z "$FZF_HOME" ]]; then
   return
 fi
 
-# Setup fzf defaults - prepend to PATH to override system fzf
 if [[ ! "$PATH" == *$FZF_HOME/bin* ]]; then
-  export PATH="$FZF_HOME/bin${PATH:+:${PATH}}"
+  export PATH="${PATH:+${PATH}:}$FZF_HOME/bin"
 fi
 
 eval "$($FZF_HOME/bin/fzf --bash)"
