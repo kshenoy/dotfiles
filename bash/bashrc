@@ -18,7 +18,7 @@
 # Turn off TTY "start" and "stop" commands in all interactive shells.
 # They default to ~C-q~ and ~C-s~. I want to use ~C-s~ to do forward history search.
 stty start ''
-stty stop  ''
+stty stop ''
 stty -ixon # disable XON/XOFF flow control
 stty ixoff # enable sending (to app) of start/stop characters
 stty ixany # let any character restart output, not only start character
@@ -34,30 +34,31 @@ umask 002
 # List of shell options: http://wiki.bash-hackers.org/internals/shell_options
 
 # Directory and completion options
-shopt -s cdable_vars  # Allow cd to variable names containing directory paths
-shopt -s cdspell      # Auto-correct minor typos in directory names
-shopt -s checkhash    # Check if hashed commands still exist before executing
-shopt -s checkjobs    # List stopped/running jobs before exiting shell
-shopt -s checkwinsize # Update LINES and COLUMNS after each command
-shopt -s direxpand    # Expand directory names (prevents escaping $ in $dir_variable)
-shopt -s dirspell     # Auto-correct directory names during completion
-shopt -s dotglob      # Include hidden files in filename expansion
+shopt -s cdable_vars   # Allow cd to variable names containing directory paths
+shopt -s cdspell       # Auto-correct minor typos in directory names
+shopt -s checkhash     # Check if hashed commands still exist before executing
+shopt -s checkjobs     # List stopped/running jobs before exiting shell
+shopt -s checkwinsize  # Update LINES and COLUMNS after each command
+shopt -s direxpand     # Expand directory names (prevents escaping $ in $dir_variable)
+shopt -s dirspell      # Auto-correct directory names during completion
+shopt -s dotglob       # Include hidden files in filename expansion
 shopt -s huponexit     # Send SIGHUP to jobs when interactive login shell exits
 shopt -s lastpipe      # Run last command of pipeline in current shell
 shopt -s lithist       # Save multi-line commands with embedded newlines
 shopt -s mailwarn      # Warn if mail file has been accessed
 shopt -s shift_verbose # Print error when shift count exceeds parameters
 
-set -o noclobber
-set bell-style none
-set +o nounset  # Otherwise some completions will fail
+set -o noclobber # Prevent '>' from overwriting existing files; use '>|' to force overwrite
+set +o nounset   # Allow unset variables (some completion scripts reference unset vars and will break otherwise)
+
+bind 'set bell-style none' # Disable terminal bell (audible/visible) on tab completion and errors
 
 #=======================================================================================================================
 # HISTORY CONFIGURATION
 #=======================================================================================================================
-shopt -s histappend    # Append to history file instead of overwriting
-shopt -s histreedit    # Allow re-editing failed history substitutions
-shopt -s histverify    # Load history substitutions into readline buffer for confirmation
+shopt -s histappend # Append to history file instead of overwriting
+shopt -s histreedit # Allow re-editing failed history substitutions
+shopt -s histverify # Load history substitutions into readline buffer for confirmation
 
 # Increase size of history in the terminal. Default is a measly 512 lines
 export HISTSIZE=65535
@@ -93,8 +94,8 @@ export LANG=en_US.UTF-8
 #=======================================================================================================================
 # ls colors
 if [[ -x /usr/bin/dircolors ]]; then
-    _dircolors=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/dircolors.rc
-    [[ -r $_dircolors ]] && eval "$(/usr/bin/dircolors -b $_dircolors)" || eval "$(/usr/bin/dircolors -b)"
+  _dircolors=${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/dircolors.rc
+  [[ -r $_dircolors ]] && eval "$(/usr/bin/dircolors -b $_dircolors)" || eval "$(/usr/bin/dircolors -b)"
 fi
 
 #=======================================================================================================================
@@ -103,8 +104,8 @@ fi
 # Load modular configuration files
 # Note: utils/query.sh is available but not auto-loaded (source manually if needed)
 for f in aliases.sh completions.sh utils/alert.sh utils/man.sh utils/navigation.sh utils/path.sh; do
-    [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/$f ]] &&
-        . ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/$f
+  [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/$f ]] &&
+    . ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/bash/$f
 done
 
 #=======================================================================================================================
@@ -131,12 +132,12 @@ __setprompt() {
 . ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf.bash
 
 # zoxide (https://github.com/ajeetdsouza/zoxide)
-if hash zoxide 2> /dev/null; then
+if hash zoxide 2>/dev/null; then
   eval "$(zoxide init --cmd j bash)"
 fi
 
 # Use the starship prompt
-if hash starship 2> /dev/null; then
+if hash starship 2>/dev/null; then
   eval "$(starship init bash)"
 fi
 

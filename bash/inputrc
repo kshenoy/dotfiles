@@ -1,17 +1,48 @@
+#=======================================================================================================================
+# Bindings reference (emacs mode)
+# [custom] marks bindings added in this file; all others are readline defaults
+#=======================================================================================================================
+#
+# Navigation
+#   C-a / C-e        beginning/end of line
+#   M-f / M-b        forward/backward one word (stops at non-alphanumeric: '-', ':', etc.)
+#   M-F / M-B        [custom] forward/backward one WORD (stops at whitespace/shell-meta only)
+#   C-x C-x          toggle between current position and mark
+#
+# Editing
+#   C-w              delete word backward (to whitespace)
+#   M-Backspace      delete word backward (to non-word char)
+#   M-C-w            [custom] delete path component backward (to whitespace or '/')
+#   M-d              delete word forward
+#   C-k              kill to end of line
+#   C-u              kill to beginning of line
+#   C-y / M-y        yank/cycle through kill ring
+#   C-t / M-t        transpose chars/words
+#   M-u / M-l / M-c  uppercase/lowercase/capitalize word (case-conversions)
+#   C-x C-u          undo
+#   M-<0-9>          digit-argument: numeric prefix for commands (e.g. M-3 M-d deletes 3 words)
+#
+# History
+#   C-r / C-s        reverse/forward incremental search
+#   M-. / M-_        insert last argument of previous command (insert-last-argument)
+#   M-< / M->        beginning/end of history
+#   M-#              comment out current line and commit to history (insert-comment)
+#
+# Completion
+#   M-?              show all possible completions
+#   M-*              insert all completions
+#
+# Misc
+#   C-x C-e          open current line in $VISUAL for editing
+#   M-r              redraw current line (refresh display only, no content change)
+#   C-l              clear screen and redraw current line at top
+#   C-] / M-C-]      search forward/backward for a character (like f/F in vi)
+#=======================================================================================================================
+
 ## Readline settings
 
-# prepends a symbol to PS1 to indicate whether we're in emacs/vi mode
-# set show-mode-in-prompt-on
-
-# Handle Meta (Alt) correctly
-set meta-flag on
-set convert-meta off
-set output-meta on
-
-# Rebind C-A-H to ignore hyphens and underscores while deleting a filename
-#$if mode=emacs
-#"\eC-h": unix-filename-rubout
-#$endif
+# Set default editing mode
+set editing-mode emacs
 
 # Don't beep!
 set bell-style none
@@ -19,26 +50,31 @@ set bell-style none
 # Case-insensitive filename matching and completion
 set completion-ignore-case on
 
+# Show completions on first Tab press instead of second
+set show-all-if-ambiguous on
+
+# Color completions by file type
+set colored-stats on
+
+# Append '/' to symlinked directories in completions
+set mark-symlinked-directories on
+
+# Don't duplicate text when completing mid-word
+set skip-completed-text on
+
+# Prepends a symbol to PS1 to indicate whether we're in emacs/vi mode
+# set show-mode-in-prompt on
+
 set keymap emacs
-# Switch to vi mode
-"\C-x\C-t": vi-editing-mode
+"\C-x\C-t": vi-editing-mode       # Switch to vi mode
+"\eF":        shell-forward-word      # WORD forward: skip over '-', ':' etc. (vim's W convention)
+"\eB":        shell-backward-word     # WORD backward: skip over '-', ':' etc. (vim's B convention)
+"\e\C-w":     unix-filename-rubout   # Delete path component backward (to whitespace or '/')
 
-# Switch to emacs mode
 set keymap vi-command
-"\C-x\C-t": emacs-editing-mode
+"\C-x\C-t": emacs-editing-mode        # Switch back to emacs mode
+"\C-x\C-e": edit-and-execute-command  # Open current line in $VISUAL for editing (to match emacs mode)
+
 set keymap vi-insert
-"\C-x\C-t": emacs-editing-mode
-
-# Open up $VISUAL to edit command
-set keymap vi-command
-"\C-x\C-e": edit-and-execute-command
-set keymap vi-insert
-"\C-x\C-e": edit-and-execute-command
-
-
-# Set default editing mode
-set editing-mode emacs
-
-# Redraw current line (useful after FZF operations)
-set keymap emacs
-"\e\C-l": redraw-current-line
+"\C-x\C-t": emacs-editing-mode        # Switch back to emacs mode
+"\C-x\C-e": edit-and-execute-command  # Open current line in $VISUAL for editing (to match emacs mode)
