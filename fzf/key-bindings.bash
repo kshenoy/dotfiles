@@ -50,6 +50,11 @@ bind -m emacs-standard -x '"\C-f\C-r": "fzf::prehistory"'
 # C-g C-s: modified files picker (overrides fzf-git.sh's stashes)
 bind -m emacs-standard -x '"\C-g\C-s": "fzf::git::status"'
 
+# C-f C-g: git files picker (mirrors LazyVim's convention; same as C-g C-f from fzf-git.sh)
+if declare -f _fzf_git_files >/dev/null; then
+  bind -m emacs-standard '"\C-f\C-g": "\C-g\C-f"'
+fi
+
 # CTRL-F ALT-/ : Repeat last command and pipe result to FZF
 # From http://brettterpstra.com/2015/07/09/shell-tricks-inputrc-binding-fun/
 bind -m emacs-standard -x '"\C-f\e/": "!! | fzf -m\C-m\C-m"'
