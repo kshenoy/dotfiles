@@ -8,10 +8,7 @@ if [[ -z "$FZF_HOME" ]]; then
   return
 fi
 
-if [[ ! "$PATH" == *$FZF_HOME/bin* ]]; then
-  export PATH="${PATH:+${PATH}:}$FZF_HOME/bin"
-fi
-
+export PATH="$FZF_HOME/bin${PATH:+:${PATH}}"
 eval "$($FZF_HOME/bin/fzf --bash)"
 
 # Source fzf-git.sh for enhanced git integration
@@ -25,7 +22,7 @@ fi
 . ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/fzf_functions.bash
 . ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/key-bindings.bash
 
-if hash fd 2> /dev/null; then
+if hash fd 2>/dev/null; then
   export FZF_CTRL_T_COMMAND="fd --strip-cwd-prefix --hidden --exclude .git --type f"
   export FZF_ALT_C_COMMAND="fd --strip-cwd-prefix --hidden --exclude .git --type d"
 fi

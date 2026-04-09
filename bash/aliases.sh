@@ -64,14 +64,14 @@ alias P=$PAGER
 alias v=$EDITOR
 if [[ $EDITOR == "nvim" ]]; then
     alias vi='nvim --clean'
-    alias lv='NVIM_APPNAME=nvim-LazyVim nvim'
+    alias vv='nvim -u ~/.config/nvim/init-min.lua'
     alias kv='NVIM_APPNAME=nvim-kickstart nvim'
 else
     alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
 fi
 
 # Conditional vimdiff - only runs if files exist and differ
-gvim_diff() {
+nvim_diff() {
     # Check to see if all files are present. If not, return.
     for i in "$@"; do
         [[ ! -f "$i" ]] && return
@@ -80,10 +80,10 @@ gvim_diff() {
     # If there are no differences, print that files are identical and return
     command diff -qs "$@" && return
 
-    # Run vimdiff only if there are differences and all files are present
-    gvim -df -c 'set nobackup' "$@"
+    # Run nvim in diff mode with the minimal config
+    nvim -u ~/.config/nvim-LazyVim/init-min.lua -d "$@"
 }
-alias vd=gvim_diff
+alias vd=nvim_diff
 
 
 #=======================================================================================================================

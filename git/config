@@ -35,24 +35,21 @@ renames = copies
 prompt = false
 
 [difftool "nvim"]
-cmd = nvim -d $LOCAL $REMOTE
+cmd = nvim -u ~/.config/nvim-LazyVim/init-min.lua -d $LOCAL $REMOTE
 
 [merge]
-tool = meld
+tool = nvim
 # Show the common ancestor in conflict markers (base|ours vs theirs) for more context
-conflictstyle = diff3
+conflictstyle = zdiff3
 
 [mergetool]
 prompt = false
 
-[mergetool "meld"]
-cmd = meld $LOCAL $MERGED $REMOTE --output $MERGED --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $REMOTE --diff $LOCAL $MERGED --diff $REMOTE $MERGED
-
-[mergetool "vim"]
-cmd = vim_merge $BASE $REMOTE $LOCAL $MERGED
-
 [mergetool "nvim"]
-cmd = nvim $BASE $REMOTE $LOCAL $MERGED
+cmd = nvim -u ~/.config/nvim/init-min.lua -c MergeInit "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
+
+[mergetool "meld"]
+cmd = meld $LOCAL $MERGED $REMOTE --output $MERGED --diff $LOCAL $MERGED --diff $REMOTE $MERGED --diff $BASE $REMOTE --diff $BASE $LOCAL --diff $REMOTE $LOCAL
 
 [fetch]
 # Remove stale remote-tracking branches when the remote branch is deleted
