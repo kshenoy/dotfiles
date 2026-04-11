@@ -4,6 +4,21 @@
 
 - Store new remembered behaviors here (not in local memory files) so they sync across devices via git.
 
+## README TODO format
+
+When documenting in-progress work in `README.md`, use this format (placed after the main section content):
+
+```
+#### TODO <short description>
+
+<problem statement paragraph>
+
+**Status**
+<current status / what's been tried / what's pending>
+```
+
+Remove the TODO once resolved
+
 ## Gotchas
 
 - `git/config` is symlinked as `~/.config/git/config.personal` (not `config`) and gets inlined into `~/.config/git/config.personal`
