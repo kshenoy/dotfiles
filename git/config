@@ -68,16 +68,18 @@ alias = !git config -l | grep alias | cut -c 7-
 
 # Shorthands
 st = status
-dw = diff --word-diff
+dn = diff --name-only
 dt = difftool
+dw = diff --word-diff
 mt = mergetool
 br = branch
 sw = switch
 
 # Colorized graph log of all branches with author and relative date
-lg = log --color --graph --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(red)%d%C(reset)' --abbrev-commit --all
+pplog = log --color --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(red)%d%C(reset)'
+lg = !git pplog --abbrev-commit --graph
 # Same as above but for a single file
-flog = log --color --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(red)%d%C(reset)' --abbrev-commit --all --follow
+flog = !git pplog --abbrev-commit --all --follow
 
 # Show the most recent commit
 last = log -1 HEAD

@@ -32,6 +32,20 @@ __fzf::insert_at_cursor() {
   READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
 }
 
+#=======================================================================================================================
+# Override fzf-git.sh's function
+#=======================================================================================================================
+_fzf_git_fzf() {
+  local pw=$(( $(tmux display-message -p '#{pane_width}') * 9 / 10 ))
+  local ph=$(( $(tmux display-message -p '#{pane_height}') * 9 / 10 ))
+  fzf --height 75% --tmux "center,${pw},${ph}" \
+    --layout reverse --multi --min-height 20+ --border \
+    --no-separator --header-border horizontal \
+    --border-label-pos 2 \
+    --color 'label:blue' \
+    --preview-window 'right,50%' --preview-border line \
+    --bind 'ctrl-/:change-preview-window(down,50%|hidden|)' "$@"
+}
 
 #=======================================================================================================================
 # fzf::git::status - Modified files picker (C-g C-s)
