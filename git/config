@@ -4,7 +4,7 @@ name  = Kartik Shenoy
 email = theresmorethanoneway@gmail.com
 
 [core]
-editor = nvim
+editor = nvim -u ~/.config/nvim/init-min.lua
 
 [init]
 defaultBranch = main
@@ -35,7 +35,7 @@ renames = copies
 prompt = false
 
 [difftool "nvim"]
-cmd = nvim -u ~/.config/nvim-LazyVim/init-min.lua -d $LOCAL $REMOTE
+cmd = nvim -u ~/.config/nvim/init-min.lua -d $LOCAL $REMOTE
 
 [merge]
 tool = nvim
