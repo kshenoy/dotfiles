@@ -55,7 +55,7 @@ fzf::git::status() {
   local _selected=$(git -c color.status=always status --short |
     FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf --nth 2..,.. \
     --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -500' |
-    cut -c4- | sed 's/.* -> //')
+    cut -c4- | sed 's/.* -> //' | while read -r item; do printf '%q ' "$item"; done)
   __fzf::insert_at_cursor "$_selected"
 }
 
