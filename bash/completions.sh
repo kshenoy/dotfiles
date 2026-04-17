@@ -38,6 +38,6 @@ else
     _compl_alias vim   v vi
 fi
 _compl_alias diff  vd
-_compl_alias cat   C
+complete -f C
 _compl_alias less  P
 _compl_alias tmux  tm

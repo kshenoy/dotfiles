@@ -79,7 +79,7 @@ export HISTCONTROL=ignoreboth
 # ENVIRONMENT VARIABLES
 #=======================================================================================================================
 export EDITOR=nvim
-export VISUAL=gvim
+export VISUAL="gvim -f"
 
 # Make less more friendly for non-text input files, see lesspipe(1)
 export MANPAGER=less
