@@ -59,6 +59,33 @@ tmux::_rename_pane() {
   fi
 }
 
+# Apply work-specific layouts
+# work-pc: 3 horizontal panes at 25/50/25
+# work-lp: 2 vertical panes, right one split into top/bottom halves
+tmux::_select_layout_work() {
+  local num_panes curr_pane curr_path
+  num_panes=$(tmux::exe display-message -p "#{window_panes}")
+  curr_pane=$(tmux::exe display-message -p "#{pane_index}")
+  curr_path=$(tmux::exe display-message -p "#{pane_current_path}")
+
+  for (( i = num_panes; i < 3; i++ )); do
+    tmux::exe split-window -h -c "$curr_path"
+  done
+
+  if [[ "$1" == "work-pc" ]]; then
+    tmux::exe select-layout even-horizontal
+    tmuxw resize-pane -t 1 -x 25% > /dev/null
+    tmuxw resize-pane -t 2 -x 50% > /dev/null
+    tmuxw resize-pane -t 3 -x 25% > /dev/null
+  elif [[ "$1" == "work-lp" ]]; then
+    tmux::exe select-layout main-vertical
+    tmuxw resize-pane -t 1 -x 50% > /dev/null
+    tmuxw resize-pane -t 2 -y 50% > /dev/null
+  fi
+
+  tmux::exe select-pane -t "$curr_pane"
+}
+
 # Move current window to target index, inserting it and shifting intervening windows
 tmux::_move_window_to() {
   local target=$1
@@ -141,7 +168,11 @@ tmuxw() {
     ;;
 
   select-layout | sl)
-    tmux::exe "${cmd}" "$@"
+    if [[ "$1" == work-* ]]; then
+      tmux::_select_layout_work "$1"
+    else
+      tmux::exe "${cmd}" "$@"
+    fi
     ;;
 
   send-keys-all-panes | skap)
