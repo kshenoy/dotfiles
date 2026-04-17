@@ -99,3 +99,9 @@ stsh = stash --include-untracked
 # Show commits on the remote not yet pulled / commits not yet pushed
 incoming = log HEAD..@{upstream}
 outgoing = log @{upstream}..HEAD
+
+# Pull only <REMOTE>/<BRANCH>. Defaults: REMOTE=origin, BRANCH=<current branch> eg.
+# - git pb               → origin/<current-branch>
+# - git pb main          → origin/main
+# - git pb upstream/main → upstream/main
+pb = "!f() {\n  input=\"${1}\";\n  if [ -z \"$input\" ]; then\n    remote=\"origin\"; branch=\"$(git branch --show-current)\";\n  elif echo \"$input\" | grep -q \"/\"; then\n    remote=\"${input%%/*}\"; branch=\"${input#*/}\";\n  else\n    remote=\"origin\"; branch=\"$input\";\n  fi;\n  git fetch \"$remote\" \"$branch\" && git merge \"$remote/$branch\";\n}; f"
