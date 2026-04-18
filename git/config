@@ -37,6 +37,9 @@ prompt = false
 [difftool "nvim"]
 cmd = nvim -u ~/.config/nvim/init-min.lua -d $LOCAL $REMOTE
 
+[difftool "nvim-LazyVim"]
+cmd = NVIM_APPNAME=nvim-LazyVim nvim -u ~/.config/nvim/init-min.lua -d $LOCAL $REMOTE
+
 [difftool "gvim"]
 cmd = gvim -f -d $LOCAL $REMOTE
 
@@ -50,6 +53,9 @@ prompt = false
 
 [mergetool "nvim"]
 cmd = nvim -u ~/.config/nvim/init-min.lua -c MergeInit "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
+
+[mergetool "nvim-LazyVim"]
+cmd = NVIM_APPNAME=nvim-LazyVim nvim -u ~/.config/nvim/init-min.lua -c MergeInit "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
 
 [mergetool "gvim"]
 cmd = gvim -f "$BASE" "$REMOTE" "$LOCAL" "$MERGED" -c MergeInit
@@ -107,6 +113,12 @@ stsh = stash --include-untracked
 # Show commits on the remote not yet pulled / commits not yet pushed
 incoming = log HEAD..@{upstream}
 outgoing = log @{upstream}..HEAD
+
+# Run difftool/mergetool with gvim or other nvim distros instead of the default tool
+dtg = difftool --tool=gvim
+mtg = mergetool --tool=gvim
+dtl = difftool --tool=nvim-LazyVim
+mtl = mergetool --tool=nvim-LazyVim
 
 # Pull only <REMOTE>/<BRANCH>. Defaults: REMOTE=origin, BRANCH=<current branch> eg.
 # - git pb               → origin/<current-branch>
