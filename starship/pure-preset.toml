@@ -18,11 +18,11 @@ truncation_length = 0
 style = "blue"
 
 [character]
-# success_symbol = "[❯](purple)"
-# error_symbol = "[❯](red)"
-# vimcmd_symbol = "[❮](green)"
-success_symbol = "[❮^_^❯](bold green)"
-error_symbol   = "[❮@_@❯](bold red)"
+success_symbol = "[❯](purple)"
+error_symbol = "[❯](red)"
+vimcmd_symbol = "[❮](green)"
+# success_symbol = "[❮^_^❯](bold green)"
+# error_symbol   = "[❮@_@❯](bold red)"
 
 [git_branch]
 format = "[$branch]($style)"

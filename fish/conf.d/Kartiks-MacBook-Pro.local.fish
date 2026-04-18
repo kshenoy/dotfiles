@@ -5,3 +5,5 @@ if test (hostname) != "Kartiks-MacBook-Pro.local"
 end
 
 eval (/opt/homebrew/bin/brew shellenv)
+
+set -gx FZF_GIT_HOME /opt/fzf-git.sh

@@ -36,15 +36,21 @@ __fzf::insert_at_cursor() {
 # Override fzf-git.sh's function
 #=======================================================================================================================
 _fzf_git_fzf() {
-  local pw=$(( $(tmux display-message -p '#{pane_width}') * 9 / 10 ))
-  local ph=$(( $(tmux display-message -p '#{pane_height}') * 9 / 10 ))
-  fzf --height 75% --tmux "center,${pw},${ph}" \
-    --layout reverse --multi --min-height 20+ --border \
-    --no-separator --header-border horizontal \
-    --border-label-pos 2 \
-    --color 'label:blue' \
-    --preview-window 'right,50%' --preview-border line \
-    --bind 'ctrl-/:change-preview-window(down,50%|hidden|)' "$@"
+  local fzf_args=(
+    --height 75%
+    --layout reverse --multi --min-height 20+ --border
+    --no-separator --header-border horizontal
+    --border-label-pos 2 --color 'label:blue'
+    --preview-window 'right,50%' --preview-border line
+    --bind 'ctrl-/:change-preview-window(down,50%|hidden|)'
+  )
+  if [[ -n "$TMUX" ]]; then
+    local pw=$(( $(tmux display-message -p '#{pane_width}') * 9 / 10 ))
+    local ph=$(( $(tmux display-message -p '#{pane_height}') * 9 / 10 ))
+    fzf --tmux "center,${pw},${ph}" "${fzf_args[@]}" "$@"
+  else
+    fzf "${fzf_args[@]}" "$@"
+  fi
 }
 
 #=======================================================================================================================
@@ -53,7 +59,7 @@ _fzf_git_fzf() {
 #=======================================================================================================================
 fzf::git::status() {
   local _selected=$(git -c color.status=always status --short |
-    FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf --nth 2..,.. \
+    fzf --nth 2.. \
     --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -500' |
     cut -c4- | sed 's/.* -> //' | while read -r item; do printf '%q ' "$item"; done)
   __fzf::insert_at_cursor "$_selected"
@@ -69,13 +75,12 @@ fzf::git::status() {
 #-----------------------------------------------------------------------------------------------------------------------
 fzf::lsf::bjobs() {
   local selected=$(lsf_bjobs -o "id: user: stat: queue: submit_time: name" |
-    FZF_DEFAULT_OPTS="--header-lines=1 $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf "$@" |
+    fzf --header-lines=1 "$@" |
     cut -d' ' -f1 | while read -r item; do
-  printf '%q ' "$item"
-done
-)
+      printf '%q ' "$item"
+    done)
 
-__fzf::insert_at_cursor "$selected"
+  __fzf::insert_at_cursor "$selected"
 }
 
 
@@ -99,7 +104,7 @@ fzf::cmd_opts() {
   local cmd=$(awk '{print $NF}' <<< "${READLINE_LINE:0:$READLINE_POINT}")
 
   local selected=$(eval "${cmd} --help || ${cmd} -h || ${cmd} -help || ${cmd} help" | \
-    FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf +x "$@" | \
+    fzf +x "$@" | \
     while read -r item; do
       # Extract first option flag (word starting with -)
       for word in $item; do
@@ -111,10 +116,9 @@ fzf::cmd_opts() {
       done
     done)
 
-    __fzf::insert_at_cursor "$selected"
-    # Restore READLINE_POINT to make it easier to launch this again
-    READLINE_POINT=$saved_point
-  }
+  __fzf::insert_at_cursor "$selected"
+  READLINE_POINT=$saved_point
+}
 
 
 #=======================================================================================================================
@@ -130,26 +134,26 @@ fzf::prehistory() {
   local hist_dir="${HOME}/.local/share/bash_history"
 
   # Set up the date filter for find command
-  local newermt_filter=""
+  local find_opts=(-type f)
   if [[ "$months" -ne -1 ]]; then
     local cutoff_date=$(date -d "$months months ago" +%s 2>/dev/null || date -v-${months}m +%s 2>/dev/null)
-    newermt_filter="-newermt @$cutoff_date"
+    find_opts+=(-newermt "@$cutoff_date")
   fi
 
   output=$(
     if [[ -d "$hist_dir" ]]; then
-      find "$hist_dir" -type f $newermt_filter -exec cat {} \; 2>/dev/null | \
+      find "$hist_dir" "${find_opts[@]}" -exec cat {} + 2>/dev/null | \
         grep -v '^#' | \
         awk '!seen[$0]++' | \
         FZF_DEFAULT_OPTS="--reverse --scheme=history --bind=ctrl-r:toggle-sort ${FZF_CTRL_R_OPTS-} +m" \
         FZF_DEFAULT_OPTS_FILE='' fzf --query "$READLINE_LINE"
     fi
-    ) || return
+  ) || return
 
-    READLINE_LINE="$output"
-    if [[ -z $READLINE_POINT ]]; then
-      echo "$READLINE_LINE"
-    else
-      READLINE_POINT=${#READLINE_LINE}
-    fi
-  }
+  READLINE_LINE="$output"
+  if [[ -z $READLINE_POINT ]]; then
+    echo "$READLINE_LINE"
+  else
+    READLINE_POINT=${#READLINE_LINE}
+  fi
+}
