@@ -5,12 +5,7 @@
 *sync.ffs_db
 
 # vim
-/vim/autoload/plug*
-/vim/bundles
-/vim/pack/rc_local
-/vim/pack/bundles/opt/UltiSnips/pythonx/UltiSnips_globals.pyc
-/vim/pack/bundles/opt/UltiSnips/pythonx/vimsnippets.pyc
-/vim/pack/bundles/opt/UltiSnips/pythonx/__pycache__
+/vim/pack
 /vim/tmp
 
 # neovim
