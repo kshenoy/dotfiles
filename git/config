@@ -74,6 +74,8 @@ dw = diff --word-diff
 mt = mergetool
 br = branch
 sw = switch
+ci = commit
+co = checkout
 
 # Colorized graph log of all branches with author and relative date
 pplog = log --color --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(red)%d%C(reset)'

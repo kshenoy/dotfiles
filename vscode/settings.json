@@ -3,6 +3,10 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "C_Cpp.intelliSenseEngine": "disabled",
+    "[python]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
     "cppref.searchEngine": "DuckDuckGo",
     "diffEditor.ignoreTrimWhitespace": false,
     "editor.cursorSurroundingLines": 3,
