@@ -28,6 +28,7 @@ set hidden
 set switchbuf=useopen,usetab
 set splitbelow
 set splitright
+set autochdir
 
 " Terminal
 set title
