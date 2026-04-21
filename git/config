@@ -38,7 +38,7 @@ prompt = false
 cmd = nvim -u ~/.config/nvim/init-min.lua -d $LOCAL $REMOTE
 
 [difftool "nvim-LazyVim"]
-cmd = NVIM_APPNAME=nvim-LazyVim nvim -u ~/.config/nvim/init-min.lua -d $LOCAL $REMOTE
+cmd = NVIM_APPNAME=nvim-LazyVim nvim -d $LOCAL $REMOTE
 
 [difftool "gvim"]
 cmd = gvim -f -d $LOCAL $REMOTE
@@ -55,7 +55,7 @@ prompt = false
 cmd = nvim -u ~/.config/nvim/init-min.lua -c MergeInit "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
 
 [mergetool "nvim-LazyVim"]
-cmd = NVIM_APPNAME=nvim-LazyVim nvim -u ~/.config/nvim/init-min.lua -c MergeInit "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
+cmd = NVIM_APPNAME=nvim-LazyVim nvim -c MergeInit "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
 
 [mergetool "gvim"]
 cmd = gvim -f "$BASE" "$REMOTE" "$LOCAL" "$MERGED" -c MergeInit
