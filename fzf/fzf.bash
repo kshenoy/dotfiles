@@ -2,9 +2,6 @@
 echo "$(tput setaf 2)Sourcing$(tput sgr0) ${BASH_SOURCE[0]} ..."
 
 if [[ -z "$FZF_HOME" ]]; then
-  _fg_red=$(tput setaf 1)
-  _reset=$(tput sgr0)
-  echo "${_fg_red}ERROR${_reset}: FZF_HOME is not set"
   return
 fi
 
