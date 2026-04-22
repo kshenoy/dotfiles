@@ -90,8 +90,9 @@ ci = commit
 co = checkout
 
 # Colorized graph log of all branches with author and relative date
-pplog = log --color --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(red)%d%C(reset)'
-lg = !git pplog --abbrev-commit --graph
+pplog = log --color --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(auto)%d'
+lg = "!f() { git pplog --abbrev-commit --graph \"${1:-HEAD}\" $(git rev-list -g \"${1:-HEAD}\"); }; f"
+lga = !git pplog --abbrev-commit --graph --all
 # Same as above but for a single file
 flog = !git pplog --abbrev-commit --all --follow
 
@@ -125,3 +126,6 @@ mtl = mergetool --tool=nvim-LazyVim
 # - git pb main          → origin/main
 # - git pb upstream/main → upstream/main
 pb = "!f() {\n  input=\"${1}\";\n  if [ -z \"$input\" ]; then\n    remote=\"origin\"; branch=\"$(git branch --show-current)\";\n  elif echo \"$input\" | grep -q \"/\"; then\n    remote=\"${input%%/*}\"; branch=\"${input#*/}\";\n  else\n    remote=\"origin\"; branch=\"$input\";\n  fi;\n  git fetch \"$remote\" \"$branch\" && git merge \"$remote/$branch\";\n}; f"
+
+# Delete remote-tracking refs not tracked by any local branch
+remote-prune =!bash -c \"comm -23 <(git branch -r | grep -v HEAD | sed \\\"s/^ *//\\\" | sort) <(git branch --format=\\\"%(upstream:short)\\\" | grep -v \\\"^$\\\" | sort) | xargs git branch -dr\"
