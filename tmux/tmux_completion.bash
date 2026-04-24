@@ -4,7 +4,6 @@
 # See: http://www.debian-administration.org/articles/317 for how to write more.
 # Usage: Put "source bash_completion_tmux.sh" into your .bashrc
 # Based upon the example at http://paste-it.appspot.com/Pj4mLycDE
-echo "$(tput setaf 2)Sourcing$(tput sgr0) ${BASH_SOURCE[0]} ..."
 
 
 _tmux_complete_() (

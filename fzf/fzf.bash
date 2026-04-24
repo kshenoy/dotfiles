@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-echo "$(tput setaf 2)Sourcing$(tput sgr0) ${BASH_SOURCE[0]} ..."
 
 if [[ -z "$FZF_HOME" ]]; then
   return
