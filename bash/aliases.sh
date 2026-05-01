@@ -64,7 +64,6 @@ alias P=$PAGER
 alias v=$EDITOR
 if [[ $EDITOR == "nvim" ]]; then
     alias vi='nvim --clean'
-    alias vv='nvim -u ~/.config/nvim/init-min.lua'
     alias kv='NVIM_APPNAME=nvim-kickstart nvim'
     alias lv='NVIM_APPNAME=nvim-LazyVim nvim'
 else
