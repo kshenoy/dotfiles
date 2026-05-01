@@ -4,8 +4,6 @@ if [[ -z "$FZF_HOME" ]]; then
   return
 fi
 
-export PATH="$FZF_HOME/bin${PATH:+:${PATH}}"
-
 if hash fd 2>/dev/null; then
   export FZF_CTRL_T_COMMAND="fd --strip-cwd-prefix --hidden --exclude .git --type f"
   export FZF_ALT_C_COMMAND="fd --strip-cwd-prefix --hidden --exclude .git --type d"
@@ -19,7 +17,8 @@ export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
 # FZF colorschemes (appends --color flags to FZF_DEFAULT_OPTS)
 . ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/fzf/themes/catppuccin-frappe.sh
 
-eval "$($FZF_HOME/bin/fzf --bash)"
+export PATH="$FZF_HOME/bin${PATH:+:${PATH}}"
+eval "$(fzf --bash)"
 
 # Source fzf-git.sh for enhanced git integration
 # (our custom VCS bindings in key-bindings.bash will override the default C-g bindings)

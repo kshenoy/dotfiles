@@ -47,6 +47,9 @@ bind -m emacs-standard -x '"\C-f\C-r": "fzf::prehistory"'
 #   C-g C-t / C-g t → tags            C-g C-w / C-g w → worktrees
 #   C-g C-r / C-g r → remotes         C-g C-l / C-g l → reflogs
 #   C-g C-e / C-g e → each-ref        C-g ?           → help
+# C-f Alt-.: jump to a parent directory
+bind -m emacs-standard -x '"\C-f\e.": "fzf::cd::parent"'
+
 # C-g C-s: modified files picker (overrides fzf-git.sh's stashes)
 bind -m emacs-standard -x '"\C-g\C-s": "fzf::git::status"'
 

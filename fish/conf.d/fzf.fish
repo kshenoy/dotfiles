@@ -52,6 +52,7 @@ end
 bind --erase           ctrl-t alt-c shift-tab
 bind --erase -M insert ctrl-t alt-c shift-tab
 
+# CTRL-F ALT-. : Jump to a parent directory
 # CTRL-F CTRL-F instead of CTRL-T : Paste selected file path(s)
 if set -q FZF_CTRL_T_COMMAND
     bind           ctrl-f,ctrl-f fzf-file-widget
@@ -75,6 +76,10 @@ bind -M insert ctrl-f,enter fzf-completion
 #   C-g C-t / C-g t → tags            C-g C-w / C-g w → worktrees
 #   C-g C-r / C-g r → remotes         C-g C-l / C-g l → reflogs
 #   C-g C-e / C-g e → each-ref        C-g ?           → help
+# C-f Alt-.: jump to a parent directory
+bind           ctrl-f,alt-. fzf_cd_parent
+bind -M insert ctrl-f,alt-. fzf_cd_parent
+
 # C-g C-s: modified files picker (overrides fzf-git.sh's stash binding)
 bind           ctrl-g,ctrl-s fzf_git_status
 bind -M insert ctrl-g,ctrl-s fzf_git_status

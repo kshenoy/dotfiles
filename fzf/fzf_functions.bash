@@ -54,6 +54,22 @@ _fzf_git_fzf() {
 }
 
 #=======================================================================================================================
+# fzf::cd::parent - Jump to a parent directory (Alt+Shift+C)
+# Shows all ancestor dirs (excl. PWD and /); matches on last component only
+#=======================================================================================================================
+fzf::cd::parent() {
+  local d=$PWD parents=() dir
+  while true; do
+    d="${d%/*}"
+    [[ -z "$d" || "$d" == "/" ]] && break
+    parents+=("$d")
+  done
+  [[ ${#parents[@]} -eq 0 ]] && return
+  dir=$(printf '%s\n' "${parents[@]}" | fzf --delimiter / --nth -1 --no-multi)
+  [[ -n "$dir" ]] && cd "$dir"
+}
+
+#=======================================================================================================================
 # fzf::git::status - Modified files picker (C-g C-s)
 # Inserts: File path(s) at cursor position
 #=======================================================================================================================
