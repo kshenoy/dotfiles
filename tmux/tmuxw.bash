@@ -2,17 +2,21 @@
 # tmux++
 # Wrapper around tmux to add more functionality
 
+# run-shell in tmux invokes bash as 'sh' (POSIX mode), which bans hyphens in
+# function names. Disable POSIX mode so tmux-* names are valid.
+set +o posix
+
 # Wrapper around the tmux command
-tmux::exe() {
+tmux-exe() {
   LANG=en_US.UTF-8 TMUX_DEFAULT_OPTS="$TMUX_DEFAULT_OPTS ${TMUX_DEFAULT_SOCKET:+-L $TMUX_DEFAULT_SOCKET}" command tmux "$@"
 }
 
 # Attach to existing session or else create a new one
-tmux::attach_or_new() {
+tmux-attach_or_new() {
   if [[ ! -z "$TMUX" ]]; then
-    tmux::exe -2 new-session
+    tmux-exe -2 new-session
   elif [[ -z "$1" ]]; then
-    tmux::exe -2 attach-session || tmux::exe -2 new-session
+    tmux-exe -2 attach-session || tmux-exe -2 new-session
   else
     # This doesn't work when the supplied argument is a subset of an already existing session name
     # For eg. if we have a session called DebugBus, and we check if the session "Debug" exists, tmux returns true
@@ -20,32 +24,32 @@ tmux::attach_or_new() {
 
     if [[ $(tm ls | grep -P "^$1\b" 2>/dev/null) ]]; then
       #echo "Attaching to exising session..."
-      tmux::exe -2 attach-session -t "$@"
+      tmux-exe -2 attach-session -t "$@"
     else
       echo "Creating new session $1 ..."
-      tmux::exe -2 new-session -s "$1"
+      tmux-exe -2 new-session -s "$1"
     fi
   fi
 }
 
 # Helper functions to simplify sending keys
-tmux::send_keys_other_panes() {
+tmux-send_keys_other_panes() {
   local _pane_current=$(tmux display-message -p '#P')
   for _pane in $(tmux list-panes -F '#P'); do
     if (("$_pane" != "$_pane_current")); then
-      tmux::exe send-keys -t ${_pane} "$@"
+      tmux-exe send-keys -t ${_pane} "$@"
     fi
   done
 }
 
-tmux::send_keys_all_panes() {
+tmux-send_keys_all_panes() {
   for _pane in $(tmux list-panes -F '#P'); do
-    tmux::exe send-keys -t ${_pane} "$@"
+    tmux-exe send-keys -t ${_pane} "$@"
   done
 }
 
 # Helper function to name a pane
-tmux::_rename_pane() {
+tmux-_rename_pane() {
   local _name
   if [[ -n "$1" ]]; then
     _name="$1"
@@ -60,7 +64,7 @@ tmux::_rename_pane() {
 }
 
 # Move current window to target index, inserting it and shifting intervening windows
-tmux::_move_window_to() {
+tmux-_move_window_to() {
   local target=$1
   local current
   current=$(tmux display-message -p '#I')
@@ -69,37 +73,37 @@ tmux::_move_window_to() {
 
   # If target slot is empty, simple move
   if ! tmux list-windows -F '#I' | grep -qx "$target"; then
-    tmux::exe move-window -t "$target"
+    tmux-exe move-window -t "$target"
     return 0
   fi
 
   # Park current window out of the way
-  tmux::exe move-window -t 999
+  tmux-exe move-window -t 999
 
   if [ "$current" -gt "$target" ]; then
     # Moving left: shift windows [target .. current-1] right by 1 (iterate high→low)
     for win in $(tmux list-windows -F '#I' | sort -rn); do
       if [ "$win" -ge "$target" ] && [ "$win" -lt "$current" ]; then
-        tmux::exe move-window -s ":$win" -t "$((win + 1))"
+        tmux-exe move-window -s ":$win" -t "$((win + 1))"
       fi
     done
   else
     # Moving right: shift windows [current+1 .. target] left by 1 (iterate low→high)
     for win in $(tmux list-windows -F '#I' | sort -n); do
       if [ "$win" -gt "$current" ] && [ "$win" -le "$target" ]; then
-        tmux::exe move-window -s ":$win" -t "$((win - 1))"
+        tmux-exe move-window -s ":$win" -t "$((win - 1))"
       fi
     done
   fi
 
   # Place parked window at target
-  tmux::exe move-window -s ":999" -t "$target"
+  tmux-exe move-window -s ":999" -t "$target"
 }
 
 # Top-level wrapper function
 tmuxw() {
   if (($# == 0)); then
-    tmux::exe
+    tmux-exe
     return
   fi
 
@@ -108,7 +112,7 @@ tmuxw() {
 
   case $cmd in
   attach-new | an)
-    tmux::attach_or_new "$@"
+    tmux-attach_or_new "$@"
     ;;
 
   resize-p* | resizep)
@@ -116,19 +120,19 @@ tmuxw() {
     if [[ "$*" =~ -[xy][[:space:]]+[[:digit:]]+% ]]; then
       local perVal=$(sed -e 's/^.*-[xy]\s*//' -e 's/%.*//' <<<"$*")
       if [[ "$*" =~ -x ]]; then
-        local absVal=$(($(tmux::exe display-message -p "#{window_width}") * $perVal / 100))
+        local absVal=$(($(tmux-exe display-message -p "#{window_width}") * $perVal / 100))
       elif [[ "$*" =~ -y ]]; then
-        local absVal=$(($(tmux::exe display-message -p "#{window_height}") * $perVal / 100))
+        local absVal=$(($(tmux-exe display-message -p "#{window_height}") * $perVal / 100))
       fi
       echo "tmux resize-pane $(sed "s/${perVal}%/${absVal}/" <<<"$*")"
-      eval "tmux::exe resize-pane $(sed "s/${perVal}%/${absVal}/" <<<"$*")"
+      eval "tmux-exe resize-pane $(sed "s/${perVal}%/${absVal}/" <<<"$*")"
     else
-      tmux::exe ${cmd} "$@"
+      tmux-exe ${cmd} "$@"
     fi
     ;;
 
   rename-pane)
-    tmux::_rename_pane "$@"
+    tmux-_rename_pane "$@"
     ;;
 
   respawn)
@@ -137,35 +141,35 @@ tmuxw() {
     ;;
 
   print-layout)
-    tmux::exe display-message -p "#{window_layout}"
+    tmux-exe display-message -p "#{window_layout}"
     ;;
 
   select-layout | sl)
-    if [[ "$1" == work-* ]] && declare -f tmux::_select_layout_work >/dev/null 2>&1; then
-      tmux::_select_layout_work "$1"
+    if [[ "$1" == work-* ]] && declare -f tmux-_select_layout_work >/dev/null 2>&1; then
+      tmux-_select_layout_work "$1"
     else
-      tmux::exe "${cmd}" "$@"
+      tmux-exe "${cmd}" "$@"
     fi
     ;;
 
   send-keys-all-panes | skap)
-    tmux::send_keys_all_panes "$@"
+    tmux-send_keys_all_panes "$@"
     ;;
 
   send-keys-other-panes | skop)
-    tmux::send_keys_other_panes "$@"
+    tmux-send_keys_other_panes "$@"
     ;;
 
   sk)
-    tmux::exe send-keys "$@"
+    tmux-exe send-keys "$@"
     ;;
 
   move-window-to)
-    tmux::_move_window_to "$@"
+    tmux-_move_window_to "$@"
     ;;
 
   *)
-    tmux::exe ${cmd} "$@"
+    tmux-exe ${cmd} "$@"
     ;;
   esac
 }

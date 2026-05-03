@@ -28,17 +28,17 @@ if [[ ${FZF_ALT_C_COMMAND-x} != "" ]]; then
 fi
 
 # CTRL-F CTRL-L: Search all running LSF jobs
-bind -m emacs-standard -x '"\C-f\C-l": "fzf::lsf::bjobs"'
+bind -m emacs-standard -x '"\C-f\C-l": "fzf-lsf-bjobs"'
 
 # CTRL-F CTRL-O: Show list of options of the command before the cursor using '<cmd> -h'
-bind -m emacs-standard -x '"\C-f\C-o": "fzf::cmd_opts"'
+bind -m emacs-standard -x '"\C-f\C-o": "fzf-cmd_opts"'
 
 # CTRL-F CTRL-R: Search through all archived history files
-bind -m emacs-standard -x '"\C-f\C-r": "fzf::prehistory"'
+bind -m emacs-standard -x '"\C-f\C-r": "fzf-prehistory"'
 
 # CTRL-F CTRL-X: Experimental
 #  'k'
-# bind -x '"\C-f\C-x": "fzf::_expt"'
+# bind -x '"\C-f\C-x": "fzf-_expt"'
 
 # Version-control related bindings: CTRL-G
 # fzf-git.sh provides these git-specific bindings (sourced in fzf.bash):
@@ -48,10 +48,10 @@ bind -m emacs-standard -x '"\C-f\C-r": "fzf::prehistory"'
 #   C-g C-r / C-g r → remotes         C-g C-l / C-g l → reflogs
 #   C-g C-e / C-g e → each-ref        C-g ?           → help
 # C-f Alt-.: jump to a parent directory
-bind -m emacs-standard -x '"\C-f\e.": "fzf::cd::parent"'
+bind -m emacs-standard -x '"\C-f\e.": "fzf-cd-parent"'
 
 # C-g C-s: modified files picker (overrides fzf-git.sh's stashes)
-bind -m emacs-standard -x '"\C-g\C-s": "fzf::git::status"'
+bind -m emacs-standard -x '"\C-g\C-s": "fzf-git-status"'
 
 # C-f C-g: git files picker (mirrors LazyVim's convention; same as C-g C-f from fzf-git.sh)
 if declare -f _fzf_git_files >/dev/null; then

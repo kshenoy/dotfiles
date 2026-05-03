@@ -2,10 +2,10 @@
 
 #=======================================================================================================================
 # Helper: Insert selected text at cursor position in readline buffer with smart spacing
-# Usage: __fzf::insert_at_cursor "text to insert"
+# Usage: __fzf-insert_at_cursor "text to insert"
 # Adds spaces before/after if needed based on context and selected text
 #=======================================================================================================================
-__fzf::insert_at_cursor() {
+__fzf-insert_at_cursor() {
   local selected="$1"
   [[ -z "$selected" ]] && return
 
@@ -54,10 +54,10 @@ _fzf_git_fzf() {
 }
 
 #=======================================================================================================================
-# fzf::cd::parent - Jump to a parent directory (Alt+Shift+C)
+# fzf-cd-parent - Jump to a parent directory (Alt+Shift+C)
 # Shows all ancestor dirs (excl. PWD and /); matches on last component only
 #=======================================================================================================================
-fzf::cd::parent() {
+fzf-cd-parent() {
   local d=$PWD parents=() dir
   while true; do
     d="${d%/*}"
@@ -70,38 +70,38 @@ fzf::cd::parent() {
 }
 
 #=======================================================================================================================
-# fzf::git::status - Modified files picker (C-g C-s)
+# fzf-git-status - Modified files picker (C-g C-s)
 # Inserts: File path(s) at cursor position
 #=======================================================================================================================
-fzf::git::status() {
+fzf-git-status() {
   local _selected=$(git -c color.status=always status --short |
     fzf --nth 2.. \
     --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -500' |
     cut -c4- | sed 's/.* -> //' | while read -r item; do printf '%q ' "$item"; done)
-  __fzf::insert_at_cursor "$_selected"
+  __fzf-insert_at_cursor "$_selected"
 }
 
 #=======================================================================================================================
-# fzf::lsf - LSF (Load Sharing Facility) job management functions
+# fzf-lsf - LSF (Load Sharing Facility) job management functions
 #=======================================================================================================================
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Select LSF jobs with interactive preview
 # Inserts: Job ID(s) at cursor position
 #-----------------------------------------------------------------------------------------------------------------------
-fzf::lsf::bjobs() {
+fzf-lsf-bjobs() {
   local selected=$(lsf_bjobs -o "id: user: stat: queue: submit_time: name" |
     fzf --header-lines=1 "$@" |
     cut -d' ' -f1 | while read -r item; do
       printf '%q ' "$item"
     done)
 
-  __fzf::insert_at_cursor "$selected"
+  __fzf-insert_at_cursor "$selected"
 }
 
 
 #=======================================================================================================================
-# fzf::cmd_opts - Parse and select command-line options from help output
+# fzf-cmd_opts - Parse and select command-line options from help output
 #=======================================================================================================================
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ fzf::lsf::bjobs() {
 # Inserts: Selected option(s) at cursor position
 # Smart positioning: Handles spacing around cursor automatically
 #-----------------------------------------------------------------------------------------------------------------------
-fzf::cmd_opts() {
+fzf-cmd_opts() {
   # echo "DEBUG: '${READLINE_LINE}' Point=${READLINE_POINT}, Char='${READLINE_LINE:$READLINE_POINT:1}'"
   local saved_point=$READLINE_POINT
 
@@ -132,17 +132,17 @@ fzf::cmd_opts() {
       done
     done)
 
-  __fzf::insert_at_cursor "$selected"
+  __fzf-insert_at_cursor "$selected"
   READLINE_POINT=$saved_point
 }
 
 
 #=======================================================================================================================
-# fzf::prehistory - Enhanced history search across all archived history files
-# Usage: fzf::prehistory [months]
+# fzf-prehistory - Enhanced history search across all archived history files
+# Usage: fzf-prehistory [months]
 #   months: number of months to search (default: 6, -1 for all history)
 #=======================================================================================================================
-fzf::prehistory() {
+fzf-prehistory() {
   local output
   local months="${1:-6}"  # Default to 6 months if no argument provided
 
