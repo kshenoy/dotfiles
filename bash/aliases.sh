@@ -66,6 +66,7 @@ if [[ $EDITOR == "nvim" ]]; then
     alias vi='nvim --clean'
     alias kv='NVIM_APPNAME=nvim-kickstart nvim'
     alias lv='NVIM_APPNAME=nvim-LazyVim nvim'
+    alias vv='nvim -u ~/.config/nvim-LazyVim/init-min.lua'
 else
     alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
 fi
@@ -81,7 +82,7 @@ nvim_diff() {
     command diff -qs "$@" && return
 
     # Run nvim in diff mode with the minimal config
-    nvim -u ~/.config/nvim-LazyVim/init-min.lua -d "$@"
+    vv -d "$@"
 }
 alias vd=nvim_diff
 

@@ -10,9 +10,13 @@ Always stage and commit in two separate steps so the user can review what got st
 
 ## Active Plans
 
-Active plans live in `.claude/plans/` as individual `.md` files with sensible kebab-case names describing the work (e.g. `vault-mcp-integration.md`), not auto-generated random names. If the project has a `README.md`, add a plain bullet there pointing to each active plan.
+Active plans live in `.claude/plans/` as individual `.md` files with sensible names describing the work (e.g.
+`vault-mcp-integration.md`), not auto-generated random names. If the project has a `README.md`, add a plain bullet there
+pointing to each active plan.
 
-Within plan files, simple tasks may be ticked `- [x]`; complex phases get a Status sub-heading instead. Preserve the full plan file until the user approves a git commit. When a plan is complete and committed, delete the plan file and remove the README bullet.
+Within plan files, simple tasks may be ticked `- [x]`; complex phases get a Status sub-heading instead. Preserve the
+full plan file until the user approves a git commit. When a plan is complete and committed, delete the plan file and
+remove the README bullet.
 
 ## README TODO format
 
