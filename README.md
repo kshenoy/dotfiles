@@ -13,7 +13,7 @@ Personal dotfiles — public half of a two-repo split:
 bash/         bashrc, aliases, completions, readline (inputrc), key-bindings
 fish/         config.fish, conf.d/, functions/
 fzf/          fzf.bash (setup), fzf_functions.bash, key-bindings.bash, themes/
-git/          config (symlinked as ~/.config/git/config.personal), ignore
+git/          config, ignore
 tmux/         tmux.conf, tmuxw.bash (wrapper), tmux_completion.bash
 vim/          vimrc, gvimrc, plugin packs
 doom/         Doom Emacs config
@@ -44,27 +44,18 @@ bashrc
 
 ## Key conventions
 
-**git/config** is symlinked as `~/.config/git/config.personal` (not `config`) so it can be
-used as a base that work machines extend via `~/.config/git/config`.
-
-**fzf bindings** use a `C-f` prefix instead of fzf's defaults (`C-t`/`M-c`). Git bindings
-use `C-g` via fzf-git.sh. See `fzf/key-bindings.bash` and `fish/conf.d/fzf.fish`.
+**fzf bindings** use a `C-f` prefix instead of fzf's defaults (`C-t`/`M-c`).
+Git bindings use `C-g` via fzf-git.sh. See `fzf/key-bindings.bash` and `fish/conf.d/fzf.fish`.
 
 **tmuxw.bash** is _sourced_ by `aliases.sh` to define the `tmuxw` shell function. For tmux
 `run-shell` bindings, call it explicitly:
 ```
 run-shell 'source .../tmuxw.bash && tmuxw <cmd>'
 ```
+`run-shell` invokes bash as `sh` (POSIX mode); `set +o posix` at the top of `tmuxw.bash` re-enables hyphenated function names.
 
-**fzf/FZF_GIT_HOME** are set conditionally from install paths (`~/.local/install/fzf`,
-`~/.local/install/fzf-git.sh`). Both silently return if unset.
+**Function naming** uses `-` as namespace separator (`tmux-exe`, `fzf-git-status`, etc.) matching
+fzf-git.sh conventions. Bare `::` is invalid in POSIX/sh mode.
 
-## Editor aliases
-
-| Alias | Meaning |
-|-------|---------|
-| `v`   | `$EDITOR` (nvim, full config) |
-| `vi`  | `nvim --clean` |
-| `kv`  | nvim-kickstart |
-| `lv`  | nvim-LazyVim |
-| `vd`  | nvim diff |
+**FZF_HOME** points to the fzf install (`~/.local/install/fzf`); **FZF_GIT_HOME** independently
+points to the fzf-git.sh install (`~/.local/install/fzf-git.sh`). Both silently no-op if unset.

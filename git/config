@@ -91,7 +91,7 @@ co = checkout
 
 # Colorized graph log of all branches with author and relative date
 pplog = log --color --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(auto)%d'
-lg = "!f() { git pplog --abbrev-commit --graph \"${1:-HEAD}\" $(git rev-list -g \"${1:-HEAD}\"); }; f"
+lg = "!f() { git pplog --abbrev-commit --graph HEAD \"${@}\"; }; f"
 lga = !git pplog --abbrev-commit --graph --all
 # Same as above but for a single file
 flog = !git pplog --abbrev-commit --all --follow
