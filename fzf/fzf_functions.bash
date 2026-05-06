@@ -70,6 +70,21 @@ fzf-cd-parent() {
 }
 
 #=======================================================================================================================
+# fzf-git-switch - Switch branch via fzf-git's branch picker (C-g C-g C-b)
+# Puts 'git sw <branch>' on the command line ready to execute
+#=======================================================================================================================
+fzf-git-switch() {
+  declare -f _fzf_git_branches > /dev/null || return
+  local result branch
+  result=$(_fzf_git_branches --no-multi 2>/dev/null)
+  [[ -z "$result" ]] && return
+  branch=$(sed $'s/\033\[[0-9;]*m//g; s/^[* ]*//' <<< "$result" | cut -d' ' -f1)
+  [[ -z "$branch" ]] && return
+  READLINE_LINE="git sw $branch"
+  READLINE_POINT=${#READLINE_LINE}
+}
+
+#=======================================================================================================================
 # fzf-git-status - Modified files picker (C-g C-s)
 # Inserts: File path(s) at cursor position
 #=======================================================================================================================
