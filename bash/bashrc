@@ -82,8 +82,8 @@ export EDITOR=nvim
 export VISUAL="gvim -f 2>/dev/null"
 
 # Make less more friendly for non-text input files, see lesspipe(1)
-export MANPAGER=less
-export PAGER=less
+export MANPAGER='nvim --clean +Man!'
+export PAGER='nvim --clean -R'
 [[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
 
 export HOSTNAME="$(hostname)"

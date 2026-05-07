@@ -145,3 +145,6 @@ pb = "!f() {\
 
 # Delete remote-tracking refs not tracked by any local branch
 remote-prune =!bash -c \"comm -23 <(git branch -r | grep -v HEAD | sed \\\"s/^ *//\\\" | sort) <(git branch --format=\\\"%(upstream:short)\\\" | grep -v \\\"^$\\\" | sort) | xargs git branch -dr\"
+
+# Fetch and checkout remote branch
+cor = "!f() { git fetch origin \"$1\" && git checkout \"$1\"; }; f"

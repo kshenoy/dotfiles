@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 if [[ -z "$FZF_HOME" ]]; then
   return
 fi
@@ -23,7 +22,7 @@ eval "$(fzf --bash)"
 # Source fzf-git.sh for enhanced git integration
 # (our custom VCS bindings in key-bindings.bash will override the default C-g bindings)
 # Set FZF_GIT_HOME to the fzf-git.sh repo directory (e.g. ~/.local/share/fzf-git.sh)
-if [[ -n "$FZF_GIT_HOME" ]] && [[ -f $FZF_GIT_HOME/fzf-git.sh ]]; then
+if [[ -f $FZF_GIT_HOME/fzf-git.sh ]]; then
   . $FZF_GIT_HOME/fzf-git.sh
 fi
 
