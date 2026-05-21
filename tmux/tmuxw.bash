@@ -56,9 +56,9 @@ tmux-_rename_pane() {
   else
     read -p "Enter Pane Name: " _name
   fi
-  printf "\033]2;%s\033\\r:r" "${_name}"
+  tmux select-pane -T "${_name}"
 
-  if [[ $(tmux display-message -p "#{pane-border-status}") == "off" ]]; then
+  if [[ $(tmux show-window-options -gv pane-border-status) == "off" ]]; then
     tmux setw -g pane-border-status top
   fi
 }
@@ -115,29 +115,8 @@ tmuxw() {
     tmux-attach_or_new "$@"
     ;;
 
-  resize-p* | resizep)
-    # From https://github.com/tmux/tmux/issues/888#issuecomment-297637138
-    if [[ "$*" =~ -[xy][[:space:]]+[[:digit:]]+% ]]; then
-      local perVal=$(sed -e 's/^.*-[xy]\s*//' -e 's/%.*//' <<<"$*")
-      if [[ "$*" =~ -x ]]; then
-        local absVal=$(($(tmux-exe display-message -p "#{window_width}") * $perVal / 100))
-      elif [[ "$*" =~ -y ]]; then
-        local absVal=$(($(tmux-exe display-message -p "#{window_height}") * $perVal / 100))
-      fi
-      echo "tmux resize-pane $(sed "s/${perVal}%/${absVal}/" <<<"$*")"
-      eval "tmux-exe resize-pane $(sed "s/${perVal}%/${absVal}/" <<<"$*")"
-    else
-      tmux-exe ${cmd} "$@"
-    fi
-    ;;
-
   rename-pane)
     tmux-_rename_pane "$@"
-    ;;
-
-  respawn)
-    # From https://github.com/tmux/tmux/issues/1036
-    pkill -USR1 tmux
     ;;
 
   print-layout)
