@@ -85,9 +85,9 @@ dt = difftool
 dw = diff --word-diff
 mt = mergetool
 br = branch
+re = restore
 sw = switch
 ci = commit
-co = checkout
 
 # Colorized graph log of all branches with author and relative date
 pplog = log --color --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(auto)%d'
@@ -121,30 +121,21 @@ mtg = mergetool --tool=gvim
 dtl = difftool --tool=nvim-LazyVim
 mtl = mergetool --tool=nvim-LazyVim
 
-# Pull only <REMOTE>/<BRANCH> up to an optional <SHA>. eg.
-# - git pb                          → fetch + merge tracking upstream
-# - git pb upstream/main            → fetch + merge upstream/main
-# - git pb upstream/main <sha>      → fetch upstream/main, merge <sha>
-pb = "!f() {\
-  input=\"${1}\"; sha=\"${2}\";\
-  if [ -z \"$input\" ]; then\
+# Diff against upstream if set, else origin/<current branch> (no fetch). eg.
+# - git CMD REF  →  Run CMD against REF
+# - git CMD      →  Run CMD against upstream if set, else origin/<current branch>
+du-impl = "!f() {\
+  cmd=\"$1\"; ref=\"$2\";\
+  if [ -n \"$ref\" ]; then\
+    git \"$cmd\" \"$ref\";\
+  else\
     upstream=$(git rev-parse --abbrev-ref @{upstream} 2>/dev/null);\
-    if [ -z \"$upstream\" ]; then echo \"No upstream tracking branch configured for current branch.\" >&2; return 1; fi;\
-    remote=\"${upstream%%/*}\"; branch=\"${upstream#*/}\";\
-  elif echo \"$input\" | grep -q \"/\"; then\
-    remote=\"${input%%/*}\"; branch=\"${input#*/}\";\
-  else\
-    echo \"Usage: git pb [REMOTE/BRANCH [SHA]]\" >&2; return 1;\
-  fi;\
-  if [ -n \"$sha\" ]; then\
-    git fetch \"$remote\" \"$branch\" && git merge \"$sha\";\
-  else\
-    git fetch \"$remote\" \"$branch\" && git merge \"$remote/$branch\";\
+    if [ -n \"$upstream\" ]; then\
+      git \"$cmd\" \"$upstream\";\
+    else\
+      git \"$cmd\" \"origin/$(git rev-parse --abbrev-ref HEAD)\";\
+    fi;\
   fi;\
 }; f"
-
-# Delete remote-tracking refs not tracked by any local branch
-remote-prune =!bash -c \"comm -23 <(git branch -r | grep -v HEAD | sed \\\"s/^ *//\\\" | sort) <(git branch --format=\\\"%(upstream:short)\\\" | grep -v \\\"^$\\\" | sort) | xargs git branch -dr\"
-
-# Fetch and checkout remote branch
-cor = "!f() { git fetch origin \"$1\" && git checkout \"$1\"; }; f"
+dtu = "!git du-impl dt"
+dnu = "!git du-impl dn"
