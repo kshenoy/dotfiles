@@ -142,3 +142,61 @@ du-impl = "!f() {\
 }; f"
 dtu = "!git du-impl dt"
 dnu = "!git du-impl dn"
+
+# Fetch origin/BRANCH. eg.
+# - git fob BRANCH  → fetch origin/BRANCH
+# - git fob         → fetch tracking upstream (falls back to current branch name if no upstream set)
+fob = "!f() {\
+  branch=\"${1#origin/}\";\
+  if [ -z \"$branch\" ]; then\
+    upstream=$(git rev-parse --abbrev-ref @{upstream} 2>/dev/null);\
+    branch=\"${upstream:+${upstream#*/}}\";\
+    branch=\"${branch:-$(git rev-parse --abbrev-ref HEAD)}\";\
+  fi;\
+  git fetch origin \"$branch\" && echo \"$branch\";\
+}; f"
+
+# Fetch + pull (merge/rebase) origin/<BRANCH> up to an optional <SHA>. eg.
+# - git pob PULL BRANCH SHA  → fetch origin/BRANCH, merge/rebase SHA
+# - git pob PULL BRANCH      → fetch + merge/rebase origin/BRANCH
+# - git pob PULL             → fetch + merge/rebase tracking upstream (falls back to current branch name if no upstream set)
+pob = "!f() {\
+  sha=\"${3}\";\
+  branch=$(git fob \"$2\") || return 1;\
+  git \"${1}\" \"${sha:-origin/$branch}\" && git cbwa update;\
+}; f"
+mob = !git pob merge
+mom = !git mob main
+rob = !git pob rebase
+rom = !git rob main
+
+# Fetch and switch to remote branch, creating it locally if needed (auto-tracks origin/<BRANCH>)
+cob = "!f() {\
+  branch=\"${1#origin/}\";\
+  git fetch origin \"$branch\" && git switch \"$branch\";\
+}; f"
+
+# Delete remote-tracking refs not tracked by any local branch
+# (needs bash -c explicitly since process substitution <(...) is not POSIX sh)
+remote-prune = "!bash -c 'f() { \
+  comm -23 \
+    <(git branch -r | grep -v HEAD | sed \"s/^ *//\" | sort) \
+    <(git branch --format=\"%(upstream:short)\" | grep -v \"^$\" | sort) | \
+  xargs git branch -dr; \
+}; f'"
+
+# Pretty graph log. Always shows HEAD and origin/main (or default branch).
+# Also shows: upstream if set, else origin/<branch> if that remote ref exists.
+lg = "!f() {\
+  default=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null || echo origin/main);\
+  upstream=$(git rev-parse --abbrev-ref @{upstream} 2>/dev/null);\
+  if [ -n \"$upstream\" ]; then\
+    extra=\"$upstream\";\
+  else\
+    branch=$(git rev-parse --abbrev-ref HEAD);\
+    git rev-parse --verify \"origin/$branch\" >/dev/null 2>&1 && extra=\"origin/$branch\";\
+  fi;\
+  refs=\"HEAD\";\
+  [ -n \"$extra\" ] && refs=\"$refs $extra\";\
+  git pplog --abbrev-commit --graph $refs \"$default\" \"${@}\";\
+}; f"
