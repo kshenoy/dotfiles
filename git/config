@@ -79,7 +79,7 @@ enabled = true
 # Using '!' as prefix allows running any command in the shell and it doesn't have to be a git command.
 # Thus, if we want to create an alias to run multiple commands by chaining them together, we have to use '!'
 # List all aliases
-alias = !git config -l | grep alias | cut -c 7-
+alias = !git config --list | grep alias | cut -c 7-
 
 # Shorthands
 st = status
@@ -94,8 +94,18 @@ ci = commit
 
 # Colorized graph log of all branches with author and relative date
 pplog = log --color --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(auto)%d'
-lg = "!f() { git pplog --abbrev-commit --graph HEAD \"${@}\"; }; f"
-lga = !git pplog --abbrev-commit --graph --all
+
+# Pretty graph log. Shows HEAD; origin/main; and upstream if set, else origin/<branch> if that remote ref exists eg.
+# if current branch is:
+# * main - shows HEAD, origin/main
+# * 'foo' branch - shows HEAD, origin/main, and UPSTREAM or origin/foo
+lg = "!f() {\
+  default=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null || echo origin/main);\
+  extra=$(git resolve-upstream);\
+  git rev-parse --verify \"$extra\" >/dev/null 2>&1 || extra=\"\";\
+  git pplog --abbrev-commit --graph HEAD $default $extra \"${@}\";\
+}; f"
+
 # Same as above but for a single file
 flog = !git pplog --abbrev-commit --all --follow
 
@@ -124,79 +134,45 @@ mtg = mergetool --tool=gvim
 dtl = difftool --tool=nvim-LazyVim
 mtl = mergetool --tool=nvim-LazyVim
 
-# Diff against upstream if set, else origin/<current branch> (no fetch). eg.
-# - git CMD REF  →  Run CMD against REF
-# - git CMD      →  Run CMD against upstream if set, else origin/<current branch>
-du-impl = "!f() {\
-  cmd=\"$1\"; ref=\"$2\";\
-  if [ -n \"$ref\" ]; then\
-    git \"$cmd\" \"$ref\";\
-  else\
-    upstream=$(git rev-parse --abbrev-ref @{upstream} 2>/dev/null);\
-    if [ -n \"$upstream\" ]; then\
-      git \"$cmd\" \"$upstream\";\
-    else\
-      git \"$cmd\" \"origin/$(git rev-parse --abbrev-ref HEAD)\";\
-    fi;\
+# Returns upstream if set, else origin/<current branch>
+resolve-upstream = "!f() {\
+  branch=$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null);\
+  if [ -z \"$branch\" ]; then\
+    branch=\"origin/$(git rev-parse --abbrev-ref HEAD)\";\
   fi;\
+  echo \"$branch\";\
 }; f"
-dtu = "!git du-impl dt"
-dnu = "!git du-impl dn"
+
+# Resolve upstream and run specified diff command
+# git CMD  →  Run CMD against upstream if set, else origin/<current branch>
+diff-upstream-impl = "!f() {\
+  cmd=\"$1\"; branch=\"$(git resolve-upstream)\";\
+  git \"$cmd\" \"$branch\";\
+}; f"
+dtu = "!git diff-upstream-impl dt"
+dnu = "!git diff-upstream-impl dn"
 
 # Fetch origin/BRANCH. eg.
 # - git fob BRANCH  → fetch origin/BRANCH
 # - git fob         → fetch tracking upstream (falls back to current branch name if no upstream set)
 fob = "!f() {\
-  branch=\"${1#origin/}\";\
-  if [ -z \"$branch\" ]; then\
-    upstream=$(git rev-parse --abbrev-ref @{upstream} 2>/dev/null);\
-    branch=\"${upstream:+${upstream#*/}}\";\
-    branch=\"${branch:-$(git rev-parse --abbrev-ref HEAD)}\";\
-  fi;\
-  git fetch origin \"$branch\" && echo \"$branch\";\
+  branch=\"${1:-$(git resolve-upstream)}\";\
+  branch=\"${branch#origin/}\";\
+  git fetch origin \"$branch\";\
 }; f"
+fom = !git fob main
 
-# Fetch + pull (merge/rebase) origin/<BRANCH> up to an optional <SHA>. eg.
-# - git pob PULL BRANCH SHA  → fetch origin/BRANCH, merge/rebase SHA
-# - git pob PULL BRANCH      → fetch + merge/rebase origin/BRANCH
-# - git pob PULL             → fetch + merge/rebase tracking upstream (falls back to current branch name if no upstream set)
-pob = "!f() {\
-  sha=\"${3}\";\
-  branch=$(git fob \"$2\") || return 1;\
-  git \"${1}\" \"${sha:-origin/$branch}\" && git cbwa update;\
-}; f"
-mob = !git pob merge
-mom = !git mob main
-rob = !git pob rebase
-rom = !git rob main
-
-# Fetch and switch to remote branch, creating it locally if needed (auto-tracks origin/<BRANCH>)
+# Fetch and switch to remote branch, creating it locally if needed, and set upstream to origin/<BRANCH>
 cob = "!f() {\
   branch=\"${1#origin/}\";\
-  git fetch origin \"$branch\" && git switch \"$branch\";\
+  git fetch origin \"$branch\" && git switch \"$branch\" && git branch --set-upstream-to=\"origin/$branch\";\
 }; f"
 
 # Delete remote-tracking refs not tracked by any local branch
 # (needs bash -c explicitly since process substitution <(...) is not POSIX sh)
 remote-prune = "!bash -c 'f() { \
   comm -23 \
-    <(git branch -r | grep -v HEAD | sed \"s/^ *//\" | sort) \
+    <(git branch --remotes | grep -v HEAD | sed \"s/^ *//\" | sort) \
     <(git branch --format=\"%(upstream:short)\" | grep -v \"^$\" | sort) | \
   xargs git branch -dr; \
 }; f'"
-
-# Pretty graph log. Always shows HEAD and origin/main (or default branch).
-# Also shows: upstream if set, else origin/<branch> if that remote ref exists.
-lg = "!f() {\
-  default=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null || echo origin/main);\
-  upstream=$(git rev-parse --abbrev-ref @{upstream} 2>/dev/null);\
-  if [ -n \"$upstream\" ]; then\
-    extra=\"$upstream\";\
-  else\
-    branch=$(git rev-parse --abbrev-ref HEAD);\
-    git rev-parse --verify \"origin/$branch\" >/dev/null 2>&1 && extra=\"origin/$branch\";\
-  fi;\
-  refs=\"HEAD\";\
-  [ -n \"$extra\" ] && refs=\"$refs $extra\";\
-  git pplog --abbrev-commit --graph $refs \"$default\" \"${@}\";\
-}; f"
