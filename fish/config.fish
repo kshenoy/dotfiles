@@ -7,10 +7,9 @@ fish_add_path ~/.cargo/bin
 
 set -gx EDITOR nvim
 
-# fish_config theme save "Catppuccin Frappe"
+fish_config theme choose "Catppuccin Frappe"
 
 # Use starship prompt (https://starship.rs/)
 starship init fish | source
 
 command -q zoxide && zoxide init --cmd j fish | source
-
