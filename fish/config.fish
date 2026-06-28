@@ -7,7 +7,7 @@ fish_add_path ~/.cargo/bin
 
 set -gx EDITOR nvim
 
-fish_config theme choose "Catppuccin Frappe"
+fish_config theme choose catppuccin-frappe
 
 # Use starship prompt (https://starship.rs/)
 starship init fish | source
