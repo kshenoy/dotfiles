@@ -12,6 +12,8 @@ set -gx EDITOR nvim
 # Use starship prompt (https://starship.rs/)
 starship init fish | source
 
-zoxide init --cmd j fish | source
+command -q zoxide && zoxide init --cmd j fish | source
 
-eval "$(/opt/homebrew/bin/brew shellenv)"
+if test -x /opt/homebrew/bin/brew
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+end
