@@ -14,6 +14,3 @@ starship init fish | source
 
 command -q zoxide && zoxide init --cmd j fish | source
 
-if test -x /opt/homebrew/bin/brew
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-end

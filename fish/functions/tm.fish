@@ -1,3 +1,7 @@
-function tm --wraps=tmuxw
-    tmuxw $argv
+function tm --wraps=tmux
+    if command -q tmuxw
+        tmuxw $argv
+    else
+        tmux $argv
+    end
 end
