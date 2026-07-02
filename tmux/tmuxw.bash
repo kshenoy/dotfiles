@@ -154,3 +154,5 @@ tmuxw() {
 }
 
 [[ -f "$HOME/.config/tmux/local.bash" ]] && source "$HOME/.config/tmux/local.bash"
+
+tmuxw "$@"
