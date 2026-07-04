@@ -7,33 +7,50 @@
 
 ---
 
-# Remembered Behaviors
+# Permissions
 
-- Keep the lines in markdown files to be 120 characters or less to improve readability
-- When storing a new remembered behavior or piece of information, use this guide to pick the right location:
-
-  **CLAUDE.md files** — instructions for Claude; not intended to be read by people directly. Prefer this over memory
-  files. Syncs across devices via git.
-  - **Global** (`~/.config/dotfiles/claude/CLAUDE.md`, this file) — applies across all projects and machines
-    (e.g. git workflow, formatting rules, README conventions)
-  - **Machine-specific** (`~/.claude/CLAUDE.md`) — tied to this machine's environment (e.g. local paths,
-    machine-specific tooling or shortcuts)
-  - **Project-specific** (`.claude/CLAUDE.md` inside the repo) — only relevant within that project
-    (e.g. vault conventions, domain-specific rules)
-
-  **Memory files** (`~/.claude/projects/.../memory/`) — only use when the information is both project-specific AND
-  machine-specific (i.e. it doesn't belong in a shared CLAUDE.md) OR when explicitly asked to.
-
-  **README.md** — for anything that may need to be referred to by people (active plans, pending tasks, etc.)
+Before adding a Bash/tool permission rule anywhere (project `.claude/settings.json`, `settings.local.json`, etc.), check
+the global `~/.claude/settings.json` first. Don't duplicate an existing global rule into a project-local file; add
+genuinely new rules to the global file instead unless there's a specific reason to scope one to a single project.
 
 ---
 
-# README
+# Formatting
 
-If the project has a `README.md`, use it to document active plans and simple tasks. Always update it (remove completed
-tasks, add new ones) and any active plan files before committing.
+Keep the lines in markdown files to be 120 characters or less to improve readability
 
-Add a plain bullet to it mentioning each active plan.
+---
+
+# Preferences storage
+
+When storing a new remembered behavior or piece of information, use this guide to pick the right location:
+
+**CLAUDE.md files** — instructions for Claude; not intended to be read by people directly. Prefer this over memory
+files. Syncs across devices via git.
+- **Global** (`~/.config/dotfiles/claude/CLAUDE.md`, this file) — applies across all projects and machines
+  (e.g. git workflow, formatting rules, README conventions)
+- **Machine-specific** (`~/.claude/CLAUDE.md`) — tied to this machine's environment (e.g. local paths,
+  machine-specific tooling or shortcuts)
+- **Project-specific** (`.claude/CLAUDE.md` inside the repo) — only relevant within that project
+  (e.g. vault conventions, domain-specific rules)
+
+**Memory files** (`~/.claude/projects/.../memory/`) — only use when the information is both project-specific AND
+machine-specific (i.e. it doesn't belong in a shared CLAUDE.md) OR when explicitly asked to.
+
+**README.md** — for anything that may need to be referred to by people (active plans, pending tasks, etc.)
+
+---
+
+# Task Tracking
+
+If the project has a `README.md`, use it to document active plans and simple tasks.
+
+Always update it and any active plan files before committing.
+
+When a task is done, specify the resolution details by updating the plan or the sub-heading and commit the change.
+Then, delete the plan or the sub-heading and commit again. Any history worth preserving will be maintained in git.
+
+## Simple tasks
 
 If the task is simple enough to not require a full plan, document it in the README file itself by putting it after the
 main section content and roughly use this format:
@@ -51,15 +68,20 @@ main section content and roughly use this format:
 
 Prepend each pending task with `TODO` and make it a sub-heading.
 
-When a task is done, specify the resolution details by updating the plan or the sub-heading and commit the change.
-Then, delete the plan or the sub-heading and commit again. Any history worth preserving will be maintained in git.
+## Plans
 
----
-
-# Active Plans
+Use plans for more complicated multi-step tasks
 
 Give sensible names to plan files (e.g. `vault-mcp-integration.md`) instead of using auto-generated random names.
 
-Within plan files, simple tasks may be ticked `- [x]`; complex phases get a Status sub-heading instead. Preserve the
-full plan file until the user approves a git commit. When a plan is complete and committed, confirm if the plan file can
-be deleted and the bullet removed from the README.
+Within plan files, simple tasks may be ticked `- [x]`; complex phases get a Status sub-heading instead using the same
+format described in the previous section.
+
+---
+
+# Pushing Back
+
+When I state a choice or config value is deliberate/intentional, but you have concrete technical evidence it will cause
+(or is causing) a problem I don't actually want, push back explicitly and show the evidence — don't just defer and
+comply. State the mechanism plainly, show the evidence (a config dump, an actual file path, a test result), and ask
+whether the outcome I described is really what I want, rather than softening it into a hedge.
