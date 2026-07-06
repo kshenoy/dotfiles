@@ -70,6 +70,9 @@ cmd = meld $LOCAL $MERGED $REMOTE --output $MERGED --diff $LOCAL $MERGED --diff 
 [pull]
 rebase = true
 
+[push]
+autoSetupRemote = true
+
 [rerere]
 # Record conflict resolutions and replay them automatically if the same conflict recurs
 enabled = true
@@ -93,14 +96,16 @@ sw = switch
 ci = commit
 
 # Colorized graph log of all branches with author and relative date
-pplog = log --color --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(auto)%d'
+pplog = log --color --date=short --pretty=format:' %C(yellow)%h%C(reset) %s %C(green)(%ad) %C(bold blue)<%an>%C(auto)%d'
 
 # Pretty graph log. Shows HEAD; origin/main; and upstream if set, else origin/<branch> if that remote ref exists eg.
 # if current branch is:
 # * main - shows HEAD, origin/main
 # * 'foo' branch - shows HEAD, origin/main, and UPSTREAM or origin/foo
 lg = "!f() {\
-  default=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null || echo origin/main);\
+  default=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null);\
+  git rev-parse --verify \"$default\" >/dev/null 2>&1 || default=origin/main;\
+  git rev-parse --verify \"$default\" >/dev/null 2>&1 || default="";\
   extra=$(git resolve-upstream);\
   git rev-parse --verify \"$extra\" >/dev/null 2>&1 || extra=\"\";\
   git pplog --abbrev-commit --graph HEAD $default $extra \"${@}\";\
@@ -146,11 +151,12 @@ resolve-upstream = "!f() {\
 # Resolve upstream and run specified diff command
 # git CMD  →  Run CMD against upstream if set, else origin/<current branch>
 diff-upstream-impl = "!f() {\
-  cmd=\"$1\"; branch=\"$(git resolve-upstream)\";\
-  git \"$cmd\" \"$branch\";\
+  cmd=\"$1\"; shift;\
+  branch=\"$(git resolve-upstream)\";\
+  git \"$cmd\" \"$branch\" \"$@\";\
 }; f"
-dtu = "!git diff-upstream-impl dt"
 dnu = "!git diff-upstream-impl dn"
+dtu = "!git diff-upstream-impl dt"
 
 # Fetch origin/BRANCH. eg.
 # - git fob BRANCH  → fetch origin/BRANCH

@@ -66,7 +66,7 @@ if [[ $EDITOR == "nvim" ]]; then
     alias vi='nvim --clean'
     alias kv='NVIM_APPNAME=nvim-kickstart nvim'
     alias lv='NVIM_APPNAME=nvim-LazyVim nvim'
-    alias vv='nvim -u ~/.config/nvim-LazyVim/init-min.lua'
+    alias vv='nvim -u ~/.config/nvim/init-min.lua'
 else
     alias vi="vim -u NORC -U NORC -N --cmd 'set rtp="'$VIM,$VIMRUNTIME,$VIM/after'"'"
 fi
@@ -85,7 +85,6 @@ nvim_diff() {
     vv -d "$@"
 }
 alias vd=nvim_diff
-
 
 #=======================================================================================================================
 # Calculator Functions (wrappers for ~/.local/bin/calc)
