@@ -56,17 +56,32 @@ If the task is simple enough to not require a full plan, document it in the READ
 main section content and roughly use this format:
 
 ```
-# Pending tasks
+## Pending tasks
 
-## TODO <short description>
+### DOING <short description>
 
 <problem statement paragraph>
 
 **Status**
 <current status / what's been tried / what's pending>
+
+### TODO <short description>
+
+<problem statement paragraph>
 ```
 
-Prepend each pending task with `TODO` and make it a sub-heading.
+Prepend each pending task with a status keyword and make it a sub-heading. Track status via `TODO` -> `DOING` ->
+`DONE`/`CANCEL`.
+
+- `TODO` means work hasn't started — no `**Status**` section needed, the problem statement is enough.
+- `DOING`, `DONE`, and `CANCEL` all represent progress made, so they get a `**Status**` section describing what's been
+  tried, what's pending, or (for `DONE`/`CANCEL`) the resolution. Don't include a resolution date in the status text —
+  git history already has it, and it's not useful in the note itself.
+- Order tasks within a section as `DONE`/`CANCEL` -> `DOING` -> `TODO`, so resolved/active work sits above untouched
+  items.
+
+Note that the sub-heading level denoted above is just an example. Create individual TODOs one level lower than whatever
+heading is used to track them in the document.
 
 ## Plans
 
