@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+# tmux++
+# Wrapper around tmux to add more functionality
+
+# Wrapper around the tmux command
+__exe() {
+  LANG=en_US.UTF-8 command tmux "$@"
+}
+
+# Helper functions to simplify sending keys
+__send_keys_other_panes() {
+  local _pane_current=$(tmux display-message -p '#P')
+  for _pane in $(tmux list-panes -F '#P'); do
+    if (("$_pane" != "$_pane_current")); then
+      __exe send-keys -t ${_pane} "$@"
+    fi
+  done
+}
+
+__send_keys_all_panes() {
+  for _pane in $(tmux list-panes -F '#P'); do
+    __exe send-keys -t ${_pane} "$@"
+  done
+}
+
+# Helper function to name a pane
+__rename_pane() {
+  local _name
+  if [[ -n "$1" ]]; then
+    _name="$1"
+  else
+    read -p "Enter Pane Name: " _name
+  fi
+  tmux select-pane -T "${_name}"
+
+  if [[ $(tmux show-window-options -gv pane-border-status) == "off" ]]; then
+    tmux setw -g pane-border-status top
+  fi
+}
+
+# Move current window to target index, inserting it and shifting intervening windows
+__move_window_to() {
+  local target=$1
+  local current
+  current=$(tmux display-message -p '#I')
+
+  [ "$target" = "$current" ] && return 0
+
+  # If target slot is empty, simple move
+  if ! tmux list-windows -F '#I' | grep -qx "$target"; then
+    __exe move-window -t "$target"
+    return 0
+  fi
+
+  # Park current window out of the way
+  __exe move-window -t 999
+
+  if [ "$current" -gt "$target" ]; then
+    # Moving left: shift windows [target .. current-1] right by 1 (iterate high→low)
+    for win in $(tmux list-windows -F '#I' | sort -rn); do
+      if [ "$win" -ge "$target" ] && [ "$win" -lt "$current" ]; then
+        __exe move-window -s ":$win" -t "$((win + 1))"
+      fi
+    done
+  else
+    # Moving right: shift windows [current+1 .. target] left by 1 (iterate low→high)
+    for win in $(tmux list-windows -F '#I' | sort -n); do
+      if [ "$win" -gt "$current" ] && [ "$win" -le "$target" ]; then
+        __exe move-window -s ":$win" -t "$((win - 1))"
+      fi
+    done
+  fi
+
+  # Place parked window at target
+  __exe move-window -s ":999" -t "$target"
+}
+
+if (($# == 0)); then
+  __exe
+  exit
+fi
+
+cmd=$1
+shift
+
+case $cmd in
+rename-pane)
+  __rename_pane "$@"
+  ;;
+
+select-layout | sl)
+  if [[ "$1" == work-* ]]; then
+    [[ -f "$HOME/.config/tmux/local.bash" ]] && source "$HOME/.config/tmux/local.bash" && __tmux_select_layout_work "$1"
+  else
+    __exe "${cmd}" "$@"
+  fi
+  ;;
+
+send-keys-all-panes | skap)
+  __send_keys_all_panes "$@"
+  ;;
+
+send-keys-other-panes | skop)
+  __send_keys_other_panes "$@"
+  ;;
+
+sk)
+  __exe send-keys "$@"
+  ;;
+
+move-window-to)
+  __move_window_to "$@"
+  ;;
+
+*)
+  __exe ${cmd} "$@"
+  ;;
+esac

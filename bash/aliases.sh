@@ -134,11 +134,12 @@ fi
 #=======================================================================================================================
 # tmux
 #=======================================================================================================================
-[[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/tmux/tmuxw.bash ]] &&
-    . ${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/tmux/tmuxw.bash
-
-alias tmux='tmuxw'
-alias tm='tmux'
+# tmuxw is a wrapper around tmux and adds some QoL enhancements
+if command -v tmuxw &>/dev/null; then
+  alias tm='tmuxw'
+else
+  alias tm='tmux'
+fi
 
 
 #=======================================================================================================================

@@ -47,15 +47,10 @@ bashrc
 **fzf bindings** use a `C-f` prefix instead of fzf's defaults (`C-t`/`M-c`).
 Git bindings use `C-g` via fzf-git.sh. See `fzf/key-bindings.bash` and `fish/conf.d/fzf.fish`.
 
-**tmuxw.bash** is _sourced_ by `aliases.sh` to define the `tmuxw` shell function. For tmux
-`run-shell` bindings, call it explicitly:
-```
-run-shell 'source .../tmuxw.bash && tmuxw <cmd>'
-```
-`run-shell` invokes bash as `sh` (POSIX mode); `set +o posix` at the top of `tmuxw.bash` re-enables hyphenated function names.
-
-**Function naming** uses `-` as namespace separator (`tmux-exe`, `fzf-git-status`, etc.) matching
-fzf-git.sh conventions. Bare `::` is invalid in POSIX/sh mode.
+**Function naming** uses `-` as namespace separator for public functions (`fzf-git-status`, etc.)
+matching fzf-git.sh conventions — bare `::` is invalid in POSIX/sh mode. A leading `__` marks a
+private helper not meant to be called directly (`tmuxw`'s `__exe`/`__rename_pane`/etc.,
+`bash/utils/query.sh`'s `__help`/`__parse_args`/etc.).
 
 **FZF_HOME** points to the fzf install (`~/.local/install/fzf`); **FZF_GIT_HOME** independently
 points to the fzf-git.sh install (`~/.local/install/fzf-git.sh`). Both silently no-op if unset.
