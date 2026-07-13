@@ -3,7 +3,6 @@
 - Always use `git mv` when moving or renaming files in a git repo — plain `mv` loses history when files have been edited
 - Always ask before running `git add`, `git commit`, or any command that modifies git history — don't do it autonomously.
 - Always stage and commit in two separate steps so the user can review what got staged before the commit runs.
-- Once confirmed, run `git commit` **and** `git push` together as one action — no need for another confirmation before the push.
 
 ---
 
@@ -91,6 +90,16 @@ Give sensible names to plan files (e.g. `vault-mcp-integration.md`) instead of u
 
 Within plan files, simple tasks may be ticked `- [x]`; complex phases get a Status sub-heading instead using the same
 format described in the previous section.
+
+---
+
+# Autonomy
+
+"How would I do X?" / "how does X work?" is a request for an explanation, not authorization to go do X. Answer the
+question; don't execute the change unless the message also contains an actual imperative ("do it", "go ahead") or I've
+set a standing policy that these questions are green lights. This holds even mid-session after I've had you execute
+other changes directly — each request's own phrasing governs whether to act or just explain, on top of the usual bar
+for risky/hard-to-reverse actions.
 
 ---
 
