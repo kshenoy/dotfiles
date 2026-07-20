@@ -3,6 +3,10 @@
 - Always use `git mv` when moving or renaming files in a git repo — plain `mv` loses history when files have been edited
 - Always ask before running `git add`, `git commit`, or any command that modifies git history — don't do it autonomously.
 - Always stage and commit in two separate steps so the user can review what got staged before the commit runs.
+- When staging, restrict to only the hunks I actually edited this session — including within a file I otherwise
+  touched, if other hunks in that same file came from elsewhere (a concurrent session, a direct edit). Don't ask
+  each time whether to include other files/hunks found in the working tree; default to mine-only. Only stage
+  something else if explicitly told to for that instance — this default doesn't change without being told again.
 
 ---
 
