@@ -51,49 +51,57 @@ If the project has a `README.md`, use it to document active plans and simple tas
 Always update it and any active plan files before committing.
 
 When a task is done, specify the resolution details by updating the plan or the sub-heading and commit the change.
-Then, delete the plan or the sub-heading and commit again. Any history worth preserving will be maintained in git.
+Before deleting it, apply this test: would the information be genuinely useful in the future, or is it just a
+record of what happened (no matter how non-specific)? Migrate anything that passes the test into the project's
+permanent documentation; delete everything else outright, then commit the deletion separately — git history
+already preserves what isn't worth keeping in notes.
 
 ## Simple tasks
 
-If the task is simple enough to not require a full plan, document it in the README file itself by putting it after the
-main section content and roughly use this format:
+The README's `## Pending tasks` section holds two things, in this order:
+
+1. **A flat, unordered list of links to anything not tracked inline in README.md** — a complex plan living in its
+   own file, or a simple task whose heading lives on some other project page instead of here — one line each,
+   e.g. `- [<short description>](<file>.md#<heading>) — <one-line summary/status>`. This list always goes *first*,
+   above any task sub-headings, so a link never reads as nested under one of them.
+2. **Sub-headings for simple tasks** tracked inline, right here in the README — org-mode style: prepend each
+   pending task's heading directly with its status keyword — `TODO` -> `DOING` -> `DONE`/`CANCEL` — never as a
+   separate `**Status**` line in the body. Roughly:
 
 ```
 ## Pending tasks
+
+- [Vault MCP integration](vault-mcp-integration.md) — DOING, blocked on auth
 
 ### DOING <short description>
 
 <problem statement paragraph>
 
-**Status**
-<current status / what's been tried / what's pending>
+<what's been tried / what's pending, as plain prose — folded into the body, not a separate **Status** label>
 
 ### TODO <short description>
 
 <problem statement paragraph>
 ```
 
-Prepend each pending task with a status keyword and make it a sub-heading. Track status via `TODO` -> `DOING` ->
-`DONE`/`CANCEL`.
-
-- `TODO` means work hasn't started — no `**Status**` section needed, the problem statement is enough.
-- `DOING`, `DONE`, and `CANCEL` all represent progress made, so they get a `**Status**` section describing what's been
-  tried, what's pending, or (for `DONE`/`CANCEL`) the resolution. Don't include a resolution date in the status text —
-  git history already has it, and it's not useful in the note itself.
+- `TODO` means work hasn't started — the problem statement alone is enough.
+- `DOING`, `DONE`, and `CANCEL` all represent progress made, so they get a short paragraph describing what's been
+  tried, what's pending, or (for `DONE`/`CANCEL`) the resolution, folded directly into the body. Don't include a
+  resolution date — git history already has it.
 - Order tasks within a section as `DONE`/`CANCEL` -> `DOING` -> `TODO`, so resolved/active work sits above untouched
   items.
 
-Note that the sub-heading level denoted above is just an example. Create individual TODOs one level lower than whatever
-heading is used to track them in the document.
+Note that the sub-heading level denoted above is just an example. Create individual TODOs one level lower than
+whatever heading is used to track them in the document.
 
 ## Plans
 
-Use plans for more complicated multi-step tasks
+Use plans for more complicated multi-step tasks.
 
 Give sensible names to plan files (e.g. `vault-mcp-integration.md`) instead of using auto-generated random names.
 
-Within plan files, simple tasks may be ticked `- [x]`; complex phases get a Status sub-heading instead using the same
-format described in the previous section.
+Within plan files, simple tasks may be ticked `- [x]`; complex phases get a status-keyword-prefixed sub-heading
+instead, using the same style as pending tasks above.
 
 ---
 
