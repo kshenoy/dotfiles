@@ -1,12 +1,6 @@
 {
   "permissions": {
     "allow": [
-      "Read",
-      "Edit(~/.config/dotfiles/claude/CLAUDE.md)",
-      "Edit(**/.claude/CLAUDE.md)",
-      "Write(**/.claude/CLAUDE.md)",
-      "Edit(**/.claude/plans/)",
-      "Write(**/.claude/plans/)",
       "Bash(awk:*)",
       "Bash(brew deps:*)",
       "Bash(brew info:*)",
@@ -69,6 +63,10 @@
       "Bash(uniq:*)",
       "Bash(wc:*)",
       "Bash(which:*)",
+      "Edit(**/.claude/CLAUDE.md)",
+      "Edit(**/.claude/plans/)",
+      "Edit(~/.config/dotfiles/claude/CLAUDE.md)",
+      "Read",
       "WebFetch",
       "WebSearch"
     ]
