@@ -1,4 +1,6 @@
 {
+  "//theme": "Color scheme: dark, light, dark-daltonized, light-daltonized, dark-ansi, light-ansi, auto (detect terminal bg), or custom:<slug>",
+  "theme": "custom:catppuccin-mocha",
   "permissions": {
     "allow": [
       "Bash(awk:*)",
