@@ -35,5 +35,5 @@ function clod --description 'Create-or-resume a named Claude remote-control sess
     # back nameless (needing a manual /rename) and drops out of future grep-by-name lookups above.
     # Remote Control is likewise a runtime flag, not persisted session state - pass --remote-control too,
     # or the resumed pane needs a manual /remote-control before it's reachable again.
-    claude --resume $id --name $name --remote-control $name
+    claude --resume $id --name $name --remote-control $name --permission-mode auto
 end
