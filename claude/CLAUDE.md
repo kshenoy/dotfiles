@@ -98,6 +98,11 @@ whatever heading is used to track them in the document.
 
 Use plans for more complicated multi-step tasks.
 
+Plan-mode's plan file is written relative to the current working directory — `<project>/.claude/plans/` if cwd is
+inside a project (so the plan is version-controlled with it), falling back to `~/.claude/plans/` otherwise. Before
+invoking plan mode for a task that belongs to a specific project, `cd` into that project first so the plan lands
+in its repo rather than the global, unversioned directory.
+
 Give sensible names to plan files (e.g. `vault-mcp-integration.md`) instead of using auto-generated random names.
 
 Within plan files, simple tasks may be ticked `- [x]`; complex phases get a status-keyword-prefixed sub-heading
