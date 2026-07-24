@@ -3,7 +3,7 @@ function clod --description 'Create-or-resume a named Claude remote-control sess
     set -l proj_dir ~/.claude/projects/(string replace -a / - -- (pwd))
     set -l id ""
     if test -d $proj_dir
-        set -l match (grep -ls "\"customTitle\":\"$name\"" $proj_dir/*.jsonl 2>/dev/null | xargs -r ls -t | head -1)
+        set -l match (grep -ls "\"customTitle\":\"$name\"" $proj_dir/*.jsonl 2>/dev/null | grep -v '\.orphaned-' | xargs -r ls -t | head -1)
         test -n "$match"; and set id (basename $match .jsonl)
     end
     if test -z "$id"
@@ -25,7 +25,7 @@ function clod --description 'Create-or-resume a named Claude remote-control sess
         # and `claude --resume <name>`'s interactive picker only lists "cli" sessions - it silently shows zero
         # matches for one it just created via -p. Grab the ID with the same grep used above instead of trusting
         # the picker to find it by name.
-        set -l match (grep -ls "\"customTitle\":\"$name\"" $proj_dir/*.jsonl 2>/dev/null | xargs -r ls -t | head -1)
+        set -l match (grep -ls "\"customTitle\":\"$name\"" $proj_dir/*.jsonl 2>/dev/null | grep -v '\.orphaned-' | xargs -r ls -t | head -1)
         set id (basename $match .jsonl)
     end
     # Resuming by session ID (not name) keeps this pinned to one exact conversation forever - names get
