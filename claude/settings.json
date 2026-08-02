@@ -79,10 +79,7 @@
       "Edit(~/.config/dotfiles*/**)",
       "Read",
       "WebFetch",
-      "WebSearch",
-      "Write(**/.claude/CLAUDE.md)",
-      "Write(**/.claude/plans/)",
-      "Write(~/.config/dotfiles*/**)"
+      "WebSearch"
     ]
   }
 }
