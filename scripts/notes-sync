@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Sync ~/Documents/Notes/Coppermind with its git remote.
+# If there are local changes, invokes claude to write a commit message before pushing.
+
+set -euo pipefail
+
+VAULT="$HOME/Documents/Notes/Coppermind"
+CLAUDE="$HOME/.local/bin/claude"
+LOG="$HOME/Library/Logs/notes-sync.log"
+
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" | tee -a "$LOG"; }
+
+cd "$VAULT"
+local_changes = /usr/bin/false
+
+if [[ -n "$(git status --porcelain)" ]]; then
+  # Disabling this as this results in partial changes getting committed
+  # log "Uncommitted changes detected — staging and committing"
+  # git add -A
+  #
+  # diff=$(git diff --staged)
+  # msg=$(printf '%s\n\nWrite a concise git commit message (subject line only, imperative mood) for these changes to my personal notes vault. Output only the commit message, nothing else.' "$diff" \
+  #     | "$CLAUDE" -p --output-format text 2>>"$LOG")
+  # msg=${msg:-"chore: sync notes"}
+  #
+  # log "Committing: $msg"
+  # git commit -m "$msg"
+
+  log "Stashing"
+  git stash
+  local_changes = /usr/bin/true
+fi
+
+log "Pulling (rebase)"
+git pull --rebase origin main
+
+log "Pushing"
+git push origin main
+
+if $local_changes; then
+  log "Unstashing"
+  git stash pop
+fi
+
+log "Done"

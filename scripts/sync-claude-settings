@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Merge the global (git-synced) Claude Code permissions with this machine's local
+# overrides into ~/.claude/settings.json. Run after editing either source file:
+#   - claude/settings.json (this repo)      - global, applies on every machine
+#   - ~/.claude/settings.machine.json       - local to this machine only
+
+set -euo pipefail
+
+GLOBAL="$(dirname "$0")/../claude/settings.json"
+MACHINE="$HOME/.claude/settings.machine.json"
+OUT="$HOME/.claude/settings.json"
+
+[ -f "$MACHINE" ] || echo '{}' > "$MACHINE"
+
+jq -s '
+  .[0] as $g | .[1] as $m |
+  ($g.permissions // {}) as $gp |
+  ($m.permissions // {}) as $mp |
+  {
+    permissions: (
+      ($gp | del(.allow, .deny, .ask)) * ($mp | del(.allow, .deny, .ask))
+      + { allow: (($gp.allow // []) + ($mp.allow // []) | unique) }
+      + (if (($gp.deny // []) + ($mp.deny // []) | length) > 0
+         then { deny: (($gp.deny // []) + ($mp.deny // []) | unique) } else {} end)
+      + (if (($gp.ask // []) + ($mp.ask // []) | length) > 0
+         then { ask: (($gp.ask // []) + ($mp.ask // []) | unique) } else {} end)
+    )
+  } + ($g | del(.permissions)) + ($m | del(.permissions))
+' "$GLOBAL" "$MACHINE" > "$OUT"
+
+echo "Wrote $OUT"

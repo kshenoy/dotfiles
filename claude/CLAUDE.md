@@ -10,11 +10,20 @@
 
 ---
 
-# Permissions
+# Hierarchical settings — never edit ~/.claude/settings.json directly
 
-Before adding a Bash/tool permission rule anywhere (project `.claude/settings.json`, `settings.local.json`, etc.), check
-the global `~/.claude/settings.json` first. Don't duplicate an existing global rule into a project-local file; add
-genuinely new rules to the global file instead unless there's a specific reason to scope one to a single project.
+`~/.claude/settings.json` is generated output, not a source file — it's produced by
+`~/.config/dotfiles-priv/claude/sync-settings` script, which merges
+`~/.config/dotfiles/claude/settings.json` (global) with
+`~/.config/dotfiles-priv/claude/<HOSTNAME>/settings.json` (machine-specific) via `jq`, concatenating and
+deduping `permissions.allow` from both. Both source files are version-controlled; the generated file is not.
+
+The machine-name argument eg. `FOO`, selects the `dotfiles-priv/claude/FOO/` directory and defaults to `hostname` when omitted
+
+Editing `~/.claude/settings.json` directly still works (nothing enforces the "AUTO-GENERATED" comment at the top), which
+makes it easy to silently drift from the version-controlled source — the change looks like it stuck, but a future
+`sync-settings` run overwrites it without warning. Always edit the appropriate source file and rerun `sync-settings`
+instead.
 
 ---
 
@@ -28,8 +37,8 @@ Keep the lines in markdown files to be 120 characters or less to improve readabi
 
 When storing a new remembered behavior or piece of information, use this guide to pick the right location:
 
-**CLAUDE.md files** — instructions for Claude; not intended to be read by people directly. Prefer this over memory
-files. Syncs across devices via git.
+**CLAUDE.md files** — instructions for Claude; not intended to be read by people directly. Use this instead of memory
+wherever possible as it syncs across devices via git.
 - **Global** (`~/.config/dotfiles/claude/CLAUDE.md`, this file) — applies across all projects and machines
   (e.g. git workflow, formatting rules, README conventions)
 - **Machine-specific** (`~/.claude/CLAUDE.md`) — tied to this machine's environment (e.g. local paths,
@@ -46,44 +55,27 @@ machine-specific (i.e. it doesn't belong in a shared CLAUDE.md) OR when explicit
 
 # Task Tracking
 
-If the project has a `README.md`, use it to document active plans and simple tasks.
+Give sensible names to plan files (e.g. `vault-mcp-integration.md`) instead of using auto-generated random names.
 
-Always update it and any active plan files before committing.
-
-When a task is done, specify the resolution details by updating the plan or the sub-heading and commit the change.
-Before deleting it, apply this test: would the information be genuinely useful in the future, or is it just a
-record of what happened (no matter how non-specific)? Migrate anything that passes the test into the project's
-permanent documentation; delete everything else outright, then commit the deletion separately — git history
-already preserves what isn't worth keeping in notes.
-
-## Simple tasks
-
-The README's `## Pending tasks` section holds two things, in this order:
-
-1. **A flat, unordered list of links to anything not tracked inline in README.md** — a complex plan living in its
-   own file, or a simple task whose heading lives on some other project page instead of here — one line each,
-   e.g. `- [<short description>](<file>.md#<heading>) — <one-line summary/status>`. This list always goes *first*,
-   above any task sub-headings, so a link never reads as nested under one of them.
-2. **Sub-headings for simple tasks** tracked inline, right here in the README — org-mode style: prepend each
-   pending task's heading directly with its status keyword — `TODO` -> `DOING` -> `DONE`/`CANCEL` — never as a
-   separate `**Status**` line in the body. Roughly:
+List any pending tasks under a 'Pending Tasks' heading. Simple tasks may be ticked `- [x]`; for more complex phases use a status-keyword-prefixed sub-heading instead using this format:
 
 ```
-## Pending tasks
+# Pending tasks
 
 - [Vault MCP integration](vault-mcp-integration.md) — DOING, blocked on auth
 
-### DOING <short description>
+## DOING <short description>
 
 <problem statement paragraph>
 
 <what's been tried / what's pending, as plain prose — folded into the body, not a separate **Status** label>
 
-### TODO <short description>
+## TODO <short description>
 
 <problem statement paragraph>
 ```
 
+The task status follows org-mode syntax:
 - `TODO` means work hasn't started — the problem statement alone is enough.
 - `DOING`, `DONE`, and `CANCEL` all represent progress made, so they get a short paragraph describing what's been
   tried, what's pending, or (for `DONE`/`CANCEL`) the resolution, folded directly into the body. Don't include a
@@ -93,20 +85,6 @@ The README's `## Pending tasks` section holds two things, in this order:
 
 Note that the sub-heading level denoted above is just an example. Create individual TODOs one level lower than
 whatever heading is used to track them in the document.
-
-## Plans
-
-Use plans for more complicated multi-step tasks.
-
-Plan-mode's plan file is written relative to the current working directory — `<project>/.claude/plans/` if cwd is
-inside a project (so the plan is version-controlled with it), falling back to `~/.claude/plans/` otherwise. Before
-invoking plan mode for a task that belongs to a specific project, `cd` into that project first so the plan lands
-in its repo rather than the global, unversioned directory.
-
-Give sensible names to plan files (e.g. `vault-mcp-integration.md`) instead of using auto-generated random names.
-
-Within plan files, simple tasks may be ticked `- [x]`; complex phases get a status-keyword-prefixed sub-heading
-instead, using the same style as pending tasks above.
 
 ---
 
