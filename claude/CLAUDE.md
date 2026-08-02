@@ -27,6 +27,15 @@ instead.
 
 ---
 
+# Claude Code settings.json permissions
+
+`Write(path)` is not a valid permission rule — Claude Code only matches file-editing checks against `Edit(path)`,
+which already covers both the Edit and Write tools (it warns on startup that `Write(path)` "is not matched by file
+permission checks"). Never add a separate `Write(path)` entry; a single `Edit(path)` rule is sufficient for a path
+that needs both editing and full-file-rewrite permission.
+
+---
+
 # Formatting
 
 Keep the lines in markdown files to be 120 characters or less to improve readability
