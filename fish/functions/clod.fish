@@ -33,7 +33,7 @@ function clod --description 'Create-or-resume a named Claude remote-control sess
     # and forces an interactive picker that breaks unattended restore (e.g. tmux-resurrect after a reboot).
     # --resume alone doesn't restore customTitle, so pass --name explicitly - otherwise the session comes
     # back nameless (needing a manual /rename) and drops out of future grep-by-name lookups above.
-    # Remote Control is likewise a runtime flag, not persisted session state - pass --remote-control too,
-    # or the resumed pane needs a manual /remote-control before it's reachable again.
-    claude --resume $id --name $name --remote-control $name --permission-mode auto
+    # Remote Control comes from the `remoteControlAtStartup` setting now, so it doesn't need to be
+    # passed explicitly here - it starts automatically and picks up the name from --name above.
+    claude --resume $id --name $name --permission-mode auto
 end
