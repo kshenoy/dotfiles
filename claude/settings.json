@@ -1,7 +1,11 @@
 {
   "//theme": "Color scheme: dark, light, dark-daltonized, light-daltonized, dark-ansi, light-ansi, auto (detect terminal bg), or custom:<slug>",
   "theme": "custom:catppuccin-mocha",
+  "//tui": "Rendering mode: fullscreen = alt screen buffer, no flicker/redraw artifacts, mouse-wheel scrolling works within the TUI, prior terminal content reappears on exit (nothing added to scrollback); omitted = classic mode, prints inline into normal terminal scrollback like regular CLI output",
+  "tui": "fullscreen",
   "permissions": {
+    "defaultMode": "auto",
+    "skipDangerousModePermissionPrompt": true,
     "allow": [
       "Bash(awk:*)",
       "Bash(brew deps:*)",
@@ -67,10 +71,13 @@
       "Bash(which:*)",
       "Edit(**/.claude/CLAUDE.md)",
       "Edit(**/.claude/plans/)",
-      "Edit(~/.config/dotfiles/claude/CLAUDE.md)",
+      "Edit(~/.config/dotfiles*/**)",
       "Read",
       "WebFetch",
-      "WebSearch"
+      "WebSearch",
+      "Write(**/.claude/CLAUDE.md)",
+      "Write(**/.claude/plans/)",
+      "Write(~/.config/dotfiles*/**)"
     ]
   }
 }
