@@ -12,45 +12,38 @@ Read the target vault's own `.claude/CLAUDE.md` first, then make the appropriate
 
 # Note-Writing Conventions
 
-Keep notes updated as changes are made or new information is learned. Notes exist to give context that can't be
-cheaply reconstructed — not to be a reference manual. Before adding something, ask whether it's vault-specific
-(infrastructure state, conventions established, decisions/rationale for a setup) or generic tool/product knowledge
-(how some software's config schema works, upstream behavior documented in its own docs). Only the former belongs in
-notes; the latter can be re-derived or re-looked-up next time with little effort. This extends to config content and
-live system state: if a value is already tracked by a running system (e.g. an entity a Home Assistant integration
-exposes) or lives in a named, directly-readable file (a compose file, a `templates.yaml`), don't keep a static copy
-of it in notes — point to where it lives instead. A copied value drifts silently out of sync with the live source.
+Keep notes updated as changes are made or new information is learned. Every convention below is a specific
+consequence of one of four principles — when a new situation doesn't fit an existing bullet, don't pattern-match
+against the bullets; come back to the principle itself.
 
-Write notes as clean current-state documentation, not a changelog — don't add phrases like "correcting an earlier
-assumption," "verified on \<date\>," or narrate what an audit found and when. When new information supersedes what's
-written, replace the stale content outright rather than appending a dated correction on top of it. Git history
-already captures when something changed. Exception: a standing status marker that is itself the current fact (e.g. a
-"Decommissioned \<date\>" callout) is fine — that's describing state, not narrating a correction. The same applies to
-describing multiple approaches that were tried before landing on the one that works — just document what works;
-don't narrate the dead ends (unless a dead end is a non-obvious trap someone would naturally reach for and waste time
-on — that's a forward-looking gotcha worth a short warning, not backward-looking narration).
+## 1. Current state, not a changelog
 
-Don't document something that isn't actually part of the current setup — a rejected alternative, an integration that
-was tried and removed, a feature that was never adopted. If the rationale is worth preserving so it doesn't get
-relitigated, it belongs as a terse entry in a dedicated "Deprecated / Rejected" list (`X → decommissioned; reason`),
-not woven inline into a section describing
-what's currently active. Similarly, don't explain the absence of a constraint or rule that was never actually a real
-option (e.g. "no fixed length requirement" when no one ever proposed one) — just state the actual rule.
+Describe what's true now, not how it got there — in both language and structure.
 
-If live infrastructure (compose files, configs, etc.) differs from what's documented, and the change was made by the
-user directly rather than by Claude in the current session — ask before updating notes to match. Don't proactively
-rewrite documentation to reflect changes only observed by reading files; the user may still be mid-change, and
-documenting it early bakes in assumptions about unfinished or unconfirmed work.
+- No narrative phrasing ("verified on \<date\>," "correcting an earlier assumption"). Replace stale content
+  outright; git history has the timeline.
+- Document what works, not the dead ends tried first — unless a dead end is a non-obvious trap worth a
+  forward-looking warning.
+- Don't explain the absence of a constraint that's not relevant after completion — just state the actual rule.
+- Don't document rejected alternatives or dropped plans inline with active state. Worth preserving? Park it in a
+  terse "Deprecated / Rejected" list (`X → decommissioned; reason`). Otherwise drop it.
+- Exception: a standing status marker that is itself the current fact (e.g. "Decommissioned \<date\>") is fine.
 
-When writing a specific name, ID, or label into notes, only state it if it was confirmed against the system that
-actually owns/defines it — not inferred from a downstream artifact produced by a different system (e.g. a
-path-prefix segment observed in another system's object keys or log lines, which merely implies the fact rather
-than confirming it). If it's only inferred, either verify against the owning system first or state the fact
-generically without the unconfirmed specific (e.g. "syncs via a dedicated per-folder job" rather than naming the
-job).
+## 2. Only what can't be cheaply reconstructed
 
-Never name specific downloaded files/titles (movies, shows, episodes, books) in notes — neither the raw release name
-nor the cleaned-up title. Refer to items generically instead: by category (Movie/Show/Book), state
-(seeding/stopped/downloading), ratio, or size. This applies retroactively too — fix any notes that already name
-specific titles rather than leaving them as-is. Chat responses are fine to name titles in — the restriction is
-notes-only.
+Notes give context that isn't cheaply available elsewhere — not a reference manual.
+
+- Vault-specific facts (infra state, established conventions, decisions/rationale) belong. Generic tool/product
+  knowledge (config schemas, upstream docs) doesn't — cheap to re-derive next time.
+- Don't copy a value already tracked live (a running system's entity, a compose file, `templates.yaml`) — link to
+  where it lives instead. Copies drift silently.
+
+## 3. Only what's confirmed
+
+If live infra differs from what's documented and the user changed it directly (not you, this session) — ask before
+updating notes. They may be mid-change.
+
+## 4. Discretion with downloaded media
+
+Never name specific titles (movies/shows/episodes/books) — use category, state, ratio, or size instead. Applies
+retroactively. Chat responses may name titles; notes may not.
