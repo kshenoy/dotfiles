@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Sync one or more git repos: stash local changes, pull --rebase, push if ahead, unstash.
+# Usage: repo-sync <repo> [<repo> ...]
+
+set -uo pipefail
+
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
+
+if [[ $# -eq 0 ]]; then
+  echo "Usage: $(basename "$0") <repo> [<repo> ...]" >&2
+  exit 1
+fi
+
+first=true
+for dir in "$@"; do
+  dir="${dir%/}"
+
+  if $first; then
+    first=false
+  else
+    echo
+  fi
+
+  # -e, not -d: a linked worktree's .git is a file (`gitdir: ...`), not a directory
+  if [[ ! -e "$dir/.git" ]]; then
+    log "==> $dir (missing, skipping)"
+    continue
+  fi
+
+  log "==> $dir"
+  cd "$dir"
+
+  local_changes=false
+  if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
+    log "  Stashing"
+    if ! git stash; then
+      log "  Stash failed — skipping"
+      continue
+    fi
+    local_changes=true
+  fi
+
+  log "  Pulling (rebase)"
+  if ! git pull --rebase; then
+    log "  Pull failed — aborting rebase"
+    git rebase --abort 2>/dev/null
+    if $local_changes; then
+      log "  Unstashing"
+      git stash pop || log "  Unstash failed — resolve manually in $dir"
+    fi
+    continue
+  fi
+
+  ahead=$(git rev-list --count '@{u}..HEAD' 2>/dev/null || echo 0)
+  if [[ "$ahead" -gt 0 ]]; then
+    log "  Pushing"
+    git push
+  fi
+
+  if $local_changes; then
+    log "  Unstashing"
+    git stash pop || log "  Unstash failed — resolve manually in $dir"
+  fi
+done
