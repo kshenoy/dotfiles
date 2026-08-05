@@ -1,12 +1,7 @@
 # Per-machine configuration goes here
-# Add a new host by dropping a conf.d/hosts/<name>.local.fish file and a case below
+# Add a new host by dropping a conf.d/hosts/<name>.local.fish file to match the hostname of the machine
 
-set -l host_dir (dirname (status --current-filename))/hosts
-
-switch (hostname)
-    case Kartiks-MacBook-Pro.local
-        source $host_dir/Kartiks-MacBook-Pro.local.fish
-
-    case services
-        source $host_dir/services.local.fish
+set -l local_config (dirname (status --current-filename))/hosts/(hostname).fish
+if test -f $local_config
+    source $local_config
 end
