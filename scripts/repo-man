@@ -28,37 +28,43 @@ for dir in "$@"; do
   fi
 
   log "==> $dir"
-  cd "$dir"
 
-  local_changes=false
-  if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
-    log "  Stashing"
-    if ! git stash; then
-      log "  Stash failed — skipping"
-      continue
+  # Subshell: keeps `cd` from leaking into the next iteration (so relative paths in
+  # later args still resolve against the original cwd), and its EXIT trap guarantees
+  # the stash pop runs on every exit path — normal, early `exit`, or interrupted —
+  # instead of relying on unstash being explicitly reached in each branch.
+  (
+    cd "$dir" || exit 1
+
+    local_changes=false
+    restore() {
+      if $local_changes; then
+        log "  Unstashing"
+        git stash pop || log "  Unstash failed — resolve manually in $dir"
+      fi
+    }
+    trap restore EXIT
+
+    if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
+      log "  Stashing"
+      if ! git stash; then
+        log "  Stash failed — skipping"
+        exit 0
+      fi
+      local_changes=true
     fi
-    local_changes=true
-  fi
 
-  log "  Pulling (rebase)"
-  if ! git pull --rebase; then
-    log "  Pull failed — aborting rebase"
-    git rebase --abort 2>/dev/null
-    if $local_changes; then
-      log "  Unstashing"
-      git stash pop || log "  Unstash failed — resolve manually in $dir"
+    log "  Pulling (rebase)"
+    if ! git pull --rebase; then
+      log "  Pull failed — aborting rebase"
+      git rebase --abort 2>/dev/null
+      exit 0
     fi
-    continue
-  fi
 
-  ahead=$(git rev-list --count '@{u}..HEAD' 2>/dev/null || echo 0)
-  if [[ "$ahead" -gt 0 ]]; then
-    log "  Pushing"
-    git push
-  fi
-
-  if $local_changes; then
-    log "  Unstashing"
-    git stash pop || log "  Unstash failed — resolve manually in $dir"
-  fi
+    ahead=$(git rev-list --count '@{u}..HEAD' 2>/dev/null || echo 0)
+    if [[ "$ahead" -gt 0 ]]; then
+      log "  Pushing"
+      git push || log "  Push failed — resolve manually in $dir"
+    fi
+  )
 done
