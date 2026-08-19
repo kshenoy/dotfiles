@@ -13,23 +13,14 @@ Read the target vault's own `.claude/CLAUDE.md` first, then make the appropriate
 # Note-Writing Conventions
 
 Keep notes updated as changes are made or new information is learned. Every convention below is a specific
-consequence of one of four principles — when a new situation doesn't fit an existing bullet, don't pattern-match
+consequence of one of three principles — when a new situation doesn't fit an existing bullet, don't pattern-match
 against the bullets; come back to the principle itself.
 
-## 1. Current state, not a changelog
+Changelog-language avoidance (describing current state instead of narrating how it got there) used to be a fourth
+principle here. It's now handled by the `scrub-notes` skill as a periodic audit pass instead of a live-authoring
+rule — write freely, then run the skill to catch and reword narrative phrasing after the fact.
 
-Describe what's true now, not how it got there — in both language and structure.
-
-- No narrative phrasing ("verified on \<date\>," "correcting an earlier assumption"). Replace stale content
-  outright; git history has the timeline.
-- Document what works, not the dead ends tried first — unless a dead end is a non-obvious trap worth a
-  forward-looking warning.
-- Don't explain the absence of a constraint that's not relevant after completion — just state the actual rule.
-- Don't document rejected alternatives or dropped plans inline with active state. Worth preserving? Park it in a
-  terse "Deprecated / Rejected" list (`X → decommissioned; reason`). Otherwise drop it.
-- Exception: a standing status marker that is itself the current fact (e.g. "Decommissioned \<date\>") is fine.
-
-## 2. Only what can't be cheaply reconstructed
+## 1. Only what can't be cheaply reconstructed
 
 Notes give context that isn't cheaply available elsewhere — not a reference manual.
 
@@ -38,12 +29,12 @@ Notes give context that isn't cheaply available elsewhere — not a reference ma
 - Don't copy a value already tracked live (a running system's entity, a compose file, `templates.yaml`) — link to
   where it lives instead. Copies drift silently.
 
-## 3. Only what's confirmed
+## 2. Only what's confirmed
 
 If live infra differs from what's documented and the user changed it directly (not you, this session) — ask before
 updating notes. They may be mid-change.
 
-## 4. Discretion with downloaded media
+## 3. Discretion with downloaded media
 
 Never name specific titles (movies/shows/episodes/books) — use category, state, ratio, or size instead. Applies
 retroactively. Chat responses may name titles; notes may not.
