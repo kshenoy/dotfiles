@@ -89,8 +89,6 @@ The task status follows org-mode syntax:
 - `DOING`, `DONE`, and `CANCEL` all represent progress made, so they get a short paragraph describing what's been
   tried, what's pending, or (for `DONE`/`CANCEL`) the resolution, folded directly into the body. Don't include a
   resolution date — git history already has it.
-- Order tasks within a section as `DONE`/`CANCEL` -> `DOING` -> `TODO`, so resolved/active work sits above untouched
-  items.
 
 Note that the sub-heading level denoted above is just an example. Create individual TODOs one level lower than
 whatever heading is used to track them in the document.
