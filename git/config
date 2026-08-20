@@ -81,8 +81,9 @@ enabled = true
 # https://haacked.com/archive/2014/07/28/github-flow-aliases/
 # Using '!' as prefix allows running any command in the shell and it doesn't have to be a git command.
 # Thus, if we want to create an alias to run multiple commands by chaining them together, we have to use '!'
-# List all aliases
-alias = !git config --list | grep alias | cut -c 7-
+# List all aliases. Dedupes overridden aliases (e.g. work config overriding a personal one),
+# keeping only the last-defined (i.e. effective) value for each name.
+alias = !git config --list | grep alias | cut -c 7- | tac | awk -F= '!seen[$1]++' | tac
 
 # Shorthands
 st = status
