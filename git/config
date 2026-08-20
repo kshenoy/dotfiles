@@ -108,9 +108,9 @@ lg = "!f() {\
   default=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null);\
   git rev-parse --verify \"$default\" >/dev/null 2>&1 || default=origin/main;\
   git rev-parse --verify \"$default\" >/dev/null 2>&1 || default="";\
-  extra=$(git resolve-upstream);\
-  git rev-parse --verify \"$extra\" >/dev/null 2>&1 || extra=\"\";\
-  git pplog --abbrev-commit --graph HEAD $default $extra \"${@}\";\
+  upstream=$(git resolve-upstream);\
+  git rev-parse --verify \"$upstream\" >/dev/null 2>&1 || upstream=\"\";\
+  git pplog --abbrev-commit --graph HEAD $default $upstream \"${@}\";\
 }; f"
 
 # Same as above but for a single file
@@ -169,12 +169,6 @@ fob = "!f() {\
   git fetch origin \"$branch\";\
 }; f"
 fom = !git fob main
-
-# Fetch and switch to remote branch, creating it locally if needed, and set upstream to origin/<BRANCH>
-cob = "!f() {\
-  branch=\"${1#origin/}\";\
-  git fetch origin \"$branch\" && git switch \"$branch\" && git branch --set-upstream-to=\"origin/$branch\";\
-}; f"
 
 # Delete remote-tracking refs not tracked by any local branch
 # (needs bash -c explicitly since process substitution <(...) is not POSIX sh)
