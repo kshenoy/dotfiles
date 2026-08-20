@@ -87,8 +87,9 @@ alias = !git config --list | grep alias | cut -c 7- | tac | awk -F= '!seen[$1]++
 
 # Shorthands
 st = status
-dn = diff --name-only
+ds = diff --stat
 dt = difftool
+dts = difftool --staged
 dw = diff --word-diff
 mt = mergetool
 br = branch
@@ -156,7 +157,7 @@ diff-upstream-impl = "!f() {\
   branch=\"$(git resolve-upstream)\";\
   git \"$cmd\" \"$branch\" \"$@\";\
 }; f"
-dnu = "!git diff-upstream-impl dn"
+dsu = "!git diff-upstream-impl ds"
 dtu = "!git diff-upstream-impl dt"
 
 # Fetch origin/BRANCH. eg.
