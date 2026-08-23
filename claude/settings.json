@@ -5,7 +5,6 @@
   "tui": "fullscreen",
   "permissions": {
     "defaultMode": "auto",
-    "skipDangerousModePermissionPrompt": true,
     "allow": [
       "Bash(awk:*)",
       "Bash(brew deps:*)",
