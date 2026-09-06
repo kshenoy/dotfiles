@@ -1,13 +1,57 @@
 #!/usr/bin/env bash
-# Sync one or more git repos: stash local changes, pull --rebase, push if ahead, unstash.
-# Usage: repo-sync <repo> [<repo> ...]
+# Sync one or more git repos. Run with -h/--help for usage.
 
 set -uo pipefail
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
 
+print_help() {
+  cat <<EOF
+Usage: $(basename "$0") [--commit] <repo> [<repo> ...]
+
+Sync one or more git repos: by default, stash local changes, pull --rebase, push if ahead,
+then unstash.
+
+--commit    Commit local changes instead of stashing them, for repos where nothing is ever
+            "in progress" (everything sitting in the working tree is meant to be captured
+            permanently, e.g. edits arriving from an external sync process) — so there's
+            nothing to preserve via stash/unstash, and no reason to risk a stash-pop conflict.
+            Applies to every repo in this invocation; run separately for a mix of repos that
+            need different treatment.
+
+Examples:
+  $(basename "$0") ~/HomeLab ~/Coppermind
+  $(basename "$0") --commit /mnt/store/Obsidian-Headless/Vaults/HomeLab
+EOF
+}
+
+action=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help)
+      print_help
+      exit 0
+      ;;
+    --commit)
+      action="commit"
+      shift
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      echo "Unknown option: $1" >&2
+      exit 1
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
 if [[ $# -eq 0 ]]; then
-  echo "Usage: $(basename "$0") <repo> [<repo> ...]" >&2
+  echo "Usage: $(basename "$0") [--commit] <repo> [<repo> ...]" >&2
   exit 1
 fi
 
@@ -36,22 +80,30 @@ for dir in "$@"; do
   (
     cd "$dir" || exit 1
 
-    local_changes=false
-    restore() {
-      if $local_changes; then
-        log "  Unstashing"
-        git stash pop || log "  Unstash failed — resolve manually in $dir"
+    if [[ "$action" == "commit" ]]; then
+      git add -A
+      if ! git diff --cached --quiet; then
+        log "  Committing local changes"
+        git commit -m "Auto-commit from repo-man ($(date '+%Y-%m-%d %H:%M %Z'))" --quiet
       fi
-    }
-    trap restore EXIT
+    else
+      local_changes=false
+      restore() {
+        if $local_changes; then
+          log "  Unstashing"
+          git stash pop || log "  Unstash failed — resolve manually in $dir"
+        fi
+      }
+      trap restore EXIT
 
-    if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
-      log "  Stashing"
-      if ! git stash; then
-        log "  Stash failed — skipping"
-        exit 0
+      if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
+        log "  Stashing"
+        if ! git stash; then
+          log "  Stash failed — skipping"
+          exit 0
+        fi
+        local_changes=true
       fi
-      local_changes=true
     fi
 
     log "  Pulling (rebase)"
