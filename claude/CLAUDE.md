@@ -1,29 +1,23 @@
 # Git
 
 - Always use `git mv` when moving or renaming files in a git repo — plain `mv` loses history when files have been edited
-- Always ask before running `git add`, `git commit`, or any command that modifies git history — don't do it autonomously.
+- Always ask before running `git add`, `git commit`, or any command that modifies git history — don't do it
+  autonomously.
 - Always stage and commit in two separate steps so the user can review what got staged before the commit runs.
-- When staging, restrict to only the hunks I actually edited this session — including within a file I otherwise
-  touched, if other hunks in that same file came from elsewhere (a concurrent session, a direct edit). Don't ask
-  each time whether to include other files/hunks found in the working tree; default to mine-only. Only stage
-  something else if explicitly told to for that instance — this default doesn't change without being told again.
 
 ---
 
 # Hierarchical settings — never edit ~/.claude/settings.json directly
 
-`~/.claude/settings.json` is generated output, not a source file — it's produced by
-`~/.config/dotfiles-priv/claude/sync-settings` script, which merges
-`~/.config/dotfiles/claude/settings.json` (global) with
-`~/.config/dotfiles-priv/claude/<HOSTNAME>/settings.json` (machine-specific) via `jq`, concatenating and
-deduping `permissions.allow` from both. Both source files are version-controlled; the generated file is not.
+`~/.claude/settings.json` is generated output, not a source file — `~/.config/dotfiles-priv/claude/sync-settings`
+merges the version-controlled global (`~/.config/dotfiles/claude/settings.json`) with the machine-specific
+`~/.config/dotfiles-priv/claude/hosts/<HOSTNAME>/settings.json` via `jq`, concatenating and deduping
+`permissions.allow`/`deny`/`ask` from both rather than letting one overwrite the other. The machine-name argument
+(e.g. `FOO`) selects `dotfiles-priv/claude/hosts/FOO/` and defaults to `hostname` when omitted.
 
-The machine-name argument eg. `FOO`, selects the `dotfiles-priv/claude/FOO/` directory and defaults to `hostname` when omitted
-
-Editing `~/.claude/settings.json` directly still works (nothing enforces the "AUTO-GENERATED" comment at the top), which
-makes it easy to silently drift from the version-controlled source — the change looks like it stuck, but a future
-`sync-settings` run overwrites it without warning. Always edit the appropriate source file and rerun `sync-settings`
-instead.
+Editing `~/.claude/settings.json` directly still works, so it silently drifts from the sources — a later
+`sync-settings` run overwrites it without warning. Always edit the appropriate source file and rerun
+`sync-settings` instead.
 
 ---
 
@@ -66,7 +60,8 @@ machine-specific (i.e. it doesn't belong in a shared CLAUDE.md) OR when explicit
 
 Give sensible names to plan files (e.g. `vault-mcp-integration.md`) instead of using auto-generated random names.
 
-List any pending tasks under a 'Pending Tasks' heading. Simple tasks may be ticked `- [x]`; for more complex phases use a status-keyword-prefixed sub-heading instead using this format:
+List any pending tasks under a 'Pending Tasks' heading. Simple tasks may be ticked `- [x]`; for more complex
+phases use a status-keyword-prefixed sub-heading instead using this format:
 
 ```
 # Pending tasks
