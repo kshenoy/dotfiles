@@ -83,6 +83,10 @@ for dir in "$@"; do
     if [[ "$action" == "commit" ]]; then
       git add -A
       if ! git diff --cached --quiet; then
+        if git diff --cached | grep -qE '^\+(<<<<<<< |\|\|\|\|\|\|\| |>>>>>>> )'; then
+          log "  Staged content has conflict markers — refusing to commit. Resolve manually in $dir"
+          exit 0
+        fi
         log "  Committing local changes"
         git commit -m "Auto-commit from repo-man ($(date '+%Y-%m-%d %H:%M %Z'))" --quiet
       fi

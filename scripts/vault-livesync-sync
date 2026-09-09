@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# Sync the Obsidian-Headless container's vault clone(s) — which live on the
+# `livesync` branch, NOT `main`.
+#
+# This job is deliberately dumb: for each repo it does only
+#   fast-forward pull  ->  add -A  ->  commit  ->  push
+# on `livesync`. It never merges, rebases, or stashes, so it can never commit a
+# conflicted / marker-containing tree. Every outcome is a clean fast-forward or a
+# clean stop (non-zero exit + a log line). All real integration of device edits
+# with Claude-authored `main` edits happens in the Claude clones — see
+# ~/.claude/CLAUDE.md "Vault sync".
+#
+# On a "diverged" stop, recover with:  git -C <dir> reset --hard origin/livesync
+# (CouchDB is the source of truth for device edits, so LiveSync re-materializes
+# anything real on the next sync and the next run recaptures it.)
+
+set -uo pipefail
+
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
+
+if [[ $# -eq 0 ]]; then
+  echo "Usage: $(basename "$0") <repo> [<repo> ...]" >&2
+  exit 1
+fi
+
+rc=0
+for dir in "$@"; do
+  dir="${dir%/}"
+
+  if [[ ! -e "$dir/.git" ]]; then
+    log "==> $dir (missing, skipping)"
+    continue
+  fi
+
+  log "==> $dir"
+  (
+    cd "$dir" || exit 1
+
+    branch="$(git branch --show-current)"
+    if [[ "$branch" != "livesync" ]]; then
+      log "  on '$branch', not 'livesync' — refusing to touch. Fix manually."
+      exit 1
+    fi
+
+    if ! git fetch origin livesync --quiet; then
+      log "  fetch failed"
+      exit 1
+    fi
+
+    if ! git merge --ff-only origin/livesync 2>/dev/null; then
+      log "  local livesync has diverged from origin/livesync (unpushed commit?)."
+      log "  NOT auto-resolving. Recover: git -C $dir reset --hard origin/livesync"
+      exit 1
+    fi
+
+    git add -A .
+
+    if ! git diff --cached --quiet; then
+      if git diff --cached | grep -qE '^\+(<<<<<<< |\|\|\|\|\|\|\| |>>>>>>> )'; then
+        log "  staged content contains conflict markers — refusing to commit"
+        exit 1
+      fi
+      log "  committing device edits"
+      git commit -m "livesync $(date '+%Y-%m-%d %H:%M %Z')" --quiet
+    fi
+
+    ahead="$(git rev-list --count '@{u}..HEAD' 2>/dev/null || echo 0)"
+    if [[ "$ahead" -gt 0 ]]; then
+      log "  pushing"
+      git push origin livesync || { log "  push failed"; exit 1; }
+    fi
+  ) || rc=1
+done
+
+exit $rc
