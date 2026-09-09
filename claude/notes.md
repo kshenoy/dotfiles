@@ -22,6 +22,11 @@ against the bullets; come back to the principle itself.
 - Only capture what can't be cheaply reconstructed.
 - Notes must give context that isn't cheaply available elsewhere — not a reference manual.
 
+## One home per fact
+
+State a fact once, on the page it belongs to. Everywhere else references it with a link, not a paraphrase — a
+shorter restatement is still a duplicate, and duplicates drift apart.
+
 ## Discretion with downloaded media
 
 Never name specific titles (movies/shows/episodes/books) — use category, state, ratio, or size instead. Applies

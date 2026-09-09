@@ -38,21 +38,25 @@ Keep the lines in markdown files to be 120 characters or less to improve readabi
 
 # Preferences storage
 
-When storing a new remembered behavior or piece of information, use this guide to pick the right location:
+When storing a new remembered behavior, rule, or piece of information, pick the location on two axes.
 
-**CLAUDE.md files** — instructions for Claude; not intended to be read by people directly. Use this instead of memory
-wherever possible as it syncs across devices via git.
-- **Global** (`~/.config/dotfiles/claude/CLAUDE.md`, this file) — applies across all projects and machines
-  (e.g. git workflow, formatting rules, README conventions)
-- **Machine-specific** (`~/.claude/CLAUDE.md`) — tied to this machine's environment (e.g. local paths,
-  machine-specific tooling or shortcuts)
-- **Project-specific** (`.claude/CLAUDE.md` inside the repo) — only relevant within that project
-  (e.g. vault conventions, domain-specific rules)
+**Target — who is it for?**
+- **Claude only** — workflow rules, formatting rules, authoring conventions (e.g. "state a fact once, link don't
+  restate"; a service-page vs. strategy-page content split). → a `CLAUDE.md`, or one of the files it `@include`s
+  (`notes.md`, `git-workflow.md`, …). Not meant to be read by people directly. Prefer this over memory — it
+  version-controls and syncs across devices.
+- **People, or people and Claude both** — a project's structure and service list, active plans, pending tasks.
+  → `README.md`.
 
-**Memory files** (`~/.claude/projects/.../memory/`) — only use when the information is both project-specific AND
-machine-specific (i.e. it doesn't belong in a shared CLAUDE.md) OR when explicitly asked to.
+**Scope — how broadly does it apply?**
+- **Generally**, across projects and machines (git workflow, formatting, README conventions, how to write a
+  note). → the global `CLAUDE.md` (`~/.config/dotfiles/claude/CLAUDE.md`) or a file it includes.
+- **This machine's environment** — local paths, machine-specific tooling or shortcuts. → the machine `CLAUDE.md`
+  (`~/.claude/CLAUDE.md`).
+- **One project only** — that repo's conventions, domain rules. → the repo's `.claude/CLAUDE.md`.
 
-**README.md** — for anything that may need to be referred to by people (active plans, pending tasks, etc.)
+**Memory files** (`~/.claude/projects/.../memory/`) — only when the information is both project-specific AND
+machine-specific (so it fits no shared `CLAUDE.md`), or when explicitly asked to.
 
 ---
 
