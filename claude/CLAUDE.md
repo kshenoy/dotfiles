@@ -30,13 +30,6 @@ that needs both editing and full-file-rewrite permission.
 
 ---
 
-# Formatting
-
-Keep the lines in markdown files to be 120 characters or less to improve readability. Exception: never wrap a
-`[[wikilink]]` across a line break to hit the limit — keep the whole `[[...]]` on one line even if it runs over.
-
----
-
 # Preferences storage
 
 When storing a new remembered behavior, rule, or piece of information, pick the location on two axes.

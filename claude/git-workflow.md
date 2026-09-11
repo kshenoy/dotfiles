@@ -13,3 +13,13 @@ A concurrent session's files can already be sitting in the index (staged) before
 current session's own files, check `git diff --cached --stat` to see what's actually about to be committed, not just
 `git status`. If another session's files show up staged, `git restore --staged <file>` to unstage them without
 touching their working-tree content, then commit only what's actually from the current session.
+
+---
+
+# Resolve symlinks before checking version-control status
+
+Before concluding any file under `$HOME` isn't version-controlled, resolve it first (`readlink -f <path>`) and
+check *that* path, not the one you were given — this dotfiles setup symlinks many live config files
+(`~/.claude/CLAUDE.md`, skills, settings) into git-tracked repos under `~/.config/dotfiles*`. Running `git status`/
+`git rev-parse` directly on the symlink's own location (or its containing directory) gives a false "not a git
+repository" — it never follows the link to find the real repo.
