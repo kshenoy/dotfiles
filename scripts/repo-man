@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 # Sync one or more git repos: stash local changes, pull --rebase, push if ahead, then unstash.
 # Never adds or commits — a repo's own edits are committed explicitly by whoever made them.
+#
+# Safety net for the HomeLab/Coppermind two-branch vault-sync model: also tries a plain (non-forcing)
+# `push main:livesync` on any repo with an `origin/livesync` ref, in case a Claude session committed on
+# `main` without following through on its own push-both-branches step. Harmless no-op if already pushed;
+# rejected (and ignored) if `livesync` has since diverged — never merges/rebases it, so it can't ship a
+# conflicted tree. Real reconciliation of a diverged `livesync` stays a supervised, in-session step.
+#
 # Run with -h/--help for usage.
 
 set -uo pipefail
@@ -11,7 +18,8 @@ print_help() {
   cat <<EOF
 Usage: $(basename "$0") <repo> [<repo> ...]
 
-For each repo: stash local changes (if any), pull --rebase, push if ahead, then unstash.
+For each repo: stash local changes (if any), pull --rebase, push if ahead, then unstash. Also tries a plain
+push of main:livesync where an origin/livesync ref exists (see header comment).
 
 Example:
   $(basename "$0") ~/HomeLab ~/Coppermind
@@ -82,6 +90,13 @@ for dir in "$@"; do
     if [[ "$ahead" -gt 0 ]]; then
       log "  Pushing"
       git push || log "  Push failed — resolve manually in $dir"
+    fi
+
+    # Vault-sync safety net (see header comment) — only applies where a livesync branch exists.
+    if git show-ref --verify --quiet refs/remotes/origin/livesync; then
+      if git push origin main:livesync 2>/dev/null; then
+        log "  Fast-forwarded livesync"
+      fi
     fi
   )
 done
