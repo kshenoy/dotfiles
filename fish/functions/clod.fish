@@ -10,13 +10,16 @@ function clod --description 'Create-or-resume a named Claude session, pinned to 
         # No existing session under this name yet - just start one fresh. (No bootstrap dance here: that
         # used to exist purely so tmux-resurrect would always have a stable `--resume` argv to replay even
         # if a reboot landed mid-bootstrap. Callers are static now (tmuxp), so nothing captures/replays argv.)
-        claude --name $name
+        claude --name $name --remote-control
     else
         # Resuming by session ID (not name) keeps this pinned to one exact conversation forever - names get
         # reused across many unrelated sessions over time, which eventually makes `--resume <name>` ambiguous
         # and forces an interactive picker.
         # --resume alone doesn't restore customTitle, so pass --name explicitly - otherwise the session comes
         # back nameless (needing a manual /rename) and drops out of future grep-by-name lookups above.
-        claude --resume $id --name $name
+        # --remote-control is also explicit here: resuming doesn't reliably auto-reconnect it the way a fresh
+        # session does under remoteControlAtStartup, so relying on the setting alone left these panes silently
+        # unreachable from mobile after every reboot.
+        claude --resume $id --name $name --remote-control
     end
 end
