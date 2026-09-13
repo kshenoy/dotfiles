@@ -20,6 +20,10 @@ line break to hit the limit — keep the whole `[[...]]` on one line even if it 
 State a fact once, on the page it belongs to. Everywhere else references it with a link, not a paraphrase — a
 shorter restatement is still a duplicate, and duplicates drift apart.
 
+## Frontmatter tags
+
+Multiple `tags:` use inline/flow YAML (`tags: [media, vpn]`), not a block list.
+
 ## Use real structure, not text that mimics it
 
 A heading, a table, a callout, a numbered/checkbox list — use the actual Markdown/Obsidian syntax for what the
