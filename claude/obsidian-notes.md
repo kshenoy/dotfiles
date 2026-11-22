@@ -3,6 +3,17 @@
 Keep notes updated as changes are made or new information is learned. When a situation doesn't fit a convention
 below, reason from the principle behind it rather than pattern-matching.
 
+## Vaults
+
+There are two: HomeLab (homelab, self-hosting, infrastructure) and Coppermind (everything else); their paths are in
+the machine `CLAUDE.md`. When asked to "add to notes", "log this", or similar, route by topic, and read the target
+vault's own `.claude/CLAUDE.md` first — it holds the conventions specific to that vault.
+
+A vault's README, and any index its `CLAUDE.md` adds (like HomeLab's Known Gotchas Index), records where
+information lives rather than summarizing it, so the details that matter are only on the linked page. Before
+answering, proposing, editing, or diagnosing anything an index covers, read the linked page in full instead of
+reasoning from the index line, and don't wait to be told where to look.
+
 ## Avoid changelog language
 
 A topic page describes the current state, so a reader gets the truth without replaying how it got there — "moved X

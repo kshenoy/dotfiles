@@ -22,14 +22,6 @@ Scope — where and to whom it applies — decides the location, not topic.
 
 ---
 
-# Notes vaults
-
-When I say "add to notes", "log this", or similar, route by topic: homelab / self-hosting / infrastructure → the
-HomeLab vault; everything else → the Coppermind vault (paths are in the machine `CLAUDE.md`). Read the target
-vault's own `.claude/CLAUDE.md` first.
-
----
-
 # Autonomy
 
 "How would I do X?" / "how does X work?" is a request for an explanation, not authorization to do X. Don't execute
