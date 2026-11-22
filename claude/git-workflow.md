@@ -1,8 +1,5 @@
 # Git Workflow
 
-Ask before running `git add`, `git commit`, or anything that modifies history, and stage and commit in two
-separate steps so I can review what got staged.
-
 Other Claude sessions often work concurrently in the same repo, and I edit vaults directly in Obsidian, so the
 working tree and even the index can hold changes that aren't yours. Stage only the hunks this session edited —
 including within a file you touched — without asking about the rest. After staging, check `git diff --cached
