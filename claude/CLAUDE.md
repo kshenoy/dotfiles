@@ -16,6 +16,9 @@ Scope — where and to whom it applies — decides the location, not topic.
 - For Claude only — scoped by breadth: this global file or one it includes (general); the machine
   `~/.claude/CLAUDE.md` (this machine's environment); the repo's `.claude/CLAUDE.md` (one project).
 - Add only what a capable agent wouldn't do by default or easily discover; over-specifying constrains judgment.
+- State the intent behind a rule, not just the instruction — a capable agent may be able to infer the instruction if it
+  understands the intent and handle cases the rule didn't anticipate. Never choose to preserve just the instruction
+  without the intent for brevity.
 
 ---
 
