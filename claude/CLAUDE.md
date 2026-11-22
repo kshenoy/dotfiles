@@ -1,100 +1,53 @@
-# Git
+# Claude Code settings
 
-- Always use `git mv` when moving or renaming files in a git repo — plain `mv` loses history when files have been edited
-- Always ask before running `git add`, `git commit`, or any command that modifies git history — don't do it
-  autonomously.
-- Always stage and commit in two separate steps so the user can review what got staged before the commit runs.
-
----
-
-# Hierarchical settings — never edit ~/.claude/settings.json directly
-
-`~/.claude/settings.json` is generated output, not a source file — `~/.config/dotfiles-priv/claude/sync-settings`
-merges the version-controlled global (`~/.config/dotfiles/claude/settings.json`) with the machine-specific
-`~/.config/dotfiles-priv/claude/hosts/<HOSTNAME>/settings.json` via `jq`, concatenating and deduping
-`permissions.allow`/`deny`/`ask` from both rather than letting one overwrite the other. The machine-name argument
-(e.g. `FOO`) selects `dotfiles-priv/claude/hosts/FOO/` and defaults to `hostname` when omitted.
-
-Editing `~/.claude/settings.json` directly still works, so it silently drifts from the sources — a later
-`sync-settings` run overwrites it without warning. Always edit the appropriate source file and rerun
-`sync-settings` instead.
+`~/.claude/settings.json` is generated — never edit it directly. Edit the global
+`~/.config/dotfiles/claude/settings.json` or the machine's
+`~/.config/dotfiles-priv/claude/hosts/<HOSTNAME>/settings.json`, then rerun
+`~/.config/dotfiles-priv/claude/sync-settings`. For file-permission rules use `Edit(path)` only — it covers Write
+too; `Write(path)` isn't a valid rule.
 
 ---
 
-# Claude Code settings.json permissions
+# Where to store a new rule or fact
 
-`Write(path)` is not a valid permission rule — Claude Code only matches file-editing checks against `Edit(path)`,
-which already covers both the Edit and Write tools (it warns on startup that `Write(path)` "is not matched by file
-permission checks"). Never add a separate `Write(path)` entry; a single `Edit(path)` rule is sufficient for a path
-that needs both editing and full-file-rewrite permission.
+Scope — where and to whom it applies — decides the location, not topic.
 
----
-
-# Preferences storage
-
-When storing a new remembered behavior, rule, or piece of information, pick the location on two axes.
-
-**Target — who is it for?**
-- **Claude only** — workflow rules, formatting rules, authoring conventions (e.g. "state a fact once, link don't
-  restate"; a service-page vs. strategy-page content split). → a `CLAUDE.md`, or one of the files it `@include`s
-  (`notes.md`, `git-workflow.md`, …). Not meant to be read by people directly. Prefer this over memory — it
-  version-controls and syncs across devices.
-- **People, or people and Claude both** — a project's structure and service list, active plans, pending tasks.
-  → `README.md`.
-
-**Scope — how broadly does it apply?**
-- **Generally**, across projects and machines (git workflow, formatting, README conventions, how to write a
-  note). → the global `CLAUDE.md` (`~/.config/dotfiles/claude/CLAUDE.md`) or a file it includes.
-- **This machine's environment** — local paths, machine-specific tooling or shortcuts. → the machine `CLAUDE.md`
-  (`~/.claude/CLAUDE.md`).
-- **One project only** — that repo's conventions, domain rules. → the repo's `.claude/CLAUDE.md`.
-
-**Memory files** (`~/.claude/projects/.../memory/`) — only when the information is both project-specific AND
-machine-specific (so it fits no shared `CLAUDE.md`), or when explicitly asked to.
+- For people (or people and Claude): the project's `README.md`.
+- For Claude only — scoped by breadth: this global file or one it includes (general); the machine
+  `~/.claude/CLAUDE.md` (this machine's environment); the repo's `.claude/CLAUDE.md` (one project).
+- Add only what a capable agent wouldn't do by default or easily discover; over-specifying constrains judgment.
 
 ---
 
-# Task Tracking
+# Notes vaults
 
-Give sensible names to plan files (e.g. `vault-mcp-integration.md`) instead of using auto-generated random names.
-
-List any pending tasks under a 'Pending Tasks' heading. Simple tasks may be ticked `- [x]`; for more complex
-phases use a status-keyword-prefixed sub-heading instead using this format:
-
-```
-# Pending tasks
-
-- [Vault MCP integration](vault-mcp-integration.md) — DOING, blocked on auth
-
-## DOING <short description>
-
-<problem statement paragraph>
-
-<what's been tried / what's pending, as plain prose — folded into the body, not a separate **Status** label>
-
-## TODO <short description>
-
-<problem statement paragraph>
-```
-
-The task status follows org-mode syntax:
-- `TODO` means work hasn't started — the problem statement alone is enough.
-- `DOING`, `DONE`, and `CANCEL` all represent progress made, so they get a short paragraph describing what's been
-  tried, what's pending, or (for `DONE`/`CANCEL`) the resolution, folded directly into the body. Don't include a
-  resolution date — git history already has it.
-
-Note that the sub-heading level denoted above is just an example. Create individual TODOs one level lower than
-whatever heading is used to track them in the document.
+When I say "add to notes", "log this", or similar, route by topic: homelab / self-hosting / infrastructure → the
+HomeLab vault; everything else → the Coppermind vault (paths are in the machine `CLAUDE.md`). Read the target
+vault's own `.claude/CLAUDE.md` first.
 
 ---
 
 # Autonomy
 
-"How would I do X?" / "how does X work?" is a request for an explanation, not authorization to go do X. Answer the
-question; don't execute the change unless the message also contains an actual imperative ("do it", "go ahead") or I've
-set a standing policy that these questions are green lights. This holds even mid-session after I've had you execute
-other changes directly — each request's own phrasing governs whether to act or just explain, on top of the usual bar
-for risky/hard-to-reverse actions.
+"How would I do X?" / "how does X work?" is a request for an explanation, not authorization to do X. Don't execute
+unless the message also contains an imperative ("do it", "go ahead") — even mid-session after I've had you execute
+other changes directly.
+
+Fix formatting problems (line length, wrapping, broken links, typos) on your own — don't ask.
+
+---
+
+# Commands for me to run
+
+When I need to run something myself, give the exact, complete commands in a single code block I can paste in one
+go — no paraphrased steps, placeholders, or commands split across several blocks.
+
+---
+
+# Consumer product claims
+
+When I have a consumer device or its companion app in hand, don't assert its UI capabilities from docs or web
+research — ask me to check, or mark the claim as unverified.
 
 ---
 

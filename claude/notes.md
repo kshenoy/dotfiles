@@ -1,8 +1,7 @@
 # Note-Writing Conventions
 
-Keep notes updated as changes are made or new information is learned. Every convention below is a specific
-consequence of one of these principles — when a new situation doesn't fit an existing bullet, don't pattern-match
-against the bullets; come back to the principle itself.
+Keep notes updated as changes are made or new information is learned. When a situation doesn't fit a convention
+below, reason from the principle behind it rather than pattern-matching.
 
 ## Avoid changelog language
 
@@ -12,8 +11,7 @@ against the bullets; come back to the principle itself.
 
 ## Line length
 
-Keep lines to 120 characters or less, to improve readability. Exception: never wrap a `[[wikilink]]` across a
-line break to hit the limit — keep the whole `[[...]]` on one line even if it runs over.
+Max 120 characters; never wrap a `[[wikilink]]` across lines, even if it runs over.
 
 ## One home per fact
 

@@ -1,25 +1,12 @@
 # Git Workflow
 
-Before staging/committing, diff the full working tree — not just the files touched in the current session. Other
-Claude Code sessions may be running concurrently against the same repo (the more common case), and the user
-occasionally edits the vault directly too (e.g. in Obsidian) — either way, `git status` can include changes that
-aren't from the current session. Stage only the hunks the current session actually edited — including within a file
-it otherwise touched, if other hunks in that same file came from elsewhere. Don't ask each time whether to include
-the other files/hunks found in the working tree; default to mine-only and leave them out. Only stage something else
-if explicitly told to for that instance — this default doesn't change without being told again.
+Ask before running `git add`, `git commit`, or anything that modifies history, and stage and commit in two
+separate steps so I can review what got staged.
 
-A concurrent session's files can already be sitting in the index (staged) before `git add` is ever run — plain
-`git status` doesn't distinguish "staged just now" from "was already staged by someone else." After staging the
-current session's own files, check `git diff --cached --stat` to see what's actually about to be committed, not just
-`git status`. If another session's files show up staged, `git restore --staged <file>` to unstage them without
-touching their working-tree content, then commit only what's actually from the current session.
+Other Claude sessions often work concurrently in the same repo, and I edit vaults directly in Obsidian, so the
+working tree and even the index can hold changes that aren't yours. Stage only the hunks this session edited —
+including within a file you touched — without asking about the rest. After staging, check `git diff --cached
+--stat`; `git restore --staged` anything already staged by someone else.
 
----
-
-# Resolve symlinks before checking version-control status
-
-Before concluding any file under `$HOME` isn't version-controlled, resolve it first (`readlink -f <path>`) and
-check *that* path, not the one you were given — this dotfiles setup symlinks many live config files
-(`~/.claude/CLAUDE.md`, skills, settings) into git-tracked repos under `~/.config/dotfiles*`. Running `git status`/
-`git rev-parse` directly on the symlink's own location (or its containing directory) gives a false "not a git
-repository" — it never follows the link to find the real repo.
+Many live config files under `$HOME` (`~/.claude/CLAUDE.md`, skills, settings) are symlinks into the git repos
+under `~/.config/dotfiles*` — resolve with `readlink -f` before judging whether a file is version-controlled.
