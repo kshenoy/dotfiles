@@ -15,7 +15,6 @@
       "Bash(cut:*)",
       "Bash(date:*)",
       "Bash(df:*)",
-      "Bash(diff:*)",
       "Bash(dig *)",
       "Bash(dirname:*)",
       "Bash(docker compose config *)",
@@ -61,7 +60,6 @@
       "Bash(uniq:*)",
       "Edit(**/.claude/CLAUDE.md)",
       "Edit(~/.config/dotfiles*/**)",
-      "Edit(/tmp/**)",
       "Read",
       "WebFetch",
       "WebSearch"
